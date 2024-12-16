@@ -1,20 +1,20 @@
 <script setup>
-import Autocomplete from "~/components/ui/Autocomplete.vue";
-import MyInput from "~/components/ui/MyInput.vue";
-import MyTooltip from "~/components/ui/MyTooltip.vue";
-import MyAISelect from "~/components/ui/MyAISelect.vue";
+import Autocomplete from "~/components/custom/Autocomplete.vue";
+import MyInput from "~/components/custom/MyInput.vue";
+import MyTooltip from "~/components/custom/MyTooltip.vue";
+import MyAISelect from "~/components/custom/MyAISelect.vue";
 import TiptapEditor from '~/components/TiptapEditor.vue';
-import MyCombobox from "~/components/ui/MyCombobox.vue";
-import MyDropdown from "~/components/ui/MyDropdown.vue";
-import TagSelect from "~/components/ui/TagSelect.vue";
-import MyAccordion from "~/components/ui/MyAccordion.vue";
-import MyCheckbox from "~/components/ui/MyCheckbox.vue";
-import SalaryRange from "~/components/ui/SalaryRange.vue";
+import MyCombobox from "~/components/custom/MyCombobox.vue";
+import MyDropdown from "~/components/custom/MyDropdown.vue";
+import TagSelect from "~/components/custom/TagSelect.vue";
+import MyAccordion from "~/components/custom/MyAccordion.vue";
+import MyCheckbox from "~/components/custom/MyCheckbox.vue";
+import SalaryRange from "~/components/custom/SalaryRange.vue";
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import CardOption from '@/components/ui/CardOption.vue'
-import GeoInput from '@/components/ui/GeoInput.vue'
-import ResponseInput from '@/components/ui/ResponseInput.vue'
+import CardOption from '@/components/custom/CardOption.vue'
+import GeoInput from '@/components/custom/GeoInput.vue'
+import ResponseInput from '@/components/custom/ResponseInput.vue'
 
 import schedule from "~/src/data/work-schedule.json";
 import experience from "~/src/data/experience.json";
