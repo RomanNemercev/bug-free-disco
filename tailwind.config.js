@@ -130,6 +130,7 @@ module.exports = {
       boxShadow: {
         'shadow-cards': '0 0 15px 0 rgba(0, 0, 0, 0.05);',
         'shadow-droplist': '0 0 15px 0 rgba(0, 0, 0, 0.15)',
+        'shadow-combolist': '0 10px 15px 0 rgba(0, 0, 0, 0.15)',
       },
       typography: ({ theme }) => ({
         DEFAULT: {

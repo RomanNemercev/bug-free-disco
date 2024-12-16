@@ -44,7 +44,7 @@ const value = ref('')
             <PopoverContent class="w-full p-0">
                 <Command>
                     <CommandInput class="h-9" placeholder="Найти..." />
-                    <CommandEmpty>Не резаультатов</CommandEmpty>
+                    <CommandEmpty>Нет результатов</CommandEmpty>
                     <CommandList>
                         <CommandGroup>
                             <CommandItem v-for="framework in frameworks" :key="framework.value" :value="framework.value"

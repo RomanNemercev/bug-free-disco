@@ -1,0 +1,12 @@
+[
+  { "id": "accounting", "label": "Бухгалтерский учет" },
+  { "id": "administration", "label": "Администрирование" },
+  { "id": "advertisement", "label": "Реклама" },
+  { "id": "business_analyst", "label": "Бизнес-аналитик" },
+  { "id": "financial_analyst", "label": "Финансовый аналитик" },
+  { "id": "consulting", "label": "Консультирование" },
+  { "id": "helpdesk", "label": "Служба поддержки" },
+  { "id": "design", "label": "Дизайн" },
+  { "id": "HR", "label": "HR" },
+  { "id": "management", "label": "Руководство" }
+]

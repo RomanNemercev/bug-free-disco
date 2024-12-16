@@ -18,6 +18,7 @@ import ResponseInput from '@/components/custom/ResponseInput.vue';
 import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
 import PhoneInput from '~/components/custom/PhoneInput.vue';
 import EmailInput from '~/components/custom/EmailInput.vue';
+import CustomDropdown from '~/components/custom/CustomDropdown.vue';
 
 import schedule from "~/src/data/work-schedule.json";
 import experience from "~/src/data/experience.json";
@@ -26,10 +27,13 @@ import currency from "~/src/data/currency.json";
 import AccordionAdditional from "~/src/data/accordion-additional.json";
 import CarId from "~/src/data/car-id.json";
 import MoreOptions from "~/src/data/more-options.json";
+import industry from '~/src/data/industry.json';
+import specialization from '~/src/data/specialization.json';
 
 import { ref, onMounted } from 'vue';
 import majors from "~/src/data/majors.json";
 
+const ArraySpecialization = specialization;
 const ArrayOptions = MoreOptions;
 const ArrayCarId = CarId;
 const ArrayAdditional = AccordionAdditional;
@@ -38,6 +42,7 @@ const ArrayEducation = education;
 const ArrayExperience = experience;
 const ArraySchedule = schedule;
 const ArrayMajors = majors;
+const ArrayIndustry = industry;
 
 const major = ref('')
 const options = ref([
@@ -102,6 +107,8 @@ const selectedOptions = ref([]);
 const showContacts = ref(true);
 const phone = ref("");
 const email = ref("");
+const selectedIndustry = ref(null);
+const selectedSpecialization = ref(null);
 </script>
 
 <template>
@@ -155,13 +162,15 @@ const email = ref("");
                     <div class="w-full">
                         <p class="text-sm font-medium text-space">Отрасль компании</p>
                         <div class="w-full relative">
-                            <MyCombobox />
+                            <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль"
+                              v-model="selectedIndustry" />
                         </div>
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space">Выберите специализацию</p>
                         <div>
-                            <MyCombobox />
+                            <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
+                              v-model="selectedSpecialization" />
                         </div>
                     </div>
                 </div>
@@ -296,12 +305,12 @@ const email = ref("");
                 <div class="w-full flex justify-between gap-x-[25px]">
                     <div class="w-full">
                         <p class="text-sm font-medium text-space">Номер телефона</p>
-                        <phone-input />
+                        <phone-input v-model="phone" />
                         <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space">Email</p>
-                        <email-input />
+                        <email-input v-model="email" />
                     </div>
                 </div>
             </div>

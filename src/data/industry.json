@@ -1,0 +1,21 @@
+[
+  { "id": "industry", "label": "Промышленность" },
+  { "id": "agriculture", "label": "Сельское хозяйство" },
+  { "id": "construction", "label": "Строительство" },
+  { "id": "health_care", "label": "Здавоохранение" },
+  { "id": "culture_art", "label": "Культура и искусство" },
+  { "id": "education", "label": "Образование" },
+  { "id": "trade_catering", "label": "Торговля и общественное питание" },
+  { "id": "finance_credit", "label": "Финансы и кредит" },
+  { "id": "tech_commun", "label": "IT и телекоммуникацаии" },
+  { "id": "traffic", "label": "Транспорт" },
+  { "id": "science", "label": "Наука" },
+  {
+    "id": "housing_public",
+    "label": "Жилищное хозяйство и бытовое обслуживание"
+  },
+  {
+    "id": "control",
+    "label": "Управление"
+  }
+]
