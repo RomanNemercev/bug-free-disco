@@ -1,38 +1,50 @@
 [
   {
+    "id": "salesManager",
     "name": "Менеджер по продажам"
   },
   {
+    "id": "accountManager",
     "name": "Менеджер по работе с клиентами"
   },
   {
+    "id": "purchasingManager",
     "name": "Менеджер по закупкам"
   },
   {
+    "id": "accountExecutive",
     "name": "Аккаунт менеджер"
   },
   {
+    "id": "hrManager",
     "name": "HR Менеджер"
   },
   {
+    "id": "primaryDocumentationManager",
     "name": "Менеджер первичной документации"
   },
   {
+    "id": "salesManagerOne",
     "name": "Менеджер по продажам 1"
   },
   {
+    "id": "accountManagerOne",
     "name": "Менеджер по работе с клиентами 1"
   },
   {
+    "id": "purchasingManagerOne",
     "name": "Менеджер по закупкам 1"
   },
   {
+    "id": "accountExecutiveOne",
     "name": "Аккаунт менеджер 1"
   },
   {
+    "id": "hrManagerOne",
     "name": "HR Менеджер 1"
   },
   {
+    "id": "primaryDocumentationManagerOne",
     "name": "Менеджер первичной документации 1"
   }
 ]

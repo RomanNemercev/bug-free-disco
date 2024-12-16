@@ -1,0 +1,52 @@
+[
+  {
+    "id": "categoryA",
+    "value": "A",
+    "label": "A"
+  },
+  {
+    "id": "categoryB",
+    "value": "B",
+    "label": "B"
+  },
+  {
+    "id": "categoryC",
+    "value": "C",
+    "label": "C"
+  },
+  {
+    "id": "categoryD",
+    "value": "D",
+    "label": "D"
+  },
+  {
+    "id": "categoryE",
+    "value": "E",
+    "label": "E"
+  },
+  {
+    "id": "categoryM",
+    "value": "M",
+    "label": "M"
+  },
+  {
+    "id": "categoryBE",
+    "value": "BE",
+    "label": "BE"
+  },
+  {
+    "id": "categoryTB",
+    "value": "TB",
+    "label": "TB"
+  },
+  {
+    "id": "categoryDE",
+    "value": "DE",
+    "label": "DE"
+  },
+  {
+    "id": "categoryCE",
+    "value": "CE",
+    "label": "CE"
+  }
+]

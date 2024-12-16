@@ -10,20 +10,29 @@ import TagSelect from "~/components/custom/TagSelect.vue";
 import MyAccordion from "~/components/custom/MyAccordion.vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import SalaryRange from "~/components/custom/SalaryRange.vue";
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import CardOption from '@/components/custom/CardOption.vue'
-import GeoInput from '@/components/custom/GeoInput.vue'
-import ResponseInput from '@/components/custom/ResponseInput.vue'
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import CardOption from '@/components/custom/CardOption.vue';
+import GeoInput from '@/components/custom/GeoInput.vue';
+import ResponseInput from '@/components/custom/ResponseInput.vue';
+import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
+import PhoneInput from '~/components/custom/PhoneInput.vue';
+import EmailInput from '~/components/custom/EmailInput.vue';
 
 import schedule from "~/src/data/work-schedule.json";
 import experience from "~/src/data/experience.json";
 import education from "~/src/data/education.json";
 import currency from "~/src/data/currency.json";
+import AccordionAdditional from "~/src/data/accordion-additional.json";
+import CarId from "~/src/data/car-id.json";
+import MoreOptions from "~/src/data/more-options.json";
 
 import { ref, onMounted } from 'vue';
 import majors from "~/src/data/majors.json";
 
+const ArrayOptions = MoreOptions;
+const ArrayCarId = CarId;
+const ArrayAdditional = AccordionAdditional;
 const ArrayCurrency = currency;
 const ArrayEducation = education;
 const ArrayExperience = experience;
@@ -87,7 +96,12 @@ const cards = [
     }
 ]
 
-const isChecked = ref(false);
+const selectedAdditional = ref([]);
+const selectedCarId = ref([]);
+const selectedOptions = ref([]);
+const showContacts = ref(true);
+const phone = ref("");
+const email = ref("");
 </script>
 
 <template>
@@ -191,42 +205,17 @@ const isChecked = ref(false);
                 <div class="w-fit">
                     <MyAccordion title="дополнительные условия">
                         <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
-                            <MyCheckbox id="dms" label="ДМС" v-model="isChecked" />
-                            <MyCheckbox id="mobile" label="Мобильная связь" />
-                            <MyCheckbox id="fitness" label="Фитнес" />
-                            <MyCheckbox id="nutrition" label="Питание" />
-                            <MyCheckbox id="coveralls" label="Спецодежда" />
-                            <MyCheckbox id="trips" label="Командировки" />
-                            <MyCheckbox id="car" label="Cлужебный автомобиль" />
-                            <MyCheckbox id="moving" label="Помощь с переездом, проживание" />
-                            <MyCheckbox id="none-registration" label="Без оформления по ТК" />
+                            <CheckboxGroup v-model="selectedAdditional" :options="ArrayAdditional" />
                         </div>
                     </MyAccordion>
                     <MyAccordion title="водительские права">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-                            <MyCheckbox id="A" label="A" />
-                            <MyCheckbox id="B" label="B" />
-                            <MyCheckbox id="C" label="C" />
-                            <MyCheckbox id="D" label="D" />
-                            <MyCheckbox id="E" label="E" />
-                            <MyCheckbox id="M" label="M" />
-                            <MyCheckbox id="BE" label="BE" />
-                            <MyCheckbox id="TB" label="TB" />
-                            <MyCheckbox id="DE" label="DE" />
-                            <MyCheckbox id="CE" label="CE" />
+                            <CheckboxGroup v-model="selectedCarId" :options="ArrayCarId" />
                         </div>
                     </MyAccordion>
                     <MyAccordion title="дополнительные возможности">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-                            <MyCheckbox id="personal-car" label="Личный автомобиль" />
-                            <MyCheckbox id="pensioners" label="Вакансия подходит для пенсионеров" />
-                            <MyCheckbox id="international" label="Требуется загранпаспорт" />
-                            <MyCheckbox id="weekend" label="Работа только по СБ и ВС" />
-                            <MyCheckbox id="students" label="Вакансия подходит для студентов" />
-                            <MyCheckbox id="temp" label="Возможно временное оформление" />
-                            <MyCheckbox id="evening" label="Можно начинать после 16:00" />
-                            <MyCheckbox id="teens" label="Вакансия подходит для соискателей от 14 лет" />
-                            <MyCheckbox id="half" label="Можно работать сменами по 4-6 часов" />
+                            <CheckboxGroup v-model="selectedOptions" :options="ArrayOptions" />
                         </div>
                     </MyAccordion>
                 </div>
@@ -305,12 +294,14 @@ const isChecked = ref(false);
                 <p class="text-sm font-medium text-space">Контактное лицо</p>
                 <response-input />
                 <div class="w-full flex justify-between gap-x-[25px]">
-                    <div>
+                    <div class="w-full">
                         <p class="text-sm font-medium text-space">Номер телефона</p>
-                        <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="isChecked" />
+                        <phone-input />
+                        <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
                     </div>
-                    <div>
+                    <div class="w-full">
                         <p class="text-sm font-medium text-space">Email</p>
+                        <email-input />
                     </div>
                 </div>
             </div>
@@ -322,5 +313,6 @@ const isChecked = ref(false);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
+        <UiButton variant="action" size="semiaction">Сохранить и продолжить</UiButton>
     </div>
 </template>

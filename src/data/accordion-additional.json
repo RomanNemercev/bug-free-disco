@@ -1,0 +1,47 @@
+[
+  {
+    "id": "health_insurance",
+    "value": "ДМС",
+    "label": "ДМС"
+  },
+  {
+    "id": "mobile_connection",
+    "value": "Мобильная связь",
+    "label": "Мобильная связь"
+  },
+  {
+    "id": "fitness",
+    "value": "Фитнес",
+    "label": "Фитнес"
+  },
+  {
+    "id": "meals",
+    "value": "Питание",
+    "label": "Питание"
+  },
+  {
+    "id": "work_clothes",
+    "value": "Спецодежда",
+    "label": "Спецодежда"
+  },
+  {
+    "id": "business_trips",
+    "value": "Командировки",
+    "label": "Командировки"
+  },
+  {
+    "id": "company_car",
+    "value": "Служебный автомобиль",
+    "label": "Служебный автомобиль"
+  },
+  {
+    "id": "relocation_assistance_housing",
+    "value": "Помощь с переездом, проживание",
+    "label": "Помощь с переездом, проживание"
+  },
+  {
+    "id": "no_official_employment",
+    "value": "Без оформления по ТК",
+    "label": "Без оформления по ТК"
+  }
+]
