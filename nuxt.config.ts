@@ -2,5 +2,56 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  css: ['~/assets/css/main.css'],
+  build: {
+    transpile: ['vue'],
+  },
+  typescript: {
+    shim: false,
+  },
+  css: ['~/assets/css/main.scss'],
+  modules: [['@nuxtjs/google-fonts', {
+    families: {
+      Inter: [300, 400, 500, 600, 700],
+    }
+  }],
+    '@nuxtjs/tailwindcss',
+    'shadcn-nuxt',
+    '@nuxtjs/svg-sprite',
+  ],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: 'Ui',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui'
+  },
+  // code bottom answer for deprecated saas library Dark 2.0
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler' // or "modern"
+        }
+      }
+    }
+  },
+  svgSprite: {
+    // input: '~/assets/sprite/'
+  },
+  app: {
+    head: {
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+    }
+  }
 })

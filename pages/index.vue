@@ -1,17 +1,9 @@
 <template>
-    <div>
-        <h1>Добро пожаловать на домашнюю страницу</h1>
-        <AppAlert />
+    <div class="container">
+        <h1 class="text-3xl">Добро пожаловать на домашнюю страницу</h1>
     </div>
 </template>
 
-<script setup lang="ts">
-import '~/assets/css/first.css';
-import AppAlert from "~/components/AppAlert.vue";
-</script>
+<script setup lang="ts"></script>
 
-<style scoped>
-h1 {
-    color: var(--color-primary);
-}
-</style>
+<style scoped></style>

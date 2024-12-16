@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ... */
+
+@layer base {
+  html {
+    font-family: 'Inter', sans-serif;
+    background-color: #edeff5;
+  }
+}
+
+.PopoverContent {
+  width: var(--radix-popover-trigger-width);
+  max-height: var(--radix-popover-content-available-height);
+}
+
+.my-checkbox:hover {
+  .radio-check {
+    border: 2px solid #5898ff;
+  }
+}
