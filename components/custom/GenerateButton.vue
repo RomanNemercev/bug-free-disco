@@ -216,7 +216,7 @@ const reloadGeneration = () => {
     border-radius: 8px;
     max-width: 283px;
     width: 100%;
-    margin-top: 5px;
+    margin-top: 15px;
     z-index: 10;
 }
 
