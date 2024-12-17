@@ -2,9 +2,7 @@
 import Autocomplete from "~/components/custom/Autocomplete.vue";
 import MyInput from "~/components/custom/MyInput.vue";
 import MyTooltip from "~/components/custom/MyTooltip.vue";
-import MyAISelect from "~/components/custom/MyAISelect.vue";
 import TiptapEditor from '~/components/TiptapEditor.vue';
-import MyCombobox from "~/components/custom/MyCombobox.vue";
 import MyDropdown from "~/components/custom/MyDropdown.vue";
 import TagSelect from "~/components/custom/TagSelect.vue";
 import MyAccordion from "~/components/custom/MyAccordion.vue";
@@ -19,6 +17,7 @@ import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
 import PhoneInput from '~/components/custom/PhoneInput.vue';
 import EmailInput from '~/components/custom/EmailInput.vue';
 import CustomDropdown from '~/components/custom/CustomDropdown.vue';
+import GenerateButton from '~/components/custom/GenerateButton.vue';
 
 import schedule from "~/src/data/work-schedule.json";
 import experience from "~/src/data/experience.json";
@@ -128,7 +127,8 @@ const selectedSpecialization = ref(null);
                             <p class="text-sm font-medium">Код вакансии</p>
                             <span>
                                 <svg-icon name="question" width="20" height="20" />
-                                <MyTooltip text="Hover" />
+                                <MyTooltip
+                                  text="Каждая вакансия получает свой уникальный код, что позволяет точно идентифицировать её в системе и избежать путаницы, особенно при работе с большим количеством вакансий." />
                             </span>
                         </div>
                         <MyInput />
@@ -137,7 +137,7 @@ const selectedSpecialization = ref(null);
                 <div class="w-full">
                     <div class="w-full flex justify-between">
                         <p class="text-sm font-medium"><span class="text-red">*</span>Описание вакансии</p>
-                        <MyAISelect :options="['2 строчки', '3 строчки', '4 строчки']" />
+                        <generate-button />
                     </div>
                 </div>
                 <div class="mt-25px">
