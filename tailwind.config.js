@@ -120,7 +120,7 @@ module.exports = {
         '25px': '25px',
       },
       padding: {
-        btn: '11.5px 20.38px',
+        btn: '11.5px 18.5px',
         '3px': '3px',
         '4.5px': '4.5px',
         '10px': '10px',
