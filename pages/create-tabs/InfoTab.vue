@@ -111,7 +111,7 @@ const selectedSpecialization = ref(null);
 </script>
 
 <template>
-    <div class="container pb-80">
+    <div class="container pb-72">
         <div class="flex gap-x-[24px] pt-[39px]">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="text-space text-xl font-semibold mb-8">Основная информация</p>
@@ -208,7 +208,7 @@ const selectedSpecialization = ref(null);
                         <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation" />
                     </div>
                 </div>
-                <div class="w-full mb-9">
+                <div class="w-full mb-9 max-w-[400px]">
                     <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
                     <tag-select />
                 </div>
@@ -303,7 +303,7 @@ const selectedSpecialization = ref(null);
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="leading-normal text-space text-xl font-semibold mb-[33px]">Контактная информация</p>
                 <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-                <response-input class="mb-6" />
+                <response-input class="mb-6 w-full max-w-[400px]" />
                 <div class="w-full flex justify-between gap-x-[25px]">
                     <div class="w-full">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>
