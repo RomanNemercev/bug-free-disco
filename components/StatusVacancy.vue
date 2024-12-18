@@ -6,7 +6,7 @@
           <h1 class="text-xl text-space font-semibold leading-[38px]">Новая вакансия</h1>
           <div class="flex ml-auto">
             <UiButton class="mr-15px" variant="semiaction" size="semiaction">В черновик</UiButton>
-            <UiButton class="font-bold" variant="action" size="semiaction">Сохранить и продолжить</UiButton>
+            <UiButton class="font-bold" variant="action" size="action">Сохранить и продолжить</UiButton>
           </div>
         </div>
         <div class="flex">

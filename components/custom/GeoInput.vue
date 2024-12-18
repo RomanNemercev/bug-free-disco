@@ -74,6 +74,9 @@ const props = defineProps({
 <style scoped>
 .geo-input::placeholder {
     color: #9098b4;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
 }
 
 .clear-city {

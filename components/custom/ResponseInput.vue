@@ -35,7 +35,7 @@ const selectResponse = (response) => {
 const props = defineProps({
     placeholder: {
         type: String,
-        default: 'Отвественный',
+        default: 'Ответственный',
     }
 })
 </script>
@@ -78,6 +78,9 @@ const props = defineProps({
 
 .response-input::placeholder {
     color: #9098b4;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
 }
 
 .clear-response {

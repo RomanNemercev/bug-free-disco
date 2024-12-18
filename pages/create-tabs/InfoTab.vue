@@ -114,7 +114,7 @@ const selectedSpecialization = ref(null);
     <div class="container pb-80">
         <div class="flex gap-x-[24px] pt-[39px]">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-8">Основная информация</p>
+                <p class="text-space text-xl font-semibold mb-8">Основная информация</p>
                 <div class="w-full justify-between flex gap-25px mb-6">
                     <div class="w-full">
                         <p class="text-sm font-medium mb-4 leading-normal text-space"><span class="text-red">*</span>
@@ -137,7 +137,7 @@ const selectedSpecialization = ref(null);
                 </div>
                 <div class="w-full">
                     <div class="w-full flex justify-between">
-                        <p class="text-sm font-medium"><span class="text-red">*</span> Описание вакансии</p>
+                        <p class="text-sm font-medium text-space"><span class="text-red">*</span> Описание вакансии</p>
                         <generate-button />
                     </div>
                 </div>
@@ -156,19 +156,19 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-3.5">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Подробности о компании</p>
+                <p class="text-space text-xl font-semibold mb-[31px]">Подробности о компании</p>
                 <div class="flex justify-between gap-25px">
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Отрасль компании</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Отрасль компании</p>
                         <div class="w-full relative">
                             <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль"
                               v-model="selectedIndustry" />
                         </div>
                     </div>
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Выберите специализацию</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Выберите специализацию</p>
                         <div>
                             <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
                               v-model="selectedSpecialization" />
@@ -184,46 +184,46 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-3.5">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Подробности вакансии</p>
-                <div class="flex justify-between gap-25px">
+                <p class="text-space text-xl font-semibold mb-[31px]">Подробности вакансии</p>
+                <div class="flex justify-between gap-25px mb-3.5">
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Тип занятости</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
                         <my-dropdown :defaultValue="'Тип занятости'" :options="options"
                           v-model="parentSelectedOption" />
                     </div>
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">График работы</p>
+                        <p class="text-sm font-medium text-space mb-3.5">График работы</p>
                         <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule" />
                     </div>
                 </div>
-                <div class="flex justify-between gap-25px">
+                <div class="flex justify-between gap-25px mb-3.5">
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Опыт работы</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
                         <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience" />
                     </div>
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Образование</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Образование</p>
                         <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation" />
                     </div>
                 </div>
-                <div class="w-full">
-                    <p class="text-sm font-medium text-space mb-15px">Ключевые фразы</p>
+                <div class="w-full mb-9">
+                    <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
                     <tag-select />
                 </div>
                 <div class="w-fit">
-                    <MyAccordion title="дополнительные условия">
+                    <MyAccordion title="дополнительные условия" class="mb-15px">
                         <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedAdditional" :options="ArrayAdditional" />
                         </div>
                     </MyAccordion>
-                    <MyAccordion title="водительские права">
+                    <MyAccordion title="водительские права" class="mb-15px">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedCarId" :options="ArrayCarId" />
                         </div>
                     </MyAccordion>
-                    <MyAccordion title="дополнительные возможности">
+                    <MyAccordion title="дополнительные пожелания">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedOptions" :options="ArrayOptions" />
                         </div>
@@ -238,15 +238,15 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-3.5">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Подробности вакансии</p>
+                <p class="text-space text-xl font-semibold mb-[31px]">Заработная плата</p>
                 <div class="flex justify-between gap-25px">
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Заработная плата / мес</p>
-                        <SalaryRange />
+                        <p class="text-sm font-medium text-space mb-3.5">Заработная плата / мес</p>
+                        <SalaryRange class="mb-4" />
                         <div>
-                            <RadioGroup default-value="past-cash" class="flex">
+                            <RadioGroup default-value="past-cash" class="flex gap-[18px]">
                                 <div class="my-checkbox">
                                     <Label for="past-cash" class="cursor-pointer flex items-center">
                                         <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
@@ -263,7 +263,7 @@ const selectedSpecialization = ref(null);
                         </div>
                     </div>
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Валюта</p>
+                        <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
                         <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0" />
                     </div>
                 </div>
@@ -276,19 +276,20 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-3.5">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Место работы</p>
-                <div>
+                <p class="text-space text-xl font-semibold mb-[33px]">Место работы</p>
+                <div class="mb-[23px]">
                     <RadioGroup default-value="office" class="flex gap-x-15px w-full">
                         <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
                           :description="card.description" :selectedCard="selectedCard" :hoveredCard="hoveredCard"
                           @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" />
                     </RadioGroup>
                 </div>
-                <p class="text-sm font-medium text-space">Локация офиса</p>
-                <geo-input />
-                <p class="text-xs text-bali font-normal">Укажите расположение офиса для нового сотрудника.</p>
+                <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
+                <geo-input class="mb-2.5" />
+                <p class="leading-normal text-xs text-bali font-normal">Укажите расположение офиса для нового
+                    сотрудника.</p>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
                 <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
@@ -298,19 +299,19 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-3.5 mb-25px">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Контактная информация</p>
-                <p class="text-sm font-medium text-space">Контактное лицо</p>
-                <response-input />
+                <p class="leading-normal text-space text-xl font-semibold mb-[33px]">Контактная информация</p>
+                <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
+                <response-input class="mb-6" />
                 <div class="w-full flex justify-between gap-x-[25px]">
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Номер телефона</p>
-                        <phone-input v-model="phone" />
+                        <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>
+                        <phone-input v-model="phone" class="mb-25px" />
                         <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
                     </div>
                     <div class="w-full">
-                        <p class="text-sm font-medium text-space">Email</p>
+                        <p class="text-sm font-medium text-space leading-normal mb-4">Email</p>
                         <email-input v-model="email" />
                     </div>
                 </div>
@@ -323,6 +324,6 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <UiButton variant="action" size="semiaction">Сохранить и продолжить</UiButton>
+        <UiButton variant="action" size="semiaction" class="font-semibold">Сохранить и продолжить</UiButton>
     </div>
 </template>

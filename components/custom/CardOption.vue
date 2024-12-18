@@ -23,7 +23,7 @@ const clearHover = () => emit('leave')
 <template>
     <div class="max-w-[265px] w-full my-checkbox h-auto">
         <Label :for="id"
-          class="h-full cursor-pointer flex flex-col p-15px border border-athens rounded-ten bg-athens-gray gap-y-2.5 transition-all"
+          class="h-full cursor-pointer flex flex-col p-15px border border-athens rounded-ten bg-athens-gray gap-y-[11px] transition-all"
           @mouseover="handleHover" @mouseleave="clearHover"
           :class="{ 'bg-dodger border-transparent': isHovered, 'border-transparent bg-zumthor': isSelected }">
             <div class="flex justify-between w-full card-checkbox">
@@ -33,8 +33,8 @@ const clearHover = () => emit('leave')
                 ]" class="text-15px font-semibold transition-colors">{{ title }}</p>
                 <RadioGroupItem :id="id" :value="id" @click="handleClick" />
             </div>
-            <p class="text-13px font-normal transition-colors" :class="isHovered && !isSelected ? 'text-white' : ''"
-              v-html="description"></p>
+            <p class="text-13px font-normal transition-colors leading-normal"
+              :class="isHovered && !isSelected ? 'text-white' : 'text-slate-custom'" v-html="description"></p>
         </Label>
     </div>
 </template>

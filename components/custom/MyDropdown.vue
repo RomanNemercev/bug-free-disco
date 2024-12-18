@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown-wrapper cursor-pointer relative" ref="dropDown">
-        <div class="dropdown-selected-option relative border border-athens rounded-ten py-10px px-15px bg-athens-gray"
+        <div class="dropdown-selected-option relative border border-athens rounded-ten py-9px px-15px bg-athens-gray"
           @click="toggleDropDown">
             <div>
                 <div :class="{ 'text-bali': !selectedOption, 'text-space': selectedOption }" class="text-sm">
@@ -8,12 +8,13 @@
                 </div>
                 <!-- Стрелка -->
                 <div v-show="!selectedOption"
-                  class="dropdown-arrow absolute right-4 top-3 transition-transform duration-300 text-bali"
+                  class="dropdown-arrow absolute right-3.5 top-2 transition-transform duration-300 text-bali"
                   :class="{ 'rotate-180 text-dodger': isDropDownVisible }">
                     <svg-icon name="dropdown-arrow" width="20" height="20" />
                 </div>
                 <!-- Крестик -->
-                <div v-show="selectedOption" class="dropdown-cross absolute right-4 top-3" @click.stop="resetSelection">
+                <div v-show="selectedOption" class="dropdown-cross absolute right-3.5 top-2"
+                  @click.stop="resetSelection">
                     <svg-icon name="dropdown-cross" width="20" height="20" />
                 </div>
             </div>

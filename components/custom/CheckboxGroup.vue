@@ -1,5 +1,5 @@
 <template>
-    <label v-for="option in options" :key="option.id" class="flex items-center cursor-pointer space-x-2 check-wrapper">
+    <label v-for="option in options" :key="option.id" class="flex items-center cursor-pointer check-wrapper">
         <input type="checkbox" :id="option.id" :value="option.value" v-model="selectedOptions" class="hidden" />
         <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
             'bg-dodger border-dodger': selectedOptions.includes(option.value),

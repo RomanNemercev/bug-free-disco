@@ -104,8 +104,10 @@ module.exports = {
         '11px': '11px',
         '11.5px': '11.5px',
         '12.5px': '12.5px',
+        '13px': '13px',
         '15px': '15px',
-
+        '16px': '16px',
+        '23px': '23px',
         '25px': '25px',
         '50px': '50px',
         128: '32rem',
@@ -123,6 +125,7 @@ module.exports = {
       },
       padding: {
         btn: '11.5px 15.5px',
+        'semi-btn': '11.5px 20px',
         '3px': '3px',
         '4.5px': '4.5px',
         '10px': '10px',

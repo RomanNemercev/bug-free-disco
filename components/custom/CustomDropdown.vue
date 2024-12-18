@@ -23,7 +23,7 @@
                 &#10006;
             </span>
             <!-- Стрелка -->
-            <span v-else class="absolute right-1 ml-auto mr-[12px] cursor-pointer text-bali" v-show="!isOpen">
+            <span v-else class="absolute right-1 ml-auto mr-2.5 cursor-pointer text-bali" v-show="!isOpen">
                 <svg-icon name="dropdown-arrow" width="20" height="20" />
             </span>
         </div>

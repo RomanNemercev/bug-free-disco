@@ -1,10 +1,10 @@
 <template>
     <div class="flex items-center">
-        <label :for="id" class="flex items-center cursor-pointer space-x-2 check-wrapper">
+        <label :for="id" class="flex items-center cursor-pointer check-wrapper">
             <!-- Скрытый чекбокс -->
             <input type="checkbox" :id="id" :checked="modelValue" @change="toggleCheck" class="hidden" />
             <!-- Визуальный элемент чекбокса -->
-            <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
+            <div class="mr-[6px] w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
                 'bg-dodger border-dodger': modelValue,
                 'border-athens bg-athens-gray': !modelValue
             }">
