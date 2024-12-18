@@ -101,9 +101,11 @@ module.exports = {
       spacing: {
         '5px': '5px',
         '9px': '9px',
+        '11px': '11px',
         '11.5px': '11.5px',
         '12.5px': '12.5px',
         '15px': '15px',
+
         '25px': '25px',
         '50px': '50px',
         128: '32rem',
@@ -120,7 +122,7 @@ module.exports = {
         '25px': '25px',
       },
       padding: {
-        btn: '11.5px 18.5px',
+        btn: '11.5px 15.5px',
         '3px': '3px',
         '4.5px': '4.5px',
         '10px': '10px',
@@ -137,14 +139,23 @@ module.exports = {
         DEFAULT: {
           css: {
             '--tw-prose-bullets': theme('colors.slate-custom'),
+            ul: {
+              'padding-left': '25px',
+              'margin-bottom': '22px',
+            },
             li: {
               margin: '0px',
               p: {
                 margin: '0px',
+                color: theme('colors.space'),
               },
             },
             h4: {
               'margin-top': '0px',
+              'font-size': '15px',
+              'font-weight': '500',
+              color: theme('colors.space'),
+              'margin-bottom': '7px',
             },
           },
         },

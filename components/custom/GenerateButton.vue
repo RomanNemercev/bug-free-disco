@@ -118,8 +118,9 @@ const reloadGeneration = () => {
     color: #8d47ff;
     border: 1px solid #eaddff;
     border-right: 1px solid #e0cdff;
-    padding: 8.5px 20px;
-    padding-left: 37px;
+    padding: 9px 20px;
+    padding-left: 36px;
+    padding-right: 16px;
     border-radius: 10px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -128,7 +129,7 @@ const reloadGeneration = () => {
     cursor: pointer;
     background-image: url('../../assets/sprite/svg/flash.svg');
     background-repeat: no-repeat;
-    background-position: 15px center;
+    background-position: 14px center;
 }
 
 /* Кнопка загрузки */

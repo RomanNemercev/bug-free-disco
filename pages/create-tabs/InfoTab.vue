@@ -112,35 +112,36 @@ const selectedSpecialization = ref(null);
 
 <template>
     <div class="container pb-80">
-        <div class="flex gap-x-[24px] pt-10">
+        <div class="flex gap-x-[24px] pt-[39px]">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <p class="text-xl font-semibold mb-9">Основная информация</p>
-                <div class="w-full justify-between flex gap-25px">
+                <p class="text-xl font-semibold mb-8">Основная информация</p>
+                <div class="w-full justify-between flex gap-25px mb-6">
                     <div class="w-full">
-                        <p class="text-sm font-medium"><span class="text-red">*</span> Название должности</p>
-                        <Autocomplete :source="ArrayMajors" v-model="major"
-                          placeholder="Например, Менеджер по продажам" />
+                        <p class="text-sm font-medium mb-4 leading-normal text-space"><span class="text-red">*</span>
+                            Название должности</p>
+                        <Autocomplete :source="ArrayMajors" v-model="major" placeholder="Например, Менеджер по продажам"
+                          class="mb-11px" />
                         <p class="text-xs text-bali">Осталось 80 символов. Специальных символов нет.</p>
                     </div>
                     <div class="w-full">
                         <div class="flex">
-                            <p class="text-sm font-medium">Код вакансии</p>
+                            <p class="text-sm font-medium mb-4 leading-normal text-space mr-[3px]">Код вакансии</p>
                             <span>
                                 <svg-icon name="question" width="20" height="20" />
                                 <MyTooltip
                                   text="Каждая вакансия получает свой уникальный код, что позволяет точно идентифицировать её в системе и избежать путаницы, особенно при работе с большим количеством вакансий." />
                             </span>
                         </div>
-                        <MyInput />
+                        <MyInput :placeholder="'Код вакансии'" />
                     </div>
                 </div>
                 <div class="w-full">
                     <div class="w-full flex justify-between">
-                        <p class="text-sm font-medium"><span class="text-red">*</span>Описание вакансии</p>
+                        <p class="text-sm font-medium"><span class="text-red">*</span> Описание вакансии</p>
                         <generate-button />
                     </div>
                 </div>
-                <div class="mt-25px">
+                <div class="mt-15px mb-3.5">
                     <client-only>
                         <tiptap-editor />
                     </client-only>
@@ -148,7 +149,7 @@ const selectedSpecialization = ref(null);
                 <p class="text-xs text-bali font-normal">Максимум 700 символов. Использовано 0 символов.</p>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
@@ -176,7 +177,7 @@ const selectedSpecialization = ref(null);
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
@@ -230,7 +231,7 @@ const selectedSpecialization = ref(null);
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
@@ -268,7 +269,7 @@ const selectedSpecialization = ref(null);
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
@@ -290,7 +291,7 @@ const selectedSpecialization = ref(null);
                 <p class="text-xs text-bali font-normal">Укажите расположение офиса для нового сотрудника.</p>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
@@ -315,7 +316,7 @@ const selectedSpecialization = ref(null);
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-                <p class="text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
+                <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
                     на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках
                     находиться в&nbsp;стадии рассмотрения.
                     Эта вакансия уже опубликована на&nbsp;вашей странице вакансий. Процесс утверждения займет
