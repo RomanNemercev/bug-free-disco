@@ -64,12 +64,22 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     </div>
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
-                        <div class="bg-img import mb-25px"></div>
-                        <p class="text-base font-medium text-space text-center mb-2.5">Установите кнопку&nbsp;импорта
+                        <div class="bg-img link mb-25px"></div>
+                        <p class="text-base font-medium text-space text-center mb-2.5">Короткая ссылка на вакансию
                         </p>
-                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Кнопка импорта поможет
-                            легко скопировать и&nbsp;импортировать контакт со&nbsp;странице браузера, на&nbsp;которой
-                            вы&nbsp;находитесь</p>
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Расскажите о вашей
+                            вакансии в социальных сетях, у себя на странице или отправьте контакту</p>
+                        <copy-board
+                          url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries" />
+                    </div>
+                    <div
+                      class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
+                        <div class="bg-img inbox mb-25px"></div>
+                        <p class="text-base font-medium text-space text-center mb-2.5">Почтовый ящик<br>для резюме
+                        </p>
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Отправляйте резюме
+                            непосредственно на электронную почту, отправленные резюме будут автоматиски добавлены в
+                            раздел кандидаты</p>
                         <copy-board
                           url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries" />
                     </div>
@@ -105,5 +115,13 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
 
 .import {
     background-image: url('../../assets/img/import.svg');
+}
+
+.link {
+    background-image: url('../../assets/img/vacancy-link.svg');
+}
+
+.inbox {
+    background-image: url('../../assets/img/inbox.svg');
 }
 </style>

@@ -29,27 +29,28 @@ const copyToClipboard = async () => {
 </script>
 
 <template>
-    <div class="relative flex items-center gap-2 max-w-full overflow-hidden">
+    <div class="relative flex items-center gap-2 max-w-full">
         <!-- Ссылка -->
-        <div class="truncate text-sm text-space font-normal flex-1 border border-athens rounded-ten bg-athens-gray"
-          title="Скопировать ссылку">
+        <div
+          class="truncate text-sm text-space font-normal flex-1 border border-athens rounded-ten bg-athens-gray py-9px px-15px"
+          :title="props.url">
             {{ props.url }}
         </div>
 
         <!-- Кнопка копирования -->
-        <button class="flex-shrink-0 p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition" @click="copyToClipboard">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M8 16h8M8 12h8m-8-4h8M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+        <button
+          class="text-slate-custom flex-shrink-0 p-2 bg-athens-gray border border-athens rounded-lg transition  hover:bg-zumthor hover:border-zumthor hover:text-dodger"
+          @click="copyToClipboard">
+            <svg-icon name="copy" width="20" height="20" />
         </button>
 
         <!-- Уведомление о копировании -->
-        <div v-if="isCopied"
-          class="absolute top-full mt-1 text-xs text-green-600 bg-white border border-green-200 rounded-lg shadow-md p-1">
-            Скопировано!
-        </div>
+        <transition name="slide-fade">
+            <div v-if="isCopied"
+              class="absolute mb-1 text-xs text-green-600 bg-white border border-green-200 rounded-lg shadow-md p-1 right-0 bottom-full">
+                Скопировано!
+            </div>
+        </transition>
     </div>
 </template>
 
@@ -59,5 +60,19 @@ const copyToClipboard = async () => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateY(4px);
+    opacity: 0;
 }
 </style>

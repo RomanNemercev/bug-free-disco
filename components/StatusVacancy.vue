@@ -91,7 +91,7 @@
 import { ref } from 'vue'
 
 // Объявляем переменную для состояния табов
-const isHovered = ref(true)
+const isHovered = ref(false)
 
 // Объявляем активный так с первым табом по умолчанию
 const currentTab = ref('search')
