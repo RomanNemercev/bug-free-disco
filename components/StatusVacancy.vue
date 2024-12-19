@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="min-h-[156px] max-h-[211px] bg-white shadow-shadow-cards">
+    <div class="min-h-[156px] max-h-auto bg-white shadow-shadow-cards">
       <div class="container pt-25px pb-[19px]">
         <div class="flex mb-25px">
           <h1 class="text-xl text-space font-semibold leading-[38px]">Новая вакансия</h1>
@@ -14,7 +14,7 @@
             <li :class="{ 'active-tab': currentTab === 'info' }"
               class="border-r border-athens w-full pr-1 max-w-[230.8px]" @click="changeTab('info')">
               <div
-                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten">
+                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Описание вакансии</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
                   :class="{ 'max-h-24 opacity-100': isHovered }">
@@ -27,7 +27,7 @@
             <li :class="{ 'active-tab': currentTab === 'search' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('search')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten"
+                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Поиск кандидатов</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -41,7 +41,7 @@
             <li :class="{ 'active-tab': currentTab === 'publish' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('publish')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten"
+                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Публикации (19)</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -55,7 +55,7 @@
             <li :class="{ 'active-tab': currentTab === 'team' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('team')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten"
+                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Команда вакансии</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -69,7 +69,7 @@
             <li :class="{ 'active-tab': currentTab === 'funnel' }" class="max-w-[230.8px] w-full pl-5px"
               @click="changeTab('funnel')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten"
+                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Воронка найма</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -91,10 +91,10 @@
 import { ref } from 'vue'
 
 // Объявляем переменную для состояния табов
-const isHovered = ref(false)
+const isHovered = ref(true)
 
 // Объявляем активный так с первым табом по умолчанию
-const currentTab = ref('info')
+const currentTab = ref('search')
 
 // Объявляем emit для передачи события наверх
 const emit = defineEmits<{

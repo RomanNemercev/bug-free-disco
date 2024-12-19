@@ -110,8 +110,11 @@ module.exports = {
         '23px': '23px',
         '25px': '25px',
         '50px': '50px',
+        '75px': '75px',
         128: '32rem',
+        '275px': '275px',
         '300px': '300px',
+        '330px': '330px',
         '400px': '400px',
       },
       maxWidth: {
