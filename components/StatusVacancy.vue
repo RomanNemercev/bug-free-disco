@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="min-h-[156px] max-h-auto bg-white shadow-shadow-cards">
-      <div class="container pt-25px pb-[19px]">
+    <div class="min-h-[153px] max-h-auto bg-white shadow-shadow-cards">
+      <div class="container pt-25px pb-[16px]">
         <div class="flex mb-25px">
           <h1 class="text-xl text-space font-semibold leading-[38px]">Новая вакансия</h1>
           <div class="flex ml-auto">

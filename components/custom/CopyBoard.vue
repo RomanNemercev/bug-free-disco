@@ -29,7 +29,7 @@ const copyToClipboard = async () => {
 </script>
 
 <template>
-    <div class="relative flex items-center gap-2 max-w-full">
+    <div class="relative flex items-center gap-3 max-w-full">
         <!-- Ссылка -->
         <div
           class="truncate text-sm text-space font-normal flex-1 border border-athens rounded-ten bg-athens-gray py-9px px-15px"

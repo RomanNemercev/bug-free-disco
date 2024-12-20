@@ -109,6 +109,7 @@ module.exports = {
         '16px': '16px',
         '23px': '23px',
         '25px': '25px',
+        '27px': '27px',
         '50px': '50px',
         '75px': '75px',
         128: '32rem',
@@ -135,6 +136,7 @@ module.exports = {
       },
       lineHeight: {
         normal: 'normal',
+        130: '130%',
       },
       boxShadow: {
         'shadow-cards': '0 0 15px 0 rgba(0, 0, 0, 0.05);',

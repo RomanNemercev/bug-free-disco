@@ -3,15 +3,18 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
 </script>
 
 <template>
-    <div class="container pb-72">
+    <div class="container pb-72 pt-9">
         <div>
-            <p class="text-space text-xl font-semibold">Основная информация</p>
-            <p class="text-xs text-bali">Все что нужно, чтобы начать быстро и эффективно</p>
-            <div class="flex gap-x-15px">
+            <p class="text-space text-xl font-semibold leading-normal mb-2">Опубликовать на сайтах</p>
+            <p class="text-sm text-bali font-normal leading-normal mb-27px">Все что нужно, чтобы начать быстро и
+                эффективно</p>
+            <div class="flex gap-x-15px mb-9">
                 <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                     <div class="bg-img star mb-25px"></div>
-                    <p class="text-base font-medium text-space text-center mb-2.5">Премиальные доски объявлений</p>
-                    <p class="text-13px text-slate-custom font-normal text-center mb-auto">Используйте работные сайты
+                    <p class="text-base font-medium text-space text-center mb-3 leading-normal">Премиальные доски
+                        объявлений</p>
+                    <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Используйте
+                        работные сайты
                         и&nbsp;доски
                         объявлений с&nbsp;премиум публикацией,
                         что&nbsp;бы
@@ -20,16 +23,20 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                 </div>
                 <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                     <div class="bg-img planet mb-25px"></div>
-                    <p class="text-base font-medium text-space text-center mb-2.5">Бесплатные доски&nbsp;объявлений</p>
-                    <p class="text-13px text-slate-custom font-normal text-center mb-auto">Более 100+ бесплатных
+                    <p class="text-base font-medium text-space text-center mb-3 leading-normal">Бесплатные
+                        доски&nbsp;объявлений</p>
+                    <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Более 100+
+                        бесплатных
                         площадок для размещения в один клик</p>
                     <UiButton variant="semiaction" size="semiaction" class="w-full">Выбрать площадки</UiButton>
                 </div>
                 <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                     <div class="bg-img message mb-25px"></div>
-                    <p class="text-base font-medium text-space text-center mb-2.5">Поделиться
-                        в социальных сетях</p>
-                    <p class="text-13px text-slate-custom font-normal text-center mb-auto">Расскажите о&nbsp;вашей
+                    <p class="text-base font-medium text-space text-center mb-3 leading-normal">Поделиться<br>в
+                        социальных
+                        сетях</p>
+                    <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Расскажите
+                        о&nbsp;вашей
                         вакансии в&nbsp;социальных сетях у&nbsp;себя на&nbsp;странице или поделитесь с&nbsp;контактами
                     </p>
                     <div class="flex gap-x-2.5">
@@ -40,14 +47,16 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                 </div>
             </div>
             <div>
-                <p class="text-space text-xl font-semibold">Основная информация</p>
-                <p class="text-xs text-bali">Все что нужно, чтобы начать быстро и эффективно</p>
+                <p class="text-space text-xl font-semibold leading-normal mb-2">Дополнительные инструменты</p>
+                <p class="text-sm text-bali font-normal leading-normal mb-27px">Ускорьте существующие процессы найма</p>
                 <div class="flex gap-x-15px">
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                         <div class="bg-img form mb-25px"></div>
-                        <p class="text-base font-medium text-space text-center mb-2.5">Настройте форму отклика</p>
-                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Кнопка импорта поможет
+                        <p class="text-base font-medium text-space text-center mb-3 leading-normal">Настройте форму
+                            отклика</p>
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Кнопка
+                            импорта поможет
                             легко скопировать и&nbsp;импортировать контакт со&nbsp;странице браузера, на&nbsp;которой
                             вы&nbsp;находитесь</p>
                         <UiButton variant="semiaction" size="semiaction" class="w-full">Настроить</UiButton>
@@ -55,9 +64,11 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                         <div class="bg-img import mb-25px"></div>
-                        <p class="text-base font-medium text-space text-center mb-2.5">Установите кнопку&nbsp;импорта
+                        <p class="text-base font-medium text-space text-center mb-3 leading-normal">Установите<br>
+                            кнопку импорта
                         </p>
-                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Кнопка импорта поможет
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Кнопка
+                            импорта поможет
                             легко скопировать и&nbsp;импортировать контакт со&nbsp;странице браузера, на&nbsp;которой
                             вы&nbsp;находитесь</p>
                         <UiButton variant="semiaction" size="semiaction" class="w-full">Установить расширение</UiButton>
@@ -65,9 +76,12 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                         <div class="bg-img link mb-25px"></div>
-                        <p class="text-base font-medium text-space text-center mb-2.5">Короткая ссылка на вакансию
+                        <p class="text-base font-medium text-space text-center mb-3 leading-normal">Короткая
+                            ссылка<br>на
+                            вакансию
                         </p>
-                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Расскажите о вашей
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Расскажите о
+                            вашей
                             вакансии в социальных сетях, у себя на странице или отправьте контакту</p>
                         <copy-board
                           url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries" />
@@ -75,9 +89,11 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                         <div class="bg-img inbox mb-25px"></div>
-                        <p class="text-base font-medium text-space text-center mb-2.5">Почтовый ящик<br>для резюме
+                        <p class="text-base font-medium text-space text-center mb-3 leading-normal">Почтовый ящик<br>для
+                            резюме
                         </p>
-                        <p class="text-13px text-slate-custom font-normal text-center mb-auto">Отправляйте резюме
+                        <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Отправляйте
+                            резюме
                             непосредственно на электронную почту, отправленные резюме будут автоматиски добавлены в
                             раздел кандидаты</p>
                         <copy-board
