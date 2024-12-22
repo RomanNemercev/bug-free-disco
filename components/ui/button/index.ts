@@ -18,6 +18,7 @@ export const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         semiaction: 'bg-zumthor text-dodger',
         action: 'bg-dodger text-white',
+        black: 'bg-space text-white',
       },
       size: {
         default: 'h-9 px-4 py-2',
@@ -27,6 +28,7 @@ export const buttonVariants = cva(
         icon: 'h-9 w-9',
         semiaction: 'p-semi-btn text-sm font-normal rounded-ten leading-normal',
         action: 'p-btn text-sm font-bold rounded-ten leading-normal',
+        black: 'p-semi-btn text-sm font-bold rounded-ten leading-normal',
       },
     },
     defaultVariants: {

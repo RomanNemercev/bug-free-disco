@@ -1,10 +1,32 @@
 <script setup>
 import CopyBoard from "~/components/custom/CopyBoard.vue";
+
+// Состояние для определения текущей активной страницы
+const currentPage = ref('premiumPlatforms');
+
+// Лениво загружаемые компоненты
+const pages = {
+    premiumPlatforms: defineAsyncComponent(() =>
+        import('~/pages/create-tabs/search-tab/PremiumPlatforms.vue')
+    ),
+    freePlatforms: defineAsyncComponent(() =>
+        import('~/pages/create-tabs/search-tab/FreePlatforms.vue')
+    )
+}
+
+// Функция переключения страницы
+function openPage(pageName) {
+    currentPage.value = pageName;
+}
+
+function goBack() {
+    currentPage.value = null;
+}
 </script>
 
 <template>
     <div class="container pb-72 pt-9">
-        <div>
+        <div v-if="!currentPage">
             <p class="text-space text-xl font-semibold leading-normal mb-2">Опубликовать на сайтах</p>
             <p class="text-sm text-bali font-normal leading-normal mb-27px">Все что нужно, чтобы начать быстро и
                 эффективно</p>
@@ -19,7 +41,8 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                         объявлений с&nbsp;премиум публикацией,
                         что&nbsp;бы
                         повысить узнаваемость вашей вакансии</p>
-                    <UiButton variant="semiaction" size="semiaction" class="w-full">Выбрать площадки</UiButton>
+                    <UiButton variant="semiaction" size="semiaction" class="w-full"
+                      @click="openPage('premiumPlatforms')">Выбрать площадки</UiButton>
                 </div>
                 <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                     <div class="bg-img planet mb-25px"></div>
@@ -28,7 +51,8 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">Более 100+
                         бесплатных
                         площадок для размещения в один клик</p>
-                    <UiButton variant="semiaction" size="semiaction" class="w-full">Выбрать площадки</UiButton>
+                    <UiButton variant="semiaction" size="semiaction" class="w-full" @click="openPage('freePlatforms')">
+                        Выбрать площадки</UiButton>
                 </div>
                 <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
                     <div class="bg-img message mb-25px"></div>
@@ -101,6 +125,14 @@ import CopyBoard from "~/components/custom/CopyBoard.vue";
                     </div>
                 </div>
             </div>
+        </div>
+        <div v-else>
+            <!-- Динамическая загрузка страницы -->
+            <component :is="pages[currentPage]">
+                <template #back>
+                    <UiButton variant="black" size="black" @click="goBack" class="mb-35px">Назад</UiButton>
+                </template>
+            </component>
         </div>
     </div>
 </template>

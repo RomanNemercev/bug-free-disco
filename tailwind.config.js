@@ -34,6 +34,7 @@ module.exports = {
         gallery: '#f0f0f0',
         bali: '#9098b4',
         violet: '#8d47ff',
+        feta: '#e4fde4',
         'border-editor': 'rgba(0, 82, 208, 0.2)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
@@ -109,7 +110,9 @@ module.exports = {
         '16px': '16px',
         '23px': '23px',
         '25px': '25px',
+        '26px': '26px',
         '27px': '27px',
+        '35px': '35px',
         '50px': '50px',
         '75px': '75px',
         128: '32rem',
