@@ -27,7 +27,7 @@ export const buttonVariants = cva(
         lg: 'h-10 rounded-md px-8',
         icon: 'h-9 w-9',
         semiaction: 'p-semi-btn text-sm font-normal rounded-ten leading-normal',
-        action: 'p-btn text-sm font-bold rounded-ten leading-normal',
+        action: 'p-btn text-sm font-semibold rounded-ten leading-normal',
         black: 'p-semi-btn text-sm font-bold rounded-ten leading-normal',
       },
     },
