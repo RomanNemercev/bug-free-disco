@@ -28,9 +28,10 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
             раз
             и&nbsp;управляйте вакансиями удаленно</p>
         <!-- Первый блок -->
-        <div class="flex gap-x-25px mb-35px">
+        <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap">
             <!-- Первая карточка -->
-            <div class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="hh" width="41" height="40" />
@@ -40,7 +41,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                 <p class="text-sm font-medium text-space mb-3.5">Аккаунт:</p>
-                <div class="w-full flex items-center gap-2.5 bg-feta py-11px px-15px rounded-ten mb-15px">
+                <div class="flex items-center gap-2.5 bg-feta py-11px px-15px rounded-ten mb-15px min-w-0">
                     <div>
                         <svg-icon name="green-circle" width="11" height="11" />
                     </div>
@@ -57,7 +58,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 <UiButton variant="black" size="black" class="mt-auto">Пополнить баланс</UiButton>
             </div>
             <!-- Вторая карточка -->
-            <div class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="zarplata" width="41" height="40" />
@@ -79,7 +81,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
             </div>
             <!-- Шаблон для добавления новой -->
             <div
-              class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors">
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors">
                 <div class="w-[71px] h-[71px] rounded-full bg-white flex items-center justify-center mb-25px">
                     <svg-icon name="template-plus" width="31" height="31" />
                 </div>
@@ -90,9 +92,10 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         <p class="text-xl font-semibold text-space mb-5px">Доступные публикации</p>
         <p class="text-sm font-normal text-slate-custom mb-25px">Авторизуйте ваши аккаунты на&nbsp;работных сайтах один
             раз и&nbsp;управляйте вакансиями удаленно</p>
-        <div class="flex gap-x-25px mb-35px">
+        <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap">
             <!-- Первая карточка -->
-            <div class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="hh" width="41" height="40" />
@@ -117,7 +120,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
             </div>
             <!-- Вторая карточка -->
-            <div class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="superjob" width="41" height="40" />
@@ -134,11 +138,12 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <p class="truncate text-sm font-medium text-space leading-normal">Jobly</p>
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
-                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" />
+                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" variant="selected" />
                 <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
             </div>
             <!-- Третья карточка -->
-            <div class="max-w-[281.5px] w-full p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div
+              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <div class="youla-pic"></div>
@@ -155,7 +160,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <p class="truncate text-sm font-medium text-space leading-normal">Jobly</p>
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
-                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" />
+                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" variant="default" />
                 <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
             </div>
         </div>
