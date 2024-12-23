@@ -35,6 +35,8 @@ module.exports = {
         bali: '#9098b4',
         violet: '#8d47ff',
         feta: '#e4fde4',
+        orange: '#ff6b00',
+        serenade: '#fff0e5',
         'border-editor': 'rgba(0, 82, 208, 0.2)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
