@@ -14,11 +14,7 @@ export default defineNuxtConfig({
     families: {
       Inter: [300, 400, 500, 600, 700],
     }
-  }],
-    '@nuxtjs/tailwindcss',
-    'shadcn-nuxt',
-    '@nuxtjs/svg-sprite',
-  ],
+  }], '@nuxtjs/tailwindcss', 'shadcn-nuxt', '@nuxtjs/svg-sprite', '@pinia/nuxt'],
   postcss: {
     plugins: {
       tailwindcss: {},

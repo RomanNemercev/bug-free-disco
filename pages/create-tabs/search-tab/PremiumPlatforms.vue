@@ -1,6 +1,58 @@
 <script setup>
 import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
+import CardIcon from '~/components/custom/CardIcon.vue';
+
+import { useCartStore } from '@/stores/cart';
+
+const cartStore = useCartStore();
+console.log(cartStore.cartItems);
+
+const cardsData = [
+    {
+        id: 'basket-1',
+        name: 'hh.ru',
+        icon: 'hh',
+        isPng: false,
+    },
+    {
+        id: 'basket-2',
+        name: 'avito.ru',
+        icon: 'avito',
+        isPng: false,
+    },
+    {
+        id: 'basket-3',
+        name: 'rabota.ru',
+        icon: 'rabota-ru',
+        isPng: false,
+    },
+    {
+        id: 'basket-4',
+        name: 'zarplata.ru',
+        icon: 'zarplata',
+        isPng: false,
+    },
+    {
+        id: 'basket-5',
+        name: 'superjob',
+        icon: 'superjob',
+        isPng: false,
+    },
+    {
+        id: 'basket-6',
+        name: 'youla.ru',
+        icon: false,
+        isPng: true,
+        imagePath: '/img/logo.png',
+    },
+    {
+        id: 'basket-7',
+        name: 'careerist.ru',
+        icon: 'careerist',
+        isPng: false,
+    },
+];
 
 const optionsData = [
     {
@@ -13,7 +65,7 @@ const optionsData = [
         title: "Бизнес",
         description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней."
     }
-]
+];
 
 const ratesData = [
     {
@@ -36,7 +88,7 @@ const ratesData = [
         title: "Бизнес",
         description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней."
     }
-]
+];
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
 </script>
@@ -210,7 +262,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 <div
                   class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
                     <div class="flex items-center gap-2.5 mb-3.5">
-                        <div class="avito-pic bg-img"></div>
+                        <svg-icon name="avito" width="41" height="40" />
                         <p class="text-sm font-medium text-slate-custom">avito.ru</p>
                     </div>
                     <div class="w-full h-[1px] bg-athens mb-3.5"></div>
@@ -222,7 +274,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 <div
                   class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
                     <div class="flex items-center gap-2.5 mb-3.5">
-                        <div class="rabota-pic bg-img"></div>
+                        <svg-icon name="rabota-ru" width="41" height="40" />
                         <p class="text-sm font-medium text-slate-custom">rabota.ru</p>
                     </div>
                     <div class="w-full h-[1px] bg-athens mb-3.5"></div>
@@ -286,6 +338,37 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
             </div>
         </div>
+        <div class="w-full gap-x-25px flex">
+            <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap w-full">
+                <!-- Динамический рендеринг карточек -->
+                <div v-for="card in cardsData" :key="card.id"
+                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
+                    <div class="flex items-center gap-2.5 mb-3.5">
+                        <CardIcon :icon="card.icon" :isPng="card.isPng" :imagePath="card.imagePath" />
+                        <p class="text-sm font-medium text-slate-custom">{{ card.name }}</p>
+                    </div>
+                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
+                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
+                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
+                    <UiButton :variant="cartStore.isInCart(card.id) ? 'default' : 'action'"
+                      :size="cartStore.isInCart(card.id) ? 'default' : 'action'" @click="cartStore.toggleItem(card.id)"
+                      class="mt-auto">
+                        {{ cartStore.isInCart(card.id) ? 'В корзине' : 'В корзину' }}
+                    </UiButton>
+                </div>
+            </div>
+            <div>
+                <div class="flex flex-col p-25px justify-center gap-y-15px bg-white rounded-fifteen">
+                    <p class="text-xl font-semibold text-space">
+                        {{ cartStore.cartItems.length === 0 ? 'Ваша корзина пуста' : 'Ваша корзина' }}
+                    </p>
+                    <p class="text-sm font-normal text-slate-custom">
+                        {{ cartStore.cartItems.length === 0 ? 'Пока здесь пусто' : `${cartStore.cartItems.length}
+                        товаров` }}
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -298,13 +381,5 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
 
 .youla-pic {
     background-image: url('@/assets/img/youla.svg');
-}
-
-.avito-pic {
-    background-image: url('@/assets/img/avito.svg');
-}
-
-.rabota-pic {
-    background-image: url('@/assets/img/rabota-ru.svg');
 }
 </style>
