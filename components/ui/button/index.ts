@@ -19,6 +19,7 @@ export const buttonVariants = cva(
         semiaction: 'bg-zumthor text-dodger',
         action: 'bg-dodger text-white',
         black: 'bg-space text-white',
+        success: 'bg-feta text-green',
       },
       size: {
         default: 'h-9 px-4 py-2',
@@ -29,6 +30,7 @@ export const buttonVariants = cva(
         semiaction: 'p-semi-btn text-sm font-normal rounded-ten leading-normal',
         action: 'p-btn text-sm font-semibold rounded-ten leading-normal',
         black: 'p-semi-btn text-sm font-bold rounded-ten leading-normal',
+        success: 'p-btn text-sm font-normal rounded-ten leading-normal',
       },
     },
     defaultVariants: {

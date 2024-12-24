@@ -104,10 +104,9 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
             раз
             и&nbsp;управляйте вакансиями удаленно</p>
         <!-- Первый блок -->
-        <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]">
             <!-- Первая карточка -->
-            <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="hh" width="41" height="40" />
@@ -134,8 +133,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 <UiButton variant="black" size="black" class="mt-auto">Пополнить баланс</UiButton>
             </div>
             <!-- Вторая карточка -->
-            <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="zarplata" width="41" height="40" />
@@ -157,7 +155,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
             </div>
             <!-- Шаблон для добавления новой -->
             <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors">
+              class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors">
                 <div class="w-[71px] h-[71px] rounded-full bg-white flex items-center justify-center mb-25px">
                     <svg-icon name="template-plus" width="31" height="31" />
                 </div>
@@ -168,10 +166,9 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         <p class="text-xl font-semibold text-space mb-5px">Доступные публикации</p>
         <p class="text-sm font-normal text-slate-custom mb-25px">Авторизуйте ваши аккаунты на&nbsp;работных сайтах один
             раз и&nbsp;управляйте вакансиями удаленно</p>
-        <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]">
             <!-- Первая карточка -->
-            <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="hh" width="41" height="40" />
@@ -196,8 +193,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
             </div>
             <!-- Вторая карточка -->
-            <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="superjob" width="41" height="40" />
@@ -214,12 +210,11 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <p class="truncate text-sm font-medium text-space leading-normal">Jobly</p>
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
-                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" variant="selected" />
+                <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" />
                 <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
             </div>
             <!-- Третья карточка -->
-            <div
-              class="flex-1 basis-[200px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <div class="youla-pic bg-img"></div>
@@ -244,105 +239,12 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         <p class="text-xl font-semibold text-space mb-5px">Магазин Jobly </p>
         <p class="text-sm font-normal text-slate-custom mb-25px">Вакансия будет опубликована с&nbsp;аккаунта Jobly, все
             остальное остается прежним</p>
-        <div class="w-full gap-x-25px flex">
-            <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap w-full">
-                <!-- Первая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="hh" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">hh.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Вторая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="avito" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">avito.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Третья карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="rabota-ru" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">rabota.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Четвертая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="zarplata" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">rabota.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Пятая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="superjob" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">superjob.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Шестая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <div class="youla-pic bg-img"></div>
-                        <p class="text-sm font-medium text-slate-custom">youla.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-                <!-- Седьмая карточка -->
-                <div
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
-                    <div class="flex items-center gap-2.5 mb-3.5">
-                        <svg-icon name="careerist" width="41" height="40" />
-                        <p class="text-sm font-medium text-slate-custom">careerist.ru</p>
-                    </div>
-                    <div class="w-full h-[1px] bg-athens mb-3.5"></div>
-                    <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton variant="action" size="action" class="mt-auto">В корзину</UiButton>
-                </div>
-            </div>
-            <div>
-                <div class="flex flex-col p-25px justify-center gap-y-15px bg-white rounded-fifteen">
-                    <p class="text-xl font-semibold text-space">Ваша корзина пуста</p>
-                    <p class="text-sm font-normal text-slate-custom">Пока здесь пусто</p>
-                </div>
-            </div>
-        </div>
-        <div class="w-full gap-x-25px flex">
-            <div class="flex gap-15px mb-35px max-w-[875px] flex-wrap w-full">
+        <div class="w-full gap-x-15px flex">
+            <div
+              class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] flex-wrap w-full">
                 <!-- Динамический рендеринг карточек -->
                 <div v-for="card in cardsData" :key="card.id"
-                  class="flex-1 basis-[210px] max-w-[281.5px] p-25px bg-white rounded-fifteen flex flex-col min-h-[248px]">
+                  class="p-25px bg-white rounded-fifteen flex flex-col min-w-56 min-h-[248px]">
                     <div class="flex items-center gap-2.5 mb-3.5">
                         <CardIcon :icon="card.icon" :isPng="card.isPng" :imagePath="card.imagePath" />
                         <p class="text-sm font-medium text-slate-custom">{{ card.name }}</p>
@@ -350,10 +252,11 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                     <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
                     <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
-                    <UiButton :variant="cartStore.isInCart(card.id) ? 'default' : 'action'"
-                      :size="cartStore.isInCart(card.id) ? 'default' : 'action'" @click="cartStore.toggleItem(card.id)"
+                    <UiButton :variant="cartStore.isInCart(card.id) ? 'success' : 'action'"
+                      :size="cartStore.isInCart(card.id) ? 'success' : 'action'" @click="cartStore.toggleItem(card.id)"
                       class="mt-auto">
                         {{ cartStore.isInCart(card.id) ? 'В корзине' : 'В корзину' }}
+                        <svg-icon v-if="cartStore.isInCart(card.id)" name="check-success" width="16" height="16" />
                     </UiButton>
                 </div>
             </div>

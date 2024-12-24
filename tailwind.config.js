@@ -38,6 +38,7 @@ module.exports = {
         orange: '#ff6b00',
         serenade: '#fff0e5',
         'border-editor': 'rgba(0, 82, 208, 0.2)',
+        green: '#04b600',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
