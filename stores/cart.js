@@ -36,11 +36,6 @@ export const useCartStore = defineStore('cart', {
     deleteItem(id) {
       delete this.cartItems[id]
     },
-    setRate(id, rateId) {
-      if (this.cartItems[id]) {
-        this.cartItems[id].rateId = rateId
-      }
-    },
     isInCart(id) {
       return !!this.cartItems[id]
     },
@@ -49,8 +44,3 @@ export const useCartStore = defineStore('cart', {
     },
   },
 })
-
-function parsePrice(rateTitle) {
-  const match = rateTitle.match(/\d+(\s\d+)*(?=\s₽)/g) // Извлекаем цену из строки
-  return match ? parseInt(match[0].replace(/\s/g, ''), 10) : 0
-}

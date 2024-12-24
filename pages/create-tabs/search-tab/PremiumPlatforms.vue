@@ -85,24 +85,28 @@ const ratesData = [
     {
         id: "rates-1",
         title: "Стандарт (1 490 ₽)",
+        name: "Стандарт",
         description: "Стандартная вакансия, размещается на 30 дней.",
         price: 1490,
     },
     {
         id: "rates-2",
         title: "С автоподнятием (4 390 ₽)",
+        name: "С автоподнятием",
         description: "Вакансия поднимается каждые 3 дня, в течении 30 дней.",
         price: 4390,
     },
     {
         id: "rates-3",
         title: "Бизнес (14 640 ₽)",
+        name: "Бизнес",
         description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
         price: 14640,
     },
     {
         id: "rates-4",
         title: "Бизнес",
+        name: "Бизнес",
         description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
         price: 0,
     }
@@ -112,10 +116,17 @@ function getCardName(id) {
     const card = this.cartStore.cardsData.find(card => card.id === id);
     return card?.name || 'Неизвестный товар';
 }
-function getCardRates(id) {
-    const card = this.cartStore.cardsData.find(card => card.id === id);
-    return card?.ratesData || [];
+
+function getRateName(id, rateId) {
+    const card = cartStore.cardsData.find((card) => card.id === id);
+    if (!card) return ''; // Возвращаем пустую строку, если карточка не найдена
+
+    const rate = ratesData.find((rate) => rate.id === rateId);
+    if (!rate) return ''; // Возвращаем пустую строку, если тариф не найден
+
+    return rate.name || ''; // Если у тарифа нет названия, возвращаем пустую строку
 }
+
 function getRatePrice(id, rateId) {
     const card = cartStore.cardsData.find((card) => card.id === id);
     if (!card) return 0; // Возвращаем 0, если карточка не найдена
@@ -133,6 +144,11 @@ function handleAddToCart(cardId, selectedRate) {
     }
     this.cartStore.addItem(cardId, selectedRate.id);
 }
+
+const getCardProperty = (id, key) => {
+    const card = cartStore.cardsData.find(card => card.id === id);
+    return card ? card[key] : null; // Если карта найдена, вернуть значение ключа
+};
 
 const selectedRate = ref('');
 
@@ -307,20 +323,21 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
             </div>
             <div>
-                <div v-if="Object.keys(cartStore.cartItems).length > 0" class="flex flex-col p-4 bg-white rounded-lg">
-                    <p class="text-xl font-semibold text-gray-900">Ваша корзина</p>
+                <div v-if="Object.keys(cartStore.cartItems).length > 0"
+                  class="flex flex-col p-25px bg-white rounded-fifteen">
+                    <p class="text-xl font-semibold text-gray-900 mb-25px">Ваша корзина</p>
+                    <div class="w-full h-[1px] bg-athens mb-25px"></div>
                     <div v-for="(item, id) in cartStore.cartItems" :key="id"
                       class="flex justify-between items-center py-2 border-b">
                         <div class="flex items-center gap-2">
-                            <p class="text-sm font-medium">{{ getCardName(id) }}</p>
+                            <CardIcon :icon="getCardProperty(id, 'icon')" :isPng="getCardProperty(id, 'isPng')"
+                              :imagePath="getCardProperty(id, 'imagePath')" />
+                            <div>
+                                <p class="text-sm font-medium">{{ getCardName(id) }}</p>
+                                <p class="text-sm font-medium text-slate-custom">{{ getRateName(id, item.rateId) }}</p>
+                            </div>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <select v-model="item.rateId" @change="cartStore.setRate(id, item.rateId)"
-                              class="border rounded p-1 text-sm">
-                                <option v-for="rate in getCardRates(id)" :key="rate.id" :value="rate.id">
-                                    {{ rate.title }}
-                                </option>
-                            </select>
                             <div class="flex items-center gap-2">
                                 <button @click="cartStore.removeItem(id)"
                                   class="px-2 py-1 bg-gray-200 rounded">-</button>
@@ -341,6 +358,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <div v-else class="p-4 bg-white rounded-lg">
                     <p class="text-lg font-medium text-gray-600">Ваша корзина пуста</p>
+                    <p class="text-sm font-normal text-slate-custom">Пока здесь пусто</p>
                 </div>
 
             </div>
