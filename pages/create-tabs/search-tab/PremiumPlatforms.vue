@@ -10,7 +10,7 @@ const cartStore = useCartStore();
 
 // Передаём данные карточек в хранилище
 
-console.log(cartStore.cartItems);
+// console.log(cartStore.cartItems);
 
 onMounted(() => {
     // Инициализируем данные через Pinia
@@ -328,28 +328,35 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <p class="text-xl font-semibold text-gray-900 mb-25px">Ваша корзина</p>
                     <div class="w-full h-[1px] bg-athens mb-25px"></div>
                     <div v-for="(item, id) in cartStore.cartItems" :key="id"
-                      class="flex justify-between items-center py-2 border-b">
-                        <div class="flex items-center gap-2">
+                      class="flex justify-between flex-col py-2 border-b">
+                        <div class="flex gap-x-15px mb-25px">
                             <CardIcon :icon="getCardProperty(id, 'icon')" :isPng="getCardProperty(id, 'isPng')"
                               :imagePath="getCardProperty(id, 'imagePath')" />
-                            <div>
-                                <p class="text-sm font-medium">{{ getCardName(id) }}</p>
-                                <p class="text-sm font-medium text-slate-custom">{{ getRateName(id, item.rateId) }}</p>
+                            <div class="flex flex-col gap-y-5px">
+                                <p class="text-15px font-medium">{{ getCardName(id) }}</p>
+                                <p class="text-sm font-normal text-slate-custom">{{ getRateName(id, item.rateId) }}</p>
+                                <p class="text-15px font-medium">
+                                    {{ getRatePrice(id, item.rateId) * item.count }} руб.
+                                </p>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <div class="flex items-center gap-2">
+                        <div class="flex gap-15px">
+                            <div class="flex items-center gap-x-5px w-full">
                                 <button @click="cartStore.removeItem(id)"
-                                  class="px-2 py-1 bg-gray-200 rounded">-</button>
-                                <p class="text-sm font-medium">{{ item.count }}</p>
+                                  class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger transition-all shrink-0"><svg-icon
+                                      name="basket-minus" width="20" height="20" /></button>
+                                <p
+                                  class="text-sm font-semibold w-full h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-space">
+                                    {{ item.count }}</p>
                                 <button @click="cartStore.addItem(id, item.rateId)"
-                                  class="px-2 py-1 bg-gray-200 rounded">+</button>
+                                  class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger transition-all shrink-0"><svg-icon
+                                      name="basket-plus" width="20" height="20" /></button>
                             </div>
+                            <button @click="cartStore.deleteItem(id)"
+                              class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-red hover:border-cinderella hover:bg-pink active:text-white active:bg-red active:border-red transition-all ml-auto shrink-0"><svg-icon
+                                  name="basket-basket" width="20" height="20" /></button>
                         </div>
-                        <p class="text-sm font-medium">
-                            {{ getRatePrice(id, item.rateId) * item.count }} ₽
-                        </p>
-                        <button @click="cartStore.deleteItem(id)" class="text-red-500">Удалить</button>
+
                     </div>
                     <div class="mt-4">
                         <p class="text-lg font-semibold">Итого: {{ cartStore.cardsData.totalSum }} ₽</p>

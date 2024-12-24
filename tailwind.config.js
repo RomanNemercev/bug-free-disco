@@ -39,6 +39,8 @@ module.exports = {
         serenade: '#fff0e5',
         'border-editor': 'rgba(0, 82, 208, 0.2)',
         green: '#04b600',
+        cinderella: '#fdcece',
+        pink: '#ffeaea',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
