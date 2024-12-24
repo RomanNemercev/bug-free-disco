@@ -2,16 +2,16 @@
     <div class="dropdown-wrapper cursor-pointer relative" ref="dropDown">
         <div class="dropdown-selected-option relative border rounded-ten py-9px px-15px" :class="[
             'border-athens',
-            isSelected ? 'bg-zumthor text-dodger' : 'bg-athens-gray',
+            (isSelected && selectedOption) ? 'bg-zumthor text-dodger' : 'bg-athens-gray',
         ]" @click="toggleDropDown">
             <div>
-                <div :class="isSelected ? 'text-dodger' : 'text-space'" class="text-sm">
+                <div :class="(isSelected && selectedOption) ? 'text-dodger' : 'text-space'" class="text-sm">
                     {{ mappedSelectedOption || props.placeholder }}
                 </div>
                 <!-- Стрелка -->
                 <div class="dropdown-arrow absolute right-3.5 top-2 transition-transform duration-300" :class="[
                     isDropDownVisible ? 'rotate-180 text-dodger' : 'text-bali',
-                    isSelected ? 'text-dodger' : 'text-bali',
+                    (isSelected && selectedOption) ? 'text-dodger' : 'text-bali',
                 ]">
                     <svg-icon name="dropdown-arrow" width="20" height="20" />
                 </div>

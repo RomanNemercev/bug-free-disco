@@ -4,55 +4,69 @@ import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 
 import { useCartStore } from '@/stores/cart';
+import { onMounted } from 'vue';
 
 const cartStore = useCartStore();
+
+// Передаём данные карточек в хранилище
+
 console.log(cartStore.cartItems);
 
-const cardsData = [
-    {
-        id: 'basket-1',
-        name: 'hh.ru',
-        icon: 'hh',
-        isPng: false,
-    },
-    {
-        id: 'basket-2',
-        name: 'avito.ru',
-        icon: 'avito',
-        isPng: false,
-    },
-    {
-        id: 'basket-3',
-        name: 'rabota.ru',
-        icon: 'rabota-ru',
-        isPng: false,
-    },
-    {
-        id: 'basket-4',
-        name: 'zarplata.ru',
-        icon: 'zarplata',
-        isPng: false,
-    },
-    {
-        id: 'basket-5',
-        name: 'superjob',
-        icon: 'superjob',
-        isPng: false,
-    },
-    {
-        id: 'basket-6',
-        name: 'youla.ru',
-        icon: false,
-        isPng: true,
-        imagePath: '/img/logo.png',
-    },
-    {
-        id: 'basket-7',
-        name: 'careerist.ru',
-        icon: 'careerist',
-        isPng: false,
-    },
-];
+onMounted(() => {
+    // Инициализируем данные через Pinia
+    cartStore.setCardsData([
+        {
+            id: 'basket-1',
+            name: 'hh.ru',
+            icon: 'hh',
+            isPng: false,
+            selectedRate: null,
+        },
+        {
+            id: 'basket-2',
+            name: 'avito.ru',
+            icon: 'avito',
+            isPng: false,
+            selectedRate: null,
+        },
+        {
+            id: 'basket-3',
+            name: 'rabota.ru',
+            icon: 'rabota-ru',
+            isPng: false,
+            selectedRate: null,
+        },
+        {
+            id: 'basket-4',
+            name: 'zarplata.ru',
+            icon: 'zarplata',
+            isPng: false,
+            selectedRate: null,
+        },
+        {
+            id: 'basket-5',
+            name: 'superjob',
+            icon: 'superjob',
+            isPng: false,
+            selectedRate: null,
+        },
+        {
+            id: 'basket-6',
+            name: 'youla.ru',
+            icon: false,
+            isPng: true,
+            imagePath: '/img/logo.png',
+            selectedRate: null,
+        },
+        {
+            id: 'basket-7',
+            name: 'careerist.ru',
+            icon: 'careerist',
+            isPng: false,
+            selectedRate: null,
+        },
+    ]);
+});
 
 const optionsData = [
     {
@@ -71,24 +85,56 @@ const ratesData = [
     {
         id: "rates-1",
         title: "Стандарт (1 490 ₽)",
-        description: "Стандартная вакансия, размещается на 30 дней."
+        description: "Стандартная вакансия, размещается на 30 дней.",
+        price: 1490,
     },
     {
         id: "rates-2",
         title: "С автоподнятием (4 390 ₽)",
-        description: "Вакансия поднимается каждые 3 дня, в течении 30 дней."
+        description: "Вакансия поднимается каждые 3 дня, в течении 30 дней.",
+        price: 4390,
     },
     {
         id: "rates-3",
         title: "Бизнес (14 640 ₽)",
-        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней."
+        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
+        price: 14640,
     },
     {
         id: "rates-4",
         title: "Бизнес",
-        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней."
+        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
+        price: 0,
     }
 ];
+
+function getCardName(id) {
+    const card = this.cartStore.cardsData.find(card => card.id === id);
+    return card?.name || 'Неизвестный товар';
+}
+function getCardRates(id) {
+    const card = this.cartStore.cardsData.find(card => card.id === id);
+    return card?.ratesData || [];
+}
+function getRatePrice(id, rateId) {
+    const card = cartStore.cardsData.find((card) => card.id === id);
+    if (!card) return 0; // Возвращаем 0, если карточка не найдена
+
+    const rate = ratesData.find((rate) => rate.id === rateId);
+    if (!rate) return 0; // Возвращаем 0, если тариф не найден
+
+    return rate.price || 0; // Если у тарифа нет цены, возвращаем 0
+}
+
+function handleAddToCart(cardId, selectedRate) {
+    if (!selectedRate) {
+        alert('Пожалуйста, выберите тарифный план.');
+        return;
+    }
+    this.cartStore.addItem(cardId, selectedRate.id);
+}
+
+const selectedRate = ref('');
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
 </script>
@@ -243,7 +289,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
             <div
               class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] flex-wrap w-full">
                 <!-- Динамический рендеринг карточек -->
-                <div v-for="card in cardsData" :key="card.id"
+                <div v-for="card in cartStore.cardsData" :key="card.id"
                   class="p-25px bg-white rounded-fifteen flex flex-col min-w-56 min-h-[248px]">
                     <div class="flex items-center gap-2.5 mb-3.5">
                         <CardIcon :icon="card.icon" :isPng="card.isPng" :imagePath="card.imagePath" />
@@ -251,25 +297,52 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     </div>
                     <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                     <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" :selected="ratesData[0]" class="mb-15px" variant="selected" />
+                    <MultiDropdown :options="ratesData" class="mb-15px" variant="selected" v-model="card.selectedRate"
+                      placeholder="Выберите тариф" />
                     <UiButton :variant="cartStore.isInCart(card.id) ? 'success' : 'action'"
-                      :size="cartStore.isInCart(card.id) ? 'success' : 'action'" @click="cartStore.toggleItem(card.id)"
-                      class="mt-auto">
+                      @click="handleAddToCart(card.id, card.selectedRate)" class="mt-auto">
                         {{ cartStore.isInCart(card.id) ? 'В корзине' : 'В корзину' }}
                         <svg-icon v-if="cartStore.isInCart(card.id)" name="check-success" width="16" height="16" />
                     </UiButton>
                 </div>
             </div>
             <div>
-                <div class="flex flex-col p-25px justify-center gap-y-15px bg-white rounded-fifteen">
-                    <p class="text-xl font-semibold text-space">
-                        {{ cartStore.cartItems.length === 0 ? 'Ваша корзина пуста' : 'Ваша корзина' }}
-                    </p>
-                    <p class="text-sm font-normal text-slate-custom">
-                        {{ cartStore.cartItems.length === 0 ? 'Пока здесь пусто' : `${cartStore.cartItems.length}
-                        товаров` }}
-                    </p>
+                <div v-if="Object.keys(cartStore.cartItems).length > 0" class="flex flex-col p-4 bg-white rounded-lg">
+                    <p class="text-xl font-semibold text-gray-900">Ваша корзина</p>
+                    <div v-for="(item, id) in cartStore.cartItems" :key="id"
+                      class="flex justify-between items-center py-2 border-b">
+                        <div class="flex items-center gap-2">
+                            <p class="text-sm font-medium">{{ getCardName(id) }}</p>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <select v-model="item.rateId" @change="cartStore.setRate(id, item.rateId)"
+                              class="border rounded p-1 text-sm">
+                                <option v-for="rate in getCardRates(id)" :key="rate.id" :value="rate.id">
+                                    {{ rate.title }}
+                                </option>
+                            </select>
+                            <div class="flex items-center gap-2">
+                                <button @click="cartStore.removeItem(id)"
+                                  class="px-2 py-1 bg-gray-200 rounded">-</button>
+                                <p class="text-sm font-medium">{{ item.count }}</p>
+                                <button @click="cartStore.addItem(id, item.rateId)"
+                                  class="px-2 py-1 bg-gray-200 rounded">+</button>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium">
+                            {{ getRatePrice(id, item.rateId) * item.count }} ₽
+                        </p>
+                        <button @click="cartStore.deleteItem(id)" class="text-red-500">Удалить</button>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-lg font-semibold">Итого: {{ cartStore.cardsData.totalSum }} ₽</p>
+                        <button class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Перейти к оформлению</button>
+                    </div>
                 </div>
+                <div v-else class="p-4 bg-white rounded-lg">
+                    <p class="text-lg font-medium text-gray-600">Ваша корзина пуста</p>
+                </div>
+
             </div>
         </div>
     </div>
