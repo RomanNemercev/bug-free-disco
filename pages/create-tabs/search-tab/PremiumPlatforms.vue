@@ -45,6 +45,7 @@ function getRatePrice(id, rateId) {
 }
 
 function handleAddToCart(cardId, selectedRate) {
+    console.log('cartStore:', cartStore);
     console.log('cardId:', cardId);
     console.log('selectedRate:', selectedRate);
 

@@ -30,6 +30,7 @@ export const useCartStore = defineStore('cart', {
   },
   actions: {
     addItem(id, rateId) {
+      console.log('Adding item:', { id, rateId })
       if (this.cartItems[id]) {
         this.cartItems[id].count++
       } else {
