@@ -11,6 +11,7 @@ import cardsData from '~/src/data/cards-data.json';
 import ratesData from '~/src/data/rates-data.json';
 
 const cartStore = useCartStore();
+console.log('cartStore', cartStore);
 
 onMounted(async () => {
     await Promise.all([
