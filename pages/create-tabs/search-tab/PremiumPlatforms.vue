@@ -64,6 +64,7 @@ const getCardProperty = (id, key) => {
 const selectedRate = ref('');
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
+console.log('cartStore is', cartStore ? 'available' : 'undefined');
 </script>
 
 <template>
