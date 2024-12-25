@@ -225,7 +225,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     <MultiDropdown :options="ratesData" class="mb-15px" variant="selected" v-model="card.selectedRate"
                       placeholder="Выберите тариф" />
                     <UiButton :variant="cartStore.isInCart(card.id) ? 'success' : 'action'"
-                      @click="handleAddToCart(card.id, card.selectedRate)" class="mt-auto">
+                      @click="handleAddToCart(card.id, card.selectedRate || null)" class="mt-auto">
                         {{ cartStore.isInCart(card.id) ? 'В корзине' : 'В корзину' }}
                         <svg-icon v-if="cartStore.isInCart(card.id)" name="check-success" width="16" height="16" />
                     </UiButton>
