@@ -44,7 +44,7 @@ function getRatePrice(id, rateId) {
     return rate.price || 0; // Если у тарифа нет цены, возвращаем 0
 }
 
-function handleAddToCart(cardId, selectedRate) {
+const handleAddToCart = (cardId, selectedRate) => {
     console.log('cardId:', cardId);
     console.log('selectedRate:', selectedRate);
 
@@ -52,8 +52,8 @@ function handleAddToCart(cardId, selectedRate) {
         alert('Пожалуйста, выберите тарифный план.');
         return;
     }
-    this.cartStore.addItem(cardId, selectedRate.id);
-}
+    cartStore.addItem(cardId, selectedRate.id); // Теперь `this` корректен
+};
 
 const getCardProperty = (id, key) => {
     const card = cartStore.cardsData.find(card => card.id === id);
