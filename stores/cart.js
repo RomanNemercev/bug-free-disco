@@ -49,6 +49,7 @@ export const useCartStore = defineStore('cart', {
       return !!this.cartItems[id]
     },
     setCardsData(cards) {
+      console.log('Pinia store initialized with cards data:', cards)
       this.cardsData = cards
     },
     setRatesData(rates) {
