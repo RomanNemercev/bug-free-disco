@@ -45,11 +45,14 @@ function getRatePrice(id, rateId) {
 }
 
 function handleAddToCart(cardId, selectedRate) {
+    console.log('cardId:', cardId);
+    console.log('selectedRate:', selectedRate);
+
     if (!selectedRate) {
         alert('Пожалуйста, выберите тарифный план.');
         return;
     }
-    cartStore.addItem(cardId, selectedRate.id);
+    this.cartStore.addItem(cardId, selectedRate.id);
 }
 
 const getCardProperty = (id, key) => {
