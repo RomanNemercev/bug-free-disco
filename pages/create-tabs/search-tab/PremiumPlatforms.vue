@@ -3,7 +3,7 @@ import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 
-import { useCartStore } from '@/stores/cart';
+import { useCartStore } from '@/stores/cart.js';
 import { onMounted } from 'vue';
 
 import optionsData from '~/src/data/options-data.json';
