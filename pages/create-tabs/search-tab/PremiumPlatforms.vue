@@ -3,7 +3,7 @@ import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 
-import { useCartStore } from '@/stores/cart.js';
+import { useCartStore } from '@/stores/cart';
 import { onMounted } from 'vue';
 
 import optionsData from '~/src/data/options-data.json';
@@ -11,12 +11,13 @@ import cardsData from '~/src/data/cards-data.json';
 import ratesData from '~/src/data/rates-data.json';
 
 const cartStore = useCartStore();
-console.log('cartStore', cartStore);
 
-await Promise.all([
-    cartStore.setCardsData(cardsData),
-    cartStore.setRatesData(ratesData)
-]);
+onMounted(async () => {
+    await Promise.all([
+        cartStore.setCardsData(cardsData),
+        cartStore.setRatesData(ratesData)
+    ]);
+});
 function getCardName(id) {
     const card = this.cartStore.cardsData.find(card => card.id === id);
     return card?.name || 'Неизвестный товар';
@@ -43,10 +44,6 @@ function getRatePrice(id, rateId) {
 }
 
 function handleAddToCart(cardId, selectedRate) {
-    // console.log('cartStore:', cartStore);
-    console.log('cardId:', cardId);
-    console.log('selectedRate:', selectedRate);
-
     if (!selectedRate) {
         alert('Пожалуйста, выберите тарифный план.');
         return;
@@ -62,7 +59,6 @@ const getCardProperty = (id, key) => {
 const selectedRate = ref('');
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
-console.log('cartStore is', cartStore ? 'available' : 'undefined');
 </script>
 
 <template>

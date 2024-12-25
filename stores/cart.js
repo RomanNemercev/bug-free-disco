@@ -30,7 +30,6 @@ export const useCartStore = defineStore('cart', {
   },
   actions: {
     addItem(id, rateId) {
-      console.log('Adding item:', { id, rateId })
       if (this.cartItems[id]) {
         this.cartItems[id].count++
       } else {
@@ -49,7 +48,6 @@ export const useCartStore = defineStore('cart', {
       return !!this.cartItems[id]
     },
     setCardsData(cards) {
-      console.log('Pinia store initialized with cards data:', cards)
       this.cardsData = cards
     },
     setRatesData(rates) {
