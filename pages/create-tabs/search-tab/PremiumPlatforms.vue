@@ -49,11 +49,12 @@ function handleAddToCart(cardId, selectedRate) {
     console.log('cardId:', cardId);
     console.log('selectedRate:', selectedRate);
 
+    const store = cartStore; // Сохранить явный контекст
     if (!selectedRate) {
         alert('Пожалуйста, выберите тарифный план.');
         return;
     }
-    this.cartStore.addItem(cardId, selectedRate.id);
+    store.addItem(cardId, selectedRate.id);
 }
 
 const getCardProperty = (id, key) => {
