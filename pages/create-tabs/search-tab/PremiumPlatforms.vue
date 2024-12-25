@@ -13,12 +13,10 @@ import ratesData from '~/src/data/rates-data.json';
 const cartStore = useCartStore();
 console.log('cartStore', cartStore);
 
-onMounted(async () => {
-    await Promise.all([
-        cartStore.setCardsData(cardsData),
-        cartStore.setRatesData(ratesData)
-    ]);
-});
+await Promise.all([
+    cartStore.setCardsData(cardsData),
+    cartStore.setRatesData(ratesData)
+]);
 function getCardName(id) {
     const card = this.cartStore.cardsData.find(card => card.id === id);
     return card?.name || 'Неизвестный товар';
