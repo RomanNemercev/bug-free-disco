@@ -6,112 +6,17 @@ import CardIcon from '~/components/custom/CardIcon.vue';
 import { useCartStore } from '@/stores/cart';
 import { onMounted } from 'vue';
 
+import optionsData from '~/src/data/options-data.json';
+import cardsData from '~/src/data/cards-data.json';
+import ratesData from '~/src/data/rates-data.json';
+
 const cartStore = useCartStore();
-
-// Передаём данные карточек в хранилище
-
-// console.log(cartStore.cartItems);
 
 onMounted(() => {
     // Инициализируем данные через Pinia
-    cartStore.setCardsData([
-        {
-            id: 'basket-1',
-            name: 'hh.ru',
-            icon: 'hh',
-            isPng: false,
-            selectedRate: null,
-        },
-        {
-            id: 'basket-2',
-            name: 'avito.ru',
-            icon: 'avito',
-            isPng: false,
-            selectedRate: null,
-        },
-        {
-            id: 'basket-3',
-            name: 'rabota.ru',
-            icon: 'rabota-ru',
-            isPng: false,
-            selectedRate: null,
-        },
-        {
-            id: 'basket-4',
-            name: 'zarplata.ru',
-            icon: 'zarplata',
-            isPng: false,
-            selectedRate: null,
-        },
-        {
-            id: 'basket-5',
-            name: 'superjob',
-            icon: 'superjob',
-            isPng: false,
-            selectedRate: null,
-        },
-        {
-            id: 'basket-6',
-            name: 'youla.ru',
-            icon: false,
-            isPng: true,
-            imagePath: '/img/logo.png',
-            selectedRate: null,
-        },
-        {
-            id: 'basket-7',
-            name: 'careerist.ru',
-            icon: 'careerist',
-            isPng: false,
-            selectedRate: null,
-        },
-    ]);
+    cartStore.setCardsData(cardsData);
+    cartStore.setRatesData(ratesData);
 });
-
-const optionsData = [
-    {
-        id: 1,
-        title: "Стандарт (2)",
-        description: "Стандартная вакансия, размещается на 30 дней."
-    },
-    {
-        id: 2,
-        title: "Бизнес",
-        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней."
-    }
-];
-
-const ratesData = [
-    {
-        id: "rates-1",
-        title: "Стандарт (1 490 ₽)",
-        name: "Стандарт",
-        description: "Стандартная вакансия, размещается на 30 дней.",
-        price: 1490,
-    },
-    {
-        id: "rates-2",
-        title: "С автоподнятием (4 390 ₽)",
-        name: "С автоподнятием",
-        description: "Вакансия поднимается каждые 3 дня, в течении 30 дней.",
-        price: 4390,
-    },
-    {
-        id: "rates-3",
-        title: "Бизнес (14 640 ₽)",
-        name: "Бизнес",
-        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
-        price: 14640,
-    },
-    {
-        id: "rates-4",
-        title: "Бизнес",
-        name: "Бизнес",
-        description: "Вакансия висит в топе в течении 7 дней, размещается на 7 дней.",
-        price: 0,
-    }
-];
-
 function getCardName(id) {
     const card = this.cartStore.cardsData.find(card => card.id === id);
     return card?.name || 'Неизвестный товар';
@@ -302,8 +207,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         <p class="text-sm font-normal text-slate-custom mb-25px">Вакансия будет опубликована с&nbsp;аккаунта Jobly, все
             остальное остается прежним</p>
         <div class="w-full gap-x-15px flex">
-            <div
-              class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] flex-wrap w-full">
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] w-full">
                 <!-- Динамический рендеринг карточек -->
                 <div v-for="card in cartStore.cardsData" :key="card.id"
                   class="p-25px bg-white rounded-fifteen flex flex-col min-w-56 min-h-[248px]">
@@ -322,13 +226,13 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     </UiButton>
                 </div>
             </div>
-            <div>
+            <div class="max-w-[275px] w-full">
                 <div v-if="Object.keys(cartStore.cartItems).length > 0"
                   class="flex flex-col p-25px bg-white rounded-fifteen">
                     <p class="text-xl font-semibold text-gray-900 mb-25px">Ваша корзина</p>
-                    <div class="w-full h-[1px] bg-athens mb-25px"></div>
+                    <div class="w-full h-[1px] bg-athens"></div>
                     <div v-for="(item, id) in cartStore.cartItems" :key="id"
-                      class="flex justify-between flex-col py-2 border-b">
+                      class="flex justify-between flex-col border-b py-25px">
                         <div class="flex gap-x-15px mb-25px">
                             <CardIcon :icon="getCardProperty(id, 'icon')" :isPng="getCardProperty(id, 'isPng')"
                               :imagePath="getCardProperty(id, 'imagePath')" />
@@ -342,8 +246,12 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                         </div>
                         <div class="flex gap-15px">
                             <div class="flex items-center gap-x-5px w-full">
-                                <button @click="cartStore.removeItem(id)"
-                                  class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger transition-all shrink-0"><svg-icon
+                                <button @click="cartStore.removeItem(id)" :disabled="cartStore.isRemoveDisabled(id)"
+                                  :class="{
+                                    'opacity-50 cursor-not-allowed': cartStore.isRemoveDisabled(id),
+                                    'hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger': !cartStore.isRemoveDisabled(id),
+                                }"
+                                  class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom transition-all shrink-0"><svg-icon
                                       name="basket-minus" width="20" height="20" /></button>
                                 <p
                                   class="text-sm font-semibold w-full h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-space">
@@ -356,18 +264,23 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                               class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-red hover:border-cinderella hover:bg-pink active:text-white active:bg-red active:border-red transition-all ml-auto shrink-0"><svg-icon
                                   name="basket-basket" width="20" height="20" /></button>
                         </div>
-
                     </div>
                     <div class="mt-4">
-                        <p class="text-lg font-semibold">Итого: {{ cartStore.cardsData.totalSum }} ₽</p>
-                        <button class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg">Перейти к оформлению</button>
+                        <div class="flex justify-between">
+                            <p class="text-sm font-normal text-slate-custom">Позиций</p>
+                            <p class="text-15px font-semibold text-space">{{ cartStore.totalItems }}</p>
+                        </div>
+                        <div class="flex justify-between mb-35px">
+                            <p class="text-sm font-normal text-slate-custom">Итого</p>
+                            <p class="text-15px font-semibold text-space">{{ cartStore.totalSum }} ₽</p>
+                        </div>
+                        <UiButton variant="action" size="action" class="w-full">Перейти к оформлению</UiButton>
                     </div>
                 </div>
-                <div v-else class="p-4 bg-white rounded-lg">
+                <div v-else class="p-4 bg-white rounded-fifteen">
                     <p class="text-lg font-medium text-gray-600">Ваша корзина пуста</p>
                     <p class="text-sm font-normal text-slate-custom">Пока здесь пусто</p>
                 </div>
-
             </div>
         </div>
     </div>

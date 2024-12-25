@@ -5,7 +5,8 @@
             (isSelected && selectedOption) ? 'bg-zumthor text-dodger' : 'bg-athens-gray',
         ]" @click="toggleDropDown">
             <div>
-                <div :class="(isSelected && selectedOption) ? 'text-dodger' : 'text-space'" class="text-sm">
+                <div :class="(isSelected && selectedOption) ? 'text-dodger' : 'text-space'"
+                  class="text-sm truncate pr-4">
                     {{ mappedSelectedOption || props.placeholder }}
                 </div>
                 <!-- Стрелка -->
@@ -26,6 +27,7 @@
                   v-for="(option, index) in props.options" :key="index" @click="toggleOptionSelect(option)">
                     <div class="text-space text-sm">{{ option.title }}</div>
                     <div class="text-xs text-slate-custom text-13px">{{ option.description }}</div>
+                    <div class="text-xs text-slate-custom text-13px">{{ option.price_list }}</div>
                 </div>
             </div>
         </transition>

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "basket-1",
+    "name": "hh.ru",
+    "icon": "hh",
+    "isPng": false,
+    "selectedRate": null
+  },
+  {
+    "id": "basket-2",
+    "name": "avito.ru",
+    "icon": "avito",
+    "isPng": false,
+    "selectedRate": null
+  },
+  {
+    "id": "basket-3",
+    "name": "rabota.ru",
+    "icon": "rabota-ru",
+    "isPng": false,
+    "selectedRate": null
+  },
+  {
+    "id": "basket-4",
+    "name": "zarplata.ru",
+    "icon": "zarplata",
+    "isPng": false,
+    "selectedRate": null
+  },
+  {
+    "id": "basket-5",
+    "name": "superjob",
+    "icon": "superjob",
+    "isPng": false,
+    "selectedRate": null
+  },
+  {
+    "id": "basket-6",
+    "name": "youla.ru",
+    "icon": false,
+    "isPng": true,
+    "imagePath": "/img/logo.png",
+    "selectedRate": null
+  },
+  {
+    "id": "basket-7",
+    "name": "careerist.ru",
+    "icon": "careerist",
+    "isPng": false,
+    "selectedRate": null
+  }
+]

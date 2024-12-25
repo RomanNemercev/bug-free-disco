@@ -4,6 +4,7 @@ export const useCartStore = defineStore('cart', {
   state: () => ({
     cartItems: {}, // Объект вида { id: { count, rateId } }
     cardsData: [],
+    ratesData: [],
   }),
   getters: {
     totalSum(state) {
@@ -11,11 +12,20 @@ export const useCartStore = defineStore('cart', {
         (sum, [id, { count, rateId }]) => {
           const card = state.cardsData.find(card => card.id === id)
           if (!card) return sum // Пропускаем, если карточка не найдена
-          const rate = ratesData.find(rate => rate.id === rateId) // Найди тариф
+          const rate = state.ratesData.find(rate => rate.id === rateId) // Используем state.ratesData
           return sum + (rate ? count * rate.price : 0) // Используем свойство price
         },
         0
       )
+    },
+    totalItems(state) {
+      return Object.values(state.cartItems).reduce(
+        (total, { count }) => total + count,
+        0
+      )
+    },
+    isRemoveDisabled: state => id => {
+      return state.cartItems[id]?.count <= 1 // Кнопка отключается при count <= 1
     },
   },
   actions: {
@@ -29,8 +39,6 @@ export const useCartStore = defineStore('cart', {
     removeItem(id) {
       if (this.cartItems[id]?.count > 1) {
         this.cartItems[id].count--
-      } else {
-        delete this.cartItems[id]
       }
     },
     deleteItem(id) {
@@ -41,6 +49,9 @@ export const useCartStore = defineStore('cart', {
     },
     setCardsData(cards) {
       this.cardsData = cards
+    },
+    setRatesData(rates) {
+      this.ratesData = rates // Метод для инициализации ratesData
     },
   },
 })
