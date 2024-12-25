@@ -12,10 +12,11 @@ import ratesData from '~/src/data/rates-data.json';
 
 const cartStore = useCartStore();
 
-onMounted(() => {
-    // Инициализируем данные через Pinia
-    cartStore.setCardsData(cardsData);
-    cartStore.setRatesData(ratesData);
+onMounted(async () => {
+    await Promise.all([
+        cartStore.setCardsData(cardsData),
+        cartStore.setRatesData(ratesData)
+    ]);
 });
 function getCardName(id) {
     const card = this.cartStore.cardsData.find(card => card.id === id);
