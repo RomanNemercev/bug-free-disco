@@ -44,7 +44,7 @@ function getRatePrice(id, rateId) {
     return rate.price || 0; // Если у тарифа нет цены, возвращаем 0
 }
 
-const handleAddToCart = (cardId, selectedRate) => {
+function handleAddToCart(cardId, selectedRate) {
     console.log('cardId:', cardId);
     console.log('selectedRate:', selectedRate);
 
@@ -52,15 +52,15 @@ const handleAddToCart = (cardId, selectedRate) => {
         alert('Пожалуйста, выберите тарифный план.');
         return;
     }
-    cartStore.addItem(cardId, selectedRate.id); // Теперь `this` корректен
-};
+    this.cartStore.addItem(cardId, selectedRate.id);
+}
 
 const getCardProperty = (id, key) => {
     const card = cartStore.cardsData.find(card => card.id === id);
     return card ? card[key] : null; // Если карта найдена, вернуть значение ключа
 };
 
-const selectedRate = ref('');
+const selectedRate = ref(null);
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
 </script>
