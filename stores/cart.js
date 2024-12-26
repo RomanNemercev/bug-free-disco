@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia'
-import cardsData from '~/src/data/cards-data.json'
-import ratesData from '~/src/data/rates-data.json'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
