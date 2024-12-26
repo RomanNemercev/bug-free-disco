@@ -68,7 +68,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
 
         <!-- Контент страницы -->
         <p class="text-xl font-semibold text-space mb-5px">Подключенные профили</p>
-        <p class="text-sm font-normal text-slate-custom mb-25px">Авторизуйте ваши аккаунты на&nbsp;работных сайтах один
+        <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">Авторизуйте ваши аккаунты
+            на&nbsp;работных сайтах один
             раз
             и&nbsp;управляйте вакансиями удаленно</p>
         <!-- Первый блок -->
@@ -132,11 +133,12 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         </div>
         <!-- Второй блок -->
         <p class="text-xl font-semibold text-space mb-5px">Доступные публикации</p>
-        <p class="text-sm font-normal text-slate-custom mb-25px">Авторизуйте ваши аккаунты на&nbsp;работных сайтах один
+        <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">Авторизуйте ваши аккаунты
+            на&nbsp;работных сайтах один
             раз и&nbsp;управляйте вакансиями удаленно</p>
         <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]">
             <!-- Первая карточка -->
-            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="hh" width="41" height="40" />
@@ -154,14 +156,14 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
                 <MultiDropdown :options="optionsData" :selected="optionsData[1]" class="mb-15px" />
-                <p class="text-sm font-medium text-space mb-auto">Статус:</p>
+                <p class="text-sm font-medium text-space mb-2.5">Статус:</p>
                 <div class="p-15px rounded-ten bg-serenade">
-                    <p class="text-sm font-medium text-space">Услуга ожидает оплаты по&nbsp;счету: <a href="#"
-                          class="text-orange underline">N2939238</a></p>
+                    <p class="text-sm font-medium text-space leading-normal">Услуга ожидает оплаты по&nbsp;счету: <a
+                          href="#" class="text-orange underline">N2939238</a></p>
                 </div>
             </div>
             <!-- Вторая карточка -->
-            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <svg-icon name="superjob" width="41" height="40" />
@@ -182,7 +184,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
             </div>
             <!-- Третья карточка -->
-            <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+            <div class="p-25px bg-white rounded-fifteen flex flex-col">
                 <div class="flex justify-between mb-3.5">
                     <div class="flex items-center gap-2.5">
                         <div class="youla-pic bg-img"></div>
@@ -205,7 +207,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         </div>
         <!-- Третий блок(магазин) -->
         <p class="text-xl font-semibold text-space mb-5px">Магазин Jobly </p>
-        <p class="text-sm font-normal text-slate-custom mb-25px">Вакансия будет опубликована с&nbsp;аккаунта Jobly, все
+        <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">Вакансия будет опубликована
+            с&nbsp;аккаунта Jobly, все
             остальное остается прежним</p>
         <div class="w-full gap-x-15px flex">
             <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] w-full">
