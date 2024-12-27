@@ -210,7 +210,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
         <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">Вакансия будет опубликована
             с&nbsp;аккаунта Jobly, все
             остальное остается прежним</p>
-        <div class="w-full gap-x-15px flex">
+        <div class="w-full gap-x-25px flex">
             <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] w-full">
                 <!-- Динамический рендеринг карточек -->
                 <div v-for="card in cartStore.cardsData" :key="card.id"
@@ -221,10 +221,10 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                     </div>
                     <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                     <p class="text-sm font-medium text-space mb-3.5">Тарифный план:</p>
-                    <MultiDropdown :options="ratesData" class="mb-15px" variant="selected" v-model="card.selectedRate"
+                    <MultiDropdown :options="ratesData" class="mb-auto" variant="selected" v-model="card.selectedRate"
                       placeholder="Выберите тариф" />
-                    <UiButton :variant="cartStore.isInCart(card.id) ? 'success' : 'action'"
-                      @click="handleAddToCart(card.id, card.selectedRate)" class="mt-auto">
+                    <UiButton :variant="cartStore.isInCart(card.id) ? 'success' : 'action'" size="action"
+                      @click="handleAddToCart(card.id, card.selectedRate)">
                         {{ cartStore.isInCart(card.id) ? 'В корзине' : 'В корзину' }}
                         <svg-icon v-if="cartStore.isInCart(card.id)" name="check-success" width="16" height="16" />
                     </UiButton>
@@ -281,9 +281,9 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                         <UiButton variant="action" size="action" class="w-full">Перейти к оформлению</UiButton>
                     </div>
                 </div>
-                <div v-else class="p-4 bg-white rounded-fifteen">
-                    <p class="text-lg font-medium text-gray-600">Ваша корзина пуста</p>
-                    <p class="text-sm font-normal text-slate-custom">Пока здесь пусто</p>
+                <div v-else class="p-25px bg-white rounded-fifteen">
+                    <p class="text-xl font-medium text-space mb-15px">Ваша корзина</p>
+                    <p class="text-sm font-normal text-slate-custom">Пока что здесь пусто</p>
                 </div>
             </div>
         </div>
