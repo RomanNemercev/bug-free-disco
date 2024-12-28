@@ -2,7 +2,7 @@
 import CopyBoard from "~/components/custom/CopyBoard.vue";
 
 // Состояние для определения текущей активной страницы
-const currentPage = ref('premiumPlatforms');
+const currentPage = ref('freePlatforms');
 
 // Лениво загружаемые компоненты
 const pages = {
