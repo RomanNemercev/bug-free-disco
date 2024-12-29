@@ -30,6 +30,7 @@ import industry from '~/src/data/industry.json';
 import specialization from '~/src/data/specialization.json';
 
 import { ref, onMounted } from 'vue';
+import { useVacancyStore } from '@/stores/vacancy';
 import majors from "~/src/data/majors.json";
 
 const ArraySpecialization = specialization;
@@ -43,7 +44,8 @@ const ArraySchedule = schedule;
 const ArrayMajors = majors;
 const ArrayIndustry = industry;
 
-const major = ref('')
+const vacancyStore = useVacancyStore();
+const newVacancy = ref('Менеджер по продажам');
 const options = ref([
     {
         name: 'Полная',
@@ -108,6 +110,10 @@ const phone = ref("");
 const email = ref("");
 const selectedIndustry = ref(null);
 const selectedSpecialization = ref(null);
+function saveVacancy() {
+    vacancyStore.setNameVacancy(newVacancy.value); // Сохраняем в глобальное хранилище
+    alert('Название вакансии сохранено!');
+}
 </script>
 
 <template>
@@ -119,8 +125,8 @@ const selectedSpecialization = ref(null);
                     <div class="w-full">
                         <p class="text-sm font-medium mb-4 leading-normal text-space"><span class="text-red">*</span>
                             Название должности</p>
-                        <Autocomplete :source="ArrayMajors" v-model="major" placeholder="Например, Менеджер по продажам"
-                          class="mb-11px" />
+                        <Autocomplete :source="ArrayMajors" v-model="newVacancy"
+                          placeholder="Например, Менеджер по продажам" class="mb-11px" />
                         <p class="text-xs text-bali">Осталось 80 символов. Специальных символов нет.</p>
                     </div>
                     <div class="w-full">
@@ -324,7 +330,8 @@ const selectedSpecialization = ref(null);
                     до&nbsp;4&nbsp;часов.</p>
             </div>
         </div>
-        <UiButton variant="action" size="semiaction" class="font-semibold">Сохранить и продолжить</UiButton>
+        <UiButton @click="saveVacancy" variant="action" size="semiaction" class="font-semibold">Сохранить и продолжить
+        </UiButton>
     </div>
 </template>
 
