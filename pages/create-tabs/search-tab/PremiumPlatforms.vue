@@ -2,9 +2,11 @@
 import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
+import Popup from '~/components/custom/Popup.vue';
+import EmailDropdown from '~/components/custom/EmailDropdown.vue';
 
 import { useCartStore } from '@/stores/cart';
-import { onMounted } from 'vue';
+import { onMounted, ref, onBeforeUnmount } from 'vue';
 
 import optionsData from '~/src/data/options-data.json';
 import cardsData from '~/src/data/cards-data.json';
@@ -59,6 +61,43 @@ const getCardProperty = (id, key) => {
 const selectedRate = ref('');
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
+
+const isPopupOpen = ref(true); // control visibility popup
+
+function openPopup(content) {
+    isPopupOpen.value = true;
+    disableBodyScroll();
+}
+
+function closePopup() {
+    isPopupOpen.value = false;
+    enableBodyScroll();
+}
+
+// Функции для управления прокруткой
+function disableBodyScroll() {
+    document.body.style.overflow = 'hidden'; // Отключаем прокрутку
+}
+
+function enableBodyScroll() {
+    document.body.style.overflow = ''; // Восстанавливаем прокрутку
+}
+
+// Убедимся, что при размонтировании компонента скролл включится
+onBeforeUnmount(() => {
+    enableBodyScroll();
+});
+
+const emailOptions = [
+    { email: 'evseev@gmail.com', name: 'rabota.ru', icon: new URL('@/assets/img/rabota-ru.svg', import.meta.url).href },
+    { email: 'Jobly', name: 'zarplata.ru', icon: new URL('@/assets/img/zarplata.svg', import.meta.url).href },
+    { email: 'alex2000@gmail.com', name: 'hh.ru', icon: new URL('@/assets/img/hh.svg', import.meta.url).href },
+    { email: 'evseev@gmail.com', name: 'superjob.ru', icon: new URL('@/assets/img/superjob.svg', import.meta.url).href },
+    { email: 'alex2000@gmail.com', name: 'youla.ru', icon: new URL('@/assets/img/youla.svg', import.meta.url).href },
+    { email: 'overmnogosimvolov@gmail.com', name: 'avito.ru', icon: new URL('@/assets/img/avito.svg', import.meta.url).href },
+];
+
+const selectedEmail = ref(null);
 </script>
 
 <template>
@@ -120,7 +159,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
                 <MultiDropdown :options="optionsData" :selected="optionsData[0]" />
-                <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
+                <UiButton variant="action" size="action" class="mt-auto" @click="openPopup">
+                    Опубликовать</UiButton>
             </div>
             <!-- Шаблон для добавления новой -->
             <div
@@ -181,7 +221,8 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
                 <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" />
-                <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
+                <UiButton variant="action" size="action" class="mt-auto" @click="openPopup">
+                    Опубликовать</UiButton>
             </div>
             <!-- Третья карточка -->
             <div class="p-25px bg-white rounded-fifteen flex flex-col">
@@ -202,7 +243,7 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
                 <p class="text-sm font-medium text-space mb-3.5">Баланс публикаций:</p>
                 <MultiDropdown :options="optionsData" :selected="optionsData[0]" class="mb-15px" variant="default" />
-                <UiButton variant="action" size="action" class="mt-auto">Опубликовать</UiButton>
+                <UiButton variant="action" size="action" class="mt-auto" @click="openPopup">Опубликовать</UiButton>
             </div>
         </div>
         <!-- Третий блок(магазин) -->
@@ -287,6 +328,22 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
                 </div>
             </div>
         </div>
+        <transition name="fade" @after-leave="enableBodyScroll">
+            <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false">
+                <!-- Добавляй любые компоненты и разметку -->
+                <div>
+                    <p class="text-xl text-space font-semibold leading-130 mb-25px">Новая публикация</p>
+                    <div class="w-full h-[1px] bg-athens mb-25px"></div>
+                    <p>Другие источники:</p>
+                    <EmailDropdown :options="emailOptions" v-model="selectedEmail" placeholder="Выберите аккаунт" />
+                    <div class="mt-4">
+                        <UiButton variant="action" size="action" @click="closePopup">
+                            Закрыть
+                        </UiButton>
+                    </div>
+                </div>
+            </Popup>
+        </transition>
     </div>
 </template>
 
@@ -299,5 +356,23 @@ const dropItems = ['Импорт публикаций', 'Отвязать про
 
 .youla-pic {
     background-image: url('@/assets/img/youla.svg');
+}
+
+/* Анимация появления и скрытия */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    /* transform: scale(0.95); */
+    /* Небольшое уменьшение */
+}
+
+.fade-leave-from {
+    opacity: 1;
+    /* transform: scale(1); */
 }
 </style>

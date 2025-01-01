@@ -94,14 +94,17 @@ const handleButtonClick = (card) => {
 
         <!-- Контент страницы -->
         <div>
-            <div class="flex justify-between items-end mb-25px">
+            <div class="flex justify-between items-end mb-6">
                 <div>
                     <p class="text-xl font-semibold text-space mb-2.5">Доступные площадки для размещения</p>
                     <p class="text-sm font-normal text-slate-custom">Опубликуйте вакансию на&nbsp;бесплатных ресурсах
                         в&nbsp;один
                         клик</p>
                 </div>
-                <UiButton variant="action" size="action" class="h-fit">Опубликовать на всех доступных
+                <UiButton variant="action" size="action" class="leading-normal py-2.5 px-5 text-sm font-semibold h-fit">
+                    Опубликовать
+                    на всех
+                    доступных
                     площадках
                 </UiButton>
             </div>
@@ -110,7 +113,7 @@ const handleButtonClick = (card) => {
                     <div v-for="card in cards" :key="card.id"
                       class="flex flex-col items-center justify-between p-25px rounded-fifteen bg-white">
                         <!-- Тултип (посадочное место) -->
-                        <div class="self-end cursor-pointer">
+                        <div class="tooltip-icon self-end cursor-pointer mb-[22px]">
                             <span>
                                 <svg-icon name="question" width="20" height="20" />
                                 <MyTooltip
@@ -119,7 +122,7 @@ const handleButtonClick = (card) => {
                         </div>
 
                         <!-- Заголовок -->
-                        <div class="company-logo min-h-20"></div>
+                        <div class="company-logo min-h-20 mb-25px"></div>
 
                         <!-- Состояния кнопок -->
                         <div class="w-full">
@@ -180,7 +183,10 @@ const handleButtonClick = (card) => {
 <style scoped>
 .grid {
     display: grid;
-    gap: 1rem;
+}
+
+.tooltip-icon {
+    transform: translate(1px, -1px);
 }
 
 .company-logo {
