@@ -95,6 +95,11 @@ input::placeholder {
     font-size: 14px;
     font-weight: 400;
     font-family: 'Inter', sans-serif;
+    max-width: 95%;
+}
+
+input:placeholder-shown {
+    text-overflow: ellipsis;
 }
 
 input:focus-within {
@@ -107,7 +112,7 @@ input.focused {
     background-repeat: no-repeat;
     background-position: 15px center;
     background-size: 20px 20px;
-    outline: 1px solid #5898FF;
+    border: 1px solid #5898FF;
 }
 
 /* input.has-value {

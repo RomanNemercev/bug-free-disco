@@ -138,7 +138,9 @@ function saveVacancy() {
                                   text="Каждая вакансия получает свой уникальный код, что позволяет точно идентифицировать её в системе и избежать путаницы, особенно при работе с большим количеством вакансий." />
                             </span>
                         </div>
-                        <MyInput :placeholder="'Код вакансии'" />
+                        <div class="max-w-400px">
+                            <MyInput :placeholder="'Код вакансии'" type="number" />
+                        </div>
                     </div>
                 </div>
                 <div class="w-full">

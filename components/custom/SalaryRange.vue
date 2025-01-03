@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex space-x-2">
+    <div class="w-full flex gap-x-2.5">
         <!-- Поле "От" -->
         <input type="text" v-model="from" @input="handleInput('from', $event.target.value)"
           @blur="handleBlurAndValidate('from')"

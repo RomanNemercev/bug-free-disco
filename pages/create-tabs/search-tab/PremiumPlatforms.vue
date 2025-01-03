@@ -4,6 +4,21 @@ import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
 import EmailDropdown from '~/components/custom/EmailDropdown.vue';
+import MyInput from '~/components/custom/MyInput.vue';
+import Autocomplete from '~/components/custom/Autocomplete.vue';
+import MyTooltip from "~/components/custom/MyTooltip.vue";
+import GenerateButton from "~/components/custom/GenerateButton.vue";
+import TiptapEditor from '~/components/TiptapEditor.vue';
+import CustomDropdown from "~/components/custom/CustomDropdown.vue";
+import MyDropdown from "~/components/custom/MyDropdown.vue";
+import TagSelect from "~/components/custom/TagSelect.vue";
+import MyAccordion from "~/components/custom/MyAccordion.vue";
+import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
+import SalaryRange from "~/components/custom/SalaryRange.vue";
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import CardOption from '@/components/custom/CardOption.vue';
+import GeoInput from '@/components/custom/GeoInput.vue';
 
 import { useCartStore } from '@/stores/cart';
 import { onMounted, ref, onBeforeUnmount } from 'vue';
@@ -11,7 +26,27 @@ import { onMounted, ref, onBeforeUnmount } from 'vue';
 import optionsData from '~/src/data/options-data.json';
 import cardsData from '~/src/data/cards-data.json';
 import ratesData from '~/src/data/rates-data.json';
+import majors from "~/src/data/majors.json";
+import industry from '~/src/data/industry.json';
+import specialization from '~/src/data/specialization.json';
+import schedule from "~/src/data/work-schedule.json";
+import experience from "~/src/data/experience.json";
+import education from "~/src/data/education.json";
+import AccordionAdditional from "~/src/data/accordion-additional.json";
+import CarId from "~/src/data/car-id.json";
+import MoreOptions from "~/src/data/more-options.json";
+import currency from "~/src/data/currency.json";
 
+const ArrayMajors = majors;
+const ArrayIndustry = industry;
+const ArraySpecialization = specialization;
+const ArraySchedule = schedule;
+const ArrayExperience = experience;
+const ArrayEducation = education;
+const ArrayAdditional = AccordionAdditional;
+const ArrayCarId = CarId;
+const ArrayOptions = MoreOptions;
+const ArrayCurrency = currency;
 const cartStore = useCartStore();
 
 onMounted(async () => {
@@ -74,6 +109,22 @@ function closePopup() {
     enableBodyScroll();
 }
 
+const handleCheck = (id) => {
+    selectedCard.value = id;
+}
+
+onMounted(() => {
+    selectedCard.value = "office";
+})
+
+const handleHover = (id) => {
+    hoveredCard.value = id;
+}
+
+const clearHover = () => {
+    hoveredCard.value = null;
+}
+
 // Функции для управления прокруткой
 function disableBodyScroll() {
     document.body.style.overflow = 'hidden'; // Отключаем прокрутку
@@ -97,7 +148,54 @@ const emailOptions = [
     { email: 'overmnogosimvolov@gmail.com', name: 'avito.ru', icon: new URL('@/assets/img/avito.svg', import.meta.url).href },
 ];
 
+const options = ref([
+    {
+        name: 'Полная',
+        value: 1,
+    },
+    {
+        name: 'Частичная',
+        value: 2,
+    },
+    {
+        name: 'Временная',
+        value: 3,
+    },
+    {
+        name: 'Стажировка',
+        value: 4,
+    },
+])
+
+const cards = [
+    {
+        id: 'office',
+        title: 'Офис',
+        description: 'Сотрудники<br>работают в офисе',
+    },
+    {
+        id: 'hybrid',
+        title: 'Гибрид',
+        description: 'Сотрудники работают как офисе,<br>так и дома',
+    },
+    {
+        id: 'outsource',
+        title: 'Удаленно',
+        description: 'Сотрудники<br>работают из дома',
+    }
+]
+
 const selectedEmail = ref(null);
+const countDays = ref(30);
+const newVacancy = ref('Менеджер по продажам');
+const selectedIndustry = ref(null);
+const selectedSpecialization = ref(null);
+const parentSelectedOption = ref(null);
+const selectedAdditional = ref([]);
+const selectedCarId = ref([]);
+const selectedOptions = ref([]);
+const selectedCard = ref(null);
+const hoveredCard = ref(null);
 </script>
 
 <template>
@@ -334,8 +432,156 @@ const selectedEmail = ref(null);
                 <div>
                     <p class="text-xl text-space font-semibold leading-130 mb-25px">Новая публикация</p>
                     <div class="w-full h-[1px] bg-athens mb-25px"></div>
-                    <p>Другие источники:</p>
-                    <EmailDropdown :options="emailOptions" v-model="selectedEmail" placeholder="Выберите аккаунт" />
+                    <p class="text-sm font-medium text-space mb-15px">Доступные источники:</p>
+                    <EmailDropdown :options="emailOptions" v-model="selectedEmail" placeholder="Выберите аккаунт"
+                      class="mb-25px" />
+                    <div class="flex gap-x-25px mb-25px">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-15px">Баланс публикаций:</p>
+                            <MultiDropdown :options="optionsData" :selected="optionsData[0]" />
+                        </div>
+                        <div class="max-w-[100px]">
+                            <p class="text-sm font-medium text-space mb-15px">Дней всего</p>
+                            <MyInput type="number" v-model="countDays" />
+                        </div>
+                    </div>
+                    <div class="w-full h-[1px] bg-athens mb-25px"></div>
+                    <div class="w-full justify-between flex gap-25px mb-6">
+                        <div class="w-full">
+                            <p class="text-sm font-medium mb-4 leading-normal text-space"><span
+                                  class="text-red">*</span>
+                                Название должности</p>
+                            <Autocomplete :source="ArrayMajors" v-model="newVacancy"
+                              placeholder="Например, Менеджер по продажам" class="mb-11px" />
+                            <p class="text-xs text-bali">Осталось 80 символов. Специальных символов нет.</p>
+                        </div>
+                        <div class="w-full max-w-[165px]">
+                            <div class="flex">
+                                <p class="text-sm font-medium mb-4 leading-normal text-space mr-[3px]">Код вакансии</p>
+                                <span>
+                                    <svg-icon name="question" width="20" height="20" />
+                                    <MyTooltip
+                                      text="Каждая вакансия получает свой уникальный код, что позволяет точно идентифицировать её в системе и избежать путаницы, особенно при работе с большим количеством вакансий." />
+                                </span>
+                            </div>
+                            <div class="max-w-400px">
+                                <MyInput :placeholder="'Код вакансии'" type="number" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-15px"><span class="text-red">*</span> Описание
+                                вакансии
+                            </p>
+                            <generate-button />
+                        </div>
+                    </div>
+                    <div class="mt-15px mb-3.5">
+                        <client-only>
+                            <tiptap-editor />
+                        </client-only>
+                    </div>
+                    <p class="text-xs text-bali font-normal mb-25px">Максимум 700 символов. Использовано 0 символов.</p>
+                    <div class="flex justify-between gap-25px">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Отрасль компании</p>
+                            <div class="w-full relative">
+                                <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль"
+                                  v-model="selectedIndustry" />
+                            </div>
+                        </div>
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Выберите специализацию</p>
+                            <div>
+                                <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
+                                  v-model="selectedSpecialization" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between gap-25px mb-3.5">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
+                            <my-dropdown :defaultValue="'Тип занятости'" :options="options"
+                              v-model="parentSelectedOption" />
+                        </div>
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">График работы</p>
+                            <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule" />
+                        </div>
+                    </div>
+                    <div class="flex justify-between gap-25px mb-3.5">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
+                            <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience" />
+                        </div>
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Образование</p>
+                            <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation" />
+                        </div>
+                    </div>
+                    <div class="w-full mb-9 max-w-input">
+                        <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
+                        <tag-select />
+                    </div>
+                    <div class="w-fit mb-25px">
+                        <MyAccordion title="дополнительные условия" class="mb-15px">
+                            <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
+                                <CheckboxGroup v-model="selectedAdditional" :options="ArrayAdditional" />
+                            </div>
+                        </MyAccordion>
+                        <MyAccordion title="водительские права" class="mb-15px">
+                            <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
+                                <CheckboxGroup v-model="selectedCarId" :options="ArrayCarId" />
+                            </div>
+                        </MyAccordion>
+                        <MyAccordion title="дополнительные пожелания">
+                            <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
+                                <CheckboxGroup v-model="selectedOptions" :options="ArrayOptions" />
+                            </div>
+                        </MyAccordion>
+                    </div>
+                    <div class="flex justify-between gap-25px mb-25px">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-3.5">Заработная плата / мес</p>
+                            <SalaryRange class="mb-4" />
+                            <div>
+                                <RadioGroup default-value="past-cash" class="flex gap-x-[18px]">
+                                    <div class="my-checkbox">
+                                        <Label for="past-cash" class="cursor-pointer flex items-center">
+                                            <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
+                                            <p class="text-sm font-normal text-space">На руки</p>
+                                        </Label>
+                                    </div>
+                                    <div class="my-checkbox">
+                                        <Label for="full-cash" class="cursor-pointer flex items-center">
+                                            <RadioGroupItem id="full-cash" value="full-cash" class="mr-5px" />
+                                            <p class="text-sm font-normal text-space">До вычета налогов</p>
+                                        </Label>
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </div>
+                        <div class="w-full max-w-[215px]">
+                            <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
+                            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0" />
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-space mb-3.5">Место работы</p>
+                        <div class="mb-[23px]">
+                            <RadioGroup default-value="office" class="flex gap-x-15px w-full flex-wrap">
+                                <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
+                                  :description="card.description" :selectedCard="selectedCard"
+                                  :hoveredCard="hoveredCard" @update:selected="handleCheck" @hover="handleHover"
+                                  @leave="clearHover" />
+                            </RadioGroup>
+                        </div>
+                        <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
+                        <geo-input class="mb-2.5" />
+                        <p class="leading-normal text-xs text-bali font-normal">Укажите расположение офиса для нового
+                            сотрудника.</p>
+                    </div>
                     <div class="mt-4">
                         <UiButton variant="action" size="action" @click="closePopup">
                             Закрыть

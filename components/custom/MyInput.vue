@@ -1,19 +1,46 @@
 <script setup>
+import { ref, watch } from 'vue';
+
 const isFocused = ref(false)
 
 const props = defineProps({
     placeholder: {
         type: String,
         default: 'Введите значение'
+    },
+    type: {
+        type: String,
+        default: 'text'
+    },
+    modelValue: {
+        type: [String, Number],
+        default: null, // value on default
     }
 })
+
+const emit = defineEmits(['update:modelValue'])
+const localValue = ref(props.modelValue); // local state for control value
+
+// watch for value change
+watch(
+    () => props.modelValue,
+    (newValue) => {
+        localValue.value = newValue;
+    }
+);
+
+// update value on enter at input
+const updateValue = (event) => {
+    localValue.value = event.target.value;
+    emit('update:modelValue', localValue.value);
+};
 </script>
 
 <template>
-    <div class="w-full max-w-400px">
-        <input class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
-          :placeholder="isFocused ? '' : placeholder" @focus="isFocused = true" :class="{ 'focused': isFocused }"
-          @blur="isFocused = false" />
+    <div class="w-full">
+        <input :type="type" class="bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
+          :placeholder="isFocused ? '' : placeholder" :value="localValue" @input="updateValue" @focus="isFocused = true"
+          :class="{ 'focused': isFocused }" @blur="isFocused = false" />
     </div>
 </template>
 
@@ -25,6 +52,7 @@ input::placeholder {
 }
 
 .focused {
-    outline: 1px solid #5898FF;
+    border: 1px solid #5898FF;
+    outline: none;
 }
 </style>

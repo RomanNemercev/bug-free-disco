@@ -4,7 +4,7 @@
         <!-- Внешний контейнер с закруглениями -->
         <div
           class="bg-white max-w-[590px] w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform overflow-hidden"
-          :class="{ 'scale-100': isOpen, 'scale-95': !isOpen }">
+          :class="{ 'max-w-[620px]': customStyles }">
             <!-- Внутренний контейнер со скроллом -->
             <div ref="scrollContainer" class="overflow-y-auto h-full pr-[15px]" :style="customStyles">
                 <!-- btn for close (опционально) -->
