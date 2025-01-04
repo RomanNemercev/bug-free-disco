@@ -19,6 +19,10 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import CardOption from '@/components/custom/CardOption.vue';
 import GeoInput from '@/components/custom/GeoInput.vue';
+import ResponseInput from '@/components/custom/ResponseInput.vue';
+import PhoneInput from '~/components/custom/PhoneInput.vue';
+import EmailInput from '~/components/custom/EmailInput.vue';
+import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 
 import { useCartStore } from '@/stores/cart';
 import { onMounted, ref, onBeforeUnmount } from 'vue';
@@ -97,7 +101,9 @@ const selectedRate = ref('');
 
 const dropItems = ['Импорт публикаций', 'Отвязать профиль'];
 
-const isPopupOpen = ref(true); // control visibility popup
+const isPopupOpen = ref(false); // control visibility popup
+
+const addProfilePopup = ref(false);
 
 function openPopup(content) {
     isPopupOpen.value = true;
@@ -138,6 +144,20 @@ function enableBodyScroll() {
 onBeforeUnmount(() => {
     enableBodyScroll();
 });
+
+function addProfile() {
+    addProfilePopup.value = true;
+    disableBodyScroll();
+};
+
+function closeAddProfilePopup() {
+    addProfilePopup.value = false;
+    enableBodyScroll();
+}
+
+function publishVacancy() {
+    alert('Вакансия опубликована!');
+};
 
 const emailOptions = [
     { email: 'evseev@gmail.com', name: 'rabota.ru', icon: new URL('@/assets/img/rabota-ru.svg', import.meta.url).href },
@@ -196,6 +216,9 @@ const selectedCarId = ref([]);
 const selectedOptions = ref([]);
 const selectedCard = ref(null);
 const hoveredCard = ref(null);
+const email = ref("");
+const showContacts = ref(true);
+const phone = ref("");
 </script>
 
 <template>
@@ -262,7 +285,8 @@ const hoveredCard = ref(null);
             </div>
             <!-- Шаблон для добавления новой -->
             <div
-              class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors">
+              class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px] items-center justify-center cursor-pointer text-slate-custom hover:bg-dodger hover:text-dodger group transition-colors"
+              @click="addProfile">
                 <div class="w-[71px] h-[71px] rounded-full bg-white flex items-center justify-center mb-25px">
                     <svg-icon name="template-plus" width="31" height="31" />
                 </div>
@@ -427,7 +451,7 @@ const hoveredCard = ref(null);
             </div>
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false">
+            <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false" :width="'620px'" :height="'100%'">
                 <!-- Добавляй любые компоненты и разметку -->
                 <div>
                     <p class="text-xl text-space font-semibold leading-130 mb-25px">Новая публикация</p>
@@ -567,7 +591,7 @@ const hoveredCard = ref(null);
                             <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0" />
                         </div>
                     </div>
-                    <div>
+                    <div class="mb-25px">
                         <p class="text-sm font-medium text-space mb-3.5">Место работы</p>
                         <div class="mb-[23px]">
                             <RadioGroup default-value="office" class="flex gap-x-15px w-full flex-wrap">
@@ -582,11 +606,60 @@ const hoveredCard = ref(null);
                         <p class="leading-normal text-xs text-bali font-normal">Укажите расположение офиса для нового
                             сотрудника.</p>
                     </div>
-                    <div class="mt-4">
-                        <UiButton variant="action" size="action" @click="closePopup">
-                            Закрыть
+                    <div class="flex gap-x-25px">
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-15px">Контактное лицо</p>
+                            <response-input class="mb-6 w-full max-w-input" />
+                        </div>
+                        <div class="w-full">
+                            <p class="text-sm font-medium text-space mb-15px">Номер телефона</p>
+                            <phone-input v-model="phone" class="mb-25px" />
+                        </div>
+                    </div>
+                    <div class="w-full mb-25px">
+                        <p class="text-sm font-medium text-space leading-normal mb-4">Email</p>
+                        <email-input v-model="email" />
+                    </div>
+                    <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
+                    <div class="mt-9 flex justify-between">
+                        <UiButton variant="action" size="action" @click="publishVacancy">
+                            Опубликовать
+                        </UiButton>
+                        <UiButton variant="back" size="back" @click="closePopup">
+                            Отмена
                         </UiButton>
                     </div>
+                </div>
+            </Popup>
+        </transition>
+        <transition name="fade" @after-leave="enableBodyScroll">
+            <Popup :isOpen="addProfilePopup" @close="closeAddProfilePopup" :showCloseButton="false" :width="'361px'"
+              :height="'fit-content'">
+                <p class="text-xl font-semibold text-space mb-2.5">Подключить свой аккаунт</p>
+                <p class="text-sm font-normal text-slate-custom mb-25px">Укажите данные авторизации вашего профиля</p>
+                <div class="w-full mb-25px h-[1px] bg-athens"></div>
+                <div class="flex gap-[15px] flex-wrap">
+                    <button>
+                        <svg-icon name="hh-50" width="50" height="50" />
+                    </button>
+                    <button>
+                        <svg-icon name="rabota-50" width="50" height="50" />
+                    </button>
+                    <button>
+                        <svg-icon name="zarplata-50" width="50" height="50" />
+                    </button>
+                    <button>
+                        <svg-icon name="superjob-50" width="50" height="50" />
+                    </button>
+                    <button>
+                        <svg-icon name="careerist-50" width="50" height="50" />
+                    </button>
+                    <button>
+                        <div class="popup-youla"></div>
+                    </button>
+                    <button>
+                        <svg-icon name="avito-50" width="50" height="50" />
+                    </button>
                 </div>
             </Popup>
         </transition>
@@ -602,6 +675,13 @@ const hoveredCard = ref(null);
 
 .youla-pic {
     background-image: url('@/assets/img/youla.svg');
+}
+
+.popup-youla {
+    background-size: cover;
+    width: 50px;
+    height: 50px;
+    background-image: url('@/assets/img/youla-50.svg');
 }
 
 /* Анимация появления и скрытия */

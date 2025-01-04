@@ -1,7 +1,6 @@
 <template>
-    <div class="w-full max-w-400px">
-        <input v-model="formattedValue"
-          class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
+    <div class="w-full">
+        <input v-model="formattedValue" class="bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
           :class="{ 'focused': isFocused, 'border-red-500': error }" placeholder="+7-000-000-0000"
           @focus="isFocused = true" @blur="validatePhone" @input="handleInput" />
         <span v-if="error" class="text-red-500 text-xs">{{ error }}</span>

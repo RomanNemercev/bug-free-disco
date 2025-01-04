@@ -313,7 +313,7 @@ function saveVacancy() {
                 <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
                 <response-input class="mb-6 w-full max-w-input" />
                 <div class="w-full flex justify-between gap-x-[25px]">
-                    <div class="w-full">
+                    <div class="w-full max-w-[400px]">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>
                         <phone-input v-model="phone" class="mb-25px" />
                         <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />

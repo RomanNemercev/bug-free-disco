@@ -138,6 +138,7 @@ module.exports = {
       padding: {
         btn: '11.5px 15.5px',
         'semi-btn': '11.5px 20px',
+        'border-btn': '10.5px 15.5px',
         '3px': '3px',
         '4.5px': '4.5px',
         '10px': '10px',

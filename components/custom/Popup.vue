@@ -2,11 +2,11 @@
     <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
       :class="{ 'opacity-100': isOpen, 'opacity-0': !isOpen }" @click.self="closePopup">
         <!-- Внешний контейнер с закруглениями -->
-        <div
-          class="bg-white max-w-[590px] w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform overflow-hidden"
-          :class="{ 'max-w-[620px]': customStyles }">
+        <div class="bg-white w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform overflow-hidden"
+          :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height }" :class="{ 'pr-2.5': customStyles }">
             <!-- Внутренний контейнер со скроллом -->
-            <div ref="scrollContainer" class="overflow-y-auto h-full pr-[15px]" :style="customStyles">
+            <div ref="scrollContainer" class="overflow-y-auto h-full pr-[15px]"
+              :style="{ ...customStyles, maxHeight: height === 'auto' ? 'auto' : height }">
                 <!-- btn for close (опционально) -->
                 <button v-if="showCloseButton && !hasScrollbar" @click="closePopup"
                   class="absolute top-25px right-25px text-gray-500 hover:text-black">
@@ -30,6 +30,14 @@ const props = defineProps({
     showCloseButton: {
         type: Boolean,
         default: true, // По умолчанию кнопка отображается
+    },
+    width: {
+        type: String,
+        default: "fit-content",
+    },
+    height: {
+        type: String,
+        default: "auto",
     },
 });
 const emit = defineEmits(["close"]);
