@@ -10,7 +10,7 @@
               class="absolute right-0 mt-15px bg-white rounded-plus shadow-shadow-droplist cards z-10 min-w-[226px]">
                 <div v-for="(item, index) in items" :key="index"
                   class="cards-item px-15px py-2.5 text-slate-custom text-sm font-normal cursor-pointer hover:bg-gray-100 hover:text-space"
-                  @click="selectItem(item)">
+                  @click="handleClick(item)">
                     {{ item }}
                 </div>
             </div>
@@ -29,13 +29,14 @@ export default {
             required: true,
         },
     },
-    setup(props) {
+    emits: ['select-item'], // Добавляем emit события
+    setup(props, { emit }) {
         const isOpen = ref(false);
         const dropdownRef = ref(null);
 
         const toggleDropdown = () => {
             isOpen.value = !isOpen.value;
-        }
+        };
 
         const closeDropdown = (event) => {
             if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
@@ -43,9 +44,9 @@ export default {
             }
         };
 
-        const selectItem = (item) => {
-            console.log('Selected item:', item);
-            isOpen.value = false; // Закрываем меню после выбора
+        const handleClick = (item) => {
+            emit('select-item', item); // Эмитим событие при выборе
+            isOpen.value = false; // Закрываем меню
         };
 
         onMounted(() => {
@@ -59,7 +60,7 @@ export default {
         return {
             isOpen,
             toggleDropdown,
-            selectItem,
+            handleClick,
             dropdownRef,
         };
     },

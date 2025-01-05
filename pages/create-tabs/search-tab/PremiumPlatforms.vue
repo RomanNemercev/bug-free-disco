@@ -105,6 +105,20 @@ const isPopupOpen = ref(false); // control visibility popup
 
 const addProfilePopup = ref(false);
 
+const importPopup = ref(false);
+
+const handleSelectItem = (item) => {
+    if (item === 'Импорт публикаций') {
+        importPopup.value = true;
+        disableBodyScroll();
+    }
+}
+
+function closeImportPopup() {
+    importPopup.value = false;
+    enableBodyScroll();
+}
+
 function openPopup(content) {
     isPopupOpen.value = true;
     disableBodyScroll();
@@ -241,7 +255,7 @@ const phone = ref("");
                         <svg-icon name="hh" width="41" height="40" />
                         <p class="text-sm font-medium text-slate-custom">hh.ru</p>
                     </div>
-                    <DotsDropdonw :items="dropItems" />
+                    <DotsDropdonw :items="dropItems" @select-item="handleSelectItem" />
                 </div>
                 <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                 <p class="text-sm font-medium text-space mb-3.5">Аккаунт:</p>
@@ -268,7 +282,7 @@ const phone = ref("");
                         <svg-icon name="zarplata" width="41" height="40" />
                         <p class="text-sm font-medium text-slate-custom">zarplata.ru</p>
                     </div>
-                    <DotsDropdonw :items="dropItems" />
+                    <DotsDropdonw :items="dropItems" @select-item="handleSelectItem" />
                 </div>
                 <div class="w-full h-[1px] bg-athens mb-3.5"></div>
                 <p class="text-sm font-medium text-space mb-3.5">Аккаунт:</p>
@@ -661,6 +675,17 @@ const phone = ref("");
                         <svg-icon name="avito-50" width="50" height="50" />
                     </button>
                 </div>
+            </Popup>
+        </transition>
+        <transition name="fade" @after-leave="enableBodyScroll">
+            <Popup :isOpen="importPopup" @close="closeImportPopup" :showCloseButton="false" :width="'434px'"
+              :height="'fit-content'">
+                <p class="text-xl font-semibold text-space mb-2.5">Импорт публикаций</p>
+                <p class="text-sm font-normal text-slate-custom mb-25px">Свяжите уже размещенные объявления вашего
+                    профиля с вакансией в Jobly</p>
+                <div class="w-full mb-25px h-[1px] bg-athens"></div>
+                <p class="text-sm font-medium text-space mb-15px">Авторизованные профили:</p>
+                <EmailDropdown :options="emailOptions" placeholder="Выберите аккаунт" class="mb-25px" />
             </Popup>
         </transition>
     </div>
