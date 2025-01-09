@@ -50,7 +50,7 @@ const props = defineProps({
         required: true,
     },
     modelValue: {
-        type: String,
+        type: [String, Object],
         default: null,
     },
     placeholder: {

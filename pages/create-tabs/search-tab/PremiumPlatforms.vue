@@ -220,6 +220,7 @@ const cards = [
 ]
 
 const selectedEmail = ref(null);
+const importEmail = ref(null);
 const countDays = ref(30);
 const newVacancy = ref('Менеджер по продажам');
 const selectedIndustry = ref(null);
@@ -685,7 +686,17 @@ const phone = ref("");
                     профиля с вакансией в Jobly</p>
                 <div class="w-full mb-25px h-[1px] bg-athens"></div>
                 <p class="text-sm font-medium text-space mb-15px">Авторизованные профили:</p>
-                <EmailDropdown :options="emailOptions" placeholder="Выберите аккаунт" class="mb-25px" />
+                <EmailDropdown :options="emailOptions" v-model="importEmail" placeholder="Выберите аккаунт"
+                  class="mb-25px" />
+                <div class="loader-wrapper text-center bg-athens py-50px">
+                    <div class="loader mx-auto mb-25px"></div>
+                    <p class="text-13px text-dodger font-normal">Обновляем список вакансий</p>
+                </div>
+                <div class="flex w-full mt-[252px]">
+                    <UiButton variant="back" size="back" @click="closePopup" class="ml-auto px-[19.5px]">
+                        Отмена
+                    </UiButton>
+                </div>
             </Popup>
         </transition>
     </div>
@@ -725,5 +736,29 @@ const phone = ref("");
 .fade-leave-from {
     opacity: 1;
     /* transform: scale(1); */
+}
+
+/* loader */
+.loader {
+    width: 56px;
+    height: 56px;
+    background-image: url('@/assets/img/import-loader.png');
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader-wrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
 }
 </style>
