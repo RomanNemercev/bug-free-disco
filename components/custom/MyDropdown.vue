@@ -24,7 +24,7 @@
               class="options-wrapper absolute w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-10"
               v-if="isDropDownVisible">
                 <div
-                  class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer"
+                  class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer first:rounded-t-ten last:rounded-b-ten"
                   v-for="(option, index) in props.options" :key="index" @click="toggleOptionSelect(option)">
                     {{ option.name || option }}
                 </div>

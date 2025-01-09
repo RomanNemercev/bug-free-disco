@@ -2,7 +2,7 @@
 import CopyBoard from "~/components/custom/CopyBoard.vue";
 
 // Состояние для определения текущей активной страницы
-const currentPage = ref('premiumPlatforms');
+const currentPage = ref('responseSettings');
 
 // Лениво загружаемые компоненты
 const pages = {
@@ -11,7 +11,10 @@ const pages = {
     ),
     freePlatforms: defineAsyncComponent(() =>
         import('~/pages/create-tabs/search-tab/FreePlatforms.vue')
-    )
+    ),
+    responseSettings: defineAsyncComponent(() =>
+        import('~/pages/create-tabs/search-tab/ResponseSettings.vue')
+    ),
 }
 
 // Функция переключения страницы
@@ -83,7 +86,8 @@ function goBack() {
                             импорта поможет
                             легко скопировать и&nbsp;импортировать контакт со&nbsp;странице браузера, на&nbsp;которой
                             вы&nbsp;находитесь</p>
-                        <UiButton variant="semiaction" size="semiaction" class="w-full">Настроить</UiButton>
+                        <UiButton variant="semiaction" size="semiaction" class="w-full"
+                          @click="openPage('responseSettings')">Настроить</UiButton>
                     </div>
                     <div
                       class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
