@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="absolute w-full z-10">
     <div class="min-h-[153px] max-h-auto bg-white shadow-shadow-cards">
       <div class="container pt-25px pb-[16px]">
         <div class="flex mb-25px">

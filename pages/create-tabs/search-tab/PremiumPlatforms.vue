@@ -693,7 +693,7 @@ const phone = ref("");
                     <p class="text-13px text-dodger font-normal">Обновляем список вакансий</p>
                 </div>
                 <div class="flex w-full mt-[252px]">
-                    <UiButton variant="back" size="back" @click="closePopup" class="ml-auto px-[19.5px]">
+                    <UiButton variant="back" size="back" @click="closeImportPopup" class="ml-auto px-[19.5px]">
                         Отмена
                     </UiButton>
                 </div>

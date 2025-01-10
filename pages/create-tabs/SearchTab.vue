@@ -28,7 +28,7 @@ function goBack() {
 </script>
 
 <template>
-    <div class="container pb-72 pt-9">
+    <div class="container pb-72 pt-48">
         <div v-if="!currentPage">
             <p class="text-space text-xl font-semibold leading-normal mb-2">Опубликовать на сайтах</p>
             <p class="text-sm text-bali font-normal leading-normal mb-27px">Все что нужно, чтобы начать быстро и
