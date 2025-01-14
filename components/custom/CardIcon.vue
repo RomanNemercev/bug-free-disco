@@ -9,9 +9,9 @@
     </div>
 </template>
 
-#### Логика:
+<!-- #### Логика: -->
 
-```javascript
+<!-- ```javascript -->
 <script setup>
 defineProps({
     icon: { type: [String, Boolean], default: false },

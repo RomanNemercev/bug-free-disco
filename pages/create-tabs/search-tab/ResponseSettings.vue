@@ -1,6 +1,7 @@
 <script setup>
 import MinDropdown from '~/components/custom/MinDropdown.vue'
 import ConfigResponse from '~/components/custom/config-response/ConfigResponse.vue'
+import MoreQuestions from '~/components/custom/MoreQuestions.vue'
 
 const templates = [
     {
@@ -23,6 +24,7 @@ const activeTemplate = ref(null);
         <div class="flex gap-x-[24px] pt-4">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <ConfigResponse />
+                <MoreQuestions />
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
                 <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии

@@ -10,7 +10,10 @@
 <script>
 export default {
     props: {
-        value: Boolean, // Выбранное значение
+        value: {
+            type: [Boolean, String, Number],
+            required: true
+        },
         options: {
             type: Array,
             required: true,
@@ -43,21 +46,19 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    background-color: #f5f5f5;
-    color: #666;
-    font-size: 14px;
+    padding: 5px 10px;
+    background-color: transparent;
+    color: #79869a;
+    font-size: 13px;
     font-weight: 500;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .radio-group label.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
+    background-color: #5898ff;
+    color: #ffffff;
 }
 
 .hidden-radio {
