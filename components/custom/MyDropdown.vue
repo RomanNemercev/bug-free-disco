@@ -87,8 +87,9 @@ const toggleDropDown = () => {
 
 // Выбор значения
 const toggleOptionSelect = (option) => {
+    const valueToEmit = option?.name || option;
     selectedOption.value = option || null;
-    emit('update:modelValue', option?.name || option);
+    emit('update:modelValue', valueToEmit);
     isDropDownVisible.value = false;
 };
 

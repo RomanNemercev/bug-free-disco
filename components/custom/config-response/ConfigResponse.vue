@@ -13,7 +13,7 @@
                         <svg-icon name="drag-burger" width="20" height="20" />
                     </div>
                     <div
-                      class="w-full border border-athens rounded-ten bg-athens-gray flex justify-between items-center pl-15px pr-2.5 py-[6.5px]">
+                      class="w-full border border-athens rounded-ten bg-athens-gray flex justify-between items-center pl-15px pr-2.5 py-1">
                         <div class="max-w-[calc(100%/3)]">
                             <p class="text-sm font-normal text-space truncate">
                                 {{ element.title }}
