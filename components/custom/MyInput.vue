@@ -38,7 +38,8 @@ const updateValue = (event) => {
 
 <template>
     <div class="w-full">
-        <input :type="type" class="bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
+        <input :type="type"
+          class="text-sm font-normal bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
           :placeholder="isFocused ? '' : placeholder" :value="localValue" @input="updateValue" @focus="isFocused = true"
           :class="{ 'focused': isFocused }" @blur="isFocused = false" />
     </div>

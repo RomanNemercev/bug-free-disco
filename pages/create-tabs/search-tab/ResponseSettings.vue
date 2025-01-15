@@ -4,6 +4,7 @@ import ConfigResponse from '~/components/custom/config-response/ConfigResponse.v
 import MoreQuestions from '~/components/custom/MoreQuestions.vue'
 import Popup from '~/components/custom/Popup.vue';
 import MyDropdown from "~/components/custom/MyDropdown.vue";
+import MyInput from "~/components/custom/MyInput.vue";
 
 import { ref, watch } from 'vue';
 
@@ -25,6 +26,7 @@ const openSettingsPopup = ref(false);
 const openDeletePopup = ref(false);
 const openAddQuestionPopup = ref(false);
 const SettingsArrayValue = ref('');
+const InputExampleHeader = ref('Есть ли у вас гарнитура?');
 
 const handleSelectOption = (value) => {
     if (value === 'Поле для ввода в одну строку') {
@@ -89,10 +91,14 @@ function handleCloseAddQuestionPopup() {
         <slot name="back" />
         <MinDropdown :options="templates" v-model="activeTemplate" />
         <div class="flex gap-x-[24px] pt-4">
-            <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
-                <ConfigResponse />
-                <MoreQuestions @open-settings="handleOpenSettings" @open-delete="handleOpenDelete"
-                  @open-add-question="handleOpenAddQuestion" />
+            <div class="max-w-[875px]">
+                <div class="mb-25px p-25px bg-white rounded-fifteen">
+                    <ConfigResponse />
+                </div>
+                <div class="p-25px bg-white rounded-fifteen">
+                    <MoreQuestions @open-settings="handleOpenSettings" @open-delete="handleOpenDelete"
+                      @open-add-question="handleOpenAddQuestion" />
+                </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
                 <p class="text-space leading-[17px] text-13px font-normal">Ваша заявка на&nbsp;размещение вакансии
@@ -109,6 +115,11 @@ function handleCloseAddQuestionPopup() {
                 <p class="text-sm font-medium text-space">Тип вопроса</p>
                 <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray"
                   v-model="SettingsArrayValue" />
+                <div>
+                    <p class="text-sm font-medium text-space mt-15px">Заголовок</p>
+                    <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" />
+
+                </div>
             </Popup>
         </transition>
         <transition name="fade" @after-leave="enableBodyScroll">

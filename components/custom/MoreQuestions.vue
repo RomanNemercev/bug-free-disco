@@ -1,5 +1,9 @@
 <template>
     <div class="card-list">
+        <h2 class="text-xl font-semibold text-space mb-1">Дополнительные вопросы</h2>
+        <p class="text-sm font-normal text-slate-custom mb-8">
+            Добавляйте и редактируйте свои вопросы
+        </p>
         <draggable v-model="items" item-key="id" handle=".drag-handle" animation="200" ghost-class="ghost"
           chosen-class="chosen" @start="onDragStart" @end="onDragEnd">
             <template #item="{ element }">
