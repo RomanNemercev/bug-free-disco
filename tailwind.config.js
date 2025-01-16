@@ -41,6 +41,7 @@ module.exports = {
         green: '#04b600',
         cinderella: '#fdcece',
         pink: '#ffeaea',
+        'border-pink': 'rgba(245, 10, 10, 0.2)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -139,6 +140,7 @@ module.exports = {
         btn: '11.5px 15.5px',
         'semi-btn': '11.5px 20px',
         'border-btn': '10.5px 15.5px',
+        'border-semi-btn': '10.5px 20px',
         '3px': '3px',
         '4.5px': '4.5px',
         '10px': '10px',

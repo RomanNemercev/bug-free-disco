@@ -5,6 +5,8 @@ import MoreQuestions from '~/components/custom/MoreQuestions.vue'
 import Popup from '~/components/custom/Popup.vue';
 import MyDropdown from "~/components/custom/MyDropdown.vue";
 import MyInput from "~/components/custom/MyInput.vue";
+import GenerateDraggable from "~/components/custom/GenerateDraggable.vue";
+import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 
 import { ref, watch } from 'vue';
 
@@ -27,16 +29,10 @@ const openDeletePopup = ref(false);
 const openAddQuestionPopup = ref(false);
 const SettingsArrayValue = ref('');
 const InputExampleHeader = ref('Есть ли у вас гарнитура?');
-
-const handleSelectOption = (value) => {
-    if (value === 'Поле для ввода в одну строку') {
-        console.log('Поле для ввода в одну строку');
-    }
-};
-
-watch(SettingsArrayValue, (newValue) => {
-    handleSelectOption(newValue);
-});
+const makeRequired = ref(false);
+const NewArrayValue = ref('');
+const InputNewField = ref('');
+const makeRequiredNewField = ref(false);
 
 // config for control scroll
 function disableBodyScroll() {
@@ -95,9 +91,13 @@ function handleCloseAddQuestionPopup() {
                 <div class="mb-25px p-25px bg-white rounded-fifteen">
                     <ConfigResponse />
                 </div>
-                <div class="p-25px bg-white rounded-fifteen">
+                <div class="p-25px bg-white rounded-fifteen mb-25px">
                     <MoreQuestions @open-settings="handleOpenSettings" @open-delete="handleOpenDelete"
                       @open-add-question="handleOpenAddQuestion" />
+                </div>
+                <div class="gap-15px flex max-w-fit">
+                    <UiButton variant="action" size="semiaction">Сохранить и продолжить</UiButton>
+                    <UiButton variant="black" size="black" class="font-semibold">Сохранить и назвать шаблон</UiButton>
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
@@ -111,25 +111,54 @@ function handleCloseAddQuestionPopup() {
         <transition name="fade" @after-leave="enableBodyScroll">
             <Popup :isOpen="openSettingsPopup" @close="handleCloseSettingsPopup" :showCloseButton="false"
               :width="'490px'" :disableOverflowHidden="true" :topActive="true">
-                <p class="text-xl font-semibold text-space mb-25px">Редактор поля</p>
-                <p class="text-sm font-medium text-space">Тип вопроса</p>
+                <p class="text-xl font-semibold text-space mb-6">Редактор поля</p>
+                <p class="text-sm font-medium text-space mb-15px">Тип вопроса</p>
                 <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray"
                   v-model="SettingsArrayValue" />
-                <div>
-                    <p class="text-sm font-medium text-space mt-15px">Заголовок</p>
-                    <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" />
-
+                <div v-if="SettingsArrayValue === 'Поле для ввода в одну строку'">
+                    <p class="text-sm font-medium text-space my-15px">Заголовок</p>
+                    <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" class="mb-5" />
+                    <GenerateDraggable class="mb-[23px]" />
+                    <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequired"
+                      class="mb-25px" />
+                    <div class="flex gap-15px justify-between max-w-fit">
+                        <UiButton variant="action" size="semiaction">Сохранить</UiButton>
+                        <UiButton variant="back" size="second-back" @click="handleCloseSettingsPopup">Отмена
+                        </UiButton>
+                    </div>
                 </div>
             </Popup>
         </transition>
         <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="openDeletePopup" @close="handleCloseDeletePopup">
-                <p>Удалить</p>
+            <Popup :isOpen="openDeletePopup" @close="handleCloseDeletePopup" :width="'490px'" :showCloseButton="false">
+                <p class="leading-normal text-xl font-semibold text-space mb-2">Удаление поля</p>
+                <p class="text-sm font-normal text-slate-custom mb-25px">Вы действительно хотите удалить поле
+                    “Телефон”
+                    ?
+                </p>
+                <div class="flex gap-15px justify-between">
+                    <UiButton variant="back" size="second-back" @click="handleCloseDeletePopup">Отмена</UiButton>
+                    <UiButton variant="delete" size="delete">Удалить поле</UiButton>
+                </div>
             </Popup>
         </transition>
         <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="openAddQuestionPopup" @close="handleCloseAddQuestionPopup">
-                <p>Добавить вопрос</p>
+            <Popup :isOpen="openAddQuestionPopup" @close="handleCloseAddQuestionPopup" :width="'490px'"
+              :showCloseButton="false" :disableOverflowHidden="true" :topActive="true">
+                <p class="text-xl font-semibold text-space mb-6">Новое поле</p>
+                <p class="text-sm font-medium text-space mb-15px">Тип поля</p>
+                <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="NewArrayValue" />
+                <div v-if="NewArrayValue === 'Поле для ввода в одну строку'">
+                    <p class="text-sm font-medium text-space my-15px">Заголовок</p>
+                    <MyInput :placeholder="'Введите текст'" v-model="InputNewField" class="mb-5" />
+                    <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequiredNewField"
+                      class="mb-25px" />
+                    <div class="flex gap-15px justify-between max-w-fit">
+                        <UiButton variant="action" size="semiaction">Сохранить</UiButton>
+                        <UiButton variant="back" size="second-back" @click="handleCloseAddQuestionPopup">Отмена
+                        </UiButton>
+                    </div>
+                </div>
             </Popup>
         </transition>
     </div>

@@ -16,7 +16,7 @@
                 </svg>
             </div>
             <!-- Текстовое значение -->
-            <span class="text-sm text-space">{{ label }}</span>
+            <span class="text-sm text-space select-none">{{ label }}</span>
         </label>
     </div>
 </template>

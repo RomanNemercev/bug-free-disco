@@ -21,6 +21,7 @@ export const buttonVariants = cva(
         black: 'bg-space text-white',
         success: 'bg-feta text-green',
         back: 'bg-athens-gray border border-athens text-slate-custom',
+        delete: 'bg-pink border border-pink text-red',
       },
       size: {
         default: 'h-9 px-4 py-2',
@@ -33,6 +34,8 @@ export const buttonVariants = cva(
         black: 'p-semi-btn text-sm font-bold rounded-ten leading-normal',
         success: 'p-btn text-sm font-normal rounded-ten leading-normal',
         back: 'p-border-btn text-sm font-medium rounded-ten leading-normal',
+        'second-back': 'p-border-semi-btn text-sm font-normal rounded-ten leading-normal',
+        delete: 'p-border-semi-btn text-sm font-medium rounded-ten leading-normal',
       },
     },
     defaultVariants: {

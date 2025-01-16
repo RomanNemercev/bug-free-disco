@@ -13,7 +13,8 @@
                     </div>
                     <div
                       class="card-content flex items-center py-[9px] px-15px border border-athens rounded-ten bg-athens-gray w-full overflow-hidden">
-                        <svg-icon v-if="element.icon" :name="element.icon" width="18" height="18" class="mr-2.5" />
+                        <svg-icon v-if="element.icon" :name="element.icon" width="18" height="18"
+                          class="mr-2.5 text-slate-custom" />
                         <div class="star text-red mr-1">{{ element.star }}</div>
                         <div class="card-title text-sm font-normal text-space truncate">{{ element.title }}</div>
                     </div>
@@ -27,7 +28,7 @@
             </template>
         </draggable>
         <button class="add-question-button" @click="openAddQuestionPopup">
-            <svg-icon name="accordion-plus" width="20" height="20" /> Добавить вопрос
+            <svg-icon name="accordion-plus" width="20" height="20" class="mr-5px" /><span>Добавить вопрос</span>
         </button>
     </div>
 </template>

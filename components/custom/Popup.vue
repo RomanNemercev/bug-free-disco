@@ -3,7 +3,7 @@
       :class="{ 'opacity-100': isOpen, 'opacity-0': !isOpen }" @click.self="closePopup">
         <!-- Внешний контейнер с закруглениями -->
         <div class="bg-white w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform"
-          :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height, overflow: disableOverflowHidden ? 'visible' : 'hidden', top: topActive ? '-20%' : 'auto' }"
+          :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height, overflow: disableOverflowHidden ? 'visible' : 'hidden', top: topActive ? '-10%' : 'auto' }"
           :class="{ 'pr-2.5': customStyles }">
             <!-- Внутренний контейнер со скроллом -->
             <div ref="scrollContainer" class="overflow-y-auto h-full pr-[15px]"
