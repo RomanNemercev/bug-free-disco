@@ -30,7 +30,7 @@ export const buttonVariants = cva(
         lg: 'h-10 rounded-md px-8',
         icon: 'h-9 w-9',
         semiaction: 'p-semi-btn text-sm font-normal rounded-ten leading-normal',
-        action: 'p-btn text-sm font-semibold rounded-ten leading-normal',
+        action: 'p-btn text-sm font-semibold rounded-ten leading-normal h-fit',
         black: 'p-semi-btn text-sm font-bold rounded-ten leading-normal',
         success: 'p-btn text-sm font-normal rounded-ten leading-normal',
         back: 'p-border-btn text-sm font-medium rounded-ten leading-normal',

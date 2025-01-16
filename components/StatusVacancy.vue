@@ -27,7 +27,7 @@
             <li :class="{ 'active-tab': currentTab === 'search' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('search')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
+                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Поиск кандидатов</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -41,7 +41,7 @@
             <li :class="{ 'active-tab': currentTab === 'publish' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('publish')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
+                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Публикации (19)</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -55,7 +55,7 @@
             <li :class="{ 'active-tab': currentTab === 'team' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('team')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
+                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Команда вакансии</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -69,7 +69,7 @@
             <li :class="{ 'active-tab': currentTab === 'funnel' }" class="max-w-[230.8px] w-full pl-5px"
               @click="changeTab('funnel')">
               <div
-                class="cursor-pointer hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
+                class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
                 :class="isHovered ? 'opacity-30' : 'opacity-100'">
                 <p class="leading-normal text-sm font-medium text-space mb-1">Воронка найма</p>
                 <div class="max-h-0 overflow-hidden opacity-0 transition-all"
@@ -98,7 +98,7 @@ const nameVacancy = computed(() => vacancyStore.nameVacancy);
 const isHovered = ref(false)
 
 // Объявляем активный так с первым табом по умолчанию
-const currentTab = ref('search')
+const currentTab = ref('publish')
 
 // Объявляем emit для передачи события наверх
 const emit = defineEmits<{
