@@ -33,7 +33,7 @@ const tabs: Record<string, () => Promise<any>> = {
     funnel: () => import('@/pages/create-tabs/FunnelTab.vue'),
 }
 
-const currentTab = ref<keyof typeof tabs>('publish')
+const currentTab = ref<keyof typeof tabs>('team')
 
 // Динамическая загрузка компонента
 const currentTabComponent = computed(() =>

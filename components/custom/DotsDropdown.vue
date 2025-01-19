@@ -9,7 +9,7 @@
             <div v-if="isOpen"
               class="absolute right-0 mt-15px bg-white rounded-plus shadow-shadow-droplist cards z-10 min-w-[226px]">
                 <div v-for="(item, index) in items" :key="index"
-                  class="cards-item px-15px py-2.5 text-slate-custom text-sm font-normal cursor-pointer hover:bg-gray-100 hover:text-space"
+                  class="cards-item px-15px py-2.5 text-slate-custom text-sm font-normal cursor-pointer whitespace-nowrap hover:bg-gray-100 hover:text-space"
                   @click="handleClick(item)">
                     {{ item }}
                 </div>

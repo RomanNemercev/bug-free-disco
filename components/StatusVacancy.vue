@@ -98,7 +98,7 @@ const nameVacancy = computed(() => vacancyStore.nameVacancy);
 const isHovered = ref(false)
 
 // Объявляем активный так с первым табом по умолчанию
-const currentTab = ref('publish')
+const currentTab = ref('team')
 
 // Объявляем emit для передачи события наверх
 const emit = defineEmits<{
