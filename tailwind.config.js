@@ -41,6 +41,7 @@ module.exports = {
         green: '#04b600',
         cinderella: '#fdcece',
         pink: '#ffeaea',
+        catskill: '#f9fafc',
         'border-pink': 'rgba(245, 10, 10, 0.2)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',

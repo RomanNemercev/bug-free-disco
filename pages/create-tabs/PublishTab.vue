@@ -1,51 +1,75 @@
 <template>
     <div class="container pb-72 pt-48">
+        <!-- Заголовок -->
         <div class="flex justify-between bg-white rounded-fifteen p-25px items-center mb-15px">
             <div>
                 <p class="text-xl font-semibold text-space mb-2.5">Активные публикации</p>
-                <p class="text-sm font-normal text-slate-custom">Сюда перемещаются активные объявления опубликованные
-                    на&nbsp;сайтах или импортированные
-                    из&nbsp;подключенных профилей</p>
+                <p class="text-sm font-normal text-slate-custom">
+                    Сюда перемещаются активные объявления опубликованные на&nbsp;сайтах или импортированные
+                    из&nbsp;подключенных профилей
+                </p>
             </div>
             <UiButton variant="action" size="action" class="font-bold">Добавить публикации</UiButton>
         </div>
-        <div class="bg-white rounded-fifteen p-25px">
-            <table class="w-full">
-                <!-- Хедер таблицы -->
-                <thead>
-                    <tr>
-                        <th>
-                            <MyCheckbox @change="toggleAll" />
-                        </th>
-                        <th>Вакансия</th>
-                        <th>Регион</th>
-                        <th>Тариф</th>
-                        <th @click="sortBy('site')">Сайт</th>
-                        <th @click="sortBy('views')">Просмотры</th>
-                        <th @click="sortBy('responses')">Отклики</th>
-                        <th @click="sortBy('expires')">Истекает</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <!-- Тело таблицы -->
-                <tbody>
-                    <tr v-for="item in sortedData" :key="item.id">
-                        <td>
-                            <MyCheckbox v-model="selected[item.id]" />
-                        </td>
-                        <td>{{ item.vacancy }}</td>
-                        <td>{{ item.region }}</td>
-                        <td>{{ item.tariff }}</td>
-                        <td>{{ item.site }}</td>
-                        <td>{{ item.views }}</td>
-                        <td>{{ item.responses }}</td>
-                        <td>{{ item.expires }}</td>
-                        <td>
-                            <DotsDropdonw :options="dropdownOptions" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <!-- Таблица на Grid -->
+        <div class="table-container">
+            <!-- Хедер -->
+            <div class="table-header">
+                <div>
+                    <MyCheckbox id="select-all" :label="''" v-model="allSelected" @update:modelValue="toggleAll"
+                      :emptyLabel="true" />
+                </div>
+                <div class="px-2.5">Вакансия</div>
+                <div class="px-2.5">Регион</div>
+                <div class="px-2.5">Тариф</div>
+                <div @click="sortBy('site')" class="flex items-center gap-x-2.5 px-2.5 cursor-pointer select-none">
+                    Сайт
+                    <div class="sort-arrow" :style="sortArrowStyle('site')">
+                        <svg-icon name="sort-arrow" width="16px" height="15px" />
+                    </div>
+                </div>
+
+                <div @click="sortBy('views')" class="flex items-center gap-x-2.5 px-2.5 cursor-pointer select-none">
+                    Просмотры
+                    <div class="sort-arrow" :style="sortArrowStyle('views')">
+                        <svg-icon name="sort-arrow" width="16px" height="15px" />
+                    </div>
+                </div>
+                <div @click="sortBy('responses')" class="flex items-center gap-x-2.5 px-2.5 cursor-pointer select-none">
+                    Отклики<div class="sort-arrow" :style="sortArrowStyle('responses')">
+                        <svg-icon name="sort-arrow" width="16px" height="15px" />
+                    </div>
+                </div>
+                <div @click="sortBy('expires')" class="flex items-center gap-x-2.5 px-2.5 cursor-pointer select-none">
+                    Истекает<div class="sort-arrow" :style="sortArrowStyle('expires')">
+                        <svg-icon name="sort-arrow" width="16px" height="15px" />
+                    </div>
+                </div>
+                <div></div>
+            </div>
+
+            <!-- Тело -->
+            <div class="table-body">
+                <div v-for="item in sortedData" :key="item.id" class="table-row">
+                    <div>
+                        <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" />
+                    </div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.vacancy }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.region }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.tariff }}</div>
+                    <div>
+                        <CardIcon :icon="item.icon" :isPng="item.isPng" :imagePath="item.imagePath" :width="21"
+                          :height="21" class="px-2.5" />
+                    </div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.views }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.responses }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.expires }}</div>
+                    <div>
+                        <DotsDropdonw :items="dropdownOptions" />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -54,17 +78,25 @@
 import { ref, computed } from "vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
+import CardIcon from '~/components/custom/CardIcon.vue';
 
 const data = ref([
-    { id: 1, vacancy: "Менеджер по продажам", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", views: 3250, responses: 492, expires: "18.12" },
-    { id: 2, vacancy: "Администратор", region: "Самара", tariff: "С автоподнятием", site: "3", views: 3250, responses: 492, expires: "18.12" },
+    { id: 1, vacancy: "Менеджер по продажам не детских игрушек", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", icon: "sj20", isPng: false, imagePath: "", views: 3250, responses: 492, expires: "18.12" },
+    { id: 2, vacancy: "Администратор", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 3249, responses: 491, expires: "18.11" },
+    { id: 3, vacancy: "Повар кассир", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 2249, responses: 391, expires: "17.11" },
+    { id: 4, vacancy: "Лесник", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 3149, responses: 481, expires: "19.11" },
+    { id: 5, vacancy: "Менеджер по продажам всякой всячины", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 3239, responses: 461, expires: "14.11" },
+    { id: 6, vacancy: "Разработчик", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 3248, responses: 490, expires: "18.10" },
+    { id: 7, vacancy: "Бизнес коуч", region: "Самара городок", tariff: "С автоподнятием", site: "3", icon: "zarplata20", isPng: false, imagePath: "", views: 3229, responses: 421, expires: "11.11" },
+    { id: 8, vacancy: "Астролог", region: "Томск", tariff: "С Бизнес", site: "youla", icon: false, isPng: true, imagePath: "/img/logo20.png", views: 3249, responses: 491, expires: "18.11" },
     // Добавь остальные данные
 ]);
 
 const selected = ref({}); // Выбранные чекбоксы
-
+const allSelected = ref(false);
 const sortKey = ref(""); // Поле для сортировки
 const sortOrder = ref("asc"); // Порядок сортировки
+const sortDirection = ref("asc");
 
 const sortedData = computed(() => {
     if (!sortKey.value) return data.value;
@@ -79,10 +111,20 @@ const sortedData = computed(() => {
 const sortBy = (key) => {
     if (sortKey.value === key) {
         sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
     } else {
         sortKey.value = key;
         sortOrder.value = "asc";
+        sortDirection.value = "asc";
     }
+};
+
+// Вычисляемое свойство для стилей стрелки
+const sortArrowStyle = (key) => {
+    return {
+        transform: sortKey.value === key && sortOrder.value === "asc" ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.3s ease", // Плавное вращение
+    };
 };
 
 const toggleAll = (isChecked) => {
@@ -91,5 +133,82 @@ const toggleAll = (isChecked) => {
     });
 };
 
+// Следить за изменениями состояния частных чекбоксов
+watch(selected, (newSelected) => {
+    // Проверяем, выбраны ли все элементы
+    const allChecked = data.value.every(item => newSelected[item.id]);
+    const noneChecked = data.value.every(item => !newSelected[item.id]);
+
+    allSelected.value = allChecked; // Обновляем общий чекбокс
+
+    // Логика для состояния "частично выбрано" (например, при необходимости в будущем)
+    if (!allChecked && !noneChecked) {
+        console.log("Частично выбрано"); // Для добавления UI-реакции
+    }
+}, { deep: true }); // Обязательно deep, так как мы следим за вложенными объектами
+
 const dropdownOptions = ["Редактировать", "Удалить"];
 </script>
+
+<style scoped>
+.table-container {
+    display: grid;
+    grid-template-rows: auto;
+    /* Автоматическая высота строк */
+    gap: 1px;
+    /* Отступы между строками */
+}
+
+.table-body {
+    display: grid;
+    gap: 1px;
+    /* Отступы между строками */
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns:
+        1.75%
+        /* 1-й столбец */
+        16.186%
+        /* 2-й столбец */
+        16.186%
+        /* 3-й столбец */
+        16.186%
+        /* 4-й столбец */
+        7.175%
+        /* 5-й столбец */
+        11.199%
+        /* 6-й столбец */
+        9.362%
+        /* 7-й столбец */
+        9.887%
+        /* 8-й столбец */
+        3.5%;
+    /* 9-й столбец */
+    gap: 10px;
+    /* Горизонтальный отступ */
+    padding: 20px 25px;
+    align-items: center;
+    /* Центрирование содержимого */
+}
+
+.table-header {
+    background-color: #f5f7fa;
+    border-radius: 15px 15px 0 0;
+    font-weight: 500;
+    font-size: 14px;
+    color: #79869a;
+    text-align: left;
+}
+
+.table-row {
+    background-color: #ffffff;
+    /* Для эстетики */
+}
+
+.table-row:last-child {
+    border-radius: 0 0 15px 15px;
+}
+</style>

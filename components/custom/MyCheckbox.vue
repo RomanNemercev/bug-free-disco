@@ -4,9 +4,11 @@
             <!-- Скрытый чекбокс -->
             <input type="checkbox" :id="id" :checked="modelValue" @change="toggleCheck" class="hidden" />
             <!-- Визуальный элемент чекбокса -->
-            <div class="mr-[6px] w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
+            <div class="w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
                 'bg-dodger border-dodger': modelValue,
-                'border-athens bg-athens-gray': !modelValue
+                'border-athens bg-athens-gray': !modelValue,
+                'mr-0': emptyLabel,
+                'mr-[6px]': !emptyLabel,
             }">
                 <svg v-if="modelValue" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20"
                   fill="currentColor">
@@ -26,7 +28,7 @@ export default {
     name: "Checkbox",
     props: {
         id: {
-            type: String,
+            type: [String, Number],
             required: true,
         },
         label: {
@@ -37,11 +39,15 @@ export default {
             type: Boolean,
             default: false, // Значение по умолчанию
         },
+        emptyLabel: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ["update:modelValue"],
     methods: {
         toggleCheck(event) {
-            this.$emit("update:modelValue", event.target.checked);
+            this.$emit("update:modelValue", event.target.checked); // Передаём только булевое значение
         },
     },
 };
