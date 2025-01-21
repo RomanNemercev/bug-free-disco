@@ -3,7 +3,7 @@
         <input v-model="email" class="bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
           :class="{ 'focused': isFocused, 'border-red-500': error }" placeholder="Email" @focus="isFocused = true"
           @blur="validateEmail" />
-        <span v-if="error" class="text-red-500 text-xs">{{ error }}</span>
+        <span v-if="error" class="text-red text-xs">{{ error }}</span>
     </div>
 </template>
 
@@ -45,6 +45,7 @@ input::placeholder {
 }
 
 .focused {
-    outline: 1px solid #5898FF;
+    border: 1px solid #5898FF;
+    outline: none;
 }
 </style>

@@ -7,7 +7,7 @@
                     Назначьте рекрутер или заказчиков, которые будут взаимодействовать с&nbsp;этой вакансией
                 </p>
             </div>
-            <UiButton variant="black" size="black" class="font-bold">Добавить участников</UiButton>
+            <UiButton variant="black" size="black" class="font-bold" @click="openPopup">Добавить участников</UiButton>
         </div>
         <div class="table-container">
             <div class="table-header">
@@ -42,18 +42,100 @@
             </div>
         </div>
     </div>
+    <transition name="fade" @after-leave="enableBodyScroll">
+        <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false" :width="'490px'"
+          :height="'fit-content'" :disableOverflowHidden="true">
+            <!-- Первое окно -->
+            <div v-if="activePopup === 'invite'">
+                <p class="text-xl font-semibold text-space mb-2.5">Новый участник</p>
+                <p class="text-sm font-normal text-slate-custom mb-25px">
+                    Приглашенному участнику придет письмо с&nbsp;доступом, которое нужно подтвердить.
+                </p>
+                <div class="flex gap-x-1 mb-15px items-center">
+                    <span class="text-red">*</span>
+                    <p class="text-sm font-medium text-space leading-normal">Email</p>
+                </div>
+                <EmailInput v-model="emailInvoice" class="mb-15px" />
+                <div class="flex gap-x-1 mb-15px items-center">
+                    <span class="text-red">*</span>
+                    <p class="text-sm font-medium text-space leading-normal">Доступ</p>
+                </div>
+                <MultiDropdown :options="optionsData" class="mb-25px" />
+                <div class="flex gap-x-15px">
+                    <UiButton variant="action" size="action" @click="switchToConfirmation">Пригласить</UiButton>
+                    <UiButton variant="back" size="back" @click="closePopup">Отмена</UiButton>
+                </div>
+            </div>
+
+            <!-- Второе окно -->
+            <div v-if="activePopup === 'confirmation'">
+                <p class="text-xl font-semibold text-space mb-2.5">Приглашение отправлено</p>
+                <p class="text-sm font-normal text-slate-custom mb-25px">
+                    Пользователю {{ emailInvoice }} направлено письмо с регистрацией в системе.
+                    Вы получите уведомление, как только он примет ваше приглашение.
+                </p>
+                <div class="flex gap-x-15px">
+                    <UiButton variant="action" size="semiaction" @click="closePopup">Хорошо</UiButton>
+                    <UiButton variant="delete" size="delete" @click="cancelInvitation">Отменить приглашение</UiButton>
+                </div>
+            </div>
+        </Popup>
+    </transition>
+
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onBeforeUnmount } from "vue";
 
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
+import Popup from '~/components/custom/Popup.vue';
+import EmailInput from '~/components/custom/EmailInput.vue';
+import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 
 const selected = ref({}); // Выбранные чекбоксы
 const allSelected = ref(false);
 const hoveredIndex = ref(null);
+const isPopupOpen = ref(false); // control visibility popup
+const emailInvoice = ref('');
+const activePopup = ref('invite'); // Текущее активное окно ('invite' or 'confirmation')
+
+// Функции для управления прокруткой
+function disableBodyScroll() {
+    document.body.style.overflow = 'hidden'; // Отключаем прокрутку
+}
+
+function enableBodyScroll() {
+    document.body.style.overflow = ''; // Восстанавливаем прокрутку
+}
+
+function openPopup() {
+    isPopupOpen.value = true;
+    activePopup.value = 'invite'; // Открываем начальное окно
+    disableBodyScroll();
+}
+
+function closePopup() {
+    console.log('Закрываем попап');
+    isPopupOpen.value = false;
+    activePopup.value = 'invite'; // Сбрасываем на начальное окно
+    enableBodyScroll();
+}
+
+function switchToConfirmation() {
+    console.log('Переключаемся на окно confirmation');
+    activePopup.value = 'confirmation'; // Переключаемся на окно подтверждения
+}
+
+function cancelInvitation() {
+    alert('Приглашение отменено');
+}
+
+// Убедимся, что при размонтировании компонента скролл включится
+onBeforeUnmount(() => {
+    enableBodyScroll();
+});
 
 const users = ref([
     { id: 1, isPng: true, imagePath: "/img/user.png", profile: "Туманов Анатолий Семенович", email: "tumanovanatolya@gmail.com", role: "Рекрутер" },
@@ -61,6 +143,24 @@ const users = ref([
     { id: 3, isPng: true, imagePath: "/img/user.png", profile: "Лидия Семенова", email: "lidiasemenova@gmail.com", role: "Рекрутер" },
     { id: 4, isPng: true, imagePath: "/img/user.png", profile: "Алексей Самсонов", email: "samsonov1204871824@gmail.com", role: "Рекрутер" },
 ])
+
+const optionsData = [
+    {
+        "id": 1,
+        "title": "Администратор",
+        "description": "Может добавлять, редактировать, активировать вакансии. Имеет доступ к отчетам и многому другому."
+    },
+    {
+        "id": 2,
+        "title": "Рекрутер",
+        "description": "Имеет доступ к кандидатам, комментариям и электронной почте. Может создать вакансию добавить и команду."
+    },
+    {
+        "id": 3,
+        "title": "Заказчик",
+        "description": "Имеет доступ к статистики, может оставлять комментарии и оценивать кандидатов."
+    }
+]
 
 const dropdownOptions = ["Редактировать текст", "Посмотреть публикацию", "Снять с публикации", "Дублировать публикацию", "Показать отчет по публикации"];
 
@@ -135,5 +235,23 @@ watch(selected, (newSelected) => {
 
 .user-hovered {
     text-decoration: underline;
+}
+
+/* Анимация появления и скрытия */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    /* transform: scale(0.95); */
+    /* Небольшое уменьшение */
+}
+
+.fade-leave-from {
+    opacity: 1;
+    /* transform: scale(1); */
 }
 </style>

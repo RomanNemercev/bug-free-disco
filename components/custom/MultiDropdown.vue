@@ -5,8 +5,7 @@
             (isSelected && selectedOption) ? 'bg-zumthor text-dodger' : 'bg-athens-gray',
         ]" @click="toggleDropDown">
             <div>
-                <div :class="(isSelected && selectedOption) ? 'text-dodger' : 'text-space'"
-                  class="text-sm truncate pr-4">
+                <div :class="mappedSelectedOption ? 'text-space' : 'text-slate-custom'" class="text-sm truncate pr-4">
                     {{ mappedSelectedOption || props.placeholder }}
                 </div>
                 <!-- Стрелка -->
