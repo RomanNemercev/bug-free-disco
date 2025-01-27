@@ -1,21 +1,45 @@
 <template>
     <div class="body-page">
-        <div class="container-reg">
-            <EnterForm />
+        <div class="auth-container">
+            <transition name="fade">
+                <EnterForm v-if="currentForm === 'enter'" @changeForm="changeForm" />
+            </transition>
+            <transition name="fade">
+                <RegForm v-if="currentForm === 'reg'" @changeForm="changeForm" />
+            </transition>
+            <transition name="fade">
+                <ResetForm v-if="currentForm === 'reset'" @changeForm="changeForm" />
+            </transition>
         </div>
     </div>
 </template>
 
 <script setup>
 import EnterForm from "~/pages/auth/EnterForm.vue";
+import RegForm from "~/pages/auth/RegForm.vue";
+import ResetForm from "~/pages/auth/ResetForm.vue";
+
+import { ref } from "vue";
 
 definePageMeta({
     layout: 'blank',
 })
+
+const currentForm = ref('enter'); // enter, reg, reset
+
+// Функция переключения форм
+const changeForm = (formName) => {
+    currentForm.value = formName;
+};
 </script>
 
 <style scoped>
 /* fonts */
+:deep(.f12w400) {
+    font-size: 12px;
+    font-weight: 400;
+}
+
 :deep(.f14w400) {
     font-size: 14px;
     font-weight: 400;
@@ -62,6 +86,20 @@ definePageMeta({
     line-height: normal;
 }
 
+:deep(.error) {
+    border: 1px solid #f50a0a;
+    margin-bottom: 4px;
+}
+
+:deep(.e-input:focus) {
+    outline: 1px solid #5898ff;
+    ;
+}
+
+:deep(.e-input.error:focus) {
+    outline: none
+}
+
 :deep(.pass-eye) {
     position: absolute;
     width: 40px;
@@ -81,15 +119,24 @@ definePageMeta({
 }
 
 
+:deep(.pass-eye.show) {
+    background-image: url('/assets/img/eyeShow.svg');
+}
+
 :deep(.btn) {
     border-radius: 10px;
     min-width: 80px;
     min-height: 40px;
-    padding: 10px 20px;
+    padding: 9.5px 20px;
+}
+
+
+:deep(.p-flex) {
+    display: flex;
 }
 
 /* end components */
-.container-reg {
+.auth-reg {
     position: relative;
     max-width: 530px;
     width: 100%;
@@ -104,15 +151,22 @@ definePageMeta({
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
-    opacity: 0;
-    visibility: hidden;
-    z-index: -1;
 }
 
 .form.active {
     visibility: visible;
     opacity: 1;
     z-index: 0;
+}
+
+/* Анимация */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

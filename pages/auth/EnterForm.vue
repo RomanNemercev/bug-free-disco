@@ -1,19 +1,25 @@
 <template>
     <div class="enter active form">
         <p class="enter__title f25w700">
-            Вход <span class="enter__title-custom">JOBLY</span>
+            Вход в <span class="enter__title-custom">Jobly</span>
         </p>
         <p class="enter__descr f14w500 c-bali">Используйте данные для входа</p>
         <div class="enter__data">
             <p class="enter__email-title f14w500">Email</p>
             <label class="enter__email-wrapper">
                 <input type="email" class="enter__email-input e-input f14w400" placeholder="Введите email"
-                  v-model="email" />
+                  v-model="email" :class="{ 'error': emailError }" />
+                <span v-if="emailError" class="error-message f12w400" style="color: red">
+                    {{ emailError }}
+                </span>
             </label>
             <p class="enter__pass-title f14w500">Пароль</p>
             <label class="enter__pass-wrapper">
                 <input type="password" class="enter__pass-input e-input f14w400" placeholder="******"
-                  :type="showPassword ? 'text' : 'password'" v-model="password" required />
+                  :type="showPassword ? 'text' : 'password'" v-model="password" :class="{ 'error': passwordError }" />
+                <span v-if="passwordError" class="error-message f12w400" style="color: red">
+                    {{ passwordError }}
+                </span>
                 <button type="button" class="pass-eye" @click="togglePassword"></button>
             </label>
         </div>
@@ -33,25 +39,62 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: "EnterForm",
-    data() {
-        return {
-            email: "",
-            password: "",
-            showPassword: false,
-        };
-    },
-    methods: {
-        togglePassword() {
-            this.showPassword = !this.showPassword;
-        },
-        login() {
-            // Логика входа
-            console.log("Email:", this.email, "Password:", this.password);
-        },
-    },
+<script setup>
+import { ref, nextTick } from "vue";
+
+const email = ref("");
+const password = ref("");
+const emailError = ref(null);
+const passwordError = ref(null);
+const showPassword = ref(false);
+
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
+    // Принудительное обновление типа через $nextTick
+    nextTick(() => {
+        const input = document.querySelector(".enter__pass-input");
+        input.type = showPassword.value ? "text" : "password";
+
+        // change eye icon
+        const eyeButton = document.querySelector(".pass-eye");
+        if (showPassword.value) {
+            eyeButton.classList.add("show");
+        } else {
+            eyeButton.classList.remove("show");
+        }
+    });
+};
+
+const validateEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+};
+
+const login = () => {
+    emailError.value = null;
+    passwordError.value = null;
+
+    let isValid = true;
+
+    if (!email.value) {
+        emailError.value = "Это поле обязательно для заполнения";
+        isValid = false;
+    } else if (!validateEmail(email.value)) {
+        emailError.value = "Введите корректный email";
+        isValid = false;
+    }
+
+    if (!password.value) {
+        passwordError.value = "Это поле обязательно для заполнения";
+        isValid = false;
+    } else if (password.value.length < 8) {
+        passwordError.value = "Пароль должен содержать не менее 8 символов";
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    console.log("Email:", email.value, "Password:", password.value);
 };
 </script>
 
@@ -61,13 +104,14 @@ export default {
     background-color: #ffffff;
     padding: 50px;
     border-radius: 15px;
-    max-width: 500px;
+    max-width: 400px;
     width: 100%;
 }
 
 .enter__title {
     text-align: center;
     margin-bottom: 12px;
+    line-height: normal;
 }
 
 .enter__title-custom {
@@ -76,7 +120,7 @@ export default {
 
 .enter__descr {
     text-align: center;
-    margin-bottom: 52px;
+    margin-bottom: 35px;
 }
 
 .enter__email-title {
@@ -85,13 +129,13 @@ export default {
 
 .enter__email-input {
     display: block;
-    margin-bottom: 17px;
-    padding: 10.96px 15px 10.96px 15px;
+    margin-bottom: 15px;
+    padding: 10.5px 15px 10.5px 15px;
     border-radius: 5px;
 }
 
 .enter__pass-input {
-    padding: 10.96px 15px 10.96px 15px;
+    padding: 10.5px 15px 10.5px 15px;
     border-radius: 5px;
 }
 
@@ -101,20 +145,20 @@ export default {
 
 .enter__pass-wrapper {
     display: block;
-    margin-bottom: 26px;
+    margin-bottom: 15px;
     position: relative;
 }
 
 .enter__btn-in {
     background-color: #5898ff;
-    margin-bottom: 26px;
+    margin-bottom: 23px;
     width: 100%;
 }
 
 .enter__btns {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 51px;
+    margin-bottom: 31px;
 }
 
 .enter__more {
@@ -124,6 +168,17 @@ export default {
 }
 
 .enter__more-agree {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    font-size: 12px;
+    color: red;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+.enter__pass-input.error+.error-message {
+    margin-bottom: 0;
 }
 </style>
