@@ -40,6 +40,16 @@ const changeForm = (formName) => {
     font-weight: 400;
 }
 
+:deep(.f13w300) {
+    font-size: 13px;
+    font-weight: 300;
+}
+
+:deep(.f13w400) {
+    font-size: 13px;
+    font-weight: 400;
+}
+
 :deep(.f14w400) {
     font-size: 14px;
     font-weight: 400;
@@ -80,7 +90,7 @@ const changeForm = (formName) => {
 /* components */
 :deep(.e-input) {
     border: 1px solid #EDEFF5;
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: #F4F6F8;
     width: 100%;
     line-height: normal;
@@ -93,7 +103,6 @@ const changeForm = (formName) => {
 
 :deep(.e-input:focus) {
     outline: 1px solid #5898ff;
-    ;
 }
 
 :deep(.e-input.error:focus) {

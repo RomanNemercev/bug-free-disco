@@ -12,15 +12,16 @@
                         </svg>
                     </button>
                     <p class="reg__title f25w700">
-                        Регистрация <span class="reg__title-brand c-dodger">Jobly</span>
+                        Регистрация в <span class="reg__title-brand c-dodger">Jobly</span>
                     </p>
                     <div class="reg__data-wrapper">
                         <p class="reg__first-name f14w500">
                             <span class="reg__circle">*</span> Как вас зовут?
                         </p>
                         <label class="reg__data-label"><input type="text" class="reg__name e-input f14w400"
-                              placeholder="Введите ваше ФИО" id="name" v-model="name" required /><span v-if="nameError"
-                              id="name-error" class="error-message f12w400" style="color: red">{{ nameError
+                              placeholder="Введите ваше ФИО" id="name" v-model="name" required
+                              :class="{ 'error': nameError }" /><span v-if="nameError" id="name-error"
+                              class="error-message f12w400" style="color: red">{{ nameError
                                 }}</span></label>
                         <div class="reg__inputs p-flex">
                             <div class="reg__email-wrapper">
@@ -29,8 +30,9 @@
                                 </p>
                                 <label class="reg__email-label"><input type="email"
                                       class="reg__email-input e-input f14w400" placeholder="Введите email" id="email"
-                                      required v-model="email" /><span v-if="emailError" id="email-error"
-                                      class="error-message f12w400" style="color: red">{{
+                                      required v-model="email" :class="{ 'error': emailError }" /><span
+                                      v-if="emailError" id="email-error" class="error-message f12w400"
+                                      style="color: red">{{
                                         emailError
                                         }}</span></label>
                             </div>
@@ -40,8 +42,8 @@
                                 </p>
                                 <label class="reg__phone-label"><input type="tel"
                                       class="reg__phone-input e-input f14w400" placeholder="+7" id="phone" required
-                                      v-model="phone" @focus="onFocusPhone" @blur="onBlurPhone"
-                                      @input="onInputPhone" /><span v-if="phoneError" id="phone-error"
+                                      v-model="phone" @focus="onFocusPhone" @blur="onBlurPhone" @input="onInputPhone"
+                                      :class="{ 'error': phoneError }" /><span v-if="phoneError" id="phone-error"
                                       class="error-message f12w400" style="color: red">{{
                                         phoneError
                                         }}</span></label>
@@ -70,7 +72,7 @@
                         </svg>
                     </button>
                     <p class="reg__title f25w700">
-                        Регистрация <span class="reg__title-brand c-dodger">Jobly</span>
+                        Регистрация в <span class="reg__title-brand c-dodger">Jobly</span>
                     </p>
                     <div class="reg__check-pass p-flex">
                         <div class="reg__check-first">
@@ -124,7 +126,7 @@
 
                 <div v-if="currentStep === 'third'" class="reg__third-step child-form" @changeStep="changeStep"
                   :class="{ 'active': currentStep === 'third' }">
-                    <button class="reg__to-second btn-reset" id="reg-to-second-btn">
+                    <button class="reg__to-second btn-reset" id="reg-to-second-btn" @click="goToSecond">
                         <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                               d="M17.8132 10.5C17.8132 10.7486 17.7145 10.9871 17.5387 11.1629C17.3628 11.3387 17.1244 11.4375 16.8757 11.4375H5.39136L9.41636 15.4617C9.59248 15.6378 9.69143 15.8767 9.69143 16.1258C9.69143 16.3748 9.59248 16.6137 9.41636 16.7898C9.24024 16.966 9.00137 17.0649 8.7523 17.0649C8.50323 17.0649 8.26436 16.966 8.08824 16.7898L2.46324 11.1648C2.37584 11.0777 2.30649 10.9742 2.25917 10.8603C2.21186 10.7463 2.1875 10.6242 2.1875 10.5008C2.1875 10.3774 2.21186 10.2552 2.25917 10.1413C2.30649 10.0273 2.37584 9.92381 2.46324 9.83671L8.08824 4.21171C8.17544 4.1245 8.27897 4.05533 8.39291 4.00813C8.50685 3.96094 8.62897 3.93665 8.7523 3.93665C8.87563 3.93665 8.99775 3.96094 9.11169 4.00813C9.22563 4.05533 9.32916 4.1245 9.41636 4.21171C9.50357 4.29891 9.57275 4.40244 9.61994 4.51638C9.66714 4.63032 9.69143 4.75244 9.69143 4.87577C9.69143 4.9991 9.66714 5.12122 9.61994 5.23516C9.57275 5.3491 9.50357 5.45263 9.41636 5.53983L5.39136 9.56249H16.8757C17.1244 9.56249 17.3628 9.66126 17.5387 9.83708C17.7145 10.0129 17.8132 10.2514 17.8132 10.5Z"
@@ -234,7 +236,7 @@ const checkPasswords = () => {
 
     // Проверка на пустое поле пароля
     if (!password.value) {
-        passwordError.value = 'Поле обязательно для заполнения';
+        passwordError.value = 'Введите пароль';
         isValid = false;
     } else {
         // Проверка на длину и сложность пароля
@@ -351,6 +353,10 @@ function goToFirst() {
     currentStep.value = 'first';
 }
 
+function goToSecond() {
+    currentStep.value = 'second';
+}
+
 const nextStep1 = () => {
     // Проверка паролей
     const isValid = checkPasswords();
@@ -400,7 +406,7 @@ const nextStep1 = () => {
     background-color: #F4F6F8;
     padding: 8.5px 9px;
     display: flex;
-    margin-bottom: 52px;
+    margin-bottom: 26px;
 }
 
 .reg__to-in:focus-visible,
@@ -413,10 +419,12 @@ const nextStep1 = () => {
 
 .reg__title {
     text-align: center;
-    margin-bottom: 37px;
+    margin-bottom: 38px;
+    line-height: normal;
 }
 
 .reg__first-name {
+    line-height: normal;
     margin-bottom: 17px;
 }
 
@@ -426,29 +434,30 @@ const nextStep1 = () => {
 
 .reg__data-label {
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .reg__email-title {
-    margin-bottom: 17px;
+    margin-bottom: 15px;
 }
 
 .reg__phone-title {
-    margin-bottom: 17px;
+    margin-bottom: 15px;
 }
 
 .reg__inputs {
     gap: 15px;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .reg__web-title {
-    margin-bottom: 16px;
+    margin-bottom: 13px;
 }
 
 .reg__web-label {
     display: block;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
 }
 
 .reg__web-descr {
@@ -457,10 +466,10 @@ const nextStep1 = () => {
 
 .reg__btn-next {
     width: 100%;
-    padding: 11.96px 10px;
+    padding: 9.5px 10px;
     background-color: #eff5ff;
     border-radius: 10px;
-    margin-bottom: 49px;
+    margin-bottom: 35px;
 }
 
 .reg__progress-bar {
@@ -489,7 +498,7 @@ const nextStep1 = () => {
 }
 
 .reg__progress-count--third {
-    width: 385px;
+    width: 342.5px;
 }
 
 .reg__name,
@@ -499,12 +508,13 @@ const nextStep1 = () => {
 .reg__phone-input,
 .reg__web-input,
 .reset__email-input {
-    padding: 10.96px 15px 10.96px 15px;
-    border-radius: 5px;
+    padding: 10.5px 15px 10.5px 15px;
+    border-radius: 10px;
 }
 
 .reg__pass-title {
-    margin-bottom: 16px;
+    margin-bottom: 17px;
+    line-height: normal;
 }
 
 .reg__check-pass {
@@ -513,21 +523,21 @@ const nextStep1 = () => {
 }
 
 .reg__pass-descr {
-    margin-bottom: 27px;
+    margin-bottom: 16px;
     line-height: 130%;
 }
 
 .reg__check-promo {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .reg__promo-label {
     display: block;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
 }
 
 .reg__btn-finish {
-    padding: 11.96px 10px;
+    padding: 9.5px 10px;
     background-color: #5898ff;
     border-radius: 10px;
     margin-bottom: 16px;
@@ -535,7 +545,7 @@ const nextStep1 = () => {
 }
 
 .reg__agree {
-    margin-bottom: 60px;
+    margin-bottom: 36px;
     line-height: 130%;
 }
 
@@ -546,12 +556,12 @@ const nextStep1 = () => {
 .reg__quiz-wrapper {
     display: flex;
     flex-direction: column;
-    margin-bottom: 27px;
+    margin-bottom: 26px;
     line-height: 124%;
 }
 
 .reg__third-title {
-    margin-bottom: 52px;
+    margin-bottom: 31px;
     text-align: center;
 }
 
@@ -566,12 +576,12 @@ const nextStep1 = () => {
 .reg__third-btns {
     display: grid;
     gap: 10px;
-    grid-template-columns: 2.1405fr 1fr;
-    margin-bottom: 25px;
+    grid-template-columns: 1.77fr 1fr;
+    margin-bottom: 35px;
 }
 
 .reg__btn-skip {
-    padding: 11px 10px;
+    padding: 9.5px 10px;
     background-color: #e8f1ff;
     border-radius: 10px;
 }
@@ -623,10 +633,7 @@ const nextStep1 = () => {
 
 .reg__pass-label {
     position: relative;
-}
-
-.reg__pass-label .pass-eye {
-    top: -10px;
+    display: block;
 }
 
 .reg-wrapper {
@@ -670,7 +677,7 @@ const nextStep1 = () => {
     background-color: transparent;
     top: 50%;
     left: 50%;
-    transform: translate(-50px, -50px);
+    transform: translate(-50px, -55px);
     background-image: url('../../assets/img/play-icon.svg');
     transition: opacity .3s ease-in-out;
 }
@@ -685,5 +692,73 @@ const nextStep1 = () => {
 
 :deep(.video-js) {
     border-radius: 15px;
+}
+
+.reg__email-wrapper,
+.reg__phone-wrapper,
+.reg__check-first,
+.reg__check-second {
+    width: 100%;
+}
+
+.reg__third-step {
+    padding: 50px 50px 0 50px;
+}
+
+.reg__to-second {
+    margin-bottom: 22px;
+}
+
+.checkbox-hide {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0 0 0 0);
+}
+
+.radio-visible {
+    padding-left: 25px;
+    position: relative;
+    user-select: none;
+    cursor: pointer;
+}
+
+.radio-visible::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background-image: url('../../assets/img/RadioButton-nonechecked.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.radio-visible::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background-image: url('../../assets/img/RadioButton.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.radio-visible:hover:before {
+    background-image: url('../../assets/img/RadioButton-hover.svg');
+}
+
+.checkbox-hide:checked+.radio-visible::after {
+    opacity: 1;
+    visibility: visible;
 }
 </style>
