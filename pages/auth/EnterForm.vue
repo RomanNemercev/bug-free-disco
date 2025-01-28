@@ -28,7 +28,7 @@
             <button class="btn-reset enter__btn-reg c-dodger f14w500" @click="$emit('changeForm', 'reg')">
                 Регистрация
             </button>
-            <button class="btn-reset enter__btn-forgot c-bali f14w500" @click="$emit('changeForm', 'reset')">
+            <button class="btn-reset enter__btn-forgot c-dodger f14w500" @click="$emit('changeForm', 'reset')">
                 Забыли пароль?
             </button>
         </div>
