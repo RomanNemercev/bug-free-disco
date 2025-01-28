@@ -653,12 +653,12 @@ const nextStep1 = () => {
     height: 100vh;
 }
 
-.video-js .vjs-control-bar {
+:deep(.video-js .vjs-control-bar) {
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
 }
 
-.vjs-poster {
+:deep(.vjs-poster) {
     background-size: cover;
     border-radius: 15px;
 }
@@ -677,5 +677,9 @@ const nextStep1 = () => {
 
 :deep(.video-js .vjs-big-play-button:hover) {
     opacity: .5
+}
+
+:deep(.video-js .vjs-big-play-button .vjs-icon-placeholder:before) {
+    content: none;
 }
 </style>
