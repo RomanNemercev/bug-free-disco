@@ -33,7 +33,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "tippy.js": "^6.3.7",
-    "video.js": "^8.21.0",
+    "video.js": "^7.21.6",
     "vue": "latest",
     "vue-router": "latest",
     "vue-tippy": "^6.5.0",
