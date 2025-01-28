@@ -189,4 +189,38 @@ function toSecondStep() {
     display: inline-block;
     margin-bottom: 23px;
 }
+
+:deep(.video-js .vjs-control-bar) {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+:deep(.vjs-poster) {
+    background-size: cover;
+    border-radius: 15px;
+}
+
+:deep(.video-js .vjs-big-play-button) {
+    height: 100px;
+    width: 100px;
+    border: none;
+    background-color: transparent;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50px, -55px);
+    background-image: url('../../assets/img/play-icon.svg');
+    transition: opacity .3s ease-in-out;
+}
+
+:deep(.video-js .vjs-big-play-button:hover) {
+    opacity: .5
+}
+
+:deep(.video-js .vjs-big-play-button .vjs-icon-placeholder:before) {
+    content: none;
+}
+
+:deep(.video-js) {
+    border-radius: 15px;
+}
 </style>
