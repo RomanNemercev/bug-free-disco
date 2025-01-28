@@ -663,7 +663,7 @@ const nextStep1 = () => {
     border-radius: 15px;
 }
 
-.video-js .vjs-big-play-button {
+:deep(.video-js .vjs-big-play-button) {
     height: 100px;
     width: 100px;
     border: none;
@@ -671,6 +671,11 @@ const nextStep1 = () => {
     top: 50%;
     left: 50%;
     transform: translate(-50px, -50px);
-    background-image: url('../../../assets/img/play-icon.svg');
+    background-image: url('../../assets/img/play-icon.svg');
+    transition: opacity .3s ease-in-out;
+}
+
+:deep(.video-js .vjs-big-play-button:hover) {
+    opacity: .5
 }
 </style>
