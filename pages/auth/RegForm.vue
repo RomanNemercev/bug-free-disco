@@ -682,4 +682,8 @@ const nextStep1 = () => {
 :deep(.video-js .vjs-big-play-button .vjs-icon-placeholder:before) {
     content: none;
 }
+
+:deep(.video-js) {
+    border-radius: 15px;
+}
 </style>
