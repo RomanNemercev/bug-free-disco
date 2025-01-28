@@ -640,10 +640,9 @@ const nextStep1 = () => {
 }
 
 .video-block {
-    background-color: #cfa9a9;
     border-radius: 15px;
     flex: 1;
-    min-height: 631px;
+    /* min-height: 631px; */
     /* max-width: 442.5px; */
     /* width: 100%; */
 }
@@ -654,9 +653,24 @@ const nextStep1 = () => {
     height: 100vh;
 }
 
-.vjs-icon-play:before,
-.video-js .vjs-play-control .vjs-icon-placeholder:before,
-.video-js .vjs-big-play-button .vjs-icon-placeholder:before {
-    content: none;
+.video-js .vjs-control-bar {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.vjs-poster {
+    background-size: cover;
+    border-radius: 15px;
+}
+
+.video-js .vjs-big-play-button {
+    height: 100px;
+    width: 100px;
+    border: none;
+    background-color: transparent;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50px, -50px);
+    background-image: url('../../../assets/img/play-icon.svg');
 }
 </style>
