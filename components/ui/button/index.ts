@@ -22,6 +22,7 @@ export const buttonVariants = cva(
         success: 'bg-feta text-green',
         back: 'bg-athens-gray border border-athens text-slate-custom',
         delete: 'bg-pink border border-pink text-red',
+        orange: 'bg-orange text-white',
       },
       size: {
         default: 'h-9 px-4 py-2',

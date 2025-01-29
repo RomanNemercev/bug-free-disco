@@ -42,6 +42,7 @@ module.exports = {
         cinderella: '#fdcece',
         pink: '#ffeaea',
         catskill: '#f9fafc',
+        chilean: '#fffce4',
         'border-pink': 'rgba(245, 10, 10, 0.2)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
@@ -149,6 +150,7 @@ module.exports = {
       lineHeight: {
         normal: 'normal',
         130: '130%',
+        150: '150%',
       },
       boxShadow: {
         'shadow-cards': '0 0 15px 0 rgba(0, 0, 0, 0.05);',
