@@ -1,15 +1,9 @@
 <template>
     <div class="body-page">
         <div class="auth-container">
-            <transition name="fade">
-                <EnterForm v-if="currentForm === 'enter'" @changeForm="changeForm" />
-            </transition>
-            <transition name="fade">
-                <RegForm v-if="currentForm === 'reg'" @changeForm="changeForm" />
-            </transition>
-            <transition name="fade">
-                <ResetForm v-if="currentForm === 'reset'" @changeForm="changeForm" />
-            </transition>
+            <EnterForm v-if="currentForm === 'enter'" @changeForm="changeForm" />
+            <RegForm v-if="currentForm === 'reg'" @changeForm="changeForm" />
+            <ResetForm v-if="currentForm === 'reset'" @changeForm="changeForm" />
         </div>
     </div>
 </template>
@@ -166,16 +160,5 @@ const changeForm = (formName) => {
     visibility: visible;
     opacity: 1;
     z-index: 0;
-}
-
-/* Анимация */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
 }
 </style>
