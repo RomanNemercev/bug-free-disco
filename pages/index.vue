@@ -46,16 +46,49 @@
             <div v-if="currentLevel === 'user'" class="bg-white w-full rounded-fifteen p-25px">
                 <div class="flex justify-between">
                     <p class="text-base font-normal text-space">Мероприятия</p>
+                    <DropdownCalendar />
                 </div>
+                <EventList v-for="event in events" :key="event.date" :event="event" />
             </div>
         </div>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 
+import DropdownCalendar from '@/components/custom/DropdownCalendar.vue';
+import EventList from '@/components/custom/page-parts/EventList.vue';
+
 const currentLevel = ref('user');
+
+interface EventData {
+    date: string
+    time: string
+    participants: string[]
+    eventName: string
+    description: string
+    organizer: string
+}
+
+const events: EventData[] = [
+    {
+        date: 'Воскресенье, 15 октября, 2024г',
+        time: '15:35-16:00',
+        participants: ['Антонина Сарова', 'Андрей Саров', 'Алексей Андреев'],
+        eventName: 'Собеседование по Skype',
+        description: 'Обсудить опыт кандидата',
+        organizer: 'Антонина Сарова',
+    },
+    {
+        date: '...',
+        time: '...',
+        participants: ['...'],
+        eventName: '...',
+        description: '...',
+        organizer: '...',
+    }
+]
 </script>
 
 <style scoped></style>
