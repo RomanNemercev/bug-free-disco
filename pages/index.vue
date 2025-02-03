@@ -44,11 +44,12 @@
                 </div>
             </div>
             <div v-if="currentLevel === 'user'" class="bg-white w-full rounded-fifteen p-25px">
-                <div class="flex justify-between">
-                    <p class="text-base font-normal text-space">Мероприятия</p>
+                <div class="flex justify-between items-center mb-35px">
+                    <p class="text-xl font-semibold text-space leading-normal">Мероприятия</p>
                     <DropdownCalendar />
                 </div>
-                <EventList v-for="event in events" :key="event.date" :event="event" />
+                <EventList v-for="(event, index) in events" :key="index" :event="event"
+                  :class="{ 'mb-4': index !== events.length - 1 }" />
             </div>
         </div>
     </div>
@@ -81,12 +82,20 @@ const events: EventData[] = [
         organizer: 'Антонина Сарова',
     },
     {
-        date: '...',
-        time: '...',
-        participants: ['...'],
-        eventName: '...',
-        description: '...',
-        organizer: '...',
+        date: 'Воскресенье, 15 октября, 2024г',
+        time: '15:35-16:00',
+        participants: ['Антонина Сарова', 'Андрей Саров', 'Алексей Андреев'],
+        eventName: 'Собеседование по Skype',
+        description: 'Обсудить опыт кандидата',
+        organizer: 'Антонина Сарова',
+    },
+    {
+        date: 'Воскресенье, 15 октября, 2024г',
+        time: '15:35-16:00',
+        participants: ['Антонина Сарова', 'Андрей Саров', 'Алексей Андреев'],
+        eventName: 'Собеседование по Skype',
+        description: 'Обсудить опыт кандидата',
+        organizer: 'Антонина Сарова',
     }
 ]
 </script>
