@@ -51,6 +51,17 @@
                 <EventList v-for="(event, index) in events" :key="index" :event="event"
                   :class="{ 'mb-4': index !== events.length - 1 }" />
             </div>
+            <div v-if="currentLevel === 'complete'" class="bg-white w-full rounded-fifteen p-25px">
+                <p class="text-xl font-semibold text-space leading-normal mb-35px">Мероприятия</p>
+                <div
+                  class="border border-athens rounded-ten py-35px px-25px bg-catskill flex items-center justify-center flex-col">
+                    <div class="rounded-full bg-feta flex items-center justify-center p-10 w-fit mb-3">
+                        <svg-icon name="check-green" width="50" height="50" />
+                    </div>
+                    <p class="text-lg font-medium text-space mb-1">На сегодня все задачи выполнены</p>
+                    <p class="text-sm font-normal text-slate-custom">Если появятся новые, мы отобразим их здесь</p>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -61,7 +72,7 @@ import { ref } from 'vue';
 import DropdownCalendar from '@/components/custom/DropdownCalendar.vue';
 import EventList from '@/components/custom/page-parts/EventList.vue';
 
-const currentLevel = ref('user');
+const currentLevel = ref('beginner');
 
 interface EventData {
     date: string
