@@ -13,7 +13,7 @@
                     </NuxtLink>
                 </li>
                 <li>
-                    <NuxtLink to="/newvacancy" exact-active-class="active-link">
+                    <NuxtLink to="/vacancies" :class="{ 'active-link': isVacanciesActive }">
                         <p
                           class="page-name leading-normal text-white opacity-50 px-3 py-2 hover:opacity-100 transition-all rounded-lg hover:bg-hoverbtn text-15px font-semibold">
                             Вакансии</p>
@@ -71,6 +71,13 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const isVacanciesActive = computed(() => route.path.startsWith('/vacancies'))
+</script>
 
 <style lang="scss" scoped>
 .active-link {

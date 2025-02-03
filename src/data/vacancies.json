@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "title": "Менеджер по продажам",
+    "city": "Новороссийск",
+    "columns": [
+      { "label": "Все", "value": 328, "isVisible": true },
+      { "label": "Не разобранное", "value": 41, "isVisible": true },
+      { "label": "Подумать", "value": 13, "isVisible": true },
+      { "label": "Подходящие", "value": 43, "isVisible": true },
+      { "label": "Отклоненные", "value": 201, "isVisible": true },
+      { "label": "Удаленные", "value": 17, "isVisible": true }
+    ],
+    "footerData": {
+      "sites": 64,
+      "responsible": "Не назначен",
+      "applicationId": "2134"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Менеджер по часовым поясам",
+    "city": "Ногинск",
+    "columns": [
+      { "label": "Все", "value": 328, "isVisible": true },
+      { "label": "Не разобранное", "value": 41, "isVisible": true },
+      { "label": "Подумать", "value": 13, "isVisible": true }
+    ],
+    "footerData": {
+      "sites": 64,
+      "candidatesInWork": 32,
+      "responsible": "Владимир Соловьев",
+      "applicationId": "N23832"
+    }
+  }
+]
