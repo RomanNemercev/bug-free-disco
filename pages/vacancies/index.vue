@@ -15,9 +15,7 @@ const vacancies = ref(vacanciesData);
 const currentPage = ref(1);
 const itemsPerPage = 2;
 
-const totalPages = computed(() => {
-    return Math.ceil(vacancies.value.length / itemsPerPage);
-});
+const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
 
 const paginatedVacancies = computed(() => {
     const startIndex = (currentPage.value - 1) * itemsPerPage;
@@ -75,7 +73,7 @@ function handlePageChange(page) {
         </div>
         <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
           :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
-        <Pagination v-if="totalPages > 1" :current-page="currentPage" :total-pages="totalPages"
+        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
           @page-changed="handlePageChange" />
     </div>
 </template>

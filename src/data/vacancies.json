@@ -59,5 +59,430 @@
       "responsible": "Алексей Петров",
       "itemId": "5432 ID"
     }
+  },
+  {
+    "id": 4,
+    "title": "Менеджер по маркетингу",
+    "city": "Москва",
+    "columns": [
+      { "label": "Все", "value": 400 },
+      { "label": "Не разобранное", "value": 50 },
+      { "label": "Подумать", "value": 20 },
+      { "label": "Подходящие", "value": 60 },
+      { "label": "Отклоненные", "value": 270 }
+    ],
+    "footerData": {
+      "sites": 70,
+      "responsible": "Ирина Сидорова",
+      "itemId": "6789 ID"
+    }
+  },
+  {
+    "id": 5,
+    "title": "Менеджер по логистике",
+    "city": "Санкт-Петербург",
+    "columns": [
+      { "label": "Все", "value": 300 },
+      { "label": "Не разобранное", "value": 40 },
+      { "label": "Подумать", "value": 10 },
+      { "label": "Подходящие", "value": 50 },
+      { "label": "Отклоненные", "value": 200 }
+    ],
+    "footerData": {
+      "sites": 60,
+      "responsible": "Дмитрий Иванов",
+      "itemId": "9876 ID"
+    }
+  },
+  {
+    "id": 6,
+    "title": "Менеджер по закупкам",
+    "city": "Екатеринбург",
+    "columns": [
+      { "label": "Все", "value": 350 },
+      { "label": "Не разобранное", "value": 45 },
+      { "label": "Подумать", "value": 15 },
+      { "label": "Подходящие", "value": 55 },
+      { "label": "Отклоненные", "value": 235 }
+    ],
+    "footerData": {
+      "sites": 65,
+      "responsible": "Ольга Кузнецова",
+      "itemId": "4567 ID"
+    }
+  },
+  {
+    "id": 7,
+    "title": "Менеджер по персоналу",
+    "city": "Казань",
+    "columns": [
+      { "label": "Все", "value": 280 },
+      { "label": "Не разобранное", "value": 35 },
+      { "label": "Подумать", "value": 12 },
+      { "label": "Подходящие", "value": 48 },
+      { "label": "Отклоненные", "value": 185 }
+    ],
+    "footerData": {
+      "sites": 55,
+      "responsible": "Анна Смирнова",
+      "itemId": "3456 ID"
+    }
+  },
+  {
+    "id": 8,
+    "title": "Менеджер по развитию",
+    "city": "Нижний Новгород",
+    "columns": [
+      { "label": "Все", "value": 320 },
+      { "label": "Не разобранное", "value": 42 },
+      { "label": "Подумать", "value": 14 },
+      { "label": "Подходящие", "value": 52 },
+      { "label": "Отклоненные", "value": 212 }
+    ],
+    "footerData": {
+      "sites": 68,
+      "responsible": "Сергей Петров",
+      "itemId": "2345 ID"
+    }
+  },
+  {
+    "id": 9,
+    "title": "Менеджер по качеству",
+    "city": "Самара",
+    "columns": [
+      { "label": "Все", "value": 290 },
+      { "label": "Не разобранное", "value": 38 },
+      { "label": "Подумать", "value": 11 },
+      { "label": "Подходящие", "value": 47 },
+      { "label": "Отклоненные", "value": 194 }
+    ],
+    "footerData": {
+      "sites": 58,
+      "responsible": "Мария Иванова",
+      "itemId": "1234 ID"
+    }
+  },
+  {
+    "id": 10,
+    "title": "Менеджер по продукту",
+    "city": "Омск",
+    "columns": [
+      { "label": "Все", "value": 310 },
+      { "label": "Не разобранное", "value": 39 },
+      { "label": "Подумать", "value": 13 },
+      { "label": "Подходящие", "value": 51 },
+      { "label": "Отклоненные", "value": 207 }
+    ],
+    "footerData": {
+      "sites": 62,
+      "responsible": "Александр Соколов",
+      "itemId": "5678 ID"
+    }
+  },
+  {
+    "id": 11,
+    "title": "Менеджер по проектам",
+    "city": "Ростов-на-Дону",
+    "columns": [
+      { "label": "Все", "value": 330 },
+      { "label": "Не разобранное", "value": 43 },
+      { "label": "Подумать", "value": 16 },
+      { "label": "Подходящие", "value": 53 },
+      { "label": "Отклоненные", "value": 218 }
+    ],
+    "footerData": {
+      "sites": 66,
+      "responsible": "Елена Кузнецова",
+      "itemId": "6789 ID"
+    }
+  },
+  {
+    "id": 12,
+    "title": "Менеджер по продажам",
+    "city": "Уфа",
+    "columns": [
+      { "label": "Все", "value": 340 },
+      { "label": "Не разобранное", "value": 44 },
+      { "label": "Подумать", "value": 17 },
+      { "label": "Подходящие", "value": 54 },
+      { "label": "Отклоненные", "value": 225 }
+    ],
+    "footerData": {
+      "sites": 67,
+      "responsible": "Игорь Николаев",
+      "itemId": "7890 ID"
+    }
+  },
+  {
+    "id": 13,
+    "title": "Менеджер по логистике",
+    "city": "Красноярск",
+    "columns": [
+      { "label": "Все", "value": 360 },
+      { "label": "Не разобранное", "value": 46 },
+      { "label": "Подумать", "value": 18 },
+      { "label": "Подходящие", "value": 56 },
+      { "label": "Отклоненные", "value": 240 }
+    ],
+    "footerData": {
+      "sites": 69,
+      "responsible": "Наталья Семенова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 14,
+    "title": "Менеджер по маркетингу",
+    "city": "Воронеж",
+    "columns": [
+      { "label": "Все", "value": 370 },
+      { "label": "Не разобранное", "value": 47 },
+      { "label": "Подумать", "value": 19 },
+      { "label": "Подходящие", "value": 57 },
+      { "label": "Отклоненные", "value": 247 }
+    ],
+    "footerData": {
+      "sites": 70,
+      "responsible": "Виктор Павлов",
+      "itemId": "9012 ID"
+    }
+  },
+  {
+    "id": 15,
+    "title": "Менеджер по персоналу",
+    "city": "Пермь",
+    "columns": [
+      { "label": "Все", "value": 380 },
+      { "label": "Не разобранное", "value": 48 },
+      { "label": "Подумать", "value": 20 },
+      { "label": "Подходящие", "value": 58 },
+      { "label": "Отклоненные", "value": 254 }
+    ],
+    "footerData": {
+      "sites": 71,
+      "responsible": "Ольга Васильева",
+      "itemId": "0123 ID"
+    }
+  },
+  {
+    "id": 16,
+    "title": "Менеджер по развитию",
+    "city": "Волгоград",
+    "columns": [
+      { "label": "Все", "value": 390 },
+      { "label": "Не разобранное", "value": 49 },
+      { "label": "Подумать", "value": 21 },
+      { "label": "Подходящие", "value": 59 },
+      { "label": "Отклоненные", "value": 261 }
+    ],
+    "footerData": {
+      "sites": 72,
+      "responsible": "Андрей Федоров",
+      "itemId": "1234 ID"
+    }
+  },
+  {
+    "id": 17,
+    "title": "Менеджер по качеству",
+    "city": "Краснодар",
+    "columns": [
+      { "label": "Все", "value": 400 },
+      { "label": "Не разобранное", "value": 50 },
+      { "label": "Подумать", "value": 22 },
+      { "label": "Подходящие", "value": 60 },
+      { "label": "Отклоненные", "value": 268 }
+    ],
+    "footerData": {
+      "sites": 73,
+      "responsible": "Екатерина Михайлова",
+      "itemId": "2345 ID"
+    }
+  },
+  {
+    "id": 18,
+    "title": "Менеджер по продукту",
+    "city": "Сочи",
+    "columns": [
+      { "label": "Все", "value": 410 },
+      { "label": "Не разобранное", "value": 51 },
+      { "label": "Подумать", "value": 23 },
+      { "label": "Подходящие", "value": 61 },
+      { "label": "Отклоненные", "value": 275 }
+    ],
+    "footerData": {
+      "sites": 74,
+      "responsible": "Денис Степанов",
+      "itemId": "3456 ID"
+    }
+  },
+  {
+    "id": 19,
+    "title": "Менеджер по проектам",
+    "city": "Тюмень",
+    "columns": [
+      { "label": "Все", "value": 420 },
+      { "label": "Не разобранное", "value": 52 },
+      { "label": "Подумать", "value": 24 },
+      { "label": "Подходящие", "value": 62 },
+      { "label": "Отклоненные", "value": 282 }
+    ],
+    "footerData": {
+      "sites": 75,
+      "responsible": "Анастасия Козлова",
+      "itemId": "4567 ID"
+    }
+  },
+  {
+    "id": 20,
+    "title": "Менеджер по продажам",
+    "city": "Иркутск",
+    "columns": [
+      { "label": "Все", "value": 430 },
+      { "label": "Не разобранное", "value": 53 },
+      { "label": "Подумать", "value": 25 },
+      { "label": "Подходящие", "value": 63 },
+      { "label": "Отклоненные", "value": 289 }
+    ],
+    "footerData": {
+      "sites": 76,
+      "responsible": "Артем Морозов",
+      "itemId": "5678 ID"
+    }
+  },
+  {
+    "id": 21,
+    "title": "Менеджер по логистике",
+    "city": "Хабаровск",
+    "columns": [
+      { "label": "Все", "value": 440 },
+      { "label": "Не разобранное", "value": 54 },
+      { "label": "Подумать", "value": 26 },
+      { "label": "Подходящие", "value": 64 },
+      { "label": "Отклоненные", "value": 296 }
+    ],
+    "footerData": {
+      "sites": 77,
+      "responsible": "Татьяна Воробьева",
+      "itemId": "6789 ID"
+    }
+  },
+  {
+    "id": 22,
+    "title": "Менеджер по маркетингу",
+    "city": "Ярославль",
+    "columns": [
+      { "label": "Все", "value": 450 },
+      { "label": "Не разобранное", "value": 55 },
+      { "label": "Подумать", "value": 27 },
+      { "label": "Подходящие", "value": 65 },
+      { "label": "Отклоненные", "value": 303 }
+    ],
+    "footerData": {
+      "sites": 78,
+      "responsible": "Сергей Ковалев",
+      "itemId": "7890 ID"
+    }
+  },
+  {
+    "id": 23,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 24,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 25,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 26,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 27,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
+  },
+  {
+    "id": 28,
+    "title": "Менеджер по персоналу",
+    "city": "Томск",
+    "columns": [
+      { "label": "Все", "value": 460 },
+      { "label": "Не разобранное", "value": 56 },
+      { "label": "Подумать", "value": 28 },
+      { "label": "Подходящие", "value": 66 },
+      { "label": "Отклоненные", "value": 310 }
+    ],
+    "footerData": {
+      "sites": 79,
+      "responsible": "Ольга Новикова",
+      "itemId": "8901 ID"
+    }
   }
 ]
