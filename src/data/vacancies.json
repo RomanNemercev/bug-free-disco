@@ -4,17 +4,18 @@
     "title": "Менеджер по продажам",
     "city": "Новороссийск",
     "columns": [
-      { "label": "Все", "value": 328, "isVisible": true },
-      { "label": "Не разобранное", "value": 41, "isVisible": true },
-      { "label": "Подумать", "value": 13, "isVisible": true },
-      { "label": "Подходящие", "value": 43, "isVisible": true },
-      { "label": "Отклоненные", "value": 201, "isVisible": true },
-      { "label": "Удаленные", "value": 17, "isVisible": true }
+      { "label": "Все", "value": 328 },
+      { "label": "Не разобранное", "value": 41 },
+      { "label": "Подумать", "value": 13 },
+      { "label": "Подходящие", "value": 43 },
+      { "label": "Отклоненные", "value": 201 },
+      { "label": "Удаленные", "value": 17 }
     ],
+    "message": "Текст ошибки или предупреждения",
     "footerData": {
       "sites": 64,
       "responsible": "Не назначен",
-      "applicationId": "2134"
+      "itemId": "2134 ID"
     }
   },
   {
@@ -22,15 +23,41 @@
     "title": "Менеджер по часовым поясам",
     "city": "Ногинск",
     "columns": [
-      { "label": "Все", "value": 328, "isVisible": true },
-      { "label": "Не разобранное", "value": 41, "isVisible": true },
-      { "label": "Подумать", "value": 13, "isVisible": true }
+      { "label": "Все", "value": 328 },
+      { "label": "Не разобранное", "value": 41 },
+      { "label": "Подумать", "value": 13 },
+      { "label": "Источник", "value": 34 },
+      { "label": "Подходящие", "value": 59 },
+      { "label": "Интервью", "value": 3 },
+      { "label": "Служба безопасности", "value": 1 },
+      { "label": "У заказчика", "value": 42 },
+      { "label": "Вышел на работу", "value": 22 },
+      { "label": "Отклоненные", "value": 148 },
+      { "label": "Удаленные", "value": 20 }
     ],
     "footerData": {
       "sites": 64,
       "candidatesInWork": 32,
       "responsible": "Владимир Соловьев",
-      "applicationId": "N23832"
+      "applicationId": "N23832",
+      "itemId": "32323 ID"
+    }
+  },
+  {
+    "id": 3,
+    "title": "Менеджер по работе с клиентами",
+    "city": "Краснодар",
+    "columns": [
+      { "label": "Все", "value": 250 },
+      { "label": "Не разобранное", "value": 30 },
+      { "label": "Подумать", "value": 15 },
+      { "label": "Подходящие", "value": 45 },
+      { "label": "Отклоненные", "value": 160 }
+    ],
+    "footerData": {
+      "sites": 50,
+      "responsible": "Алексей Петров",
+      "itemId": "5432 ID"
     }
   }
 ]

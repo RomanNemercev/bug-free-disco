@@ -72,7 +72,7 @@ import { ref } from 'vue';
 import DropdownCalendar from '@/components/custom/DropdownCalendar.vue';
 import EventList from '@/components/custom/page-parts/EventList.vue';
 
-const currentLevel = ref('beginner');
+const currentLevel = ref('complete');
 
 interface EventData {
     date: string
