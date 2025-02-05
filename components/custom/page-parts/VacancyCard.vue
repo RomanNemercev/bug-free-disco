@@ -58,9 +58,4 @@ const props = defineProps({
         required: true,
     },
 });
-
-// Фильтруем колонки, чтобы отображать только те, у которых isVisible === true
-const visibleColumns = computed(() => {
-    return props.vacancy.columns.filter((column) => column.isVisible);
-});
 </script>

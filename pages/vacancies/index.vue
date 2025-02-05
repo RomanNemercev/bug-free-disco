@@ -13,7 +13,7 @@ const isHoveredFunnel = ref(false);
 const isHoveredSort = ref(false);
 const vacancies = ref(vacanciesData);
 const currentPage = ref(1);
-const itemsPerPage = 2;
+const itemsPerPage = 10;
 
 const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
 
