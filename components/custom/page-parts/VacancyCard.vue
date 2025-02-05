@@ -14,7 +14,8 @@
                       class="[&:not(:last-child)]:border-r [&:not(:last-child)]:border-athens">
                         <div class="p-1 text-center">
                             <div class="text-sm text-space font-normal mb-1">{{ column.value }}</div>
-                            <div class="text-13px text-slate-custom font-normal truncate">{{ column.label }}</div>
+                            <div class="text-13px text-slate-custom font-normal truncate" :title="column.label">{{
+                                column.label }}</div>
                         </div>
                     </span>
                 </div>
@@ -46,8 +47,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 
 import VacancyCardDropdown from '@/src/data/vacancy-card-dropdown.json';
