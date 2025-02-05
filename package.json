@@ -29,6 +29,7 @@
     "nuxt": "^3.14.1592",
     "nuxt-lucide-icons": "^1.0.5",
     "pinia": "^2.3.0",
+    "pm2": "^5.4.3",
     "radix-vue": "^1.9.13",
     "sass": "^1.81.0",
     "tailwind-merge": "^2.5.5",
