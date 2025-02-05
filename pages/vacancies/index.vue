@@ -28,33 +28,34 @@ function handlePageChange(page) {
 </script>
 
 <template>
-    <div class="container pt-35px">
+    <div class="container pt-35px pb-28">
         <!-- header block -->
-        <div class="w-full p-25px rounded-t-fifteen bg-white flex justify-between mb-px">
+        <div class="w-full p-25px rounded-t-fifteen bg-white flex justify-between mb-px items-center">
             <div>
-                <p class="text-xl font-semibold text-space">Вакансии</p>
+                <p class="text-xl font-semibold text-space leading-normal mb-2.5">Вакансии</p>
                 <p class="text-sm font-normal text-slate-custom">Управляйте вакансиями с этого раздела</p>
             </div>
             <NuxtLink to="/vacancies/newvacancy">
-                <UiButton variant="action" size="action">Добавить вакансию</UiButton>
+                <span class="bg-dodger text-white text-sm font-semibold rounded-ten py-11.5px px-[19px]">Добавить
+                    вакансию</span>
             </NuxtLink>
         </div>
         <!-- cards block -->
-        <div class="bg-catskill rounded-b-fifteen py-15px px-25px mb-15px">
+        <div class="bg-catskill rounded-b-fifteen py-13px px-25px mb-15px pb-15px">
             <div class="flex justify-between">
                 <div class="flex">
                     <div class="flex justify-between gap-x-2.5 mr-2.5">
                         <div
-                          class="flex bg-space rounded-ten py-11px px-15px text-white text-sm font-medium gap-x-2.5 cursor-pointer">
+                          class="flex bg-space rounded-ten py-2.5 px-15px text-white text-sm font-medium gap-x-2.5 cursor-pointer">
                             <p>Активные вакансии</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </div>
                         <div
-                          class="flex rounded-ten py-11px px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
-                            <p>Черновики</p><span>2</span>
+                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
+                            <p>Черновики</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </div>
                         <div
-                          class="flex rounded-ten py-11px px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
-                            <p>Архив</p><span>2</span>
+                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
+                            <p>Архив</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </div>
                     </div>
                     <DotsDropdown :items="vacancyItems" />

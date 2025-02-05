@@ -4,7 +4,7 @@
             <router-link to="/">
                 <h1 class="text-white text-25px font-bold uppercase px-3 py-0.5 mr-4">jobly</h1>
             </router-link>
-            <ul class="flex gap-x-1 items-center">
+            <ul class="flex gap-x-5px items-center">
                 <li>
                     <NuxtLink to="/applications" exact-active-class="active-link">
                         <p
