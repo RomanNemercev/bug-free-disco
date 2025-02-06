@@ -7,9 +7,10 @@ import ResponseInput from '~/components/custom/ResponseInput.vue';
 import CheckboxGroup from "~/components/custom/CheckboxGroup.vue";
 
 
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick, watch, onMounted } from 'vue';
 
 import vacanciesData from "@/src/data/vacancies.json";
+// import vacanciesData from "@/src/data/vacancies-empty.json";
 import responses from "~/src/data/response-roles.json";
 import singleResponses from "~/src/data/responses.json";
 import checkboxOptions from "~/src/data/checkbox-more.json";
@@ -25,6 +26,11 @@ const currentPage = ref(1);
 const itemsPerPage = 10;
 const cardsBlock = ref(null);
 const selectedMore = ref([]);
+const activeVacancies = ref(true);
+const archiveVacancies = ref(false);
+const draftVacancies = ref(false);
+const containerHeight = ref(0); // отслеживаю высоту контейнера
+const containerRef = ref(null); // ссылка на контейнер
 
 const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
 
@@ -48,6 +54,42 @@ function sortToggleActive() {
     cardsBlock.value.style.borderBottomLeftRadius = isActiveSort.value ? "0px" : "15px";
     cardsBlock.value.style.borderBottomRightRadius = isActiveSort.value ? "0px" : "15px";
 }
+
+function showActiveVacancies() {
+    activeVacancies.value = true;
+    archiveVacancies.value = false;
+    draftVacancies.value = false;
+    // updateContainerHeight(); // Обновление высоты
+}
+
+function showArchiveVacancies() {
+    activeVacancies.value = false;
+    archiveVacancies.value = true;
+    draftVacancies.value = false;
+    // updateContainerHeight();
+}
+
+function showDraftVacancies() {
+    activeVacancies.value = false;
+    draftVacancies.value = true;
+    archiveVacancies.value = false;
+    // updateContainerHeight();
+}
+
+// Функция для обновления высоты контейнера
+async function updateContainerHeight() {
+    await nextTick();
+    if (containerRef.value) {
+        const activeBlock = containerRef.value.querySelector(".active-view");
+        containerHeight.value = activeBlock?.offsetHeight || 0;
+    }
+}
+
+// Инициализация высоты при монтировании
+onMounted(updateContainerHeight);
+
+// Следим за изменением активных блоков
+watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight);
 </script>
 
 <template>
@@ -70,15 +112,18 @@ function sortToggleActive() {
                 <div class="flex">
                     <div class="flex justify-between gap-x-2.5 mr-2.5">
                         <button
-                          class="flex bg-space rounded-ten py-2.5 px-15px text-white text-sm font-medium gap-x-2.5 cursor-pointer">
+                          class="flex bg-space rounded-ten py-2.5 px-15px text-white text-sm font-medium gap-x-2.5 cursor-pointer"
+                          @click="showActiveVacancies()">
                             <p>Активные вакансии</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </button>
                         <button
-                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
+                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
+                          @click="showDraftVacancies()">
                             <p>Черновики</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </button>
                         <button
-                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer">
+                          class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
+                          @click="showArchiveVacancies()">
                             <p>Архив</p><span class="text-slate-custom text-sm font-medium">2</span>
                         </button>
                     </div>
@@ -146,18 +191,55 @@ function sortToggleActive() {
                 </transition>
             </div>
         </div>
-        <div>
-            <div v-if="vacancies.length === 0"
-              class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
-                <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно управлять
-                </p>
-            </div>
-            <div v-if="vacancies.length > 0">
-                <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
-                  :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
-                <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
-                  @page-changed="handlePageChange" />
-            </div>
+        <div ref="containerRef" :style="{ height: `${containerHeight}px` }" class="relative">
+            <transition name="fade" @after-enter="updateContainerHeight">
+                <div v-if="activeVacancies" class="absolute w-full active-view">
+                    <div v-if="vacancies.length === 0"
+                      class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
+                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
+                            управлять
+                        </p>
+                    </div>
+                    <div v-if="vacancies.length > 0">
+                        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
+                          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
+                        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
+                          @page-changed="handlePageChange" />
+                    </div>
+                </div>
+            </transition>
+            <transition name="fade" @after-enter="updateContainerHeight">
+                <div v-if="draftVacancies" class="absolute w-full active-view">
+                    <div v-if="vacancies.length === 0"
+                      class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
+                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
+                            управлять
+                        </p>
+                    </div>
+                    <div v-if="vacancies.length > 0">
+                        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
+                          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
+                        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
+                          @page-changed="handlePageChange" />
+                    </div>
+                </div>
+            </transition>
+            <transition name="fade" @after-enter="updateContainerHeight">
+                <div v-if="archiveVacancies" class="absolute w-full active-view">
+                    <div v-if="true"
+                      class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
+                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
+                            управлять
+                        </p>
+                    </div>
+                    <div v-if="!vacancies.length > 0">
+                        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
+                          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
+                        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
+                          @page-changed="handlePageChange" />
+                    </div>
+                </div>
+            </transition>
         </div>
     </div>
 </template>
@@ -181,6 +263,20 @@ function sortToggleActive() {
 
 .fade-enter-from,
 .fade-leave-to {
+    opacity: 0;
+}
+
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateX(20px);
     opacity: 0;
 }
 </style>

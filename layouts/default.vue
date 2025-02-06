@@ -2,6 +2,6 @@
     <div>
         <vacancy-header />
         <slot />
-        <p>footer</p>
+        <!-- there is a footer block -->
     </div>
 </template>
