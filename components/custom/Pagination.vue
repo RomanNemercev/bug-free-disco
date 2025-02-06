@@ -36,7 +36,7 @@
         </button>
       </div>
 
-      <button :disabled="currentPage === totalPages" @click="$emit('page-changed', currentPage + 1)"
+      <button :disabled="currentPage === (totalPages - 1)" @click="$emit('page-changed', currentPage + 1)"
         class="p-2.5 rounded-ten ml-2.5 transition-colors" @mouseover="checkDisableArrowRight()"
         @mouseleave="isHoveredRightArrow = false"
         :class="isHoveredRightArrow ? 'bg-zumthor text-dodger' : 'bg-athens-gray text-slate-custom'">

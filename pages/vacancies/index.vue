@@ -2,18 +2,23 @@
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import VacancyCard from '~/components/custom/page-parts/VacancyCard.vue';
 import Pagination from "@/components/custom/Pagination.vue";
+import GeoInput from '~/components/custom/GeoInput.vue';
+import ResponseInput from '~/components/custom/ResponseInput.vue';
 
 import { ref, computed } from 'vue';
 
 import vacanciesData from "@/src/data/vacancies.json";
+import responses from "~/src/data/response-roles.json";
 
 const vacancyItems = ['Пункт меню 1', 'Пункт меню 2', 'Пункт меню 3', 'Пункт меню 4', 'Пункт меню 5', 'Пункт меню 6', 'Пункт меню 7'];
 
 const isHoveredFunnel = ref(false);
+const isActiveFunnel = ref(false);
 const isHoveredSort = ref(false);
 const vacancies = ref(vacanciesData);
 const currentPage = ref(1);
 const itemsPerPage = 10;
+const cardsBlock = ref(null);
 
 const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
 
@@ -24,6 +29,12 @@ const paginatedVacancies = computed(() => {
 
 function handlePageChange(page) {
     currentPage.value = page;
+}
+
+function funnelToggleActive() {
+    isActiveFunnel.value = !isActiveFunnel.value;
+    cardsBlock.value.style.borderBottomLeftRadius = isActiveFunnel.value ? "0px" : "15px";
+    cardsBlock.value.style.borderBottomRightRadius = isActiveFunnel.value ? "0px" : "15px";
 }
 </script>
 
@@ -41,7 +52,8 @@ function handlePageChange(page) {
             </NuxtLink>
         </div>
         <!-- cards block -->
-        <div class="bg-catskill rounded-b-fifteen py-13px px-25px mb-15px pb-15px">
+        <div class="bg-catskill rounded-b-fifteen py-13px px-25px mb-15px pb-15px transition-all relative"
+          ref="cardsBlock">
             <div class="flex justify-between">
                 <div class="flex">
                     <div class="flex justify-between gap-x-2.5 mr-2.5">
@@ -66,16 +78,41 @@ function handlePageChange(page) {
                       :class="isHoveredSort ? 'border-zumthor text-dodger bg-zumthor' : 'text-slate-custom border-athens bg-white'"><svg-icon
                           name="sort-list" width="20" height="20" /></button>
                     <button class="p-2.5 rounded-ten border transition-colors" @mouseover="isHoveredFunnel = true"
-                      @mouseleave="isHoveredFunnel = false"
+                      @mouseleave="isHoveredFunnel = false" @click="funnelToggleActive()"
                       :class="isHoveredFunnel ? 'border-zumthor text-dodger bg-zumthor' : 'text-slate-custom border-athens bg-white'"><svg-icon
                           name="funnel" width="20" height="20" /></button>
                 </div>
+                <transition name="fade">
+                    <div v-if="isActiveFunnel"
+                      class="absolute bg-white w-full top-[69px] left-0 p-25px pt-15px rounded-b-ten">
+                        <p class="text-18px font-medium text-space">Фильтры</p>
+                        <div class="grid grid-cols-4 gap-15px">
+                            <div>
+                                <p>Регион поиска</p>
+                                <geo-input placeholder="Введите город" />
+                            </div>
+                            <div>
+                                <p>Отвестсвенный вакансии</p>
+                                <response-input :placeholder="Участники" :showRoles="true" :responses="responses" />
+                            </div>
+                        </div>
+                    </div>
+                </transition>
             </div>
         </div>
-        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
-          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
-        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
-          @page-changed="handlePageChange" />
+        <div>
+            <div v-if="vacancies.length === 0"
+              class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
+                <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно управлять
+                </p>
+            </div>
+            <div v-if="vacancies.length > 0">
+                <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
+                  :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
+                <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
+                  @page-changed="handlePageChange" />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -99,5 +136,15 @@ button:disabled {
 
 .active {
     font-weight: bold;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

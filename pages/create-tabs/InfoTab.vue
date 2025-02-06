@@ -28,6 +28,7 @@ import CarId from "~/src/data/car-id.json";
 import MoreOptions from "~/src/data/more-options.json";
 import industry from '~/src/data/industry.json';
 import specialization from '~/src/data/specialization.json';
+import responses from '~/src/data/responses.json';
 
 import { ref, onMounted } from 'vue';
 import { useVacancyStore } from '@/stores/vacancy';
@@ -311,7 +312,7 @@ function saveVacancy() {
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="leading-normal text-space text-xl font-semibold mb-[33px]">Контактная информация</p>
                 <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-                <response-input class="mb-6 w-full max-w-input" />
+                <response-input class="mb-6 w-full max-w-input" :responses="responses" />
                 <div class="w-full flex justify-between gap-x-[25px]">
                     <div class="w-full max-w-[400px]">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>

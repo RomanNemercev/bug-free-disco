@@ -110,5 +110,3 @@ const events: EventData[] = [
     }
 ]
 </script>
-
-<style scoped></style>
