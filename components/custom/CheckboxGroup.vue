@@ -1,5 +1,5 @@
 <template>
-    <label v-for="option in options" :key="option.id" class="flex items-center cursor-pointer check-wrapper">
+    <label v-for="option in options" :key="option.id" class="flex items-center cursor-pointer check-wrapper w-fit">
         <input type="checkbox" :id="option.id" :value="option.value" v-model="selectedOptions" class="hidden" />
         <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
             'bg-dodger border-dodger': selectedOptions.includes(option.value),
@@ -12,7 +12,7 @@
                   clip-rule="evenodd" />
             </svg>
         </div>
-        <span class="text-sm text-space">{{ option.label }}</span>
+        <span class="text-sm text-space select-none">{{ option.label }}</span>
     </label>
 </template>
 
