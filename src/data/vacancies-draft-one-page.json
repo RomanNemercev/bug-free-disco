@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Менеджер по продажам",
+    "city": "Новороссийск",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Разработчик Python",
+    "city": "Москва",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Дизайнер UI/UX",
+    "city": "Санкт-Петербург",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  }
+]

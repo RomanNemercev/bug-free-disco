@@ -1,45 +1,54 @@
 <template>
   <div class="flex justify-center">
     <div class="flex justify-center mt-25px bg-white w-fit p-2.5 rounded-ten leading-normal">
-
-      <button :disabled="currentPage === 1" @click="$emit('page-changed', currentPage - 1)"
-        class="p-2.5 rounded-ten mr-2.5 transition-colors" @mouseover="checkDisableArrowLeft()"
-        @mouseleave="isHoveredLeftArrow = false"
-        :class="isHoveredLeftArrow ? 'bg-zumthor text-dodger' : 'bg-athens-gray text-slate-custom'">
+      <!-- Кнопка "Назад" -->
+      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)"
+        @mouseover="setHoverState('leftArrow', true)" @mouseleave="setHoverState('leftArrow', false)"
+        :class="buttonClasses('arrow', 'leftArrow')" class="p-2.5 rounded-ten mr-2.5 transition-colors">
         <svg-icon name="pagination-arrow-left" width="20" height="20" />
       </button>
+
+      <!-- Блок с кнопками страниц -->
       <div class="flex justify-center gap-x-5px">
-        <button v-if="shouldShowFirst" @click="$emit('page-changed', 1)" :class="buttonClasses(1, isHoveredFirstPage)"
-          @mouseover="isHoveredFirstPage = true" @mouseleave="isHoveredFirstPage = false"
+        <!-- Первая страница -->
+        <button v-if="shouldShowFirst" @click="changePage(1)" @mouseover="setHoverState(1, true)"
+          @mouseleave="setHoverState(1, false)" :class="buttonClasses('page', 1)"
           class="p-1 min-w-10 h-10 text-13px font-bold rounded-ten transition-colors">
           1
         </button>
 
+        <!-- Многоточие слева -->
         <span v-if="showLeftDots"
-          class="p-2 min-w-10 h-10 text-13px font-bold text-slate-custom flex justify-center items-center">...</span>
+          class="p-2 min-w-10 h-10 text-13px font-bold text-slate-custom flex justify-center items-center">
+          ...
+        </span>
 
-        <button v-for="page in visiblePages" :key="page" @click="$emit('page-changed', page)"
-          :class="buttonClasses(page, isHoveredMainPage[page])" @mouseover="isHoveredMainPage[page] = true"
-          @mouseleave="isHoveredMainPage[page] = false"
+        <!-- Основные страницы -->
+        <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
+          @mouseover="setHoverState(page, true)" @mouseleave="setHoverState(page, false)"
+          :class="buttonClasses('page', page)"
           class="p-1 min-w-10 h-10 text-13px font-bold rounded-ten transition-colors">
           {{ page }}
         </button>
 
+        <!-- Многоточие справа -->
         <span v-if="showRightDots"
-          class="px-2 min-w-10 h-10 text-13px font-bold text-slate-custom flex justify-center items-center">...</span>
+          class="px-2 min-w-10 h-10 text-13px font-bold text-slate-custom flex justify-center items-center">
+          ...
+        </span>
 
-        <button v-if="shouldShowLast" @click="$emit('page-changed', totalPages)"
-          :class="buttonClasses(totalPages, isHoveredLastPage)" @mouseover="isHoveredLastPage = true"
-          @mouseleave="isHoveredLastPage = false"
+        <!-- Последняя страница -->
+        <button v-if="shouldShowLast" @click="changePage(totalPages)" @mouseover="setHoverState(totalPages, true)"
+          @mouseleave="setHoverState(totalPages, false)" :class="buttonClasses('page', totalPages)"
           class="p-1 min-w-10 h-10 text-13px font-bold rounded-ten transition-colors">
           {{ totalPages }}
         </button>
       </div>
 
-      <button :disabled="currentPage === (totalPages - 1)" @click="$emit('page-changed', currentPage + 1)"
-        class="p-2.5 rounded-ten ml-2.5 transition-colors" @mouseover="checkDisableArrowRight()"
-        @mouseleave="isHoveredRightArrow = false"
-        :class="isHoveredRightArrow ? 'bg-zumthor text-dodger' : 'bg-athens-gray text-slate-custom'">
+      <!-- Кнопка "Вперед" -->
+      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)"
+        @mouseover="setHoverState('rightArrow', true)" @mouseleave="setHoverState('rightArrow', false)"
+        :class="buttonClasses('arrow', 'rightArrow')" class="p-2.5 rounded-ten ml-2.5 transition-colors">
         <svg-icon name="pagination-arrow-right" width="20" height="20" />
       </button>
     </div>
@@ -47,18 +56,18 @@
 </template>
 
 <script setup>
+import { ref, computed } from "vue";
+
 const props = defineProps({
   currentPage: Number,
   totalPages: Number,
-  visiblePages: Array,
-  shouldShowFirst: Boolean,
-  shouldShowLast: Boolean
 });
 
-import { ref, computed } from "vue";
+const emit = defineEmits(["page-changed"]);
 
 const maxVisiblePages = 5;
 
+// Вычисляемые свойства
 const shouldShowFirst = computed(() => props.currentPage > 3);
 const shouldShowLast = computed(() => props.currentPage < props.totalPages - 2);
 
@@ -66,43 +75,48 @@ const showLeftDots = computed(() => props.currentPage > maxVisiblePages);
 const showRightDots = computed(() => props.currentPage < props.totalPages - maxVisiblePages + 1);
 
 const visiblePages = computed(() => {
-  let startPage = Math.max(1, props.currentPage - 2);
-  let endPage = Math.min(props.totalPages - 1, props.currentPage + 2);
+  const { currentPage, totalPages } = props;
 
-  if (props.currentPage === 1) {
-    endPage = Math.min(maxVisiblePages, props.totalPages - 1);
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage === totalPages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
 
   return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
 });
 
-const isHoveredLeftArrow = ref(false);
-const isHoveredRightArrow = ref(false);
-const isHoveredFirstPage = ref(false);
-const isHoveredLastPage = ref(false);
-const isHoveredMainPage = ref({}); // реактивный объект для всех страниц
+// Состояние наведения
+const hoverState = ref({
+  leftArrow: false,
+  rightArrow: false,
+  pages: {},
+});
 
-function checkDisableArrowLeft() {
-  if (props.currentPage === 1) {
-    isHoveredLeftArrow.value = false;
+// Установка состояния наведения
+function setHoverState(key, value) {
+  if (key === "leftArrow" || key === "rightArrow") {
+    hoverState.value[key] = value;
   } else {
-    isHoveredLeftArrow.value = true;
+    hoverState.value.pages[key] = value;
   }
 }
 
-function checkDisableArrowRight() {
-  if (props.currentPage === props.totalPages) {
-    isHoveredRightArrow.value = false;
-  } else {
-    isHoveredRightArrow.value = true;
-  }
+// Изменение страницы
+function changePage(page) {
+  emit("page-changed", page);
 }
 
-// Функция возвращает корректный класс для каждой кнопки в зависимости от состояния
-function buttonClasses(page, isHovered) {
-  if (props.currentPage === page) {
-    return 'bg-space text-white'; // Активная страница — фиксированные стили
+// Классы для кнопок
+function buttonClasses(type, key) {
+  if (type === "arrow") {
+    return hoverState.value[key] ? "bg-zumthor text-dodger" : "bg-athens-gray text-slate-custom";
+  } else if (type === "page") {
+    if (props.currentPage === key) {
+      return "bg-space text-white";
+    }
+    return hoverState.value.pages[key] ? "bg-athens-gray text-space" : "bg-transparent text-slate-custom";
   }
-  return isHovered ? 'bg-athens-gray text-space' : 'bg-transparent text-slate-custom';
 }
 </script>

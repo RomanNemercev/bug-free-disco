@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "title": "Менеджер по продажам",
+    "city": "Новороссийск",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Разработчик Python",
+    "city": "Москва",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Дизайнер UI/UX",
+    "city": "Санкт-Петербург",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Аналитик данных",
+    "city": "Екатеринбург",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Инженер-программист",
+    "city": "Казань",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Тестировщик ПО",
+    "city": "Нижний Новгород",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Системный администратор",
+    "city": "Челябинск",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Веб-разработчик",
+    "city": "Самара",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 9,
+    "title": "Data Scientist",
+    "city": "Омск",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Менеджер проектов",
+    "city": "Ростов-на-Дону",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  },
+  {
+    "id": 11,
+    "title": "Frontend-разработчик",
+    "city": "Уфа",
+    "editButton": true,
+    "columns": [
+      { "label": "Все", "value": "-" },
+      { "label": "Неразобранное", "value": "-" },
+      { "label": "Подумать", "value": "-" },
+      { "label": "Подходящие", "value": "-" },
+      { "label": "Отклоненные", "value": "-" },
+      { "label": "Удаленные", "value": "-" }
+    ]
+  }
+]

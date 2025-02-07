@@ -11,9 +11,19 @@ import { ref, computed, nextTick, watch, onMounted } from 'vue';
 
 import vacanciesData from "@/src/data/vacancies.json";
 // import vacanciesData from "@/src/data/vacancies-empty.json";
+// import vacanciesData from "@/src/data/vacancies-one-page.json";
+import vacanciesDraftData from "@/src/data/vacancies-draft.json";
+// import vacanciesDraftData from "@/src/data/vacancies-draft-empty.json";
+// import vacanciesDraftData from "@/src/data/vacancies-draft-one-page.json"
+import vacanciesArchiveData from "@/src/data/vacancies-archive.json";
+// import vacanciesArchiveData from "@/src/data/vacancies-archive-empty.json";
+// import vacanciesArchiveData from "@/src/data/vacancies-archive-one-page.json"
 import responses from "~/src/data/response-roles.json";
 import singleResponses from "~/src/data/responses.json";
 import checkboxOptions from "~/src/data/checkbox-more.json";
+import VacancyCardDropdown from '@/src/data/vacancy-card-dropdown.json';
+import VacancyCardDraftDropdown from '@/src/data/vacancy-card-draft-dropdown.json';
+import VacancyCardArchiveDropdown from '@/src/data/vacancy-card-archive-dropdown.json';
 
 const vacancyItems = ['Пункт меню 1', 'Пункт меню 2', 'Пункт меню 3', 'Пункт меню 4', 'Пункт меню 5', 'Пункт меню 6', 'Пункт меню 7'];
 
@@ -22,8 +32,14 @@ const isActiveFunnel = ref(false);
 const isHoveredSort = ref(false);
 const isActiveSort = ref(false);
 const vacancies = ref(vacanciesData);
+const vacanciesDraft = ref(vacanciesDraftData);
+const vacanciesArchive = ref(vacanciesArchiveData);
 const currentPage = ref(1);
+const currentDraftPage = ref(1);
+const currentArchivePage = ref(1);
 const itemsPerPage = 10;
+const itemsDraftPerPage = 10;
+const itemsArchivePerPage = 10;
 const cardsBlock = ref(null);
 const selectedMore = ref([]);
 const activeVacancies = ref(true);
@@ -33,14 +49,34 @@ const containerHeight = ref(0); // отслеживаю высоту конте�
 const containerRef = ref(null); // ссылка на контейнер
 
 const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
+const totalDraftPages = computed(() => Math.max(1, Math.ceil(vacanciesDraft.value.length / itemsDraftPerPage)));
+const totalArchivePages = computed(() => Math.max(1, Math.ceil(vacanciesArchive.value.length / itemsArchivePerPage)));
 
 const paginatedVacancies = computed(() => {
     const startIndex = (currentPage.value - 1) * itemsPerPage;
     return vacancies.value.slice(startIndex, startIndex + itemsPerPage);
 });
 
+const paginatedDraftVacancies = computed(() => {
+    const startIndex = (currentDraftPage.value - 1) * itemsDraftPerPage;
+    return vacanciesDraft.value.slice(startIndex, startIndex + itemsDraftPerPage);
+});
+
+const paginatedArchiveVacancies = computed(() => {
+    const startIndex = (currentArchivePage.value - 1) * itemsArchivePerPage;
+    return vacanciesArchive.value.slice(startIndex, startIndex + itemsArchivePerPage);
+});
+
 function handlePageChange(page) {
     currentPage.value = page;
+}
+
+function handleDraftPageChange(page) {
+    currentDraftPage.value = page;
+}
+
+function handleArchivePageChange(page) {
+    currentArchivePage.value = page;
 }
 
 function funnelToggleActive() {
@@ -59,21 +95,18 @@ function showActiveVacancies() {
     activeVacancies.value = true;
     archiveVacancies.value = false;
     draftVacancies.value = false;
-    // updateContainerHeight(); // Обновление высоты
 }
 
 function showArchiveVacancies() {
     activeVacancies.value = false;
     archiveVacancies.value = true;
     draftVacancies.value = false;
-    // updateContainerHeight();
 }
 
 function showDraftVacancies() {
     activeVacancies.value = false;
     draftVacancies.value = true;
     archiveVacancies.value = false;
-    // updateContainerHeight();
 }
 
 // Функция для обновления высоты контейнера
@@ -111,20 +144,28 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
             <div class="flex justify-between">
                 <div class="flex">
                     <div class="flex justify-between gap-x-2.5 mr-2.5">
-                        <button
-                          class="flex bg-space rounded-ten py-2.5 px-15px text-white text-sm font-medium gap-x-2.5 cursor-pointer"
-                          @click="showActiveVacancies()">
-                            <p>Активные вакансии</p><span class="text-slate-custom text-sm font-medium">2</span>
+                        <button class="flex rounded-ten py-2.5 px-15px text-sm font-medium gap-x-2.5 cursor-pointer"
+                          @click="showActiveVacancies()"
+                          style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
+                          :class="activeVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
+                            <p>Активные вакансии</p><span class="text-slate-custom text-sm font-medium">{{
+                                vacancies.length }}</span>
                         </button>
                         <button
                           class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
-                          @click="showDraftVacancies()">
-                            <p>Черновики</p><span class="text-slate-custom text-sm font-medium">2</span>
+                          @click="showDraftVacancies()"
+                          style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
+                          :class="draftVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
+                            <p>Черновики</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesDraft.length
+                                }}</span>
                         </button>
                         <button
                           class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
-                          @click="showArchiveVacancies()">
-                            <p>Архив</p><span class="text-slate-custom text-sm font-medium">2</span>
+                          @click="showArchiveVacancies()"
+                          style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
+                          :class="archiveVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
+                            <p>Архив</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesArchive.length
+                                }}</span>
                         </button>
                     </div>
                     <DotsDropdown :items="vacancyItems" />
@@ -202,6 +243,7 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                     </div>
                     <div v-if="vacancies.length > 0">
                         <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
+                          :dropdownItems="VacancyCardDropdown"
                           :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
                         <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
                           @page-changed="handlePageChange" />
@@ -210,33 +252,34 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
             </transition>
             <transition name="fade" @after-enter="updateContainerHeight">
                 <div v-if="draftVacancies" class="absolute w-full active-view">
-                    <div v-if="vacancies.length === 0"
+                    <div v-if="vacanciesDraft.length === 0"
                       class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
-                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
-                            управлять
+                        <p class="text-15px font-medium text-slate-custom">Вы ещё не добавили вакансии которые можно
+                            редактировать
                         </p>
                     </div>
-                    <div v-if="vacancies.length > 0">
-                        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
-                          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
-                        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
-                          @page-changed="handlePageChange" />
+                    <div v-if="vacanciesDraft.length > 0">
+                        <VacancyCard v-for="(vacancy, index) in paginatedDraftVacancies" :key="vacancy.id"
+                          :vacancy="vacancy" :dropdownItems="VacancyCardDraftDropdown"
+                          :class="{ 'mb-4': index !== paginatedDraftVacancies.length - 1 }" />
+                        <Pagination v-if="totalDraftPages > 1" :currentPage="currentDraftPage"
+                          :totalPages="totalDraftPages" @page-changed="handleDraftPageChange" />
                     </div>
                 </div>
             </transition>
             <transition name="fade" @after-enter="updateContainerHeight">
                 <div v-if="archiveVacancies" class="absolute w-full active-view">
-                    <div v-if="true"
+                    <div v-if="vacanciesArchive.length === 0"
                       class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
-                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
-                            управлять
+                        <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансии в архив
                         </p>
                     </div>
-                    <div v-if="!vacancies.length > 0">
-                        <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
-                          :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
-                        <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
-                          @page-changed="handlePageChange" />
+                    <div v-if="vacanciesArchive.length > 0">
+                        <VacancyCard v-for="(vacancy, index) in paginatedArchiveVacancies" :key="vacancy.id"
+                          :vacancy="vacancy" :dropdownItems="VacancyCardArchiveDropdown"
+                          :class="{ 'mb-4': index !== paginatedArchiveVacancies.length - 1 }" />
+                        <Pagination v-if="totalArchivePages > 1" :currentPage="currentArchivePage"
+                          :totalPages="totalArchivePages" @page-changed="handleArchivePageChange" />
                     </div>
                 </div>
             </transition>
