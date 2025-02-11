@@ -118,7 +118,7 @@ function saveVacancy() {
 </script>
 
 <template>
-    <div class="container pb-72">
+    <div class="container pb-10">
         <div class="flex gap-x-[24px] pt-48">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="text-space text-xl font-semibold mb-8">Основная информация</p>

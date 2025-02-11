@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Повар",
+    "region": "Пермь",
+    "createdAt": "2024-06-15",
+    "closeDate": "2024-07-10",
+    "status": "new",
+    "customer": "Людмила Сергеева",
+    "executor": "Алексей Смирнов",
+    "responsible": "Иван Иванов"
+  },
+  {
+    "title": "Астролог",
+    "region": "Москва",
+    "createdAt": "2024-05-01",
+    "closeDate": "2024-05-30",
+    "status": "in_review",
+    "customer": "Иван Петров",
+    "responsible": "Андрей Власов",
+    "executor": ""
+  },
+  {
+    "title": "Маркетолог",
+    "region": "Сочи",
+    "createdAt": "2024-04-12",
+    "closeDate": "2024-05-05",
+    "status": "in_work",
+    "customer": "Ольга Смирнова",
+    "responsible": "Андрей Власов",
+    "executor": "Дмитрий Кузнецов"
+  },
+  {
+    "title": "Дизайнер",
+    "region": "Казань",
+    "createdAt": "2024-02-18",
+    "closeDate": "2024-03-10",
+    "status": "paused",
+    "customer": "Андрей Власов",
+    "responsible": "Ирина Лебедева",
+    "executor": ""
+  },
+  {
+    "title": "Менеджер",
+    "region": "Санкт-Петербург",
+    "createdAt": "2024-01-11",
+    "closeDate": "2024-01-25",
+    "status": "new",
+    "customer": "Екатерина Смолова",
+    "responsible": "Сергей Сидоров",
+    "executor": "Арсений Медведев"
+  }
+]

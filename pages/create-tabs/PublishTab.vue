@@ -66,7 +66,7 @@
                     <div class="text-sm font-medium text-space px-2.5">{{ item.responses }}</div>
                     <div class="text-sm font-medium text-space px-2.5">{{ item.expires }}</div>
                     <div>
-                        <DotsDropdonw :items="dropdownOptions" />
+                        <DotsDropdown :items="dropdownOptions" />
                     </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
-import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
+import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 
 const data = ref([
