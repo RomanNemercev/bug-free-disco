@@ -8,7 +8,7 @@ import MyInput from "~/components/custom/MyInput.vue";
 import GenerateDraggable from "~/components/custom/GenerateDraggable.vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 import SettingsArray from '~/src/data/change-settings.json';
 
@@ -41,12 +41,6 @@ function disableBodyScroll() {
 
 function enableBodyScroll() {
     document.body.style.overflow = ''; // Включаем прокрутку
-}
-
-// main fn for close popup
-function closePopup(popup) {
-    popup.value = false;
-    enableBodyScroll();
 }
 
 // Обработчики событий

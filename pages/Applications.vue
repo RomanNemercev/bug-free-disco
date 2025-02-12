@@ -7,11 +7,11 @@
                     управляйте доступом
                 </p>
             </div>
-            <UiButton size="semiaction" variant="action">Новая заявка</UiButton>
+            <UiButton size="semiaction" variant="action" @click="handleOpenNewApp">Новая заявка</UiButton>
         </div>
 
         <div class="w-full leading-normal pl-15px pr-25px rounded-t-fifteen bg-catskill mb-px">
-            <div class="header-wrapper grid grid-cols-8 gap-x-2.5 min-h-[71px]">
+            <div class="header-wrapper grid grid-cols-8 gap-x-2.5 min-h-[71px] items-center">
                 <div v-for="header in headers" :key="header.key"
                   class="text-sm font-medium text-slate-custom flex pl-2.5"
                   @click="['createdAt', 'closeDate', 'status'].includes(header.key) && sortBy(header.key)"
@@ -81,6 +81,78 @@
                 <DotsDropdown :items="dropdownOptions" />
             </div>
         </div>
+        <transition name="fade" @after-leave="enableBodyScroll">
+            <Popup :isOpen="isNewAppPopup" @close="handleCloseNewApp" :width="'740px'" :showCloseButton="false">
+                <p class="leading-normal text-xl font-semibold text-space mb-35px">Новая заявка</p>
+                <div>
+                    <p class="text-sm font-medium text-space mb-5px">Ответственный</p>
+                    <div ref="responseContainer">
+                        <div v-if="newResponse" class="text-sm font-medium text-dodger">{{ newResponse }}</div>
+                        <button v-else-if="!showNewResponse" @click="openNewResponse"
+                          class="text-sm font-medium text-dodger">Добавить</button>
+                        <response-input class="w-full" :responses="responses" v-model="newResponse"
+                          v-show="showNewResponse" @update:modelValue="(value) => updateNewResponse(value)" />
+                    </div>
+                </div>
+                <div class="grid gap-x-5 grid-flow-col">
+                    <div>
+                        <p class="text-sm font-medium text-space">Должность</p>
+                        <SimpleInput placeholder="Введите название должности" v-model="newPosition" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-space">Департамент</p>
+                        <SimpleInput v-model="newDepartment" />
+                    </div>
+                </div>
+                <div class="grid gap-x-5 grid-flow-col">
+                    <div>
+                        <p class="text-sm font-medium text-space">Регион поиска</p>
+                        <SimpleInput v-model="newRegion" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-space">Причина открытия вакансии</p>
+                        <SimpleInput v-model="newReason" />
+                    </div>
+                </div>
+                <div class="grid gap-x-5 grid-flow-col">
+                    <div>
+                        <p class="text-sm font-medium text-space">Зарплата от</p>
+                        <SimpleInput v-model="salaryMin" type="number" />
+
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-space">Зарплата до</p>
+                        <SimpleInput v-model="salaryMax" type="number" />
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-space">Количество позиций</p>
+                    <SimpleInput v-model="vacancyCount" type="number" />
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-space">Требования кандидата</p>
+                    <SimpleInput v-model="requirements" />
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-space">Обязанности кандидата</p>
+                    <SimpleInput v-model="responsibilities" />
+                </div>
+                <div class="grid gap-x-5 grid-flow-col">
+                    <div>
+                        <p class="text-sm font-medium text-space">Начать подбор не позднее </p>
+                        <InputCalendar v-model="startDate" />
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-space">Желаемая дата выхода кандидата</p>
+                        <SimpleInput v-model="exitDate" />
+                    </div>
+                </div>
+                <div class="flex gap-15px justify-between w-fit">
+                    <UiButton variant="action" size="action">Создать</UiButton>
+                    <UiButton variant="back" size="second-back" @click="handleCloseNewApp">Отмена</UiButton>
+                </div>
+            </Popup>
+        </transition>
     </div>
 </template>
 
@@ -89,6 +161,9 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
 import ResponseInput from '@/components/custom/ResponseInput.vue';
 import DotsDropdown from '@/components/custom/DotsDropdown.vue';
+import Popup from '~/components/custom/Popup.vue';
+import SimpleInput from '~/components/custom/SimpleInput.vue';
+import InputCalendar from '~/components/custom/InputCalendar.vue';
 
 import responses from '~/src/data/responses.json';
 import dataList from '~/src/data/roles-data-admin.json';
@@ -120,8 +195,23 @@ const headers = computed(() => {
 
 const sortKey = ref("");
 const sortOrder = ref("asc");
-const userRole = ref("customer"); // Change to "admin" or "responsible" and "customer" for testing
+const userRole = ref("admin"); // Change to "admin" or "responsible" and "customer" for testing
 const dropdownOptions = ["Управлять", "Копировать заявку", "Удалить"];
+const isNewAppPopup = ref(false);
+const showNewResponse = ref(false);
+const newResponse = ref('');
+const responseContainer = ref(null);
+const newPosition = ref('');
+const newDepartment = ref('');
+const newRegion = ref('');
+const newReason = ref('');
+const salaryMin = ref('');
+const salaryMax = ref('');
+const vacancyCount = ref('');
+const requirements = ref('');
+const responsibilities = ref('');
+const startDate = ref('');
+const exitDate = ref('');
 
 const statusLabels = {
     new: "Новая заявка",
@@ -194,12 +284,22 @@ const handleClickOutside = (event) => {
     });
 };
 
+const handleClickOutsideNewAppPopup = (event) => {
+    if (responseContainer.value && !responseContainer.value.contains(event.target)) {
+        if (!newResponse.value) {
+            showNewResponse.value = false; // Закрываем input, если ничего не выбрано
+        }
+    }
+};
+
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutsideNewAppPopup);
 });
 
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside);
+    document.removeEventListener('click', handleClickOutsideNewAppPopup);
 });
 
 const updateResponseChoose = (vacancy, value) => {
@@ -208,20 +308,62 @@ const updateResponseChoose = (vacancy, value) => {
         vacancy.showResponseInput = false;
     }
 };
+
+
+// popup's settings
+// config for control scroll
+function disableBodyScroll() {
+    document.body.style.overflow = 'hidden'; // Отключаем прокрутку
+}
+
+function enableBodyScroll() {
+    document.body.style.overflow = ''; // Включаем прокрутку
+}
+
+function handleOpenNewApp() {
+    isNewAppPopup.value = true;
+    disableBodyScroll();
+}
+
+function handleCloseNewApp() {
+    isNewAppPopup.value = false;
+    enableBodyScroll();
+}
+
+const openNewResponse = (event) => {
+    event.stopPropagation();
+    showNewResponse.value = true;
+};
+
+const updateNewResponse = (value) => {
+    if (value) {
+        newResponse.value = value;
+        showNewResponse.value = false;
+    }
+}
 </script>
 
 <style scoped>
-.grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    align-items: center;
-}
-
 .header-wrapper {
     grid-template-columns: 14.01% 14.01% 10.485% 10.662% 13.128% 14.01% 14.01% 3.525%;
 }
 
 .items-wrapper {
     grid-template-columns: 13.833% 13.833% 10.485% 10.662% 13.833% 13.833% 13.833% 3.525%;
+}
+
+/* Анимация появления и скрытия */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-leave-from {
+    opacity: 1;
 }
 </style>

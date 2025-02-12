@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref } from 'vue';
 
 import CalendarBar from '@/components/custom/CalendarBar.vue';
 
@@ -29,20 +29,6 @@ const minDropdown = ref(null);
 const toggleDropdown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
 }
-
-// const closeDropdown = (element) => {
-//   if (!minDropdown.value?.contains(element.target)) {
-//     isDropDownVisible.value = false;
-//   }
-// }
-
-// onMounted(() => {
-//   window.addEventListener('click', closeDropdown);
-// });
-
-// onBeforeUnmount(() => {
-//   window.removeEventListener('click', closeDropdown);
-// })
 </script>
 
 <style scoped>

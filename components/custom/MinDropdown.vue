@@ -6,7 +6,7 @@
                   :class="{ 'text-slate-custom font-semibold': !selectedOption, 'text-space font-semibold': selectedOption }"
                   class="text-sm">{{
                     mappedSelectedOption }}</div>
-                <div class="dropdown-arrow absolute right-0 transition-transform duration-300 text-bali"
+                <div class="dropdown-arrow top-0 absolute right-0 transition-transform duration-300 text-bali"
                   :class="{ 'rotate-180 text-dodger': isDropDownVisible, 'text-space': selectedOption }">
                     <svg-icon name="arrow-min-dropdown" width="19" height="19" />
                 </div>
