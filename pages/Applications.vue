@@ -12,12 +12,13 @@
 
         <div class="w-full leading-normal pl-15px pr-25px rounded-t-fifteen bg-catskill mb-px">
             <div class="header-wrapper grid grid-cols-8 gap-x-2.5 min-h-[71px]">
-                <div v-for="header in headers" :key="header.key" class="text-sm font-medium text-slate-custom flex"
-                  @click="sortBy(header.key)"
+                <div v-for="header in headers" :key="header.key"
+                  class="text-sm font-medium text-slate-custom flex pl-2.5"
+                  @click="['createdAt', 'closeDate', 'status'].includes(header.key) && sortBy(header.key)"
                   :class="{ 'cursor-pointer select-none': ['createdAt', 'closeDate', 'status'].includes(header.key) }">
                     <span>{{ header.label }}</span>
                     <button v-if="['createdAt', 'closeDate', 'status'].includes(header.key)"
-                      class="relative flex items-center justify-center ml-[5px] custom-button">
+                      class="relative flex items-center justify-center ml-[2.2px] custom-button">
                         <span :style="sortArrowStyle(header.key)" class="ml-1"><svg-icon name="sort-arrow" width="16px"
                               height="15px" /></span>
                     </button>
@@ -27,44 +28,56 @@
         </div>
 
         <div v-for="(vacancy, index) in sortedData" :key="index" :data-vacancy="vacancy.title"
-          class="items-wrapper grid grid-cols-8 gap-x-2.5 py-2 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen">
+          class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen">
             <!-- simple values -->
-            <div class="text-sm font-medium text-space">{{ vacancy.title }}</div>
-            <div class="text-sm font-medium text-space">{{ vacancy.region }}</div>
-            <div class="text-sm font-medium text-space">{{ vacancy.createdAt }}</div>
-            <div class="text-sm font-medium text-space">{{ vacancy.closeDate }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.title }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.region }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.createdAt }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.closeDate }}</div>
             <!-- status vacancy -->
-            <div class="text-sm font-medium text-space">{{ statusLabels[vacancy.status] }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ statusLabels[vacancy.status] }}</div>
             <!-- admin or responsible column on user role -->
-            <div class="text-sm font-medium text-space" v-if="['admin', 'responsible'].includes(userRole)">{{
-                vacancy.customer }}</div>
-            <div v-if="userRole === 'customer'">{{ vacancy.responsible }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5" v-if="['admin', 'responsible'].includes(userRole)">
+                {{
+                    vacancy.customer }}</div>
+            <div v-if="userRole === 'customer'" class="text-sm font-medium text-space py-5 pl-5px">{{
+                vacancy.responsible }}</div>
 
             <!-- admin or costomer column -->
             <div>
                 <div v-if="userRole === 'admin'">
-                    <div class="text-sm font-medium text-space" v-if="vacancy.executor">{{ vacancy.executor }}</div>
+                    <div class="text-sm font-medium text-space py-5 pl-2.5" v-if="vacancy.executor">{{ vacancy.executor
+                        }}
+                    </div>
                     <div v-else>
-                        <button v-if="!vacancy.showResponseInput" @click="openResponseInput(vacancy, $event)"
-                          class="text-sm font-medium text-dodger">Добавить</button>
-                        <response-input v-show="vacancy.showResponseInput" class="mb-0 w-full max-w-input"
-                          :responses="responses" />
+                        <!-- Если выбрано значение, показываем его -->
+                        <div v-if="vacancy.responseChoose" class="text-sm font-medium text-dodger py-5 pl-2.5">
+                            {{ vacancy.responseChoose }}
+                        </div>
+                        <button v-else-if="!vacancy.showResponseInput" @click="openResponseInput(vacancy, $event)"
+                          class="text-sm font-medium text-dodger py-5 pl-2.5">Добавить</button>
+                        <response-input v-model="vacancy.responseChoose" v-show="vacancy.showResponseInput"
+                          @update:modelValue="(value) => updateResponseChoose(vacancy, value)"
+                          class="mb-0 w-full max-w-input py-5" :responses="responses" />
                     </div>
                 </div>
                 <div v-if="userRole === 'responsible'">
-                    <div v-if="vacancy.responsible">{{ vacancy.responsible }}</div>
-                    <div v-else><button @click="takeInWork(vacancy)">Взять в работу</button>
+                    <div v-if="vacancy.executor" class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.executor
+                        }}</div>
+                    <div v-else><button @click="takeInWork(vacancy)"
+                          class="py-5 pl-2.5 text-sm font-medium text-dodger">Взять в работу</button>
                     </div>
                 </div>
                 <div div v-if="userRole === 'customer'">
-                    <div v-if="vacancy.responsible">{{ vacancy.responsible }}</div>
+                    <div v-if="vacancy.executor" class="text-sm font-medium text-space py-5 pl-2.5">{{
+                        vacancy.responsible }}</div>
                     <div v-else>
-                        <p>Не назначен</p>
+                        <p class="py-5 text-bali text-sm font-normal pl-2.5">Не назначен</p>
                     </div>
                 </div>
             </div>
             <!-- dropdown item -->
-            <div>
+            <div class="py-2.5">
                 <DotsDropdown :items="dropdownOptions" />
             </div>
         </div>
@@ -82,7 +95,8 @@ import dataList from '~/src/data/roles-data-admin.json';
 
 const data = ref(dataList.map(vacancy => ({
     ...vacancy,
-    showResponseInput: false // Добавляем состояние для каждого элемента
+    showResponseInput: false, // Добавляем состояние для каждого элемента
+    responseChoose: '', // Выбранный ответственный
 })));
 
 const headers = computed(() => {
@@ -106,7 +120,7 @@ const headers = computed(() => {
 
 const sortKey = ref("");
 const sortOrder = ref("asc");
-const userRole = ref("admin"); // Change to "admin" or "responsible" and "customer" for testing
+const userRole = ref("customer"); // Change to "admin" or "responsible" and "customer" for testing
 const dropdownOptions = ["Управлять", "Копировать заявку", "Удалить"];
 
 const statusLabels = {
@@ -116,10 +130,23 @@ const statusLabels = {
     paused: "Приостановлена"
 };
 
+const statusWeights = {
+    new: 1,
+    in_review: 2,
+    in_work: 3,
+    paused: 4
+};
+
 const sortedData = computed(() => {
     if (!sortKey.value) return data.value;
+
     return [...data.value].sort((a, b) => {
         const multiplier = sortOrder.value === "asc" ? 1 : -1;
+
+        if (sortKey.value === "status") {
+            return (statusWeights[a.status] - statusWeights[b.status]) * multiplier;
+        }
+
         if (a[sortKey.value] > b[sortKey.value]) return 1 * multiplier;
         if (a[sortKey.value] < b[sortKey.value]) return -1 * multiplier;
         return 0;
@@ -156,7 +183,12 @@ const handleClickOutside = (event) => {
         if (vacancy.showResponseInput) {
             const element = document.querySelector(`[data-vacancy="${vacancy.title}"]`);
             if (element && !element.contains(event.target)) {
-                vacancy.showResponseInput = false;
+                // Если не было выбора, оставляем кнопку "Добавить"
+                if (!vacancy.responseChoose) {
+                    vacancy.showResponseInput = false;
+                } else {
+                    vacancy.showResponseInput = false;
+                }
             }
         }
     });
@@ -169,6 +201,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside);
 });
+
+const updateResponseChoose = (vacancy, value) => {
+    if (value) {
+        vacancy.responseChoose = value;
+        vacancy.showResponseInput = false;
+    }
+};
 </script>
 
 <style scoped>
