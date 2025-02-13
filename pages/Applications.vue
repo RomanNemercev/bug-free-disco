@@ -82,7 +82,8 @@
             </div>
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="isNewAppPopup" @close="handleCloseNewApp" :width="'740px'" :showCloseButton="false">
+            <Popup :isOpen="isNewAppPopup" @close="handleCloseNewApp" :width="'740px'" :showCloseButton="false"
+              :disableOverflowHidden="true" :overflowContainer="true">
                 <p class="leading-normal text-xl font-semibold text-space mb-35px">Новая заявка</p>
                 <div>
                     <p class="text-sm font-medium text-space mb-5px">Ответственный</p>
@@ -136,6 +137,7 @@
                 <div>
                     <p class="text-sm font-medium text-space">Обязанности кандидата</p>
                     <SimpleInput v-model="responsibilities" />
+                    <p>Выбранная дата: {{ startDate }}</p>
                 </div>
                 <div class="grid gap-x-5 grid-flow-col">
                     <div>

@@ -1,6 +1,7 @@
 <template>
     <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-      :class="{ 'opacity-100': isOpen, 'opacity-0': !isOpen }" @click.self="closePopup">
+      @click.self="closePopup"
+      :class="[isOpen ? 'opacity-100' : 'opacity-0', overflowContainer ? 'overflow-auto' : 'overflow-hidden']">
         <!-- Внешний контейнер с закруглениями -->
         <div class="bg-white w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform"
           :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height, overflow: disableOverflowHidden ? 'visible' : 'hidden', top: topActive ? '-10%' : 'auto' }"
@@ -43,6 +44,10 @@ const props = defineProps({
     disableOverflowHidden: {
         type: Boolean,
         default: false, // По умолчанию 'overflow-hidden' включен
+    },
+    overflowContainer: {
+        type: Boolean,
+        default: false, // по умолчанию overflow-hidden включен
     },
     topActive: {
         type: Boolean,

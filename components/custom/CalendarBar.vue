@@ -41,7 +41,7 @@ const formatter = useDateFormatter('ru')
 
 <template>
     <CalendarRoot v-slot="{ date, grid, weekDays }" v-model:placeholder="placeholder" v-bind="forwarded"
-      :class="cn('rounded-md border p-3', props.class)" locale="ru">
+      :class="cn('rounded-md border p-3', props.class)" locale="ru" class="calendar-wrapper">
         <CalendarHeader>
             <CalendarHeading class="flex w-full items-center justify-between gap-2">
                 <Select :default-value="placeholder.month.toString()" @update:model-value="(v) => {
