@@ -137,12 +137,11 @@
                 <div>
                     <p class="text-sm font-medium text-space">Обязанности кандидата</p>
                     <SimpleInput v-model="responsibilities" />
-                    <p>Выбранная дата: {{ startDate }}</p>
                 </div>
                 <div class="grid gap-x-5 grid-flow-col">
                     <div>
                         <p class="text-sm font-medium text-space">Начать подбор не позднее </p>
-                        <InputCalendar v-model="startDate" />
+                        <InputCalendar />
                     </div>
                     <div>
                         <p class="text-sm font-medium text-space">Желаемая дата выхода кандидата</p>
@@ -160,6 +159,13 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+
+// import { getMovieList } from "@/src/api";
+
+// const apiTest = getMovieList('movie');
+
+// const initTop = await useAsyncData('top10', async () => await getMovieList('movie'));
+// console.log(apiTest);
 
 import ResponseInput from '@/components/custom/ResponseInput.vue';
 import DotsDropdown from '@/components/custom/DotsDropdown.vue';

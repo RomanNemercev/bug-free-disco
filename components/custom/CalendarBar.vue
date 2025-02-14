@@ -37,6 +37,15 @@ const placeholder = useVModel(props, 'modelValue', emits, {
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 
 const formatter = useDateFormatter('ru')
+
+import { watch } from 'vue';
+import { useCalendarStore } from '@/stores/calendarStore';
+const store = useCalendarStore();
+watch(placeholder, (newValue) => {
+    console.log('Выбранная дата:', newValue);
+    store.selectedDate = newValue;  // 🔥 Теперь дата обновляется глобально!
+}, { deep: true });
+
 </script>
 
 <template>

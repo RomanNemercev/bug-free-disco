@@ -43,6 +43,7 @@
                     </div>
                 </div>
             </div>
+            <!-- <div>Выбранная дата: {{ store.selectedDate }}</div> -->
             <div v-if="currentLevel === 'user'" class="bg-white w-full rounded-fifteen p-25px">
                 <div class="flex justify-between items-center mb-35px">
                     <p class="text-xl font-semibold text-space leading-normal">Мероприятия</p>
@@ -68,6 +69,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useCalendarStore } from '@/stores/calendarStore';
+
+const store = useCalendarStore();
 
 import DropdownCalendar from '@/components/custom/DropdownCalendar.vue';
 import EventList from '@/components/custom/page-parts/EventList.vue';
