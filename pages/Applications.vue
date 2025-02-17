@@ -161,9 +161,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
 // import { getMovieList } from "@/src/api";
-
 // const apiTest = getMovieList('movie');
-
 // const initTop = await useAsyncData('top10', async () => await getMovieList('movie'));
 // console.log(apiTest);
 

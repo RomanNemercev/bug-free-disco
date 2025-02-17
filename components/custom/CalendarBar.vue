@@ -43,7 +43,7 @@ import { useCalendarStore } from '@/stores/calendarStore';
 const store = useCalendarStore();
 watch(placeholder, (newValue) => {
     console.log('Выбранная дата:', newValue);
-    store.selectedDate = newValue;  // 🔥 Теперь дата обновляется глобально!
+    store.selectedDate = newValue.toString();   // 🔥 Теперь дата обновляется глобально!
 }, { deep: true });
 
 </script>

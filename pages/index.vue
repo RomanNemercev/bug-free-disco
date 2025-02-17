@@ -69,9 +69,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useCalendarStore } from '@/stores/calendarStore';
+// import { useCalendarStore } from '@/stores/calendarStore';
 
-const store = useCalendarStore();
+// const store = useCalendarStore();
 
 import DropdownCalendar from '@/components/custom/DropdownCalendar.vue';
 import EventList from '@/components/custom/page-parts/EventList.vue';
