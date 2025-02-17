@@ -3,8 +3,8 @@
       @click.self="closePopup"
       :class="[isOpen ? 'opacity-100' : 'opacity-0', overflowContainer ? 'overflow-auto' : 'overflow-hidden']">
         <!-- Внешний контейнер с закруглениями -->
-        <div class="bg-white w-full h-full max-h-[80vh] rounded-fifteen p-25px relative transform"
-          :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height, overflow: disableOverflowHidden ? 'visible' : 'hidden', top: topActive ? '-10%' : 'auto' }"
+        <div class="bg-white w-full h-full rounded-fifteen p-25px relative transform"
+          :style="{ maxWidth: width, height: height === 'auto' ? 'auto' : height, overflow: disableOverflowHidden ? 'visible' : 'hidden', top: topActive ? '-10%' : 'auto', maxHeight: maxHeight ? 'fit-content' : '80vh' }"
           :class="{ 'pr-2.5': customStyles }">
             <!-- Внутренний контейнер со скроллом -->
             <div ref="scrollContainer" class="overflow-y-auto h-full pr-[15px]"
@@ -53,6 +53,10 @@ const props = defineProps({
         type: Boolean,
         default: false, // По умолчанию top-auto
     },
+    maxHeight: {
+        type: Boolean,
+        default: false,
+    }
 });
 const emit = defineEmits(["close"]);
 

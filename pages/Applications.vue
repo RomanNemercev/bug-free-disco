@@ -83,74 +83,75 @@
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">
             <Popup :isOpen="isNewAppPopup" @close="handleCloseNewApp" :width="'740px'" :showCloseButton="false"
-              :disableOverflowHidden="true" :overflowContainer="true">
-                <p class="leading-normal text-xl font-semibold text-space mb-35px">Новая заявка</p>
-                <div>
-                    <p class="text-sm font-medium text-space mb-5px">Ответственный</p>
+              :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
+                <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
+                <div class="mb-22px">
+                    <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
                     <div ref="responseContainer">
                         <div v-if="newResponse" class="text-sm font-medium text-dodger">{{ newResponse }}</div>
                         <button v-else-if="!showNewResponse" @click="openNewResponse"
-                          class="text-sm font-medium text-dodger">Добавить</button>
+                          class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
                         <response-input class="w-full" :responses="responses" v-model="newResponse"
                           v-show="showNewResponse" @update:modelValue="(value) => updateNewResponse(value)" />
                     </div>
                 </div>
-                <div class="grid gap-x-5 grid-flow-col">
+                <div class="grid gap-x-5 grid-flow-col mb-6">
                     <div>
-                        <p class="text-sm font-medium text-space">Должность</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Должность</p>
                         <SimpleInput placeholder="Введите название должности" v-model="newPosition" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-space">Департамент</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Департамент</p>
                         <SimpleInput v-model="newDepartment" />
                     </div>
                 </div>
-                <div class="grid gap-x-5 grid-flow-col">
+                <div class="grid gap-x-5 grid-flow-col mb-6">
                     <div>
-                        <p class="text-sm font-medium text-space">Регион поиска</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Регион поиска</p>
                         <SimpleInput v-model="newRegion" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-space">Причина открытия вакансии</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Причина открытия вакансии</p>
                         <SimpleInput v-model="newReason" />
                     </div>
                 </div>
-                <div class="grid gap-x-5 grid-flow-col">
+                <div class="grid gap-x-5 grid-flow-col mb-6">
                     <div>
-                        <p class="text-sm font-medium text-space">Зарплата от</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата от</p>
                         <SimpleInput v-model="salaryMin" type="number" />
 
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-space">Зарплата до</p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата до</p>
                         <SimpleInput v-model="salaryMax" type="number" />
                     </div>
                 </div>
-                <div>
-                    <p class="text-sm font-medium text-space">Количество позиций</p>
+                <div class="mb-6">
+                    <p class="text-sm font-medium text-space pl-15px mb-1">Количество позиций</p>
                     <SimpleInput v-model="vacancyCount" type="number" />
                 </div>
-                <div>
-                    <p class="text-sm font-medium text-space">Требования кандидата</p>
+                <div class="mb-6">
+                    <p class="text-sm font-medium text-space pl-15px mb-1">Требования кандидата</p>
                     <SimpleInput v-model="requirements" />
                 </div>
-                <div>
-                    <p class="text-sm font-medium text-space">Обязанности кандидата</p>
+                <div class="mb-6">
+                    <p class="text-sm font-medium text-space pl-15px mb-1">Обязанности кандидата</p>
                     <SimpleInput v-model="responsibilities" />
                 </div>
-                <div class="grid gap-x-5 grid-flow-col">
+                <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-9">
                     <div>
-                        <p class="text-sm font-medium text-space">Начать подбор не позднее </p>
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Начать подбор не позднее </p>
                         <InputCalendar />
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-space">Желаемая дата выхода кандидата</p>
-                        <SimpleInput v-model="exitDate" />
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Желаемая дата выхода кандидата</p>
+                        <InputCalendar />
                     </div>
                 </div>
                 <div class="flex gap-15px justify-between w-fit">
-                    <UiButton variant="action" size="action">Создать</UiButton>
-                    <UiButton variant="back" size="second-back" @click="handleCloseNewApp">Отмена</UiButton>
+                    <UiButton variant="action" size="semiaction" class="font-bold">Создать</UiButton>
+                    <UiButton variant="back" size="second-back" class="font-medium" @click="handleCloseNewApp">Отмена
+                    </UiButton>
                 </div>
             </Popup>
         </transition>
@@ -216,8 +217,6 @@ const salaryMax = ref('');
 const vacancyCount = ref('');
 const requirements = ref('');
 const responsibilities = ref('');
-const startDate = ref('');
-const exitDate = ref('');
 
 const statusLabels = {
     new: "Новая заявка",
