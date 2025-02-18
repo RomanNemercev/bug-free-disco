@@ -7,7 +7,15 @@
                     управляйте доступом
                 </p>
             </div>
-            <UiButton size="semiaction" variant="action" @click="handleOpenNewApp">Новая заявка</UiButton>
+            <div>
+                <UiButton v-if="userRole === 'admin'" size="semiaction" variant="action" @click="isNewAppPopup = true">
+                    Новая
+                    заявка А</UiButton>
+                <UiButton v-else-if="userRole === 'responsible'" size="semiaction" variant="action"
+                  @click="isNewAppPopupResponsible = true">Новая заявка Р</UiButton>
+                <UiButton v-else-if="userRole === 'customer'" size="semiaction" variant="action"
+                  @click="isNewAppPopupCustomer = true">Новая заявка К</UiButton>
+            </div>
         </div>
 
         <div class="w-full leading-normal pl-15px pr-25px rounded-t-fifteen bg-catskill mb-px">
@@ -81,80 +89,129 @@
                 <DotsDropdown :items="dropdownOptions" />
             </div>
         </div>
-        <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="isNewAppPopup" @close="handleCloseNewApp" :width="'740px'" :showCloseButton="false"
-              :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
-                <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
-                <div class="mb-22px">
-                    <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
-                    <div ref="responseContainer">
-                        <div v-if="newResponse" class="text-sm font-medium text-dodger">{{ newResponse }}</div>
-                        <button v-else-if="!showNewResponse" @click="openNewResponse"
-                          class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
-                        <response-input class="w-full" :responses="responses" v-model="newResponse"
-                          v-show="showNewResponse" @update:modelValue="(value) => updateNewResponse(value)" />
+        <div v-if="userRole === 'admin'">
+            <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
+                <Popup :isOpen="isNewAppPopup" @close="() => isNewAppPopup = false" :width="'740px'"
+                  :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
+                    <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
+                    <div class="mb-22px">
+                        <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
+                        <div ref="responseContainer">
+                            <div v-if="newResponse" class="text-sm font-medium text-dodger pl-15px">{{ newResponse }}
+                            </div>
+                            <button v-else-if="!showNewResponse" @click="openNewResponse"
+                              class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                            <response-input class="w-full" :responses="responses" v-model="newResponse"
+                              v-show="showNewResponse" @update:modelValue="(value) => updateNewResponse(value)" />
+                        </div>
                     </div>
-                </div>
-                <div class="grid gap-x-5 grid-flow-col mb-6">
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Должность</p>
-                        <SimpleInput placeholder="Введите название должности" v-model="newPosition" />
+                    <div class="grid gap-x-5 grid-flow-col mb-6">
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Должность</p>
+                            <SimpleInput placeholder="Введите название должности" v-model="newPosition" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Департамент</p>
+                            <SimpleInput v-model="newDepartment" />
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Департамент</p>
-                        <SimpleInput v-model="newDepartment" />
+                    <div class="grid gap-x-5 grid-flow-col mb-6">
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Регион поиска</p>
+                            <SimpleInput v-model="newRegion" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Причина открытия вакансии</p>
+                            <SimpleInput v-model="newReason" />
+                        </div>
                     </div>
-                </div>
-                <div class="grid gap-x-5 grid-flow-col mb-6">
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Регион поиска</p>
-                        <SimpleInput v-model="newRegion" />
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Причина открытия вакансии</p>
-                        <SimpleInput v-model="newReason" />
-                    </div>
-                </div>
-                <div class="grid gap-x-5 grid-flow-col mb-6">
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата от</p>
-                        <SimpleInput v-model="salaryMin" type="number" />
+                    <div class="grid gap-x-5 grid-flow-col mb-6">
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата от</p>
+                            <SimpleInput v-model="salaryMin" type="number" />
 
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата до</p>
+                            <SimpleInput v-model="salaryMax" type="number" />
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата до</p>
-                        <SimpleInput v-model="salaryMax" type="number" />
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Количество позиций</p>
+                        <SimpleInput v-model="vacancyCount" type="number" />
                     </div>
-                </div>
-                <div class="mb-6">
-                    <p class="text-sm font-medium text-space pl-15px mb-1">Количество позиций</p>
-                    <SimpleInput v-model="vacancyCount" type="number" />
-                </div>
-                <div class="mb-6">
-                    <p class="text-sm font-medium text-space pl-15px mb-1">Требования кандидата</p>
-                    <SimpleInput v-model="requirements" />
-                </div>
-                <div class="mb-6">
-                    <p class="text-sm font-medium text-space pl-15px mb-1">Обязанности кандидата</p>
-                    <SimpleInput v-model="responsibilities" />
-                </div>
-                <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-9">
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Начать подбор не позднее </p>
-                        <InputCalendar />
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Требования кандидата</p>
+                        <SimpleInput v-model="requirements" />
                     </div>
-                    <div>
-                        <p class="text-sm font-medium text-space pl-15px mb-1">Желаемая дата выхода кандидата</p>
-                        <InputCalendar />
+                    <div class="mb-6">
+                        <p class="text-sm font-medium text-space pl-15px mb-1">Обязанности кандидата</p>
+                        <SimpleInput v-model="responsibilities" />
                     </div>
-                </div>
-                <div class="flex gap-15px justify-between w-fit">
-                    <UiButton variant="action" size="semiaction" class="font-bold">Создать</UiButton>
-                    <UiButton variant="back" size="second-back" class="font-medium" @click="handleCloseNewApp">Отмена
-                    </UiButton>
-                </div>
-            </Popup>
-        </transition>
+                    <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-9">
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Начать подбор не позднее </p>
+                            <InputCalendar />
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Желаемая дата выхода кандидата</p>
+                            <InputCalendar />
+                        </div>
+                    </div>
+                    <div class="flex gap-15px justify-between w-fit">
+                        <UiButton variant="action" size="semiaction" class="font-bold">Создать</UiButton>
+                        <UiButton variant="back" size="second-back" class="font-medium" @click="isNewAppPopup = false">
+                            Отмена
+                        </UiButton>
+                    </div>
+                </Popup>
+            </transition>
+        </div>
+        <div v-else-if="userRole === 'responsible'">
+            <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
+                <Popup :isOpen="isNewAppPopupResponsible" @close="() => isNewAppPopupResponsible = false"
+                  :width="'740px'" :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true"
+                  maxHeight>
+                    <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
+                    <div class="mb-22px">
+                        <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
+                        <div ref="responseContainerResponsible">
+                            <div v-if="newResponseResponsible" class="text-sm font-medium text-dodger pl-15px">{{
+                                newResponseResponsible }}</div>
+                            <button v-else-if="!showNewResponseResponsible" @click="openNewResponseResponsible"
+                              class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                            <response-input class="w-full" :responses="responses" v-model="newResponseResponsible"
+                              v-show="showNewResponseResponsible"
+                              @update:modelValue="(value) => updateNewResponseResponsible(value)" />
+                        </div>
+                        <div>
+                            <div ref="executorContainer">
+                                <div v-if="newExecutor" class="text-sm font-medium text-dodger pl-15px">{{
+                                    newExecutor }}</div>
+                                <button v-else-if="!showNewExecutor" @click="openNewExecutor"
+                                  class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                                <response-input class="w-full" :responses="responses" v-model="newExecutor"
+                                  v-show="showNewExecutor" @update:modelValue="(value) => updateNewExecutor(value)" />
+                            </div>
+                            <div ref="customerContainer">
+                                <div v-if="newCustomer" class="text-sm font-medium text-dodger pl-15px">{{
+                                    newCustomer }}</div>
+                                <button v-else-if="!showNewCustomer" @click="openNewCustomer"
+                                  class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                                <response-input class="w-full" :responses="responses" v-model="newCustomer"
+                                  v-show="showNewCustomer" @update:modelValue="(value) => updateNewCustomer(value)" />
+                            </div>
+                        </div>
+                    </div>
+                </Popup>
+            </transition>
+        </div>
+        <div v-else-if="userRole === 'customer'">
+            <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
+                <Popup :isOpen="isNewAppPopupCustomer" @close="() => isNewAppPopupCustomer = false" :width="'740px'"
+                  :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight></Popup>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -202,9 +259,11 @@ const headers = computed(() => {
 
 const sortKey = ref("");
 const sortOrder = ref("asc");
-const userRole = ref("admin"); // Change to "admin" or "responsible" and "customer" for testing
+const userRole = ref("responsible"); // Change to "admin" or "responsible" and "customer" for testing
 const dropdownOptions = ["Управлять", "Копировать заявку", "Удалить"];
 const isNewAppPopup = ref(false);
+const isNewAppPopupCustomer = ref(false);
+const isNewAppPopupResponsible = ref(false);
 const showNewResponse = ref(false);
 const newResponse = ref('');
 const responseContainer = ref(null);
@@ -217,6 +276,15 @@ const salaryMax = ref('');
 const vacancyCount = ref('');
 const requirements = ref('');
 const responsibilities = ref('');
+const newResponseResponsible = ref('');
+const showNewResponseResponsible = ref(false);
+const responseContainerResponsible = ref(null);
+const newExecutor = ref('');
+const showNewExecutor = ref(false);
+const executorContainer = ref(null);
+const newCustomer = ref('');
+const showNewCustomer = ref(false);
+const customerContainer = ref(false);
 
 const statusLabels = {
     new: "Новая заявка",
@@ -297,14 +365,44 @@ const handleClickOutsideNewAppPopup = (event) => {
     }
 };
 
+const handleClickOutsideNewAppPopupResponsible = (event) => {
+    if (responseContainerResponsible.value && !responseContainerResponsible.value.contains(event.target)) {
+        if (!newResponseResponsible.value) {
+            showNewResponseResponsible.value = false; // Закрываем input, если ничего не выбрано
+        }
+    }
+};
+
+const handleClickOutsideNewAppPopupExecutor = (event) => {
+    if (executorContainer.value && !executorContainer.value.contains(event.target)) {
+        if (!newExecutor.value) {
+            showNewExecutor.value = false; // Закрываем input, если ничего не выбрано
+        }
+    }
+};
+
+const handleClickOutsideNewAppPopupCustomer = (event) => {
+    if (customerContainer.value && !customerContainer.value.contains(event.target)) {
+        if (!newCustomer.value) {
+            showNewCustomer.value = false; // Закрываем input, если ничего не выбрано
+        }
+    }
+};
+
 onMounted(() => {
     document.addEventListener('click', handleClickOutside);
     document.addEventListener('click', handleClickOutsideNewAppPopup);
+    document.addEventListener('click', handleClickOutsideNewAppPopupResponsible);
+    document.addEventListener('click', handleClickOutsideNewAppPopupExecutor);
+    document.addEventListener('click', handleClickOutsideNewAppPopupCustomer);
 });
 
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside);
     document.removeEventListener('click', handleClickOutsideNewAppPopup);
+    document.removeEventListener('click', handleClickOutsideNewAppPopupResponsible);
+    document.removeEventListener('click', handleClickOutsideNewAppPopupExecutor);
+    document.removeEventListener('click', handleClickOutsideNewAppPopupCustomer);
 });
 
 const updateResponseChoose = (vacancy, value) => {
@@ -325,16 +423,6 @@ function enableBodyScroll() {
     document.body.style.overflow = ''; // Включаем прокрутку
 }
 
-function handleOpenNewApp() {
-    isNewAppPopup.value = true;
-    disableBodyScroll();
-}
-
-function handleCloseNewApp() {
-    isNewAppPopup.value = false;
-    enableBodyScroll();
-}
-
 const openNewResponse = (event) => {
     event.stopPropagation();
     showNewResponse.value = true;
@@ -344,6 +432,42 @@ const updateNewResponse = (value) => {
     if (value) {
         newResponse.value = value;
         showNewResponse.value = false;
+    }
+}
+
+const openNewResponseResponsible = (event) => {
+    event.stopPropagation();
+    showNewResponseResponsible.value = true;
+}
+
+const openNewExecutor = (event) => {
+    event.stopPropagation();
+    showNewExecutor.value = true;
+}
+
+const openNewCustomer = (event) => {
+    event.stopPropagation();
+    showNewCustomer.value = true;
+}
+
+const updateNewResponseResponsible = (value) => {
+    if (value) {
+        newResponseResponsible.value = value;
+        showNewResponseResponsible.value = false;
+    }
+}
+
+const updateNewExecutor = (value) => {
+    if (value) {
+        newExecutor.value = value;
+        showNewExecutor.value = false;
+    }
+}
+
+const updateNewCustomer = (value) => {
+    if (value) {
+        newCustomer.value = value;
+        showNewCustomer.value = false;
     }
 }
 </script>
