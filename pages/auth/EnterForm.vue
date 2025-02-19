@@ -42,6 +42,9 @@
 <script setup>
 import { ref, nextTick } from "vue";
 
+const nuxtApp = useNuxtApp();
+const axios = nuxtApp.$axios;
+
 const email = ref("");
 const password = ref("");
 const emailError = ref(null);
@@ -70,7 +73,8 @@ const validateEmail = (email) => {
     return emailPattern.test(email);
 };
 
-const login = () => {
+
+const login = async () => {
     emailError.value = null;
     passwordError.value = null;
 
@@ -95,6 +99,20 @@ const login = () => {
     if (!isValid) return;
 
     console.log("Email:", email.value, "Password:", password.value);
+    console.log("Axios instance:", axios);
+
+    try {
+        const response = await axios.post('/login-jwt', {
+            email: email.value,
+            password: password.value
+        });
+
+        console.log("Ответ сервера:", response.data);
+        localStorage.setItem('authToken', response.data.token);
+        window.location.href = '/';
+    } catch (error) {
+        console.error("Ошибка авторизации", error);
+    }
 };
 </script>
 

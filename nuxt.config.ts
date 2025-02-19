@@ -52,5 +52,10 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1',
     },
     pageTransition: { name: 'page', mode: 'out-in' },
+  },
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'no-url',
+    }
   }
 })
