@@ -171,37 +171,110 @@
             <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
                 <Popup :isOpen="isNewAppPopupResponsible" @close="() => isNewAppPopupResponsible = false"
                   :width="'740px'" :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true"
-                  maxHeight>
+                  maxHeight lgSize>
                     <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
                     <div class="mb-22px">
-                        <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
-                        <div ref="responseContainerResponsible">
-                            <div v-if="newResponseResponsible" class="text-sm font-medium text-dodger pl-15px">{{
-                                newResponseResponsible }}</div>
-                            <button v-else-if="!showNewResponseResponsible" @click="openNewResponseResponsible"
-                              class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
-                            <response-input class="w-full" :responses="responses" v-model="newResponseResponsible"
-                              v-show="showNewResponseResponsible"
-                              @update:modelValue="(value) => updateNewResponseResponsible(value)" />
-                        </div>
-                        <div>
-                            <div ref="executorContainer">
-                                <div v-if="newExecutor" class="text-sm font-medium text-dodger pl-15px">{{
-                                    newExecutor }}</div>
-                                <button v-else-if="!showNewExecutor" @click="openNewExecutor"
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
+                            <div ref="responseContainerResponsible">
+                                <div v-if="newResponseResponsible" class="text-sm font-medium text-dodger pl-15px">{{
+                                    newResponseResponsible }}</div>
+                                <button v-else-if="!showNewResponseResponsible" @click="openNewResponseResponsible"
                                   class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
-                                <response-input class="w-full" :responses="responses" v-model="newExecutor"
-                                  v-show="showNewExecutor" @update:modelValue="(value) => updateNewExecutor(value)" />
-                            </div>
-                            <div ref="customerContainer">
-                                <div v-if="newCustomer" class="text-sm font-medium text-dodger pl-15px">{{
-                                    newCustomer }}</div>
-                                <button v-else-if="!showNewCustomer" @click="openNewCustomer"
-                                  class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
-                                <response-input class="w-full" :responses="responses" v-model="newCustomer"
-                                  v-show="showNewCustomer" @update:modelValue="(value) => updateNewCustomer(value)" />
+                                <response-input class="w-full" :responses="responses" v-model="newResponseResponsible"
+                                  v-show="showNewResponseResponsible"
+                                  @update:modelValue="(value) => updateNewResponseResponsible(value)" />
                             </div>
                         </div>
+                        <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-5">
+                            <div>
+                                <p class="text-sm font-medium text-space mb-7px pl-15px">Исполнитель</p>
+                                <div ref="executorContainer">
+                                    <div v-if="newExecutor" class="text-sm font-medium text-dodger pl-15px">{{
+                                        newExecutor }}</div>
+                                    <button v-else-if="!showNewExecutor" @click="openNewExecutor"
+                                      class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                                    <response-input class="w-full" :responses="responses" v-model="newExecutor"
+                                      v-show="showNewExecutor"
+                                      @update:modelValue="(value) => updateNewExecutor(value)" />
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space mb-7px pl-15px">Заказчик</p>
+                                <div ref="customerContainer">
+                                    <div v-if="newCustomer" class="text-sm font-medium text-dodger pl-15px">{{
+                                        newCustomer }}</div>
+                                    <button v-else-if="!showNewCustomer" @click="openNewCustomer"
+                                      class="text-sm font-medium text-dodger py-2.5 px-15px">Добавить</button>
+                                    <response-input class="w-full" :responses="responses" v-model="newCustomer"
+                                      v-show="showNewCustomer"
+                                      @update:modelValue="(value) => updateNewCustomer(value)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Должность</p>
+                                <SimpleInput placeholder="Введите название должности"
+                                  v-model="newPositionResponsible" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Департамент</p>
+                                <SimpleInput v-model="newDepartmentResponsible" />
+                            </div>
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Регион поиска</p>
+                                <SimpleInput v-model="newRegionResponsible" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Причина открытия вакансии</p>
+                                <SimpleInput v-model="newReasonResponsible" />
+                            </div>
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата от</p>
+                                <SimpleInput v-model="salaryMinResponsible" type="number" />
+
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата до</p>
+                                <SimpleInput v-model="salaryMaxResponsible" type="number" />
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Количество позиций</p>
+                            <SimpleInput v-model="vacancyCountResponsible" type="number" />
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Требования кандидата</p>
+                            <SimpleInput v-model="requirementsResponsible" />
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Обязанности кандидата</p>
+                            <SimpleInput v-model="responsibilitiesResponsible" />
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-9">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Начать подбор не позднее </p>
+                                <InputCalendar />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Желаемая дата выхода
+                                    кандидата</p>
+                                <InputCalendar />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-15px justify-between w-fit">
+                        <UiButton variant="action" size="semiaction" class="font-bold">Отправить на согласование
+                        </UiButton>
+                        <UiButton variant="back" size="second-back" class="font-medium"
+                          @click="isNewAppPopupResponsible = false">
+                            Отмена
+                        </UiButton>
                     </div>
                 </Popup>
             </transition>
@@ -228,6 +301,7 @@ import DotsDropdown from '@/components/custom/DotsDropdown.vue';
 import Popup from '~/components/custom/Popup.vue';
 import SimpleInput from '~/components/custom/SimpleInput.vue';
 import InputCalendar from '~/components/custom/InputCalendar.vue';
+import BtnResponseInput from '~/components/custom/BtnResponseInput.vue';
 
 import responses from '~/src/data/responses.json';
 import dataList from '~/src/data/roles-data-admin.json';
@@ -285,6 +359,15 @@ const executorContainer = ref(null);
 const newCustomer = ref('');
 const showNewCustomer = ref(false);
 const customerContainer = ref(false);
+const newPositionResponsible = ref('');
+const newDepartmentResponsible = ref('');
+const newRegionResponsible = ref('');
+const newReasonResponsible = ref('');
+const salaryMinResponsible = ref('');
+const salaryMaxResponsible = ref('');
+const vacancyCountResponsible = ref('');
+const requirementsResponsible = ref('');
+const responsibilitiesResponsible = ref('');
 
 const statusLabels = {
     new: "Новая заявка",

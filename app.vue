@@ -19,7 +19,7 @@
 }
 </style>
 
-<!--<script lang="ts" setup>
+<script lang="ts" setup>
 import { onMounted } from 'vue';
 
 import { API_DOMAIN } from "~/src/constants";
@@ -59,4 +59,3 @@ onMounted(async () => {
   }
 });
 </script>
--->
