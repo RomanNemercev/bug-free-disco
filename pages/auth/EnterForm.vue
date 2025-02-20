@@ -24,6 +24,7 @@
             </label>
         </div>
         <button class="btn-reset btn enter__btn-in f14w600 c-white" @click="login">Войти</button>
+        <p v-if="authError" class="text-center text-red mt-[-15px] text-sm">{{ authError }}</p>
         <div class="enter__btns">
             <button class="btn-reset enter__btn-reg c-dodger f14w500" @click="$emit('changeForm', 'reg')">
                 Регистрация
@@ -41,15 +42,16 @@
 
 <script setup>
 import { ref, nextTick } from "vue";
+import { useNuxtApp, useCookie } from "#app";
 
-const nuxtApp = useNuxtApp();
-const axios = nuxtApp.$axios;
+const { $axios } = useNuxtApp();
 
 const email = ref("");
 const password = ref("");
 const emailError = ref(null);
 const passwordError = ref(null);
 const showPassword = ref(false);
+const authError = ref(null);
 
 const togglePassword = () => {
     showPassword.value = !showPassword.value;
@@ -77,6 +79,7 @@ const validateEmail = (email) => {
 const login = async () => {
     emailError.value = null;
     passwordError.value = null;
+    authError.value = null;
 
     let isValid = true;
 
@@ -99,19 +102,22 @@ const login = async () => {
     if (!isValid) return;
 
     console.log("Email:", email.value, "Password:", password.value);
-    console.log("Axios instance:", axios);
+    console.log("Axios instance:", $axios);
 
     try {
-        const response = await axios.post('/login-jwt', {
+        const response = await $axios.post('/login-jwt', {
             email: email.value,
             password: password.value
         });
 
         console.log("Ответ сервера:", response.data);
-        localStorage.setItem('authToken', response.data.token);
+        const token = response.data.authorization.token;
+        const authCookie = useCookie('token');
+        authCookie.value = token;
         window.location.href = '/';
     } catch (error) {
         console.error("Ошибка авторизации", error);
+        authError.value = "Неверный email или пароль";
     }
 };
 </script>

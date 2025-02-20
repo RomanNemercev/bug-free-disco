@@ -57,5 +57,8 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'no-url',
     }
+  },
+  pinia: {
+    storesDirs: ['~/stores'],
   }
 })
