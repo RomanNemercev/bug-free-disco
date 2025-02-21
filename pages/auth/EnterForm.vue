@@ -75,6 +75,22 @@ const validateEmail = (email) => {
     return emailPattern.test(email);
 };
 
+const getToken = async () => {
+    // try to get token if it not empty
+    let authCookie = useCookie('token');
+    // if token is empty than get token from server
+    if (!authCookie || !authCookie.value) {
+        const response = await $axios.post('/login-jwt', {
+            email: email.value,
+            password: password.value
+        });
+        // it is assumed that the response contains an object with authorization data
+        authCookie = response.data.authorization.token;
+        // save it as cookie
+        useCookie('token').value = authCookie.value;
+    }
+    return authCookie.value;
+}
 
 const login = async () => {
     emailError.value = null;
@@ -105,18 +121,8 @@ const login = async () => {
     console.log("Axios instance:", $axios);
 
     try {
-        let authCookie = useCookie('token');
-        if (!authCookie) {
-            const response = await $axios.post('/login-jwt', {
-                email: email.value,
-                password: password.value
-            });
-            console.log(response);
-            authCookie = response.data.authorization.token.value;
-        }
-        console.log("Ответ сервера:", authCookie.value);
-        const token = authCookie.value;
-        console.log("Токен:", authCookie.value);
+        const token = await getToken();
+        console.log("Полученный токен: ", token);
         const response = await $axios.post('/login',
             {
                 email: email.value,

@@ -10,11 +10,11 @@
             <div>
                 <UiButton v-if="userRole === 'admin'" size="semiaction" variant="action" @click="isNewAppPopup = true">
                     Новая
-                    заявка А</UiButton>
+                    заявка</UiButton>
                 <UiButton v-else-if="userRole === 'responsible'" size="semiaction" variant="action"
-                  @click="isNewAppPopupResponsible = true">Новая заявка Р</UiButton>
+                  @click="isNewAppPopupResponsible = true">Новая заявка</UiButton>
                 <UiButton v-else-if="userRole === 'customer'" size="semiaction" variant="action"
-                  @click="isNewAppPopupCustomer = true">Новая заявка К</UiButton>
+                  @click="isNewAppPopupCustomer = true">Новая заявка</UiButton>
             </div>
         </div>
 
@@ -282,7 +282,76 @@
         <div v-else-if="userRole === 'customer'">
             <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
                 <Popup :isOpen="isNewAppPopupCustomer" @close="() => isNewAppPopupCustomer = false" :width="'740px'"
-                  :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight></Popup>
+                  :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
+                    <p class="leading-normal text-xl font-semibold text-space mb-[39px]">Новая заявка</p>
+                    <div class="mb-22px">
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space mb-7px pl-15px">Ответственный</p>
+                            <BtnResponseInput v-model="newResponseCustomer" :responses="responses" />
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Должность</p>
+                                <SimpleInput placeholder="Введите название должности" v-model="newPositionCustomer" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Департамент</p>
+                                <SimpleInput v-model="newDepartmentCustomer" />
+                            </div>
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Регион поиска</p>
+                                <SimpleInput v-model="newRegionCustomer" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Причина открытия вакансии</p>
+                                <SimpleInput v-model="newReasonCustomer" />
+                            </div>
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col mb-6">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата от</p>
+                                <SimpleInput v-model="salaryMinCustomer" type="number" />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Зарплата до</p>
+                                <SimpleInput v-model="salaryMaxCustomer" type="number" />
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Количество позиций</p>
+                            <SimpleInput v-model="vacancyCountCustomer" type="number" />
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Требования кандидата</p>
+                            <SimpleInput v-model="requirementsCustomer" />
+                        </div>
+                        <div class="mb-6">
+                            <p class="text-sm font-medium text-space pl-15px mb-1">Обязанности кандидата</p>
+                            <SimpleInput v-model="responsibilitiesCustomer" />
+                        </div>
+                        <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-8">
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Начать подбор не позднее </p>
+                                <InputCalendar />
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-space pl-15px mb-1">Желаемая дата выхода кандидата
+                                </p>
+                                <InputCalendar />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-15px justify-between w-fit">
+                        <UiButton variant="action" size="semiaction" class="font-bold">Отправить на согласование
+                        </UiButton>
+                        <UiButton variant="back" size="second-back" class="font-medium"
+                          @click="isNewAppPopupCustomer = false">
+                            Отмена
+                        </UiButton>
+                    </div>
+                </Popup>
             </transition>
         </div>
     </div>
@@ -333,7 +402,7 @@ const headers = computed(() => {
 
 const sortKey = ref("");
 const sortOrder = ref("asc");
-const userRole = ref("responsible"); // Change to "admin" or "responsible" and "customer" for testing
+const userRole = ref("customer"); // Change to "admin" or "responsible" and "customer" for testing
 const dropdownOptions = ["Управлять", "Копировать заявку", "Удалить"];
 const isNewAppPopup = ref(false);
 const isNewAppPopupCustomer = ref(false);
@@ -368,6 +437,16 @@ const salaryMaxResponsible = ref('');
 const vacancyCountResponsible = ref('');
 const requirementsResponsible = ref('');
 const responsibilitiesResponsible = ref('');
+const newResponseCustomer = ref('');
+const newPositionCustomer = ref('');
+const newDepartmentCustomer = ref('');
+const newRegionCustomer = ref('');
+const newReasonCustomer = ref('');
+const salaryMinCustomer = ref('');
+const salaryMaxCustomer = ref('');
+const vacancyCountCustomer = ref('');
+const requirementsCustomer = ref('');
+const responsibilitiesCustomer = ref('');
 
 const statusLabels = {
     new: "Новая заявка",
