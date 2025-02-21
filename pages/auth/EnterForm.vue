@@ -105,15 +105,30 @@ const login = async () => {
     console.log("Axios instance:", $axios);
 
     try {
-        const response = await $axios.post('/login-jwt', {
-            email: email.value,
-            password: password.value
-        });
-
-        console.log("Ответ сервера:", response.data);
-        const token = response.data.authorization.token;
-        const authCookie = useCookie('token');
-        authCookie.value = token;
+        let authCookie = useCookie('token');
+        if (!authCookie) {
+            const response = await $axios.post('/login-jwt', {
+                email: email.value,
+                password: password.value
+            });
+            console.log(response);
+            authCookie = response.data.authorization.token.value;
+        }
+        console.log("Ответ сервера:", authCookie.value);
+        const token = authCookie.value;
+        console.log("Токен:", authCookie.value);
+        const response = await $axios.post('/login',
+            {
+                email: email.value,
+                password: password.value
+            },
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
         window.location.href = '/';
     } catch (error) {
         console.error("Ошибка авторизации", error);

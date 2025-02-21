@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
 
@@ -375,24 +375,40 @@ const nextStep1 = () => {
     }
 };
 
+const phone_formatted = computed(() => {
+    // Убираем все символы кроме цифр, затем формируем номер с префиксом "+7"
+    const digits = phone.value.replace(/\D/g, '');
+    // Если номер введен полностью (11 цифр, первая — 7 или 8), то формируем корректный вариант
+    if (digits.length === 11) {
+        // Если первая цифра "8", заменяем её на "7"
+        const clean = digits[0] === '8' ? '7' + digits.substring(1) : digits;
+        return '+' + clean;
+    }
+    // Иначе возвращаем пустую строку или неполное значение
+    return '';
+});
+
 const registerUser = async () => {
     try {
         console.log("Отправляемые данные:", {
             name: name.value,
             email: email.value,
-            phone: phone.value
+            phone: phone.value,
+            phone_format: phone_formatted.value
         });
         const response = await $axios.post('/register', {
             login: email.value,
             name: name.value,
             email: email.value,
-            phone: phone.value,
+            phone: phone_formatted.value,
             password: password.value,
+            password_confirmation: repeatPassword.value,
             site: web.value || null,
         }, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${token.value}`,
             },
         });
         console.log(response.data.message);
