@@ -38,7 +38,8 @@
         <div v-for="(vacancy, index) in sortedData" :key="index" :data-vacancy="vacancy.title"
           class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen">
             <!-- simple values -->
-            <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.title }}</div>
+            <div class="text-sm font-medium text-space py-5 pl-2.5"><button @click="openPopup(vacancy)"
+                  class="underline text-dodger text-left">{{ vacancy.title }}</button></div>
             <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.region }}</div>
             <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.createdAt }}</div>
             <div class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.closeDate }}</div>
@@ -354,6 +355,14 @@
                 </Popup>
             </transition>
         </div>
+        <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
+            <Popup v-if="selectedVacancy" :isOpen="!!selectedVacancy" @close="closePopup" :width="'740px'"
+              :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
+                <template #header>
+                    <h2>{{ selectedVacancy.title }}</h2>
+                </template>
+            </Popup>
+        </transition>
     </div>
 </template>
 
@@ -402,7 +411,7 @@ const headers = computed(() => {
 
 const sortKey = ref("");
 const sortOrder = ref("asc");
-const userRole = ref("customer"); // Change to "admin" or "responsible" and "customer" for testing
+const userRole = ref("admin"); // Change to "admin" or "responsible" and "customer" for testing
 const dropdownOptions = ["Управлять", "Копировать заявку", "Удалить"];
 const isNewAppPopup = ref(false);
 const isNewAppPopupCustomer = ref(false);
@@ -447,6 +456,7 @@ const salaryMaxCustomer = ref('');
 const vacancyCountCustomer = ref('');
 const requirementsCustomer = ref('');
 const responsibilitiesCustomer = ref('');
+const selectedVacancy = ref(null);
 
 const statusLabels = {
     new: "Новая заявка",
@@ -631,6 +641,14 @@ const updateNewCustomer = (value) => {
         newCustomer.value = value;
         showNewCustomer.value = false;
     }
+}
+
+const openPopup = (vacancy) => {
+    selectedVacancy.value = vacancy;
+}
+
+const closePopup = () => {
+    selectedVacancy.value = null;
 }
 </script>
 
