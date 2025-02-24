@@ -43,7 +43,9 @@
 <script setup>
 import { ref, nextTick } from "vue";
 import { useNuxtApp, useCookie } from "#app";
+import { useAuthStore } from "~/stores/auth";
 
+const authStore = useAuthStore();
 const { $axios } = useNuxtApp();
 
 const email = ref("");
@@ -76,21 +78,36 @@ const validateEmail = (email) => {
 };
 
 const getToken = async () => {
-    // try to get token if it not empty
-    let authCookie = useCookie('token');
-    // if token is empty than get token from server
-    if (!authCookie || !authCookie.value) {
-        const response = await $axios.post('/login-jwt', {
-            email: email.value,
-            password: password.value
-        });
-        // it is assumed that the response contains an object with authorization data
-        authCookie = response.data.authorization.token;
-        // save it as cookie
-        useCookie('token').value = authCookie.value;
+    let token = localStorage.getItem('authToken');
+    if (!token || token === 'undefined') {
+        // Если токена нет, запрашиваем его с сервера
+        console.log('Токена нет, запрашиваем его с сервера');
+        try {
+            const response = await $axios.post('/login-jwt', {
+                email: email.value,
+                password: password.value
+            });
+            console.log('Ответ от /login-jwt:', response.data);
+            console.log('Проверка токена: ', response.data.authorization.token);
+            // Предполагается, что ответ содержит объект с токеном
+            token = response.data.authorization.token;
+            console.log('Получен токен:', token);
+
+            // Сохраняем токен и данные пользователя сразу в authStore
+            authStore.setAuth({
+                token: token,
+                user: {
+                    email: email.value,
+                    password: password.value  // если действительно необходимо
+                }
+            });
+        } catch (error) {
+            console.error('Ошибка запроса /login-jwt:', error);
+            throw error;
+        }
     }
-    return authCookie.value;
-}
+    return token;
+};
 
 const login = async () => {
     emailError.value = null;
@@ -122,8 +139,10 @@ const login = async () => {
 
     try {
         const token = await getToken();
-        console.log("Полученный токен: ", token);
-        const response = await $axios.post('/login',
+        console.log("Полученный токен:", token);
+
+        const response = await $axios.post(
+            '/login',
             {
                 email: email.value,
                 password: password.value
@@ -134,7 +153,17 @@ const login = async () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-            });
+            }
+        );
+
+        // После успешного входа ещё раз фиксируем данные в authStore
+        authStore.setAuth({
+            token: token,
+            user: {
+                email: email.value,
+                password: password.value
+            }
+        });
         window.location.href = '/';
     } catch (error) {
         console.error("Ошибка авторизации", error);
