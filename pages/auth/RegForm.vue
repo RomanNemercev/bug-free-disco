@@ -408,7 +408,7 @@ const registerUser = async () => {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${token.value}`,
+                // Заголовок Authorization устанавливается интерсептором
             },
         });
         console.log(response.data.message);

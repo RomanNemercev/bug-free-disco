@@ -11,33 +11,70 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
     });
 
-    // Request interceptor
-    axiosInstance.interceptors.request.use((config) => {
-        const authStore = useAuthStore();
-        // Берем токен из authStore или из localStorage, если authStore.token отсутствует
-        let token = authStore.token || localStorage.getItem('authToken');
-        if (authStore.token) {
-            config.headers.Authorization = `Bearer ${authStore.token}`;
+    // Флаг, чтобы не запускать множественные запросы токена одновременно
+    let tokenPromise = null;
+
+    // Функция для получения токена, если его нет в localStorage
+    const ensureToken = async () => {
+        let token = localStorage.getItem('authToken');
+        if (!token) {
+            // Если токена нет, запускаем запрос и сохраняем Promise, чтобы избежать параллельных вызовов
+            if (!tokenPromise) {
+                tokenPromise = (async () => {
+                    try {
+                        const data = {
+                            email: 'api-jwt@jobly.ru',
+                            password: 'hdjkmRkkj:sg'
+                        };
+                        const response = await $fetch(`${config.public.apiBase}/login-jwt`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data)
+                        });
+                        // Предполагается, что структура ответа такая:
+                        // { authorization: { token: { value: '...'} } }
+                        token = response.authorization.token.value;
+                        localStorage.setItem('authToken', token);
+                        console.log('Check token: ', response.data.authorization.token.value)
+                        console.log('Получен токен:', token);
+                    } catch (error) {
+                        console.error('Ошибка получения токена:', error);
+                        throw error;
+                    } finally {
+                        tokenPromise = null;
+                    }
+                    return token;
+                })();
+            }
+            token = await tokenPromise;
         }
-        return config;
+        return token;
+    };
+
+    // Request interceptor: обеспечиваем наличие токена
+    axiosInstance.interceptors.request.use(async (requestConfig) => {
+        try {
+            const token = await ensureToken();
+            requestConfig.headers['Content-Type'] = 'application/json';
+            if (token) {
+                requestConfig.headers.Authorization = `Bearer ${token}`;
+            } else {
+                console.warn('⚠️ Токен отсутствует, запрос может не пройти авторизацию.');
+            }
+        } catch (error) {
+            console.error('Ошибка в interceptor при получении токена:', error);
+        }
+        return requestConfig;
     });
 
-    // Response interceptor для обработки 401
+    // Response interceptor – стандартная обработка ошибок
     axiosInstance.interceptors.response.use(
         (response) => response,
-        async (error) => {
-            const originalRequest = error.config;
-            if (error.response && error.response.status === 401 && !originalRequest._retry) {
-                originalRequest._retry = true;
-                const authStore = useAuthStore();
-                try {
-                    await authStore.refreshToken();
-                    originalRequest.headers.Authorization = `Bearer ${authStore.token}`;
-                    return axiosInstance(originalRequest);
-                } catch (refreshError) {
-                    authStore.clearAuth();
-                    return Promise.reject(refreshError);
-                }
+        (error) => {
+            if (error.response) {
+                console.error(`Ошибка API: ${error.response.status}`, error.response.data);
             }
             return Promise.reject(error);
         }
