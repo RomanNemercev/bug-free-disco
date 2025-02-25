@@ -23,7 +23,7 @@
                 <button type="button" class="pass-eye" @click="togglePassword"></button>
             </label>
         </div>
-        <button class="btn-reset btn enter__btn-in f14w600 c-white" @click="login">Войти</button>
+        <button class="btn-reset btn enter__btn-in f14w600 c-white" @click="loginUser">Войти</button>
         <p v-if="authError" class="text-center text-red mt-[-15px] text-sm">{{ authError }}</p>
         <div class="enter__btns">
             <button class="btn-reset enter__btn-reg c-dodger f14w500" @click="$emit('changeForm', 'reg')">
@@ -42,11 +42,9 @@
 
 <script setup>
 import { ref, nextTick } from "vue";
-import { useNuxtApp, useCookie } from "#app";
-import { useAuthStore } from "~/stores/auth";
+import { useNuxtApp } from '#app';
 
-const authStore = useAuthStore();
-const { $axios } = useNuxtApp();
+const { $auth } = useNuxtApp();
 
 const email = ref("");
 const password = ref("");
@@ -77,39 +75,7 @@ const validateEmail = (email) => {
     return emailPattern.test(email);
 };
 
-const getToken = async () => {
-    let token = localStorage.getItem('authToken');
-    if (!token || token === 'undefined') {
-        // Если токена нет, запрашиваем его с сервера
-        console.log('Токена нет, запрашиваем его с сервера');
-        try {
-            const response = await $axios.post('/login-jwt', {
-                email: email.value,
-                password: password.value
-            });
-            console.log('Ответ от /login-jwt:', response.data);
-            console.log('Проверка токена: ', response.data.authorization.token);
-            // Предполагается, что ответ содержит объект с токеном
-            token = response.data.authorization.token;
-            console.log('Получен токен:', token);
-
-            // Сохраняем токен и данные пользователя сразу в authStore
-            authStore.setAuth({
-                token: token,
-                user: {
-                    email: email.value,
-                    password: password.value  // если действительно необходимо
-                }
-            });
-        } catch (error) {
-            console.error('Ошибка запроса /login-jwt:', error);
-            throw error;
-        }
-    }
-    return token;
-};
-
-const login = async () => {
+const loginUser = async () => {
     emailError.value = null;
     passwordError.value = null;
     authError.value = null;
@@ -134,41 +100,18 @@ const login = async () => {
 
     if (!isValid) return;
 
-    console.log("Email:", email.value, "Password:", password.value);
-    console.log("Axios instance:", $axios);
-
     try {
-        const token = await getToken();
-        console.log("Полученный токен:", token);
-
-        const response = await $axios.post(
-            '/login',
-            {
-                email: email.value,
-                password: password.value
-            },
-            {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            }
-        );
-
-        // После успешного входа ещё раз фиксируем данные в authStore
-        authStore.setAuth({
-            token: token,
-            user: {
-                email: email.value,
-                password: password.value
-            }
-        });
+        // Вызов функции login из auth.ts
+        const result = await $auth.login(email.value, password.value);
+        // При успешном логине можно выполнить редирект, обновить данные и т.д.
+        console.log("Результат логина:", result);
+        // Например:
         window.location.href = '/';
     } catch (error) {
         console.error("Ошибка авторизации", error);
         authError.value = "Неверный email или пароль";
     }
+
 };
 </script>
 

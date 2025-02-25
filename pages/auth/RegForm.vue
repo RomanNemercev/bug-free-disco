@@ -22,7 +22,7 @@
                               placeholder="Введите ваше ФИО" id="name" v-model="name" required
                               :class="{ 'error': nameError }" /><span v-if="nameError" id="name-error"
                               class="error-message f12w400" style="color: red">{{ nameError
-                            }}</span></label>
+                                }}</span></label>
                         <div class="reg__inputs p-flex">
                             <div class="reg__email-wrapper">
                                 <p class="reg__email-title f14w500">
@@ -34,7 +34,7 @@
                                       v-if="emailError" id="email-error" class="error-message f12w400"
                                       style="color: red">{{
                                         emailError
-                                    }}</span></label>
+                                        }}</span></label>
                             </div>
                             <div class="reg__phone-wrapper">
                                 <p class="reg__phone-title f14w500">
@@ -46,7 +46,7 @@
                                       :class="{ 'error': phoneError }" /><span v-if="phoneError" id="phone-error"
                                       class="error-message f12w400" style="color: red">{{
                                         phoneError
-                                    }}</span></label>
+                                        }}</span></label>
                             </div>
                         </div>
                         <p class="reg__web-title f14w500">
@@ -87,7 +87,7 @@
                                 <span v-if="passwordError" id="pass-error" class="error-message f12w400"
                                   style="color: red">{{
                                     passwordError
-                                }}</span></label>
+                                    }}</span></label>
                         </div>
                         <div class="reg__check-second">
                             <p class="reg__pass-title f14w500">
@@ -157,7 +157,7 @@
                             </label>
                         </div>
                         <div class="reg__third-btns">
-                            <button class="btn-reset btn reg__btn-send f14w600 c-white" @click="registerUser">
+                            <button class="btn-reset btn reg__btn-send f14w600 c-white">
                                 Принять ответ
                             </button>
                             <button class="btn-reset reg__btn-skip f14w400 c-dodger">
@@ -186,10 +186,6 @@
 import { ref, computed } from "vue";
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
-
-import { useNuxtApp } from '#app';
-
-const { $axios } = useNuxtApp();
 
 const currentStep = ref('first');
 const name = ref('');
@@ -388,40 +384,6 @@ const phone_formatted = computed(() => {
     return '';
 });
 
-const registerUser = async () => {
-    try {
-        console.log("Отправляемые данные:", {
-            name: name.value,
-            email: email.value,
-            phone: phone.value,
-            phone_format: phone_formatted.value
-        });
-        const response = await $axios.post('/register', {
-            login: email.value,
-            name: name.value,
-            email: email.value,
-            phone: phone_formatted.value,
-            password: password.value,
-            password_confirmation: repeatPassword.value,
-            site: web.value || null,
-        }, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                // Заголовок Authorization устанавливается интерсептором
-            },
-        });
-        console.log(response.data.message);
-        alert('Регистрация прошла успешно!');
-        router.push('/auth');
-    } catch (error) {
-        if (error.response && error.response.status === 422) {
-            alert(error.response.data.message);
-        } else {
-            alert('Произошла ошибка при регистрации.');
-        }
-    }
-};
 </script>
 
 <style scoped>
