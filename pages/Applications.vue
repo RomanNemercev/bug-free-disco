@@ -52,7 +52,7 @@
             <div v-if="userRole === 'customer'" class="text-sm font-medium text-space py-5 pl-5px">{{
                 vacancy.responsible }}</div>
 
-            <!-- admin or costomer column -->
+            <!-- admin or customer column -->
             <div>
                 <div v-if="userRole === 'admin'">
                     <div class="text-sm font-medium text-space py-5 pl-2.5" v-if="vacancy.executor">{{ vacancy.executor
@@ -358,8 +358,48 @@
         <transition name="fade" @after-leave="enableBodyScroll" @enter="disableBodyScroll">
             <Popup v-if="selectedVacancy" :isOpen="!!selectedVacancy" @close="closePopup" :width="'740px'"
               :showCloseButton="false" :disableOverflowHidden="true" :overflowContainer="true" maxHeight>
-                <template #header>
-                    <h2>{{ selectedVacancy.title }}</h2>
+                <template #default>
+                    <h3 class="text-xl font-semibold text-space mb-5">{{ selectedVacancy.title }}</h3>
+                    <p class="text-sm text-slate-custom font-normal mb-25px">{{ selectedVacancy.region }}</p>
+                    <div class="relative z-10">
+                        <button @click="popupSelectedTab = 'popupMainInfo'"
+                          class="text-15px font-medium p-15px transition-colors"
+                          :class="popupSelectedTab === 'popupMainInfo' ? 'text-space border-b-2 border-space' : 'text-slate-custom border-none'">Основная
+                            информация</button>
+                        <button @click="popupSelectedTab = 'popupHistory'"
+                          class="text-15px font-medium p-15px transition-colors"
+                          :class="popupSelectedTab === 'popupHistory' ? 'text-space border-b-2 border-space' : 'text-slate-custom border-none'">История</button>
+                        <button @click="popupSelectedTab = 'popupComments'"
+                          class="text-15px font-medium p-15px transition-colors"
+                          :class="popupSelectedTab === 'popupComments' ? 'text-space border-b-2 border-space' : 'text-slate-custom border-none'">Комментарии</button>
+                    </div>
+                    <div class="relative mb-25px" :style="{ height: tabContentHeight + 'px' }">
+                        <div ref="tabContentInner"
+                          class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px] p-15px">
+                            <div v-if="popupSelectedTab === 'popupMainInfo'">
+                                <div class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen">
+                                    <div class="w-full">
+                                        <p class="text-sm pl-15px font-medium mb-5px">Исполнитель</p>
+                                        <BtnResponseInput v-model="popupResponse" :responses="responses" />
+                                    </div>
+                                    <div class="w-full">
+                                        <p class="text-sm font-medium mb-15px">Статус заявки</p>
+                                        <p class="text-sm text-slate-custom">{{ statusLabels[selectedVacancy.status] ||
+                                            "Неизвестный статус" }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="popupSelectedTab === 'popupHistory'">Tab History</div>
+                            <div v-if="popupSelectedTab === 'popupComments'">Tab Comments</div>
+                        </div>
+                    </div>
+                    <div>
+                        <UiButton variant="action" size="semiaction">Готово</UiButton>
+                        <UiButton variant="back" size="second-back" class="font-medium" @click="closePopup">
+                            Отмена
+                        </UiButton>
+                    </div>
                 </template>
             </Popup>
         </transition>
@@ -367,7 +407,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watchEffect, nextTick, watch } from 'vue';
 
 // import { getMovieList } from "@/src/api";
 // const apiTest = getMovieList('movie');
@@ -457,6 +497,10 @@ const vacancyCountCustomer = ref('');
 const requirementsCustomer = ref('');
 const responsibilitiesCustomer = ref('');
 const selectedVacancy = ref(null);
+const popupSelectedTab = ref("popupMainInfo");
+const tabContentInner = ref(null);
+const tabContentHeight = ref(0);
+const popupResponse = ref('');
 
 const statusLabels = {
     new: "Новая заявка",
@@ -650,6 +694,25 @@ const openPopup = (vacancy) => {
 const closePopup = () => {
     selectedVacancy.value = null;
 }
+
+// Следим за изменением высоты контента табов
+watchEffect(() => {
+    if (tabContentInner.value) {
+        tabContentHeight.value = tabContentInner.value.offsetHeight;
+    }
+});
+
+// Функция обновления высоты контента
+const updateTabHeight = () => {
+    nextTick(() => {
+        if (tabContentInner.value) {
+            tabContentHeight.value = tabContentInner.value.offsetHeight;
+        }
+    });
+};
+
+// Следим за изменением выбранного таба и обновляем высоту
+watch(popupSelectedTab, updateTabHeight);
 </script>
 
 <style scoped>
