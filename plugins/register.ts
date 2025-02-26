@@ -6,7 +6,7 @@ interface RegisterData {
     login: string;
     name: string;
     email: string;
-    phone: string;
+    phone_formatted: string;
     password: string;
     password_confirmation: string;
     site: string | null;
