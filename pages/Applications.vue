@@ -56,7 +56,7 @@
             <div>
                 <div v-if="userRole === 'admin'">
                     <div class="text-sm font-medium text-space py-5 pl-2.5" v-if="vacancy.executor">{{ vacancy.executor
-                        }}
+                    }}
                     </div>
                     <div v-else>
                         <!-- Если выбрано значение, показываем его -->
@@ -72,7 +72,7 @@
                 </div>
                 <div v-if="userRole === 'responsible'">
                     <div v-if="vacancy.executor" class="text-sm font-medium text-space py-5 pl-2.5">{{ vacancy.executor
-                        }}</div>
+                    }}</div>
                     <div v-else><button @click="takeInWork(vacancy)"
                           class="py-5 pl-2.5 text-sm font-medium text-dodger">Взять в работу</button>
                     </div>
@@ -377,7 +377,7 @@
                         <div ref="tabContentInner"
                           class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px] p-15px">
                             <div v-if="popupSelectedTab === 'popupMainInfo'">
-                                <div class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen">
+                                <div class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen mb-2.5">
                                     <div class="w-full">
                                         <p class="text-sm pl-15px font-medium mb-5px">Исполнитель</p>
                                         <BtnResponseInput v-model="popupResponse" :responses="responses" />
@@ -389,12 +389,22 @@
                                         </p>
                                     </div>
                                 </div>
+                                <div class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen">
+                                    <div class="w-full">
+                                        <p class="text-sm font-medium mb-15px pl-15px">Вакансия</p>
+                                        <BtnAddBindVacancy :vacancies="vacancyForBind" />
+                                    </div>
+                                    <div class="w-full">
+                                        <p class="text-sm font-medium mb-15px">Кандидаты</p>
+                                        <p class="text-sm text-slate-custom">{{ selectedVacancy.candidates }}</p>
+                                    </div>
+                                </div>
                             </div>
                             <div v-if="popupSelectedTab === 'popupHistory'">Tab History</div>
                             <div v-if="popupSelectedTab === 'popupComments'">Tab Comments</div>
                         </div>
                     </div>
-                    <div>
+                    <div class="flex gap-x-15px">
                         <UiButton variant="action" size="semiaction">Готово</UiButton>
                         <UiButton variant="back" size="second-back" class="font-medium" @click="closePopup">
                             Отмена
@@ -420,9 +430,11 @@ import Popup from '~/components/custom/Popup.vue';
 import SimpleInput from '~/components/custom/SimpleInput.vue';
 import InputCalendar from '~/components/custom/InputCalendar.vue';
 import BtnResponseInput from '~/components/custom/BtnResponseInput.vue';
+import BtnAddBindVacancy from '~/components/custom/BtnAddBindVacancy.vue';
 
 import responses from '~/src/data/responses.json';
 import dataList from '~/src/data/roles-data-admin.json';
+import vacancyForBind from '~/src/data/vacancies-for-btnBind.json';
 
 const data = ref(dataList.map(vacancy => ({
     ...vacancy,
@@ -687,21 +699,6 @@ const updateNewCustomer = (value) => {
     }
 }
 
-const openPopup = (vacancy) => {
-    selectedVacancy.value = vacancy;
-}
-
-const closePopup = () => {
-    selectedVacancy.value = null;
-}
-
-// Следим за изменением высоты контента табов
-watchEffect(() => {
-    if (tabContentInner.value) {
-        tabContentHeight.value = tabContentInner.value.offsetHeight;
-    }
-});
-
 // Функция обновления высоты контента
 const updateTabHeight = () => {
     nextTick(() => {
@@ -710,6 +707,15 @@ const updateTabHeight = () => {
         }
     });
 };
+
+const openPopup = (vacancy) => {
+    selectedVacancy.value = vacancy;
+    updateTabHeight();
+}
+
+const closePopup = () => {
+    selectedVacancy.value = null;
+}
 
 // Следим за изменением выбранного таба и обновляем высоту
 watch(popupSelectedTab, updateTabHeight);

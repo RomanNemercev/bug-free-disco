@@ -7,7 +7,8 @@
     "status": "new",
     "customer": "Людмила Сергеева",
     "executor": "Алексей Смирнов",
-    "responsible": "Иван Иванов"
+    "responsible": "Иван Иванов",
+    "candidates": "0"
   },
   {
     "title": "Астролог",
@@ -17,7 +18,8 @@
     "status": "in_review",
     "customer": "Иван Петров",
     "responsible": "Андрей Власов",
-    "executor": ""
+    "executor": "",
+    "candidates": "1"
   },
   {
     "title": "Маркетолог",
@@ -27,7 +29,8 @@
     "status": "in_work",
     "customer": "Ольга Смирнова",
     "responsible": "Андрей Власов",
-    "executor": "Дмитрий Кузнецов"
+    "executor": "Дмитрий Кузнецов",
+    "candidates": "2"
   },
   {
     "title": "Дизайнер",
@@ -37,7 +40,8 @@
     "status": "paused",
     "customer": "Андрей Власов",
     "responsible": "Ирина Лебедева",
-    "executor": ""
+    "executor": "",
+    "candidates": "3"
   },
   {
     "title": "Менеджер по продажам",
@@ -47,6 +51,7 @@
     "status": "new",
     "customer": "Екатерина Смолова",
     "responsible": "Сергей Сидоров",
-    "executor": "Арсений Медведев"
+    "executor": "Арсений Медведев",
+    "candidates": "4"
   }
 ]
