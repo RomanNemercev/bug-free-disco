@@ -1,5 +1,4 @@
 // auth.ts
-import axiosInstance from './axios';
 import { useCookie, defineNuxtPlugin, useNuxtApp } from '#app';
 
 interface AuthResponse {
@@ -72,12 +71,24 @@ const login = async (email: string, password: string): Promise<any> => {
     }
 };
 
-const refreshToken = async () => {
-    // Если возникает 401, можно вызвать refreshToken – здесь можно реализовать дополнительную логику,
-    // но пока, согласно объяснениям backend, можно считать, что при 401 данные не обновляются автоматически.
-    // Вероятно, при 401 нужно перенаправить пользователя на страницу авторизации.
-    console.warn('refreshToken вызван – обработка 401, но механизм refresh пока не реализован.');
-    throw new Error('Токен просрочен, требуется повторная авторизация.');
+const refreshToken = async (): Promise<string> => {
+    console.warn('Обновление токена вызвано!');
+    const { $axios } = useNuxtApp();
+    const tokenCookie = useCookie('auth_token');
+    try {
+        const response = await $axios.post('/login-jwt', FIXED_AUTH_DATA, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const newToken = response.data.authorization.token;
+        tokenCookie.value = newToken;
+        console.log('Токен успешно добавлен: ', newToken);
+        return newToken;
+    } catch (error) {
+        console.error('Ошибка обновления токена:', error);
+        throw error;
+    }
 };
 
 export default defineNuxtPlugin((nuxtApp: any) => {

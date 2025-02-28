@@ -27,13 +27,28 @@ export default defineNuxtPlugin((nuxtApp: any) => {
         return requestConfig;
     });
 
-    // Интерсептор ответа – базовая обработка ошибок
     axiosInstance.interceptors.response.use(
         (response) => response,
-        (error) => {
-            if (error.response) {
-                console.error(`Ошибка API: ${error.response.status}`, error.response.data);
+        async (error) => {
+            if (error.response?.status === 401) {
+                console.warn('⚠️ Получен 401 – пробуем обновить токен...');
+                try {
+                    const { refreshToken } = useNuxtApp().$auth;
+                    const newToken = await refreshToken();
+
+                    if (newToken) {
+                        // rewrite request with new token
+                        useCookie('auth_token').value = newToken;
+
+                        // repeat new request with new token
+                        error.config.headers.Authorization = `Bearer ${newToken}`;
+                        return axiosInstance.request(error.config);
+                    }
+                } catch (refreshError) {
+                    console.error('Ошибка при обновлении токена:', refreshError);
+                }
             }
+            console.error(`Ошибка API: ${error.response?.status}`, error.response?.data);
             return Promise.reject(error);
         }
     );

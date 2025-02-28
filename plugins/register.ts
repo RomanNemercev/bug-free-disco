@@ -1,5 +1,4 @@
 // register.ts
-import axiosInstance from './axios';
 import { useNuxtApp, defineNuxtPlugin } from "#app";
 
 interface RegisterData {
