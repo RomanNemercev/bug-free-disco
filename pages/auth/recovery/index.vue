@@ -4,16 +4,17 @@
             <p class="recover__title f25w700">Восстановление доступа</p>
             <div class="recover__main">
                 <p class="f14w500 recover__main-new"><span class="reg__circle">*</span> Новый пароль</p>
-                <label class="recover__new-label"><input type="password" class="recover__new-input e-input"
-                      placeholder="******" id="new-pass" v-model="newPassword" :class="{ 'error': newPasswordError }">
+                <label class="recover__new-label"><input type="password"
+                      class="recover__new-input e-input text-sm font-normal" placeholder="******" id="new-pass"
+                      v-model="newPassword" :class="{ 'error': newPasswordError }">
                     <button type="button" class="pass-eye" @click="togglePassword('new-pass')"
                       data-id="new-pass"></button>
                     <span v-if="newPasswordError" id="pass-error" class="error-message f12w400" style="color:red;">{{
                         newPasswordError }}</span></label>
                 <p class="f14w500 recover__main-repeat"><span class="reg__circle">*</span> Повторите пароль</p>
-                <label class="recover__repeat-label"><input type="password" class="recover__repeat-input e-input"
-                      placeholder="******" id="repeat-pass" v-model="repeatPassword"
-                      :class="{ 'error': repeatPasswordError }">
+                <label class="recover__repeat-label"><input type="password"
+                      class="recover__repeat-input e-input text-sm font-normal" placeholder="******" id="repeat-pass"
+                      v-model="repeatPassword" :class="{ 'error': repeatPasswordError }">
                     <button type="button" class="pass-eye" @click="togglePassword('repeat-pass')"
                       data-id="repeat-pass"></button>
                     <span v-if="repeatPasswordError" id="repeat-pass-error" class="error-message f12w400"
@@ -23,8 +24,14 @@
                 минимум одну строчную, одну прописную букву и&nbsp;одну цифру</p>
             <button class="btn-reset btn__recovery-accept f14w600 c-white" id="recover-next"
               @click="finishRecovery">Восстановить</button>
+            <div v-if="successRecovery" class="recovery-success text-center pt-2.5">
+                <p class="text-xs text-green font-normal mb-2">Пароль успешно заменен!</p>
+                <NuxtLink to="/auth" class="text-dodger text-base font-semibold hover:underline decoration-dodger">
+                    Перейти на главную
+                </NuxtLink>
+            </div>
         </div>
-        <div class="video-block">
+        <div class="video-block overflow-hidden">
             <video-player src="/assets/demo1.mp4" poster="/assets/cover3.png" controls :loop="false" :volume="0.6"
               :width="442.5" style="height: 100%;" />
         </div>
@@ -33,6 +40,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useNuxtApp } from '#app';
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
 
@@ -40,6 +48,8 @@ const newPassword = ref('');
 const repeatPassword = ref('');
 const newPasswordError = ref(null);
 const repeatPasswordError = ref(null);
+const successRecovery = ref(false);
+const route = useRoute();
 
 definePageMeta({
     layout: 'blank',
@@ -94,9 +104,30 @@ const checkPasswords = () => {
     return isValid;
 };
 
-function finishRecovery() {
-    if (checkPasswords()) {
-        console.log('Пароли совпадают');
+async function finishRecovery() {
+    if (!checkPasswords()) return;
+
+    const userId = route.query.user_id;
+    const keyRestore = route.query.key;
+    const { $axios } = useNuxtApp();
+
+    if (!userId || !keyRestore) {
+        console.error("Ошибка: отсутствует параметры user_id or key");
+        return;
+    }
+
+    try {
+        const response = await $axios.post(`/restore-success/${userId}`, {
+            key: keyRestore,
+            password: newPassword.value,
+            password_confirmation: repeatPassword.value
+        });
+
+        if (response.status === 200) {
+            successRecovery.value = true;
+        }
+    } catch (error) {
+        console.error("Ошибка восстановления:", error.response?.data || error);
     }
 }
 </script>

@@ -33,8 +33,8 @@ export default defineNuxtPlugin((nuxtApp: any) => {
             if (error.response?.status === 401) {
                 console.warn('⚠️ Получен 401 – пробуем обновить токен...');
                 try {
-                    const { refreshToken } = useNuxtApp().$auth;
-                    const newToken = await refreshToken();
+                    const { $auth } = useNuxtApp();
+                    const newToken = await ($auth as { refreshToken: () => Promise<string> }).refreshToken();
 
                     if (newToken) {
                         // rewrite request with new token

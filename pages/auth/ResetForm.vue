@@ -35,7 +35,7 @@
                 <p class="f25w700 reset__checkout">Перейдите по ссылке в письме</p>
                 <p class="reset__checkout-descr f14w500 c-bali">
                     Отправили информацию по восстановлению пароля<br />
-                    на <span class="reset__checkout-item">testovoe@testo.ru</span>
+                    на <span class="reset__checkout-item">{{ email }}</span>
                 </p>
                 <div class="reset__btn-wrapper">
                     <button class="btn-reset reset__checkout-denied f14w500 c-dodger">
@@ -53,6 +53,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { useNuxtApp } from '#app';
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
 
@@ -88,11 +89,26 @@ const checkReset = () => {
 }
 
 
-function toSecondStep() {
-    const isValid = checkReset();
+async function toSecondStep() {
+    if (!checkReset()) return;
 
-    if (isValid) {
-        step.value = 2;
+    const { $axios } = useNuxtApp();
+    try {
+        const response = await $axios.post('/restore-access', { email: email.value });
+
+        if (response.status === 200) {
+            step.value = 2; // change to check email page
+        }
+    } catch (error) {
+        console.error("Ошибка восстановления:", error.response?.data || error);
+
+        if (error.response?.status === 422) {
+            emailError.value = "Ошибка валидации";
+        } else if (error.response?.status === 404) {
+            emailError.value = "Пользователь с таким email не найден";
+        } else {
+            emailError.value = "Произошла ошибка, попробуйте снова";
+        }
     }
 }
 </script>
