@@ -22,9 +22,10 @@
                             <div class="p-1 text-center transition-colors rounded-ten"
                               @mouseover="setHovered(index, true)" @mouseleave="setHovered(index, false)"
                               :class="hovered[index] ? 'bg-zumthor' : ''">
-                                <div class="text-sm font-normal mb-1 transition-colors"
+                                <div class="text-sm font-normal mb-1 transition-colors cursor-default"
                                   :class="hovered[index] ? 'text-dodger' : 'text-space'">{{ column.value }}</div>
-                                <div class="text-13px text-slate-custom font-normal truncate" :title="column.label">{{
+                                <div class="text-13px text-slate-custom font-normal truncate cursor-default"
+                                  :title="column.label">{{
                                     column.label }}</div>
                             </div>
                         </div>
