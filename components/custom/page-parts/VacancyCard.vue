@@ -4,8 +4,8 @@
           :class="!vacancy.footerData ? 'rounded-fifteen' : 'rounded-t-fifteen'">
             <div class="flex justify-between mb-[27px]">
                 <div>
-                    <h2 class="text-lg font-medium text-space mb-2 leading-normal">{{ vacancy.title }}</h2>
-                    <p class="text-sm font-normal text-slate-custom">{{ vacancy.city }}</p>
+                    <h2 class="text-lg font-medium text-space mb-2 leading-normal">{{ vacancy.name }}</h2>
+                    <p class="text-sm font-normal text-slate-custom">{{ vacancy.location }}</p>
                 </div>
                 <div :class="vacancy.editButton ? 'flex gap-x-15px' : ''">
                     <UiButton v-if="vacancy.editButton" variant="orange" size="action">Продолжить редактирование
@@ -15,7 +15,7 @@
             </div>
             <div class="w-full border border-athens py-4 px-1 leading-normal rounded-fifteen mb-15px">
                 <div class="columns grid grid-flow-col auto-cols-fr">
-                    <span v-for="(column, index) in vacancy.columns" :key="index"
+                    <span v-for="(column, index) in columns" :key="index"
                       class="title-parent [&:not(:last-child)]:border-r [&:not(:last-child)]:border-athens">
                         <div class="title-wrapper">
                             <!-- Делаем ховер-эффект для каждого элемента с использованием отдельной переменной для каждого индекса -->
@@ -68,6 +68,15 @@
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 
 import { ref } from 'vue';
+
+const columns = ref([
+    { "label": "Все", "value": 328 },
+    { "label": "Не разобранное", "value": 41 },
+    { "label": "Подумать", "value": 13 },
+    { "label": "Подходящие", "value": 43 },
+    { "label": "Отклоненные", "value": 201 },
+    { "label": "Удаленные", "value": 17 }
+]);
 
 const props = defineProps({
     vacancy: {

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 // Текущий ввод пользователя
 const currentTag = ref('');
@@ -7,10 +7,10 @@ const currentTag = ref('');
 const isFocused = ref(false);
 
 // Массив тегов
-const tags = ref([]);
-
-// Все доступные варианты (можно получать с бэкенда)
-const options = ref(['Дизайн', 'Аналитика', 'Разработка', 'Тестирование', 'Продажи', 'Маркетинг']);
+const tags = computed({
+    get: () => props.modelValue,
+    set: (value) => emit('update:modelValue', value)
+});
 
 // Отфильтрованные варианты для автокомплита
 const filteredOptions = ref([]);
@@ -51,11 +51,21 @@ const clearInput = () => {
 };
 
 const props = defineProps({
+    modelValue: {
+        type: Array,
+        default: () => []
+    },
     placeholder: {
         type: String,
         default: 'Например, Аналитика'
+    },
+    options: {
+        type: Array,
+        default: () => ['Дизайн', 'Аналитика', 'Разработка', 'Тестирование', 'Продажи', 'Маркетинг']
     }
-})
+});
+
+const emit = defineEmits(['update:modelValue']);
 </script>
 
 

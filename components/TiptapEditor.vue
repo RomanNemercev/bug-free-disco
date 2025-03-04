@@ -54,9 +54,21 @@ export default {
     EditorContent,
   },
 
+  props: {
+    modelValue: String
+  },
+
   data() {
     return {
       editor: null,
+    }
+  },
+
+  watch: {
+    modelValue(newValue) {
+      if (this.editor && this.editor.getHTML() !== newValue) {
+        this.editor.commands.setContent(newValue, false); // обновляем контент, но без триггера обновления
+      }
     }
   },
 
@@ -67,7 +79,7 @@ export default {
           class: 'border border-athens py-15px px-3.5 min-h-[460px] max-h-[460px] overflow-y-auto outline-none prose max-w-none rounded-b-fifteen bg-athens-gray',
         },
       },
-      content: `<div>
+      content: this.modelValue || `<div>
       <h4>О компании</h4>
       <ul>
         <li></li>
@@ -95,7 +107,10 @@ export default {
         openOnClick: true,
         defaultProtocol: 'https',
       }),],
-    })
+      onUpdate: () => {
+        this.$emit('update:modelValue', this.editor.getHTML()); // обновляем данные в родительском компоненте
+      }
+    });
   },
 
   methods: {

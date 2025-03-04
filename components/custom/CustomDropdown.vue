@@ -1,29 +1,32 @@
 <template>
     <div ref="dropdownRef" class="relative w-full" :class="{ 'shadow-shadow-droplist rounded-t-[10px]': isOpen }"
       @click="handleWrapperClick">
+
         <div
           class="flex items-center gap-2 py-[9px] pl-15px pr-15px border border-athens rounded-ten cursor-pointer relative bg-athens-gray"
           :class="{ 'bg-white border-transparent': isOpen }">
+
             <input v-if="isOpen" ref="inputRef" type="text" v-model="searchQuery" placeholder="Поиск"
-              :class="{ 'border border-athens rounded-ten bg-athens-gray py-[9px] pl-[43px] pr-15px': isOpen }"
-              class="dropdown-input w-full focus:outline-none bg-athens-gray text-bali text-sm font-normal"
+              class="dropdown-input w-full focus:outline-none bg-athens-gray text-bali text-sm font-normal border border-athens rounded-ten py-[9px] pl-[43px] pr-15px"
               @blur="handleBlur" />
+
             <template v-else>
-                <span v-if="selectedValue" class="truncate" @click.stop="toggleDropdown">
-                    {{ selectedValue.label }}
+                <span v-if="selectedOption" class="truncate" @click.stop="toggleDropdown">
+                    {{ selectedOption.label }}
                 </span>
                 <span v-else class="text-bali text-sm font-normal" @click.stop="toggleDropdown">
                     {{ placeholder }}
                 </span>
             </template>
 
-            <!-- Крестик с классом clear-icon -->
-            <span v-if="selectedValue" class="text-gray-500 absolute right-2 cursor-pointer clear-icon"
-              @click="clearSelection">
+            <!-- Крестик -->
+            <span v-if="selectedOption" class="text-gray-500 absolute mr-2.5 right-2 cursor-pointer clear-icon"
+              @click.stop="clearSelection">
                 &#10006;
             </span>
+
             <!-- Стрелка -->
-            <span v-else class="absolute right-1 ml-auto mr-2.5 cursor-pointer text-bali" v-show="!isOpen">
+            <span class="absolute right-1 ml-auto mr-2.5 cursor-pointer text-bali" v-show="!isOpen && !selectedOption">
                 <svg-icon name="dropdown-arrow" width="20" height="20" />
             </span>
         </div>
@@ -33,10 +36,12 @@
             <ul v-if="isOpen"
               class="absolute bg-white border rounded mt-[1px] overflow-y-auto max-h-40 z-10 w-full transition-opacity duration-300 ease-in-out"
               :class="{ 'shadow-shadow-combolist rounded-b-[10px]': isOpen }">
+
                 <li v-for="item in filteredOptions" :key="item.id" @click="selectOption(item)"
                   class="item-list text-sm text-slate-custom py-10px px-15px cursor-pointer hover:bg-gray-100">
                     {{ item.label }}
                 </li>
+
                 <li v-if="filteredOptions.length === 0" class="p-2 text-gray-500 text-center">
                     Нет результатов
                 </li>
@@ -60,7 +65,7 @@ const props = defineProps({
         default: "Выберите значение",
     },
     modelValue: {
-        type: Object,
+        type: String,
         default: null,
     },
 });
@@ -71,6 +76,11 @@ const isOpen = ref(false);
 const searchQuery = ref("");
 const inputRef = ref(null);
 const dropdownRef = ref(null);
+
+// находим объект в options по label
+const selectedOption = computed(() => {
+    return props.options.find(option => option.label === props.modelValue) || null;
+});
 
 const selectedValue = computed({
     get: () => props.modelValue,
@@ -107,14 +117,14 @@ const toggleDropdown = () => {
 
 // Выбор элемента
 const selectOption = (option) => {
-    selectedValue.value = option;
+    emit("update:modelValue", option.label); // Отправляем только label
     isOpen.value = false;
     searchQuery.value = "";
 };
 
 // Очистка выбора
 const clearSelection = () => {
-    selectedValue.value = null;
+    emit("update:modelValue", null);
 };
 
 // Обработка клика вне компонента

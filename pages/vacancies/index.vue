@@ -6,8 +6,8 @@ import GeoInput from '~/components/custom/GeoInput.vue';
 import ResponseInput from '~/components/custom/ResponseInput.vue';
 import CheckboxGroup from "~/components/custom/CheckboxGroup.vue";
 
-
 import { ref, computed, nextTick, watch, onMounted } from 'vue';
+import { useNuxtApp } from '#app';
 
 import vacanciesData from "@/src/data/vacancies.json";
 // import vacanciesData from "@/src/data/vacancies-empty.json";
@@ -31,7 +31,7 @@ const isHoveredFunnel = ref(false);
 const isActiveFunnel = ref(false);
 const isHoveredSort = ref(false);
 const isActiveSort = ref(false);
-const vacancies = ref(vacanciesData);
+const vacancies = ref([]);
 const vacanciesDraft = ref(vacanciesDraftData);
 const vacanciesArchive = ref(vacanciesArchiveData);
 const currentPage = ref(1);
@@ -47,6 +47,9 @@ const archiveVacancies = ref(false);
 const draftVacancies = ref(false);
 const containerHeight = ref(0); // отслеживаю высоту контейнера
 const containerRef = ref(null); // ссылка на контейнер
+const error = ref(null);
+const loading = ref(false);
+const isFetched = ref(false);
 
 const totalPages = computed(() => Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage)));
 const totalDraftPages = computed(() => Math.max(1, Math.ceil(vacanciesDraft.value.length / itemsDraftPerPage)));
@@ -118,8 +121,40 @@ async function updateContainerHeight() {
     }
 }
 
+// Функция загрузки данных
+const fetchVacancies = async () => {
+    loading.value = true;
+    error.value = null;
+    isFetched.value = ref(false);
+
+    try {
+        const { $axios } = useNuxtApp();
+        const response = await $axios.get("/vacancies", {
+            header: {
+                Accept: "application/json",
+                Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYWRtaW4uam9iLWx5LnJ1L2FwaS9sb2dpbi1qd3QiLCJpYXQiOjE3NDA5ODQ4MTQsImV4cCI6MTc0MTI0NDAxNCwibmJmIjoxNzQwOTg0ODE0LCJqdGkiOiJHR2JOZUV0ZGx6RGFpb1lYIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.pbDBRI5-DFxPTieDoTXgrAm6RpKMSPCcZRs-ugdo-JE"
+            }
+        });
+
+        if (response.data && response.data.data.data) {
+            vacancies.value = response.data.data.data;
+            console.log("Что мы получаем от response.data.data.data:", response.data.data.data);
+        }
+    } catch (err) {
+        error.value = "Ошибка загрузки вакансий";
+        console.error("Ошибка API:", err);
+    } finally {
+        console.log("Вакансии успешно загружены:", vacancies.value);
+        loading.value = false;
+        isFetched.value = true;
+    }
+};
 // Инициализация высоты при монтировании
-onMounted(updateContainerHeight);
+// onMounted(updateContainerHeight, fetchVacancies);
+onMounted(() => {
+    updateContainerHeight();
+    fetchVacancies();
+});
 
 // Следим за изменением активных блоков
 watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight);
@@ -233,15 +268,19 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
             </div>
         </div>
         <div ref="containerRef" :style="{ height: `${containerHeight}px` }" class="relative">
-            <transition name="fade" @after-enter="updateContainerHeight">
+            <transition name="fade" @after-enter="{ updateContainerHeight }">
                 <div v-if="activeVacancies" class="absolute w-full active-view">
-                    <div v-if="vacancies.length === 0"
+                    <div v-if="loading"
+                      class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
+                        <p class="text-15px font-medium text-slate-custom">Загрузка...</p>
+                    </div>
+                    <div v-else-if="isFetched && vacancies.length === 0"
                       class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center">
                         <p class="text-15px font-medium text-slate-custom">Вы еще не добавляли вакансий которыми можно
                             управлять
                         </p>
                     </div>
-                    <div v-if="vacancies.length > 0">
+                    <div v-else-if="vacancies.length > 0">
                         <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
                           :dropdownItems="VacancyCardDropdown"
                           :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />

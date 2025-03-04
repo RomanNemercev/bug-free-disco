@@ -46,7 +46,8 @@ const ArrayMajors = majors;
 const ArrayIndustry = industry;
 
 const vacancyStore = useVacancyStore();
-const newVacancy = ref('Менеджер по продажам');
+const newVacancy = ref('');
+const newCode = ref('');
 const options = ref([
     {
         name: 'Полная',
@@ -111,6 +112,17 @@ const phone = ref("");
 const email = ref("");
 const selectedIndustry = ref(null);
 const selectedSpecialization = ref(null);
+const jobDescription = ref('');
+const selectedSchedule = ref('');
+const selectedExperience = ref('');
+const tags = ref([]);
+const salary = ref('');
+const salaryType = ref('');
+const currencyType = ref('');
+const workSpace = ref('');
+const location = ref('');
+const response = ref('');
+const selectedEducation = ref('');
 function saveVacancy() {
     vacancyStore.setNameVacancy(newVacancy.value); // Сохраняем в глобальное хранилище
     alert('Название вакансии сохранено!');
@@ -129,6 +141,7 @@ function saveVacancy() {
                         <Autocomplete :source="ArrayMajors" v-model="newVacancy"
                           placeholder="Например, Менеджер по продажам" class="mb-11px" />
                         <p class="text-xs text-bali">Осталось 80 символов. Специальных символов нет.</p>
+                        <div>{{ newVacancy }}</div>
                     </div>
                     <div class="w-full">
                         <div class="flex">
@@ -140,8 +153,9 @@ function saveVacancy() {
                             </span>
                         </div>
                         <div class="max-w-400px">
-                            <MyInput :placeholder="'Код вакансии'" type="number" />
+                            <MyInput :placeholder="'Код вакансии'" type="number" v-model="newCode" />
                         </div>
+                        <div>{{ newCode }}</div>
                     </div>
                 </div>
                 <div class="w-full">
@@ -152,7 +166,7 @@ function saveVacancy() {
                 </div>
                 <div class="mt-15px mb-3.5">
                     <client-only>
-                        <tiptap-editor />
+                        <tiptap-editor v-model="jobDescription" />
                     </client-only>
                 </div>
                 <p class="text-xs text-bali font-normal">Максимум 700 символов. Использовано 0 символов.</p>
@@ -175,6 +189,7 @@ function saveVacancy() {
                             <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль"
                               v-model="selectedIndustry" />
                         </div>
+                        <div>{{ selectedIndustry }}</div>
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Выберите специализацию</p>
@@ -182,6 +197,7 @@ function saveVacancy() {
                             <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
                               v-model="selectedSpecialization" />
                         </div>
+                        <div>{{ selectedSpecialization }}</div>
                     </div>
                 </div>
             </div>
@@ -202,40 +218,51 @@ function saveVacancy() {
                         <my-dropdown :defaultValue="'Тип занятости'" :options="options"
                           v-model="parentSelectedOption" />
                     </div>
+                    <div>{{ parentSelectedOption }}</div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">График работы</p>
-                        <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule" />
+                        <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule"
+                          v-model="selectedSchedule" />
                     </div>
+                    <div>{{ selectedSchedule }}</div>
                 </div>
                 <div class="flex justify-between gap-25px mb-3.5">
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
-                        <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience" />
+                        <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience"
+                          v-model="selectedExperience" />
+                        <div>{{ selectedExperience }}</div>
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Образование</p>
-                        <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation" />
+                        <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation"
+                          v-model="selectedEducation" />
                     </div>
+                    <div>{{ selectedEducation }}</div>
                 </div>
                 <div class="w-full mb-9 max-w-input">
                     <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
-                    <tag-select />
+                    <tag-select v-model="tags" />
+                    <div>{{ tags }}</div>
                 </div>
                 <div class="w-fit">
                     <MyAccordion title="дополнительные условия" class="mb-15px">
                         <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedAdditional" :options="ArrayAdditional" />
                         </div>
+                        <div>{{ selectedAdditional }}</div>
                     </MyAccordion>
                     <MyAccordion title="водительские права" class="mb-15px">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedCarId" :options="ArrayCarId" />
                         </div>
+                        <div>{{ selectedCarId }}</div>
                     </MyAccordion>
                     <MyAccordion title="дополнительные пожелания">
                         <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
                             <CheckboxGroup v-model="selectedOptions" :options="ArrayOptions" />
                         </div>
+                        <div>{{ selectedOptions }}</div>
                     </MyAccordion>
                 </div>
             </div>
@@ -253,9 +280,10 @@ function saveVacancy() {
                 <div class="flex justify-between gap-25px">
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Заработная плата / мес</p>
-                        <SalaryRange class="mb-4" />
+                        <SalaryRange class="mb-4" v-model="salary" />
+                        <div>{{ salary }}</div>
                         <div>
-                            <RadioGroup default-value="past-cash" class="flex gap-[18px]">
+                            <RadioGroup default-value="past-cash" class="flex gap-[18px]" v-model="salaryType">
                                 <div class="my-checkbox">
                                     <Label for="past-cash" class="cursor-pointer flex items-center">
                                         <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
@@ -270,11 +298,14 @@ function saveVacancy() {
                                 </div>
                             </RadioGroup>
                         </div>
+                        <div>{{ salaryType }}</div>
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
-                        <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0" />
+                        <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0"
+                          v-model="currencyType" />
                     </div>
+                    <div>{{ currencyType }}</div>
                 </div>
             </div>
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
@@ -292,11 +323,13 @@ function saveVacancy() {
                     <RadioGroup default-value="office" class="flex gap-x-15px w-full">
                         <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
                           :description="card.description" :selectedCard="selectedCard" :hoveredCard="hoveredCard"
-                          @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" />
+                          @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" v-model="workSpace" />
                     </RadioGroup>
                 </div>
+                <div>{{ workSpace }}</div>
                 <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
-                <geo-input class="mb-2.5" />
+                <geo-input class="mb-2.5" v-model="location" />
+                <div>{{ location }}</div>
                 <p class="leading-normal text-xs text-bali font-normal">Укажите расположение офиса для нового
                     сотрудника.</p>
             </div>
@@ -312,16 +345,20 @@ function saveVacancy() {
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="leading-normal text-space text-xl font-semibold mb-[33px]">Контактная информация</p>
                 <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-                <response-input class="mb-6 w-full max-w-input" :responses="responses" />
+                <response-input class="mb-6 w-full max-w-input" :responses="responses" v-model="response" />
+                <div>{{ response }}</div>
                 <div class="w-full flex justify-between gap-x-[25px]">
                     <div class="w-full max-w-[400px]">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>
                         <phone-input v-model="phone" class="mb-25px" />
+                        <div>{{ phone }}</div>
                         <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
+                        <div>{{ showContacts }}</div>
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Email</p>
                         <email-input v-model="email" />
+                        <div>{{ email }}</div>
                     </div>
                 </div>
             </div>
