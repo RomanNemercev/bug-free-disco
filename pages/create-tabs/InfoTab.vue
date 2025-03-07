@@ -11,6 +11,7 @@ import SalaryRange from "~/components/custom/SalaryRange.vue";
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { parseHtmlToJson } from '~/utils/htmlParser';
+import { useNuxtApp } from '#app';
 import CardOption from '@/components/custom/CardOption.vue';
 import GeoInput from '@/components/custom/GeoInput.vue';
 import ResponseInput from '@/components/custom/ResponseInput.vue';
@@ -67,7 +68,7 @@ const options = ref([
         value: 4,
     },
 ])
-const parentSelectedOption = ref(null);
+const selectEmployment = ref(null);
 const selectedCard = ref(null);
 const hoveredCard = ref(null);
 
@@ -134,6 +135,32 @@ function saveVacancy() {
 
 // Автоматически форматируем перед отправкой
 const formattedJobDescription = computed(() => parseHtmlToJson(jobDescription.value));
+
+const { $axios } = useNuxtApp();
+const vacancyData = ref({
+    name: newVacancy.value,
+    code: newCode.value,
+    description: formattedJobDescription.value,
+    employment: selectEmployment.value,
+    specializations: selectedSpecialization.value,
+    industry: selectedIndustry.value,
+    schedule: selectedSchedule.value,
+    experience: selectedExperience.value,
+    education: selectedEducation.value,
+    phrases: tags.value,
+    conditions: selectedAdditional.value, // массив
+    drivers: selectedCarId.value, // массив
+    additions: selectedOptions.value, // массив
+    salary_from: salary.from,
+    salary_to: salary.to,
+    currency: currencyType.value,
+    place: workSpace.value.title,
+    location: location.value,
+    customer_id: 1,
+    customer_name: responses[0].name,
+    customer_phone: phone.value,
+    customer_email: email.value,
+});
 </script>
 
 <template>
@@ -218,8 +245,7 @@ const formattedJobDescription = computed(() => parseHtmlToJson(jobDescription.va
                 <div class="flex justify-between gap-25px mb-3.5">
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-                        <my-dropdown :defaultValue="'Тип занятости'" :options="options"
-                          v-model="parentSelectedOption" />
+                        <my-dropdown :defaultValue="'Тип занятости'" :options="options" v-model="selectEmployment" />
                     </div>
                     <div class="w-full">
                         <p class="text-sm font-medium text-space mb-3.5">График работы</p>
