@@ -1,7 +1,7 @@
 <template>
     <div class="w-full relative" ref="wrapperRef">
         <input type="text" ref="inputRef" v-model="search"
-          class="bg-athens-gray border border-athens rounded-ten min-h-10 pl-15px w-full"
+          class="bg-athens-gray border text-sm border-athens rounded-ten min-h-10 pl-15px w-full"
           :placeholder="isFocused ? '' : placeholder" :class="{ 'focused': isFocused, 'has-value': search }"
           @focus="isFocused = true; isOpen = true" @blur="isFocused = false" @keydown.esc="closeList"
           @keydown.enter="submitCustomValue">

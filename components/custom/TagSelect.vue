@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, computed } from 'vue';
+import debounce from 'lodash/debounce';
 
 // Текущий ввод пользователя
 const currentTag = ref('');
@@ -16,33 +17,34 @@ const tags = computed({
 const filteredOptions = ref([]);
 
 // Фильтрация списка в зависимости от ввода
-const filterOptions = () => {
+const filterOptions = debounce(() => {
     const input = currentTag.value.toLowerCase();
-    filteredOptions.value = options.value.filter(option =>
-        option.toLowerCase().includes(input) && !tags.value.includes(option)
+    filteredOptions.value = props.options.filter(option =>
+        option.toLowerCase().includes(input) &&
+        !tags.value.includes(option)
     );
-};
+}, 300);
 
 // Добавление нового тега
 const addTag = () => {
     if (currentTag.value && !tags.value.includes(currentTag.value)) {
-        tags.value.push(currentTag.value); // Добавляем тег
+        tags.value = [...tags.value, currentTag.value];
     }
-    currentTag.value = ''; // Очищаем поле
-    filteredOptions.value = []; // Сбрасываем список предложений
+    clearInput();
 };
 
 // Выбор тега из автокомплита
 const selectOption = (option) => {
-    tags.value.push(option); // Добавляем выбранный тег
-    currentTag.value = ''; // Очищаем поле
-    filteredOptions.value = []; // Сбрасываем список
+    tags.value = [...tags.value, option];
+    clearInput();
 };
 
 // Удаление тега
 const removeTag = (index) => {
-    tags.value.splice(index, 1); // Удаляем тег по индексу
+    tags.value = tags.value.filter((_, i) => i !== index);
 };
+
+const emit = defineEmits(['update:modelValue']);
 
 // Очистка поля ввода
 const clearInput = () => {
@@ -64,8 +66,6 @@ const props = defineProps({
         default: () => ['Дизайн', 'Аналитика', 'Разработка', 'Тестирование', 'Продажи', 'Маркетинг']
     }
 });
-
-const emit = defineEmits(['update:modelValue']);
 </script>
 
 

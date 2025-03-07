@@ -18,19 +18,6 @@
         class="w-10 h-10 flex-center p-1 border border-athens bg-white rounded-ten hover:border-border-editor hover:bg-zumthor hover:text-dodger active:bg-dodger active:text-white active:border-dodger transition-all">
         <svg-icon name="list" width="20" height="20" />
       </button>
-      <button @click="editor.chain().focus().toggleOrderedList().run()"
-        :class="{ 'is-active bg-dodger text-white border-dodger': editor.isActive('orderedList') }"
-        class="w-10 h-10 flex-center p-1 border border-athens bg-white rounded-ten hover:border-border-editor hover:bg-zumthor hover:text-dodger active:bg-dodger active:text-white active:border-dodger transition-all">
-        <svg-icon name="orlist" width="20" height="20" />
-      </button>
-      <button @click="setLink" :class="{ 'is-active bg-dodger text-white border-dodger': editor.isActive('link') }"
-        class="w-10 h-10 flex-center p-1 border border-athens bg-white rounded-ten hover:border-border-editor hover:bg-zumthor hover:text-dodger active:bg-dodger active:text-white active:border-dodger transition-all">
-        <svg-icon name="link" width="20" height="20" />
-      </button>
-      <button @click="editor.chain().focus().unsetLink().run()" :disabled="!editor.isActive('link')"
-        class="w-10 h-10 flex-center disabled:text-gray-400 disabled:hover:border-athens disabled:hover:bg-white p-1 border border-athens bg-white rounded-ten hover:border-border-editor hover:bg-zumthor hover:text-dodger active:bg-dodger active:text-white active:border-dodger transition-all">
-        <svg-icon name="unlink" width="20" height="20" />
-      </button>
       <button @click="editor.chain().focus().undo().run()" :disabled="!editor.can().chain().focus().undo().run()"
         class="w-10 h-10 flex-center disabled:text-gray-400 disabled:hover:border-athens disabled:hover:bg-white p-1 border border-athens bg-white rounded-ten hover:border-border-editor hover:bg-zumthor hover:text-dodger active:bg-dodger active:text-white active:border-dodger transition-all">
         <svg-icon name="undo" width="20" height="20" />

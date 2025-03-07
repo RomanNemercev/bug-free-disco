@@ -1,10 +1,21 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import debounce from 'lodash/debounce';
+
+const props = defineProps({
+    placeholder: {
+        type: String,
+        default: 'Например, Санкт-Петербург, Лиговский проспект, д2'
+    },
+    modelValue: {
+        type: String,
+        default: ''
+    }
+})
 
 const isFocused = ref(false);
 
-const currentCity = ref('');
+const currentCity = ref(props.modelValue);
 const cities = ref([
     'Санкт-Петербург, ул. Дорожная, д2',
     'Москва, ул. дорожная д2',
@@ -24,20 +35,21 @@ const filterCities = debounce(() => {
 const clearCity = () => {
     currentCity.value = '';
     filteredCities.value = [];
+    emit('update:modelValue', '');
 };
 
 const selectCity = (city) => {
     currentCity.value = city;
     filteredCities.value = [];
     isFocused.value = false;
+    emit('update:modelValue', city);
 };
 
 
-const props = defineProps({
-    placeholder: {
-        type: String,
-        default: 'Например, Санкт-Петербург, Лиговский проспект, д2'
-    }
+const emit = defineEmits(['update:modelValue']);
+
+watch(() => props.modelValue, (newValue) => {
+    currentCity.value = newValue;
 })
 </script>
 

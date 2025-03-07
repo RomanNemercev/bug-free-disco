@@ -11,7 +11,7 @@
               @blur="handleBlur" />
 
             <template v-else>
-                <span v-if="selectedOption" class="truncate" @click.stop="toggleDropdown">
+                <span v-if="selectedOption" class="truncate text-sm" @click.stop="toggleDropdown">
                     {{ selectedOption.label }}
                 </span>
                 <span v-else class="text-bali text-sm font-normal" @click.stop="toggleDropdown">
