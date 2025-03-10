@@ -10,7 +10,7 @@
                 <div :class="vacancy.editButton ? 'flex gap-x-15px' : ''">
                     <UiButton v-if="vacancy.editButton" variant="orange" size="action">Продолжить редактирование
                     </UiButton>
-                    <DotsDropdown :items="props.dropdownItems" />
+                    <DotsDropdown :items="props.dropdownItems" @select-item="handleDropdownSelect" />
                 </div>
             </div>
             <div class="w-full border border-athens py-4 px-1 leading-normal rounded-fifteen mb-15px">
@@ -65,9 +65,9 @@
 </template>
 
 <script setup>
+import { ref, defineProps } from 'vue';
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
-
-import { ref } from 'vue';
+import { useNuxtApp } from '#app';
 
 const columns = ref([
     { "label": "Все", "value": 328 },
@@ -87,6 +87,7 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    class: String,
 });
 
 const hovered = ref({});  // Массив для отслеживания ховера по индексам
@@ -94,6 +95,40 @@ const hovered = ref({});  // Массив для отслеживания хов
 const setHovered = (index, isHovered) => {
     hovered.value[index] = isHovered;  // Устанавливаем состояние ховера для конкретного элемента
 };
+
+const { $axios } = useNuxtApp();
+
+// функция для удаления вакансии
+const deleteVacancy = async () => {
+    try {
+        const response = await $axios.delete(`/vacancies/${props.vacancy.id}`)
+        console.log('Успех:', response.data.message)
+        // эмитим событие для передачи на верх
+        emit('vacancy-deleted', props.vacancy.id)
+    } catch (error) {
+        if (error.response) {
+            const status = error.response.status;
+            const message = error.response.message;
+            if (status === 404) {
+                console.warn('Вакансия не найдена:', message)
+            } else {
+                console.error('Ошибка удаления:', message)
+            }
+        } else {
+            console.error('Ошибка сети:', error.message)
+        }
+    }
+}
+
+const emit = defineEmits(['vacancy-deleted']);
+
+const handleDropdownSelect = (item) => {
+    if (item === 'Удалить вакансию') {
+        if (confirm('Вы уверены что хотите удалить вакансию?')) {
+            deleteVacancy();
+        }
+    }
+}
 </script>
 
 <style scoped>

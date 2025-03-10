@@ -7,7 +7,7 @@ import ResponseInput from '~/components/custom/ResponseInput.vue';
 import CheckboxGroup from "~/components/custom/CheckboxGroup.vue";
 
 import { ref, computed, nextTick, watch, onMounted } from 'vue';
-import { useNuxtApp } from '#app';
+import { useNuxtApp, useCookie } from '#app';
 
 import vacanciesData from "@/src/data/vacancies.json";
 // import vacanciesData from "@/src/data/vacancies-empty.json";
@@ -128,11 +128,13 @@ const fetchVacancies = async () => {
     isFetched.value = ref(false);
 
     try {
+        const tokenCookie = useCookie('auth_token');
+        const token = tokenCookie.value;
         const { $axios } = useNuxtApp();
         const response = await $axios.get("/vacancies", {
             header: {
                 Accept: "application/json",
-                Authorization: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYWRtaW4uam9iLWx5LnJ1L2FwaS9sb2dpbi1qd3QiLCJpYXQiOjE3NDA5ODQ4MTQsImV4cCI6MTc0MTI0NDAxNCwibmJmIjoxNzQwOTg0ODE0LCJqdGkiOiJHR2JOZUV0ZGx6RGFpb1lYIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.pbDBRI5-DFxPTieDoTXgrAm6RpKMSPCcZRs-ugdo-JE"
+                Authorization: `Bearer ${token}`
             }
         });
 
@@ -149,6 +151,14 @@ const fetchVacancies = async () => {
         isFetched.value = true;
     }
 };
+
+// Обработчик удаления вакансии
+const handleVacancyDeleted = (vacancyId) => {
+    // Удаляем вакансию из списка
+    vacancies.value = vacancies.value.filter((vacancy) => vacancy.id !== vacancyId)
+    console.log(`Вакансия с id ${vacancyId} удалена из списка`)
+}
+
 // Инициализация высоты при монтировании
 // onMounted(updateContainerHeight, fetchVacancies);
 onMounted(() => {
@@ -192,7 +202,7 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                           style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
                           :class="draftVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
                             <p>Черновики</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesDraft.length
-                                }}</span>
+                            }}</span>
                         </button>
                         <button
                           class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
@@ -200,7 +210,7 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                           style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
                           :class="archiveVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
                             <p>Архив</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesArchive.length
-                                }}</span>
+                            }}</span>
                         </button>
                     </div>
                     <DotsDropdown :items="vacancyItems" />
@@ -280,9 +290,9 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                             управлять
                         </p>
                     </div>
-                    <div v-else-if="vacancies.length > 0">
+                    <div v-else-if="vacancies.length > 0" :class="totalPages === 1 ? 'pb-52' : 'pb-0'">
                         <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
-                          :dropdownItems="VacancyCardDropdown"
+                          @vacancy-deleted="handleVacancyDeleted" :dropdownItems="VacancyCardDropdown"
                           :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
                         <Pagination v-if="totalPages > 1" :currentPage="currentPage" :totalPages="totalPages"
                           @page-changed="handlePageChange" />

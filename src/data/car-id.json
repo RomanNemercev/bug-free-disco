@@ -1,51 +1,51 @@
 [
   {
-    "id": "categoryA",
+    "id": 1,
     "value": "A",
     "label": "A"
   },
   {
-    "id": "categoryB",
+    "id": 2,
     "value": "B",
     "label": "B"
   },
   {
-    "id": "categoryC",
+    "id": 3,
     "value": "C",
     "label": "C"
   },
   {
-    "id": "categoryD",
+    "id": 4,
     "value": "D",
     "label": "D"
   },
   {
-    "id": "categoryE",
+    "id": 5,
     "value": "E",
     "label": "E"
   },
   {
-    "id": "categoryM",
+    "id": 6,
     "value": "M",
     "label": "M"
   },
   {
-    "id": "categoryBE",
+    "id": 7,
     "value": "BE",
     "label": "BE"
   },
   {
-    "id": "categoryTB",
+    "id": 8,
     "value": "TB",
     "label": "TB"
   },
   {
-    "id": "categoryDE",
+    "id": 9,
     "value": "DE",
     "label": "DE"
   },
   {
-    "id": "categoryCE",
+    "id": 10,
     "value": "CE",
     "label": "CE"
   }

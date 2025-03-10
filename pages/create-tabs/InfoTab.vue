@@ -48,8 +48,6 @@ const ArrayMajors = majors;
 const ArrayIndustry = industry;
 
 const vacancyStore = useVacancyStore();
-const newVacancy = ref('');
-const newCode = ref('');
 const options = ref([
     {
         name: 'Полная',
@@ -68,16 +66,17 @@ const options = ref([
         value: 4,
     },
 ])
-const selectEmployment = ref(null);
 const selectedCard = ref(null);
 const hoveredCard = ref(null);
 
 const handleCheck = (id) => {
     selectedCard.value = id;
+    workSpace.value = id;
 }
 
 onMounted(() => {
-    selectedCard.value = "office";
+    selectedCard.value = '1';
+    workSpace.value = '1';
 })
 
 const handleHover = (id) => {
@@ -88,83 +87,136 @@ const clearHover = () => {
     hoveredCard.value = null;
 }
 
+const handleWorkSpaceUpdate = (newValue) => {
+    selectedCard.value = newValue // Синхронизируем selectedCard с workSpace
+}
+
 const cards = [
     {
-        id: 'office',
+        id: "1",
         title: 'Офис',
         description: 'Сотрудники<br>работают в офисе',
     },
     {
-        id: 'hybrid',
+        id: "2",
         title: 'Гибрид',
         description: 'Сотрудники работают как офисе,<br>так и дома',
     },
     {
-        id: 'outsource',
+        id: "3",
         title: 'Удаленно',
         description: 'Сотрудники<br>работают из дома',
     }
 ]
 
+const showContacts = ref(true);
+const salaryType = ref('');
+
+// зависимости для отправки на сервер
+const newVacancy = ref('');
+const newCode = ref('');
+const jobDescription = ref('');
+// Автоматически форматируем перед отправкой
+const formattedJobDescription = computed(() => parseHtmlToJson(jobDescription.value));
+const selectEmployment = ref(null);
+const selectedSpecialization = ref(null);
+const selectedIndustry = ref(null);
+const selectedSchedule = ref('');
+const selectedExperience = ref('');
+const selectedEducation = ref('');
+const tags = ref([]);
 const selectedAdditional = ref([]);
 const selectedCarId = ref([]);
 const selectedOptions = ref([]);
-const showContacts = ref(true);
-const phone = ref("");
-const email = ref("");
-const selectedIndustry = ref(null);
-const selectedSpecialization = ref(null);
-const jobDescription = ref('');
-const selectedSchedule = ref('');
-const selectedExperience = ref('');
-const tags = ref([]);
-const salary = ref({
-    from: null,
-    to: null
-});
-const salaryType = ref('');
+const salary = ref({ from: null, to: null });
 const currencyType = ref('RUB (рубль)');
-const workSpace = ref('office');
+const workSpace = ref('1');
 const location = ref('');
 const response = ref('');
-const selectedEducation = ref('');
-function saveVacancy() {
-    vacancyStore.setNameVacancy(newVacancy.value); // Сохраняем в глобальное хранилище
-    alert('Название вакансии сохранено!');
-}
+const phone = ref('');
+const email = ref('');
 
-// Автоматически форматируем перед отправкой
-const formattedJobDescription = computed(() => parseHtmlToJson(jobDescription.value));
+const descriptionText = computed(() => {
+    return formattedJobDescription.value
+        .reduce((acc, section) => {
+            return acc + `${section.title} ${section.items.join(' ')} `;
+        }, '')
+        .trim(); // Убираем лишний пробел в конце
+});
+
+const tagsString = computed(() => {
+    return tags.value.join(' ') || '';
+});
 
 const { $axios } = useNuxtApp();
-const vacancyData = ref({
-    name: newVacancy.value,
-    code: newCode.value,
-    description: formattedJobDescription.value,
-    employment: selectEmployment.value,
-    specializations: selectedSpecialization.value,
-    industry: selectedIndustry.value,
-    schedule: selectedSchedule.value,
-    experience: selectedExperience.value,
-    education: selectedEducation.value,
-    phrases: tags.value,
-    conditions: selectedAdditional.value, // массив
-    drivers: selectedCarId.value, // массив
-    additions: selectedOptions.value, // массив
-    salary_from: salary.from,
-    salary_to: salary.to,
-    currency: currencyType.value,
-    place: workSpace.value.title,
-    location: location.value,
-    customer_id: 1,
-    customer_name: responses[0].name,
-    customer_phone: phone.value,
-    customer_email: email.value,
-});
+
+const vacancyData = computed(() => {
+
+    return {
+        name: newVacancy.value,
+        code: newCode.value,
+        description: descriptionText.value,
+        industry: selectedIndustry.value,
+        specializations: selectedSpecialization.value,
+        employment: selectEmployment.value,
+        schedule: selectedSchedule.value,
+        experience: selectedExperience.value,
+        education: selectedEducation.value,
+        phrases: tagsString.value,
+        conditions: selectedAdditional.value, // массив
+        drivers: selectedCarId.value, // массив
+        additions: selectedOptions.value, // массив
+        salary_from: salary.value.from,
+        salary_to: salary.value.to,
+        currency: currencyType.value,
+        place: workSpace.value,
+        location: location.value,
+        customer_id: 1,
+        customer_name: response.value,
+        customer_phone: phone.value,
+        customer_email: email.value,
+    };
+})
+
+const createVacancy = async () => {
+    console.log('Данные вакансии:', vacancyData.value);
+    try {
+        const response = await $axios.post('/vacancies', vacancyData.value);
+        console.log('Успех:', response.data.message);
+        // TODO: Показать уведомление об успешном создании вакансии
+    } catch (error) {
+        if (error.response) {
+            const status = error.response.status;
+            const message = error.response.data.message;
+            if (status === 409) {
+                console.warn('Конфликт:', message); // vacancy already exists
+            } else if (status === 422) {
+                console.error('Ошибка валидации:', message); // validation error
+                console.log(error.response.data)
+            } else {
+                console.error('Ошибка сервера:', message);
+            }
+        } else {
+            console.error('Ошибка сети:', error.message);
+        }
+    }
+};
+
+function saveVacancy() {
+    vacancyStore.setNameVacancy(newVacancy.value); // Сохраняем в глобальное хранилище
+    createVacancy();
+}
+
+const checkData = () => {
+    console.log('Ручная проверка данных:');
+    console.log('email:', email.value);
+};
 </script>
 
 <template>
     <div class="container pb-10">
+        <button class="sticky top-40 left-[100%] bg-black text-white p-4 rounded-md z-10" @click="checkData()">Проверка
+            данных</button>
         <div class="flex gap-x-[24px] pt-48">
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="text-space text-xl font-semibold mb-8">Основная информация</p>
@@ -338,7 +390,8 @@ const vacancyData = ref({
             <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
                 <p class="text-space text-xl font-semibold mb-[33px]">Место работы</p>
                 <div class="mb-[23px]">
-                    <RadioGroup default-value="office" class="flex gap-x-15px w-full" v-model="workSpace">
+                    <RadioGroup default-value="1" class="flex gap-x-15px w-full" v-model="workSpace"
+                      @update:modelValue="handleWorkSpaceUpdate">
                         <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
                           :description="card.description" :selectedCard="selectedCard" :hoveredCard="hoveredCard"
                           @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" />
