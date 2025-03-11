@@ -118,9 +118,9 @@ const newCode = ref('');
 const jobDescription = ref('');
 // Автоматически форматируем перед отправкой
 const formattedJobDescription = computed(() => parseHtmlToJson(jobDescription.value));
-const selectEmployment = ref(null);
-const selectedSpecialization = ref(null);
-const selectedIndustry = ref(null);
+const selectEmployment = ref('');
+const selectedSpecialization = ref('');
+const selectedIndustry = ref('');
 const selectedSchedule = ref('');
 const selectedExperience = ref('');
 const selectedEducation = ref('');
@@ -133,7 +133,7 @@ const currencyType = ref('RUB (рубль)');
 const workSpace = ref('1');
 const location = ref('');
 const response = ref('');
-const phone = ref('');
+const phone = ref(null);
 const email = ref('');
 
 const descriptionText = computed(() => {
@@ -147,6 +147,21 @@ const descriptionText = computed(() => {
 const tagsString = computed(() => {
     return tags.value.join(' ') || '';
 });
+
+const generateCustomerId = () => {
+    const now = new Date();
+
+    // Получаем компоненты даты
+    const day = String(now.getDate()).padStart(2, '0');       // День (11)
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Месяц (03)
+    const hours = String(now.getHours()).padStart(2, '0');     // Часы (09)
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Минуты (58)
+
+    // Формируем customer_id
+    return `${day}${month}${hours}${minutes}`; // Пример: "11030958"
+};
+
+const customer_id = generateCustomerId();
 
 const { $axios } = useNuxtApp();
 
@@ -171,8 +186,7 @@ const vacancyData = computed(() => {
         currency: currencyType.value,
         place: workSpace.value,
         location: location.value,
-        customer_id: 1,
-        customer_name: response.value,
+        customer_id: 10,
         customer_phone: phone.value,
         customer_email: email.value,
     };
@@ -210,7 +224,9 @@ function saveVacancy() {
 const checkData = () => {
     console.log('Ручная проверка данных:');
     console.log('email:', email.value);
+    console.log(formattedJobDescription);
 };
+
 </script>
 
 <template>
@@ -419,6 +435,7 @@ const checkData = () => {
                     <div class="w-full max-w-[400px]">
                         <p class="text-sm font-medium text-space leading-normal mb-4">Номер телефона</p>
                         <phone-input v-model="phone" class="mb-25px" />
+                        <div>{{ phone }}</div>
                         <MyCheckbox id="show-contacts" label="Отображать контакты в вакансии" v-model="showContacts" />
                     </div>
                     <div class="w-full">

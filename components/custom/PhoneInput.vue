@@ -25,17 +25,19 @@ const handleInput = (event) => {
     // Получаем только цифры
     const digits = event.target.value.replace(/\D/g, "").slice(0, 11); // Ограничиваем до 11 цифр (+7 + 10 цифр)
 
-    // Формируем маску
+    // Формируем маску с "+"
     let mask = "+7";
-    if (digits.length > 1) mask += `-${digits.slice(1, 4)}`;
-    if (digits.length >= 5) mask += `-${digits.slice(4, 7)}`;
-    if (digits.length >= 8) mask += `-${digits.slice(7, 11)}`;
+    if (digits.length > 1) mask += ` (${digits.slice(1, 4)}`;
+    if (digits.length >= 5) mask += `) ${digits.slice(4, 7)}`;
+    if (digits.length >= 8) mask += `-${digits.slice(7, 9)}`;
+    if (digits.length >= 10) mask += `-${digits.slice(9, 11)}`;
 
     // Обновляем значения
     rawValue.value = digits;
     formattedValue.value = mask;
 
-    emit("update:modelValue", digits);
+    // Отправляем на сервер номер с "+"
+    emit("update:modelValue", `+${digits}`);
 };
 
 const validatePhone = () => {
