@@ -4,8 +4,8 @@
           :class="!vacancy.footerData ? 'rounded-fifteen' : 'rounded-t-fifteen'">
             <div class="flex justify-between mb-[27px]">
                 <div>
-                    <h2 class="text-lg font-medium text-space mb-2 leading-normal">{{ vacancy.name }}</h2>
-                    <p class="text-sm font-normal text-slate-custom">{{ vacancy.location }}</p>
+                    <h2 class="text-lg font-medium text-space mb-2 leading-normal">{{ vacancy.title }}</h2>
+                    <p class="text-sm font-normal text-slate-custom">{{ vacancy.city }}</p>
                 </div>
                 <div :class="vacancy.editButton ? 'flex gap-x-15px' : ''">
                     <UiButton v-if="vacancy.editButton" variant="orange" size="action">Продолжить редактирование
@@ -45,7 +45,8 @@
         <div v-if="vacancy.footerData"
           class="footer flex justify-between bg-catskill rounded-b-fifteen py-15px px-25px">
             <div class="flex gap-x-25px">
-                <p class="text-sm font-medium text-slate-custom leading-normal" v-if="vacancy.footerData.sites">Сайтов:
+                <p class="text-sm font-medium text-slate-custom leading-normal" v-if="vacancy.footerData.sites != null">
+                    Сайтов:
                     {{
                         vacancy.footerData.sites }}</p>
                 <p class="text-sm font-medium text-slate-custom leading-normal"

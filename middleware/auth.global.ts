@@ -1,11 +1,11 @@
 // middleware/auth.global.ts
 import { defineNuxtRouteMiddleware, navigateTo, useCookie } from '#app';
+import type { RouteLocationNormalized } from '#app'; // Импортируем типы
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
   const tokenCookie = useCookie('auth_token');
-  // Пропускаем проверку для страницы /auth
   if (to.path === '/auth') {
-    return; // Ничего не делаем, разрешаем доступ
+    return;
   }
   if (!tokenCookie.value) {
     return navigateTo('/auth');

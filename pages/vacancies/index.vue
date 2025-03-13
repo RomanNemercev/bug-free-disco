@@ -202,7 +202,7 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                           style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
                           :class="draftVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
                             <p>Черновики</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesDraft.length
-                            }}</span>
+                                }}</span>
                         </button>
                         <button
                           class="flex rounded-ten py-2.5 px-15px text-space text-sm font-medium gap-x-2.5 cursor-pointer"
@@ -210,7 +210,7 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                           style="transition-property: background-color, color; transition-duration: 0.2s; transition-timing-function: ease-in-out;"
                           :class="archiveVacancies ? 'bg-space text-white' : 'bg-transparent text-space'">
                             <p>Архив</p><span class="text-slate-custom text-sm font-medium">{{ vacanciesArchive.length
-                            }}</span>
+                                }}</span>
                         </button>
                     </div>
                     <DotsDropdown :items="vacancyItems" />
@@ -290,7 +290,8 @@ watch([activeVacancies, archiveVacancies, draftVacancies], updateContainerHeight
                             управлять
                         </p>
                     </div>
-                    <div v-else-if="vacancies.length > 0" :class="totalPages === 1 ? 'pb-52' : 'pb-0'">
+                    <div class="[&>*:not(:last-child)]:mb-15px" v-else-if="vacancies.length > 0"
+                      :class="totalPages === 1 ? 'pb-52' : 'pb-0'">
                         <VacancyCard v-for="(vacancy, index) in paginatedVacancies" :key="vacancy.id" :vacancy="vacancy"
                           @vacancy-deleted="handleVacancyDeleted" :dropdownItems="VacancyCardDropdown"
                           :class="{ 'mb-4': index !== paginatedVacancies.length - 1 }" />
