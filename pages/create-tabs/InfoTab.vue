@@ -148,21 +148,6 @@ const tagsString = computed(() => {
     return tags.value.join(' ') || '';
 });
 
-const generateCustomerId = () => {
-    const now = new Date();
-
-    // Получаем компоненты даты
-    const day = String(now.getDate()).padStart(2, '0');       // День (11)
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Месяц (03)
-    const hours = String(now.getHours()).padStart(2, '0');     // Часы (09)
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Минуты (58)
-
-    // Формируем customer_id
-    return `${day}${month}${hours}${minutes}`; // Пример: "11030958"
-};
-
-const customer_id = generateCustomerId();
-
 const { $axios } = useNuxtApp();
 
 const vacancyData = computed(() => {
