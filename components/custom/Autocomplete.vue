@@ -4,7 +4,8 @@
           class="bg-athens-gray border text-sm border-athens rounded-ten min-h-10 pl-15px w-full"
           :placeholder="isFocused ? '' : placeholder" :class="{ 'focused': isFocused, 'has-value': search }"
           @focus="isFocused = true; isOpen = true" @blur="isFocused = false" @keydown.esc="closeList"
-          @keydown.enter="submitCustomValue">
+          @keydown.enter="submitCustomValue" @input="$emit('update:modelValue', $event.target.value)"
+          @change="$emit('update:modelValue', search)">
         <ul v-show="searchResults.length && isOpen"
           class="absolute left-0 right-0 max-h-52 overflow-y-auto bg-white z-10 shadow-shadow-droplist rounded-plus">
             <li v-for="(result, index) in searchResults" :key="result.name" @click="setSelected(result.name)"
@@ -17,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
     source: {
@@ -32,12 +33,16 @@ const props = defineProps({
     placeholder: {
         type: String,
         default: 'Введите значение'
+    },
+    initialValue: {
+        type: String,
+        default: ''
     }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const search = ref('')
+const search = ref(props.initialValue || props.modelValue || '');
 const isFocused = ref(false)
 const isOpen = ref(false)
 const inputRef = ref(null)
@@ -45,15 +50,15 @@ const wrapperRef = ref(null)
 
 const searchResults = computed(() => {
     if (search.value === '') {
-        return []
+        return [];
     }
 
     return props.source.filter(item => {
         if (item.name.toLowerCase().includes(search.value.toLowerCase())) {
-            return item
+            return item;
         }
-    })
-})
+    });
+});
 
 
 const setSelected = item => {
@@ -87,6 +92,16 @@ const handleClickOutside = (event) => {
         closeList();
     }
 }
+
+watch(() => props.modelValue, (newVal) => {
+    console.log('Новое значение из v-model:', newVal);
+    search.value = newVal || '';
+});
+
+watch(() => search.value, (newVal) => {
+    console.log('Изменения внутри компонента:', newVal);
+    emit('update:modelValue', newVal);
+});
 
 </script>
 

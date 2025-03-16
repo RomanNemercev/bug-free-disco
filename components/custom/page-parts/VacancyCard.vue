@@ -68,7 +68,8 @@
 <script setup>
 import { ref, defineProps } from 'vue';
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
-import { useNuxtApp } from '#app';
+import { useNuxtApp, useRouter } from '#app';
+import { useVacancyStore } from '~/stores/vacancy';
 
 const columns = ref([
     { "label": "Все", "value": 328 },
@@ -103,13 +104,13 @@ const { $axios } = useNuxtApp();
 const deleteVacancy = async () => {
     try {
         const response = await $axios.delete(`/vacancies/${props.vacancy.id}`)
-        console.log('Успех:', response.data.message)
+        console.log('Успех(если undefined, то нормально, мы же удалили её):', response.data?.message)
         // эмитим событие для передачи на верх
         emit('vacancy-deleted', props.vacancy.id)
     } catch (error) {
         if (error.response) {
             const status = error.response.status;
-            const message = error.response.message;
+            const message = error.response.data?.message;
             if (status === 404) {
                 console.warn('Вакансия не найдена:', message)
             } else {
@@ -122,12 +123,17 @@ const deleteVacancy = async () => {
 }
 
 const emit = defineEmits(['vacancy-deleted']);
+const router = useRouter();
+const vacancyStore = useVacancyStore();
 
 const handleDropdownSelect = (item) => {
     if (item === 'Удалить вакансию') {
         if (confirm('Вы уверены что хотите удалить вакансию?')) {
             deleteVacancy();
         }
+    } else if (item === 'Редактировать') {
+        vacancyStore.setEditing(props.vacancy.id);
+        router.push('/vacancies/newvacancy');
     }
 }
 </script>

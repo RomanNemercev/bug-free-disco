@@ -77,6 +77,9 @@ const handleCheck = (id) => {
 onMounted(() => {
     selectedCard.value = '1';
     workSpace.value = '1';
+    if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
+        loadVacancyData(vacancyStore.editingVacancyId);
+    }
 })
 
 const handleHover = (id) => {
@@ -178,20 +181,18 @@ const vacancyData = computed(() => {
 })
 
 const createVacancy = async () => {
-    console.log('Данные вакансии:', vacancyData.value);
     try {
         const response = await $axios.post('/vacancies', vacancyData.value);
         console.log('Успех:', response.data.message);
-        // TODO: Показать уведомление об успешном создании вакансии
+        vacancyStore.resetEditing();
     } catch (error) {
         if (error.response) {
             const status = error.response.status;
             const message = error.response.data.message;
             if (status === 409) {
-                console.warn('Конфликт:', message); // vacancy already exists
+                console.warn('Конфликт:', message);
             } else if (status === 422) {
-                console.error('Ошибка валидации:', message); // validation error
-                console.log(error.response.data)
+                console.error('Ошибка валидации:', message);
             } else {
                 console.error('Ошибка сервера:', message);
             }
@@ -201,9 +202,62 @@ const createVacancy = async () => {
     }
 };
 
+const loadVacancyData = async (id) => {
+    try {
+        const response = await $axios.get(`/vacancies/${id}`);
+        const data = response.data.data;
+        console.log('Данные вакансии:', data);
+        newVacancy.value = data.name || '';
+        newCode.value = data.code || '';
+        jobDescription.value = data.description;
+        selectEmployment.value = data.employment;
+        selectedSpecialization.value = data.specializations;
+        selectedIndustry.value = data.industry;
+        selectedSchedule.value = data.schedule;
+        selectedExperience.value = data.experience;
+        selectedEducation.value = data.education;
+        tags.value = data.phrases ? data.phrases.split(' ').filter(Boolean) : [];
+        selectedAdditional.value = data.conditions;
+        selectedCarId.value = data.drivers;
+        selectedOptions.value = data.additions;
+        salary.value = { from: data.salary_from, to: data.salary_to };
+        currencyType.value = data.currency;
+        workSpace.value = data.place;
+        location.value = data.location;
+        phone.value = data.customer_phone;
+        email.value = data.customer_email;
+    } catch (error) {
+        console.error('Ошибка загрузки вакансии:', error.response?.data || error.message);
+    }
+}
+
+const updateVacancy = async (id) => {
+    try {
+        const response = await $axios.put(`/vacancies/${id}`, vacancyData.value);
+        console.log('Успех обновления:', response.data.message);
+        vacancyStore.resetEditing();
+    } catch (error) {
+        if (error.response) {
+            const status = error.response.status;
+            const message = error.response.data.message;
+            if (status === 409) {
+                console.warn('Конфликт:', message);
+            } else if (status === 422) {
+                console.error('Ошибка валидации:', message);
+            } else console.error('Ошибка сервера:', message);
+        } else {
+            console.log('Ошибка сети:', error.message);
+        }
+    }
+};
+
 function saveVacancy() {
     vacancyStore.setNameVacancy(newVacancy.value); // Сохраняем в глобальное хранилище
-    createVacancy();
+    if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
+        updateVacancy(vacancyStore.editingVacancyId);
+    } else {
+        createVacancy();
+    }
 }
 
 const checkData = () => {
@@ -225,9 +279,10 @@ const checkData = () => {
                     <div class="w-full">
                         <p class="text-sm font-medium mb-4 leading-normal text-space"><span class="text-red">*</span>
                             Название должности</p>
-                        <Autocomplete :source="ArrayMajors" v-model="newVacancy"
+                        <Autocomplete :source="ArrayMajors" v-model="newVacancy" :initial-value="newVacancy.value"
                           placeholder="Например, Менеджер по продажам" class="mb-11px" />
                         <p class="text-xs text-bali">Осталось 80 символов. Специальных символов нет.</p>
+                        <div>{{ newVacancy }}</div>
                     </div>
                     <div class="w-full">
                         <div class="flex">
@@ -240,6 +295,7 @@ const checkData = () => {
                         </div>
                         <div class="max-w-400px">
                             <MyInput :placeholder="'Код вакансии'" type="number" v-model="newCode" />
+                            <div>{{ newCode }}</div>
                         </div>
                     </div>
                 </div>
