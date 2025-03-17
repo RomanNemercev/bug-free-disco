@@ -106,7 +106,7 @@ const loginUser = async () => {
         // При успешном логине можно выполнить редирект, обновить данные и т.д.
         console.log("Результат логина:", result);
         // Например:
-        window.location.href = '/';
+        // window.location.href = '/';
     } catch (error) {
         console.error("Ошибка авторизации", error);
         authError.value = "Неверный email или пароль";

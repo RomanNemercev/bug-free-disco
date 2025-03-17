@@ -1,6 +1,6 @@
 // axios.ts
 import axios from 'axios';
-import { useCookie, defineNuxtPlugin, useRuntimeConfig } from '#app';
+import { useCookie, defineNuxtPlugin, useRuntimeConfig, useRoute, useNuxtApp } from '#app';
 
 export default defineNuxtPlugin((nuxtApp: any) => {
     const config = useRuntimeConfig();
@@ -15,15 +15,17 @@ export default defineNuxtPlugin((nuxtApp: any) => {
     // Интерсептор запроса: если токен есть в cookies, пробрасываем его
     axiosInstance.interceptors.request.use(async (requestConfig) => {
         const tokenCookie = useCookie('auth_token');
+        const userTokenCookie = useCookie('auth_user');
         const token = tokenCookie.value;
-        console.log('Токен из cookies в interceptors:', token || '❌ Токен отсутствует');
-        // Для некоторых эндпоинтов (например, /login-jwt) заголовок не нужен, поэтому можно проверять по requestConfig.url, если требуется.
+        const userToken = userTokenCookie.value;
+
+        console.log('🔐 Основной токен:', token || '❌ отсутствует');
+        console.log('🧑‍💼 Пользовательский токен:', userToken || '❌ отсутствует');
         requestConfig.headers['Content-Type'] = 'application/json';
         if (requestConfig.url && token && !requestConfig.url.includes('/login-jwt')) {
             requestConfig.headers.Authorization = `Bearer ${token}`;
-        } else if (!token) {
-            console.warn('⚠️ Токен отсутствует – возможно, потребуется запросить его через /login-jwt');
         }
+
         return requestConfig;
     });
 
@@ -38,10 +40,12 @@ export default defineNuxtPlugin((nuxtApp: any) => {
 
                     if (newToken) {
                         // rewrite request with new token
+                        const userToken = useCookie('auth_user').value;
                         useCookie('auth_token').value = newToken;
 
                         // repeat new request with new token
-                        error.config.headers.Authorization = `Bearer ${newToken}`;
+                        error.config.headers.Authorization = `Bearer ${useCookie('auth_token').value}`;
+                        console.log('🔁 Повторный запрос с заголовками:', error.config.headers);
                         return axiosInstance.request(error.config);
                     }
                 } catch (refreshError) {

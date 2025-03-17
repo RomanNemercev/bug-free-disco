@@ -27,9 +27,7 @@ const ensureToken = async (): Promise<string> => {
                 }
             });
             const token = (response.data as AuthResponse).authorization.token;
-            console.log("Проверка токена: ", (response.data as AuthResponse).authorization.token);
             tokenCookie.value = token;
-            console.log("Проверка токена для cookies: ", tokenCookie.value);
             console.log('Получен токен через /login-jwt:', token);
         } catch (error) {
             console.error('Ошибка при получении токена через /login-jwt:', error);
@@ -62,8 +60,11 @@ const login = async (email: string, password: string): Promise<any> => {
         // Предполагается, что ответ содержит auth_token и данные пользователя
         const authToken = response.data.user.auth_token; // или response.data.auth_token, в зависимости от API
         // Сохраняем полученный токен в cookies
-        const authCookie = useCookie('auth_token');
-        authCookie.value = authToken;
+        // const authCookie = useCookie('auth_token');
+        const userTokenCookie = useCookie('auth_user');
+        userTokenCookie.value = authToken;
+        console.log('Токен пользователя:', authToken);
+        // authCookie.value = authToken;
         return response.data;
     } catch (error) {
         console.error('Ошибка логина:', error);

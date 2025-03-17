@@ -128,15 +128,8 @@ const fetchVacancies = async () => {
     isFetched.value = ref(false);
 
     try {
-        const tokenCookie = useCookie('auth_token');
-        const token = tokenCookie.value;
         const { $axios } = useNuxtApp();
-        const response = await $axios.get("/vacancies", {
-            header: {
-                Accept: "application/json",
-                Authorization: `Bearer ${token}`
-            }
-        });
+        const response = await $axios.get("/vacancies");
 
         if (response.data && response.data.data.data) {
             vacancies.value = response.data.data.data;
