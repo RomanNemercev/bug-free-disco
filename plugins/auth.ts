@@ -1,5 +1,5 @@
 // auth.ts
-import { useCookie, defineNuxtPlugin, useNuxtApp } from '#app';
+import { useCookie, defineNuxtPlugin, useNuxtApp, useRuntimeConfig } from '#app';
 
 interface AuthResponse {
     authorization: {
@@ -9,12 +9,12 @@ interface AuthResponse {
     };
 }
 
-const FIXED_AUTH_DATA = {
-    email: 'api-jwt@jobly.ru',
-    password: 'hdjkmRkkj:sg'
-};
-
 const ensureToken = async (): Promise<string> => {
+    const config = useRuntimeConfig();
+    const FIXED_AUTH_DATA = {
+        email: config.public.apiEmail,
+        password: config.public.apiPassword,
+    };
     const { $axios } = useNuxtApp();
     const tokenCookie = useCookie('auth_token');
     let token = tokenCookie.value as string | null;
@@ -73,6 +73,11 @@ const login = async (email: string, password: string): Promise<any> => {
 };
 
 const refreshToken = async (): Promise<string> => {
+    const config = useRuntimeConfig();
+    const FIXED_AUTH_DATA = {
+        email: config.public.apiEmail,
+        password: config.public.apiPassword,
+    };
     console.warn('Обновление токена вызвано!');
     const { $axios } = useNuxtApp();
     const tokenCookie = useCookie('auth_token');

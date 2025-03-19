@@ -55,7 +55,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'no-url',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+      apiEmail: process.env.NUXT_PUBLIC_API_EMAIL,
+      apiPassword: process.env.NUXT_PUBLIC_API_PASSWORD,
     }
   },
   pinia: {

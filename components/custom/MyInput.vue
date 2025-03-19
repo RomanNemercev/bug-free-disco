@@ -15,7 +15,11 @@ const props = defineProps({
     modelValue: {
         type: [String, Number],
         default: null, // value on default
-    }
+    },
+    search: {
+        type: Boolean,
+        default: false
+    },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -41,7 +45,7 @@ const updateValue = (event) => {
         <input :type="type"
           class="text-sm font-normal bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
           :placeholder="isFocused ? '' : placeholder" :value="localValue" @input="updateValue" @focus="isFocused = true"
-          :class="{ 'focused': isFocused }" @blur="isFocused = false" />
+          :class="[{ 'focused': isFocused }, { 'search': search }]" @blur="isFocused = false" />
     </div>
 </template>
 
@@ -52,8 +56,17 @@ input::placeholder {
     font-family: 'Inter', sans-serif;
 }
 
+.search {
+    background-image: url('../../assets/sprite/svg/search.svg');
+    background-repeat: no-repeat;
+    background-position: 15px center;
+    padding-left: 42px;
+}
+
 .focused {
     border: 1px solid #5898FF;
     outline: none;
+    padding-left: 15px;
+    background-image: none;
 }
 </style>

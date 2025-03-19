@@ -14,6 +14,7 @@ export const avatarVariant = cva(
         lg: 'h-32 w-32 text-5xl',
         custom: 'h-10 w-10 text-[13px] font-medium border-solid border border-borderAvatar',
         user: 'h-[124px] w-[124px] text-5xl',
+        candidate: 'w-50px h-50px bg-athens-gray text-slate-custom',
       },
       shape: {
         circle: 'rounded-full',

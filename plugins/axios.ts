@@ -40,7 +40,6 @@ export default defineNuxtPlugin((nuxtApp: any) => {
 
                     if (newToken) {
                         // rewrite request with new token
-                        const userToken = useCookie('auth_user').value;
                         useCookie('auth_token').value = newToken;
 
                         // repeat new request with new token
