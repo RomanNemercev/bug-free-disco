@@ -2,7 +2,7 @@ export const candidatesFull = [
     {
         id: 1,
         name: 'Сидоренко Валентин',
-        tags: ['#подходящий', '#IT'],
+        tags: ['#Прикольный'],
         icon: "hh20",
         isPng: false,
         imagePath: "",
