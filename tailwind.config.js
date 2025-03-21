@@ -44,6 +44,7 @@ module.exports = {
         catskill: '#f9fafc',
         chilean: '#fffce4',
         'border-pink': 'rgba(245, 10, 10, 0.2)',
+        pattens: '#d2e3ff',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -113,6 +114,7 @@ module.exports = {
         '7px': '7px',
         '8px': '8px',
         '9px': '9px',
+        '10.5px': '10.5px',
         '11px': '11px',
         '11.5px': '11.5px',
         '12.5px': '12.5px',

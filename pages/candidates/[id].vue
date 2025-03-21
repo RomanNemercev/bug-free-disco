@@ -7,8 +7,17 @@
         <div class="w-full">
             <div class="bg-white rounded-fifteen p-25px relative">
                 <div class="justify-between flex mb-10">
-                    <div class="bg-orange rounded-md text-white p-2.5">крутая кнопка</div>
-                    <div class="bg-orange rounded-md text-white p-2.5">много других не таких крутых кнопок</div>
+                    <ButtonSelector :options="options" v-model="selectedLabel" />
+                    <div class="flex gap-x-2.5">
+                        <BtnMessage />
+                        <BtnCalendar />
+                        <BtnEmail />
+                        <BtnStop />
+                        <div>
+                            <MyTooltip text="Еще действия" />
+                            <DotsDropdown :items="dropdownOptions" />
+                        </div>
+                    </div>
                 </div>
                 <div class="absolute w-full left-0 h-[1px] bg-athens-gray top-20"></div>
                 <div class="flex justify-between">
@@ -69,9 +78,30 @@
 <script setup>
 import { candidatesFull } from "~/utils/candidatesFull";
 
+import ButtonSelector from "~/components/custom/ButtonSelector.vue";
+import BtnMessage from "~/components/custom/BtnMessage.vue";
+import BtnCalendar from "~/components/custom/BtnCalendar.vue";
+import BtnEmail from "~/components/custom/BtnEmail.vue";
+import BtnStop from "~/components/custom/BtnStop.vue";
+import DotsDropdown from "~/components/custom/DotsDropdown.vue";
+import MyTooltip from "~/components/custom/MyTooltip.vue";
+
 const route = useRoute();
 
 const candidate = computed(() => {
     return candidatesFull.find(c => c.id === Number(route.params.id));
 });
+
+const options = [
+    'Все',
+    'Не разобранное',
+    'Подумать',
+    'Подходящие',
+    'Отклоненные',
+    'Служба безопасности'
+]
+
+const dropdownOptions = ['Опция 1', 'Опция 2', 'Опция 3'];
+
+const selectedLabel = ref('Подумать');
 </script>
