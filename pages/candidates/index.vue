@@ -1,10 +1,13 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 
 import MyInput from '~/components/custom/MyInput.vue';
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import CardIcon from "~/components/custom/CardIcon.vue";
 import Pagination from "@/components/custom/Pagination.vue";
+
+import { candidatesMin } from "~/utils/candidatesMin";
 
 const isHoveredFunnel = ref(false);
 const isActiveFunnel = ref(false);
@@ -14,6 +17,8 @@ const selected = ref({});
 const allSelected = ref(false);
 const itemsPerPage = 10;
 const currentPage = ref(1);
+
+const router = useRouter();
 
 const totalPages = computed(() => Math.max(1, Math.ceil(data.value.length / itemsPerPage)));
 
@@ -50,30 +55,39 @@ watch(selected, (newSelected) => {
     }
 }, { deep: true });
 
-const data = ref([
-    { id: 1, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 2, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 3, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 4, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 5, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 6, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 7, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 8, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 9, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-    { id: 10, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-]);
+// const data = ref([
+//     { id: 1, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 2, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 3, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 4, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 5, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 6, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 7, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 8, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 9, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 10, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+//     { id: 11, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
+// ]);
 
-const paginatedCanditates = computed(() => {
-    const startIndex = (currentPage.value - 1) * itemsPerPage;
-    return data.value.slice(startIndex, startIndex + itemsPerPage);
+const data = ref(candidatesMin);
+
+const paginatedCandidates = computed(() => {
+    const startIndex = (currentPage.value - 1) * itemsPerPage
+    return data.value.slice(startIndex, startIndex + itemsPerPage)
 })
+
+
+function goToCandidate(id) {
+    router.push(`/candidates/${id}`);
+}
 </script>
 
 <template>
     <div class="container pt-6 pb-28">
         <div class="bg-white rounded-fifteen p-25px relative mb-15px">
             <h2 class="text-xl font-semibold text-space leading-normal mb-2.5">Кандидаты</h2>
-            <p class="text-sm font-normal text-slate-custom mb-50px">Управляйте кандидатами с этого раздела</p>
+            <p class="text-sm font-normal text-slate-custom mb-50px">Управляйте кандидатами с этого
+                раздела</p>
             <div class="absolute w-full left-0 h-[1px] bg-athens top-[103px]"></div>
             <div class="flex gap-x-15px">
                 <MyInput placeholder="Поиск по кандидатам или ключевым фразам" :search="true" />
@@ -107,7 +121,7 @@ const paginatedCanditates = computed(() => {
 
             <!-- body -->
             <div class="table-body">
-                <div v-for="item in paginatedCanditates" :key="item.id" class="table-row">
+                <div v-for="item in paginatedCandidates" :key="item.id" class="table-row">
                     <div>
                         <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" />
                     </div>
@@ -117,7 +131,8 @@ const paginatedCanditates = computed(() => {
                             <UiAvatarFallback>АА</UiAvatarFallback>
                         </UiAvatar>
                         <div>
-                            <p class="text-sm font-medium text-space mb-5px leading-[170%]">{{ item.name }}</p>
+                            <p class="text-sm font-medium text-space mb-5px leading-[170%] cursor-pointer"
+                              @click="goToCandidate(item.id)">{{ item.name }}</p>
                             <div class="flex gap-2.5"><span v-for="tag in item.tags" :key="tag"
                                   class="text-dodger text-13px font-normal">{{
                                     tag
