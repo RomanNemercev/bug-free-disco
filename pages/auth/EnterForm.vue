@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-  import { ref, nextTick, onMounted } from 'vue'
+  import { ref, nextTick } from 'vue'
   import { loginUser } from '~/utils/loginUser'
 
   const email = ref('')

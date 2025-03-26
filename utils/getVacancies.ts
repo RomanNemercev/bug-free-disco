@@ -10,12 +10,12 @@ export const getVacancies = async () => {
     }
 
     // Токен пользователя из cookie
-    // const userTokenCookie = useCookie('auth_user');
-    // const userToken = userTokenCookie.value;
-    // if (!userToken) {
-    //     console.error('Токен пользователя не найден в cookie');
-    //     return null;
-    // }
+    const userTokenCookie = useCookie('auth_user');
+    const userToken = userTokenCookie.value;
+    if (!userToken) {
+        console.error('Токен пользователя не найден в cookie');
+        return null;
+    }
 
     try {
         const response = await $fetch('/vacancies', {
@@ -24,7 +24,7 @@ export const getVacancies = async () => {
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${serverToken}`,
-                // 'X-Auth-User': userToken, // Новый заголовок
+                'X-Auth-User': userToken, // Новый заголовок
             },
         });
 
