@@ -161,12 +161,15 @@
   // onMounted(updateContainerHeight, fetchVacancies);
   onMounted(async () => {
     updateContainerHeight()
+    loading.value = true
     const result = await getVacancies()
     if (result) {
       vacancies.value = result
+      loading.value = false
       console.log('Вакансии успешно загружены:', vacancies.value)
     } else {
       console.log('Cannot fetch vacancies')
+      isFetched.value = true
     }
   })
 

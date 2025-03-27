@@ -178,14 +178,7 @@
       salary_from: salary.value.from,
       salary_to: salary.value.to,
       currency: currencyType.value,
-      place:
-        !vacancyStore.isEditing && !vacancyStore.editingVacancyId
-          ? workSpace.value
-          : undefined,
-      places:
-        vacancyStore.isEditing || vacancyStore.editingVacancyId
-          ? workSpace.value
-          : undefined,
+      place: workSpace.value,
       location: location.value,
       customer_id: 10,
       customer_phone: phone.value,
@@ -302,11 +295,11 @@
       )
       salary.value = { from: vacancy.salary_from, to: vacancy.salary_to }
       currencyType.value = vacancy.currency
-      workSpace.value = String(vacancy.places)
+      workSpace.value = String(vacancy.place)
       location.value = vacancy.location
       phone.value = vacancy.customer_phone
       email.value = vacancy.customer_email
-      console.log('place:', vacancy.places)
+      console.log('place:', vacancy.place)
     } catch (error) {
       console.error('Ошибка загрузки вакансии:', error.data || error.message)
     }
@@ -343,22 +336,10 @@
       createVacancyHandler()
     }
   }
-
-  const checkData = () => {
-    console.log('Ручная проверка данных:')
-    console.log('email:', email.value)
-    console.log(formattedJobDescription)
-  }
 </script>
 
 <template>
   <div class="container pb-10">
-    <button
-      class="sticky top-40 left-[100%] bg-black text-white p-4 rounded-md z-10"
-      @click="checkData()"
-    >
-      Проверка данных
-    </button>
     <div class="flex gap-x-[24px] pt-48">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
         <p class="text-space text-xl font-semibold mb-8">Основная информация</p>
@@ -378,7 +359,6 @@
             <p class="text-xs text-bali">
               Осталось 80 символов. Специальных символов нет.
             </p>
-            <div>{{ newVacancy }}</div>
           </div>
           <div class="w-full">
             <div class="flex">
@@ -400,7 +380,6 @@
                 type="number"
                 v-model="newCode"
               />
-              <div>{{ newCode }}</div>
             </div>
           </div>
         </div>
@@ -492,7 +471,6 @@
               v-model="selectEmployment"
               :initialValue="selectEmployment"
             />
-            <div>{{ selectEmployment }}</div>
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
@@ -554,7 +532,6 @@
               />
             </div>
           </MyAccordion>
-          <div>{{ selectedOptions }}</div>
         </div>
       </div>
       <div
@@ -661,7 +638,6 @@
               @leave="clearHover"
             />
           </RadioGroup>
-          <div>{{ workSpace }}</div>
         </div>
         <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
         <geo-input class="mb-2.5" v-model="location" />
@@ -698,7 +674,6 @@
               Номер телефона
             </p>
             <phone-input v-model="phone" class="mb-25px" />
-            <div>{{ phone }}</div>
             <MyCheckbox
               id="show-contacts"
               label="Отображать контакты в вакансии"
@@ -710,7 +685,6 @@
               Email
             </p>
             <email-input v-model="email" />
-            <div>{{ email }}</div>
           </div>
         </div>
       </div>
