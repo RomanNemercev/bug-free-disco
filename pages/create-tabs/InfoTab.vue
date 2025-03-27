@@ -11,7 +11,6 @@
   import { Label } from '@/components/ui/label'
   import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
   import { parseHtmlToJson } from '~/utils/htmlParser'
-  import { useNuxtApp } from '#app'
   import CardOption from '@/components/custom/CardOption.vue'
   import GeoInput from '@/components/custom/GeoInput.vue'
   import ResponseInput from '@/components/custom/ResponseInput.vue'
@@ -77,10 +76,16 @@
   }
 
   onMounted(() => {
-    selectedCard.value = '1'
     workSpace.value = '1'
+    selectedCard.value = workSpace.value
     if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
-      loadVacancyData(vacancyStore.editingVacancyId)
+      loadVacancyData(vacancyStore.editingVacancyId).then(() => {
+        selectedCard.value = workSpace.value
+        console.log(
+          'Значение selectedCard после загрузки: ',
+          selectedCard.value
+        )
+      })
     }
   })
 
@@ -173,7 +178,14 @@
       salary_from: salary.value.from,
       salary_to: salary.value.to,
       currency: currencyType.value,
-      place: workSpace.value,
+      place:
+        !vacancyStore.isEditing && !vacancyStore.editingVacancyId
+          ? workSpace.value
+          : undefined,
+      places:
+        vacancyStore.isEditing || vacancyStore.editingVacancyId
+          ? workSpace.value
+          : undefined,
       location: location.value,
       customer_id: 10,
       customer_phone: phone.value,
@@ -230,7 +242,6 @@
       } else {
         parsedResponse = response
       }
-
       console.log('Тип распарсенного response:', typeof parsedResponse)
       console.log('Распарсенный response:', parsedResponse)
       console.log('Ключи response:', Object.keys(parsedResponse))
@@ -280,15 +291,22 @@
       tags.value = vacancy.phrases
         ? vacancy.phrases.split(' ').filter(Boolean)
         : []
-      selectedAdditional.value = vacancy.conditions
-      selectedCarId.value = vacancy.drivers
-      selectedOptions.value = vacancy.additions
+      selectedAdditional.value = vacancy.conditions.map(item =>
+        typeof item === 'object' ? item.id : item
+      )
+      selectedCarId.value = vacancy.drivers.map(item =>
+        typeof item === 'object' ? item.id : item
+      )
+      selectedOptions.value = vacancy.additions.map(item =>
+        typeof item === 'object' ? item.id : item
+      )
       salary.value = { from: vacancy.salary_from, to: vacancy.salary_to }
       currencyType.value = vacancy.currency
-      workSpace.value = vacancy.place
+      workSpace.value = String(vacancy.places)
       location.value = vacancy.location
       phone.value = vacancy.customer_phone
       email.value = vacancy.customer_email
+      console.log('place:', vacancy.places)
     } catch (error) {
       console.error('Ошибка загрузки вакансии:', error.data || error.message)
     }
@@ -472,7 +490,9 @@
               :defaultValue="'Тип занятости'"
               :options="options"
               v-model="selectEmployment"
+              :initialValue="selectEmployment"
             />
+            <div>{{ selectEmployment }}</div>
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
@@ -480,6 +500,7 @@
               :defaultValue="'График работы'"
               :options="ArraySchedule"
               v-model="selectedSchedule"
+              :initialValue="selectedSchedule"
             />
           </div>
         </div>
@@ -490,6 +511,7 @@
               :defaultValue="'Опыт работы'"
               :options="ArrayExperience"
               v-model="selectedExperience"
+              :initialValue="selectedExperience"
             />
           </div>
           <div class="w-full">
@@ -498,6 +520,7 @@
               :defaultValue="'Образование'"
               :options="ArrayEducation"
               v-model="selectedEducation"
+              :initialValue="selectedEducation"
             />
           </div>
         </div>
@@ -531,6 +554,7 @@
               />
             </div>
           </MyAccordion>
+          <div>{{ selectedOptions }}</div>
         </div>
       </div>
       <div
@@ -637,6 +661,7 @@
               @leave="clearHover"
             />
           </RadioGroup>
+          <div>{{ workSpace }}</div>
         </div>
         <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
         <geo-input class="mb-2.5" v-model="location" />
@@ -685,6 +710,7 @@
               Email
             </p>
             <email-input v-model="email" />
+            <div>{{ email }}</div>
           </div>
         </div>
       </div>
