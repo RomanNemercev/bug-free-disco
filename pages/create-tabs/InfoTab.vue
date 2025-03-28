@@ -284,15 +284,15 @@
       tags.value = vacancy.phrases
         ? vacancy.phrases.split(' ').filter(Boolean)
         : []
-      selectedAdditional.value = vacancy.conditions.map(item =>
-        typeof item === 'object' ? item.id : item
-      )
-      selectedCarId.value = vacancy.drivers.map(item =>
-        typeof item === 'object' ? item.id : item
-      )
-      selectedOptions.value = vacancy.additions.map(item =>
-        typeof item === 'object' ? item.id : item
-      )
+      // selectedAdditional.value = vacancy.conditions.map(item =>
+      //   typeof item === 'object' ? item.id : item
+      // )
+      // selectedCarId.value = vacancy.drivers.map(item =>
+      //   typeof item === 'object' ? item.id : item
+      // )
+      // selectedOptions.value = vacancy.additions.map(item =>
+      //   typeof item === 'object' ? item.id : item
+      // )
       salary.value = { from: vacancy.salary_from, to: vacancy.salary_to }
       currencyType.value = vacancy.currency
       workSpace.value = String(vacancy.place)

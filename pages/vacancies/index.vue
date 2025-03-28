@@ -56,7 +56,6 @@
   const containerHeight = ref(0) // отслеживаю высоту контейнера
   const containerRef = ref(null) // ссылка на контейнер
   const loading = ref(false)
-  const isFetched = ref(false)
 
   const totalPages = computed(() =>
     Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage))
@@ -169,7 +168,6 @@
       console.log('Вакансии успешно загружены:', vacancies.value)
     } else {
       console.log('Cannot fetch vacancies')
-      isFetched.value = true
     }
   })
 
@@ -405,7 +403,7 @@
             <p class="text-15px font-medium text-slate-custom">Загрузка...</p>
           </div>
           <div
-            v-else-if="isFetched && vacancies.length === 0"
+            v-else-if="vacancies.length === 0"
             class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center"
           >
             <p class="text-15px font-medium text-slate-custom">

@@ -1,5 +1,5 @@
 <template>
-  <div class="container pt-25px">
+  <div class="container py-25px">
     <div class="flex justify-between mb-25px">
       <NuxtLink to="/candidates" class="text-blue-500 hover:underline">
         ← Вернуться к списку
@@ -7,8 +7,8 @@
       <div>кнопки для навигации</div>
     </div>
     <div class="w-full">
-      <div class="bg-white rounded-fifteen p-25px relative mb-15px">
-        <div class="justify-between flex mb-10">
+      <div class="bg-white rounded-fifteen p-25px relative mb-15px pt-15px">
+        <div class="justify-between flex mb-[41px]">
           <ButtonSelector :options="options" v-model="selectedLabel" />
           <div class="flex gap-x-2.5">
             <BtnMessage />
@@ -21,11 +21,13 @@
             </div>
           </div>
         </div>
-        <div class="absolute w-full left-0 h-[1px] bg-athens-gray top-20"></div>
+        <div
+          class="absolute w-full left-0 h-[1px] bg-athens-gray top-[70px]"
+        ></div>
         <div class="flex justify-between">
           <div>
             <p class="text-25px font-bold text-space leading-normal mb-2">
-              {{ candidate.name }}
+              {{ candidate.surname }} {{ candidate.firstName }}
             </p>
             <p class="text-15px font-medium text-space leading-normal mb-6px">
               {{ candidate.vacancy }}
@@ -124,9 +126,124 @@
         <div class="bg-catskill rounded-t-fifteen py-15px px-25px mb-px">
           <BtnTab :tabs="tabs" v-model="activeTab" />
         </div>
-        <div class="bg-white rounded-b-fifteen px-2.5 py-25px">
-          <div v-if="activeTab === 'resume'">Резюме</div>
-          <div v-if="activeTab === 'fields'">Поля</div>
+        <div>
+          <div v-if="activeTab === 'resume'">
+            <div class="mb-px bg-white p-25px pt-[27px]">
+              <p class="text-15px text-space font-medium mb-15px">
+                Краткие сведения
+              </p>
+              <p class="text-sm text-slate-custom leading-150">
+                {{ candidate.quickInfo }}
+              </p>
+            </div>
+            <div class="mb-px bg-white p-25px">
+              <p class="text-15px text-space font-medium mb-4">Образование</p>
+              <p class="text-sm text-slate-custom">{{ candidate.education }}</p>
+            </div>
+            <div class="mb-px bg-white p-25px">
+              <p class="text-15px text-space font-medium mb-3.5">Навыки</p>
+              <div>
+                <div v-if="candidate.skills.length === 0">
+                  <p class="text-sm font-normal text-slate-custom">
+                    Кандидат не указал навыки
+                  </p>
+                </div>
+                <div v-else class="gap-5px flex flex-wrap">
+                  <span
+                    v-for="(skill, index) in candidate.skills"
+                    :key="index"
+                    class="text-13px font-normal text-space px-[10.56px] py-5px rounded-plus bg-athens-gray max-h-[27px] whitespace-nowrap"
+                  >
+                    {{ skill }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white mb-px p-25px pt-27px pb-[23px]">
+              <p class="text-15px text-space font-medium mb-15px">
+                Прикрепленные файлы
+              </p>
+              <div v-if="candidate.attachedFiles.length === 0">
+                <p class="text-sm font-normal text-slate-custom">
+                  Кандидат не прикрепил файлы
+                </p>
+              </div>
+              <div v-else class="flex gap-25px">
+                <div
+                  v-for="file in candidate.attachedFiles"
+                  :key="file.name"
+                  class="max-w-[100px]"
+                >
+                  <a :href="file.path" target="_blank">
+                    <span
+                      class="bg-zumthor w-[100px] h-[100px] flex items-center justify-center text-sm font-medium text-dodger rounded-tl-fifteen rounded-tr-[35px] rounded-b-fifteen uppercase mb-9px"
+                    >
+                      {{ file.type }}
+                    </span>
+                    <div class="flex">
+                      <span class="truncate text-sm text-dodger font-medium">
+                        {{ file.name }}
+                      </span>
+                      <span class="text-sm text-dodger font-medium">
+                        .{{ file.type }}
+                      </span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="bg-white rounded-b-fifteen p-25px">
+              <p class="text-15px text-space font-medium mb-4">Ссылки</p>
+              <div>
+                <div v-if="candidate.links.length === 0">
+                  <p class="text-sm font-normal text-slate-custom">
+                    Кандидат не поделился ссылками
+                  </p>
+                </div>
+                <div v-else>
+                  <div v-for="(link, index) in candidate.links" :key="index">
+                    <a
+                      :href="link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-dodger text-sm font-medium hover:underline"
+                    >
+                      {{ link }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="activeTab === 'fields'">
+            <div class="bg-white p-25px mb-px">
+              <div class="flex items-center">
+                <p class="text-lg text-space font-bold mr-2.5">Форма отклика</p>
+                <span
+                  class="rounded-fifteen text-xs font-normal px-2.5 py-[3.5px] bg-feta h-fit"
+                >
+                  Заполнено
+                </span>
+              </div>
+              <div class="flex gap-2.5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Фамилия Имя Отчество
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.surname }} {{ candidate.firstName }}
+                  {{ candidate.patronymic || '' }}
+                </p>
+              </div>
+              <div class="flex gap-2.5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Электронная почта
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.email }}
+                </p>
+              </div>
+            </div>
+          </div>
           <div v-if="activeTab === 'chat'">Общение</div>
           <div v-if="activeTab === 'review'">Рассмотрения</div>
         </div>

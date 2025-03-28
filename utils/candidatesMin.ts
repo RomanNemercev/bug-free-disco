@@ -1,8 +1,9 @@
 import { candidatesFull } from "./candidatesFull";
 
-export const candidatesMin = candidatesFull.map(({ id, name, tags, resume, vacancy, stage, icon, isPng, imagePath }) => ({
+export const candidatesMin = candidatesFull.map(({ id, surname, firstName, tags, resume, vacancy, stage, icon, isPng, imagePath }) => ({
     id,
-    name,
+    surname,
+    firstName,
     tags,
     resume,
     vacancy,
