@@ -7,27 +7,35 @@ interface ServerResponse {
 export const getServerToken = async () => {
     const config = useRuntimeConfig();
 
-    const { data } = await useFetch<ServerResponse>('/login-jwt', {
-        method: 'POST',
-        baseURL: config.public.apiBase,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: {
-            email: config.public.apiEmail,
-            password: config.public.apiPassword,
-        },
-    });
+    try {
+        const response = await $fetch<ServerResponse>('/login-jwt', {
+            method: 'POST',
+            baseURL: config.public.apiBase,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: {
+                email: config.public.apiEmail,
+                password: config.public.apiPassword,
+            },
+        });
 
-    // Логируем данные и ошибку
-    console.log('Данные server token:', data.value?.authorization?.token); // Добавляем опциональную цепочку
+        console.log('Данные server token:', response.authorization?.token);
 
-    if (data.value?.authorization?.token) {
-        const tokenCookie = useCookie('auth_token');
-        tokenCookie.value = data.value?.authorization?.token;
-        console.log('Token server is save in cookie', tokenCookie.value);
+        if (response.authorization?.token) {
+            const tokenCookie = useCookie('auth_token');
+            tokenCookie.value = response.authorization.token;
+            console.log('Token server is saved in cookie:', tokenCookie.value);
+            return tokenCookie.value;
+        } else {
+            console.warn('Токен не получен в ответе сервера');
+            return null;
+        }
+    } catch (err: any) {
+        console.error('Ошибка при получении server token:', err.message || err);
+        if (err.response?.status === 401) {
+            console.warn('401: Неверные учетные данные или доступ запрещён');
+        }
+        return null;
     }
-
-    // Возвращаем токен, если он есть
-    return data.value?.authorization?.token || null; // Исправляем доступ к токену
 };

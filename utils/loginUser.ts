@@ -1,40 +1,56 @@
 import { getServerToken } from './getServerToken';
 
-export const loginUser = async (email, password) => {
+interface LoginResponse {
+    user: {
+        auth_token: string;
+    }
+}
+
+export const loginUser = async (email: string, password: string) => {
     const serverToken = await getServerToken();
     if (!serverToken) {
         console.error('Token server not found');
-        return null;
+        return { data: null, error: 'Не удалось получить серверный токен' };
     }
 
     const config = useRuntimeConfig();
 
-    const { data, error } = await useFetch('/login', {
-        method: 'POST',
-        baseURL: config.public.apiBase,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${serverToken}`,
-        },
-        body: {
-            email,
-            password,
-        },
-    });
+    try {
+        console.log('Отправляемые данные для входа:', { email, password });
 
-    console.log('Server response:', data.value);
-    console.log('Server error:', error.value);
+        const response = await $fetch<LoginResponse>('/login', {
+            method: 'POST',
+            baseURL: config.public.apiBase,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${serverToken}`,
+            },
+            body: {
+                email,
+                password,
+            },
+        });
 
-    if (error.value) {
-        console.error('Login error:', error.value);
-        return null;
+        console.log('Server response:', response);
+
+        if (response?.user?.auth_token) {
+            const userTokenCookie = useCookie('auth_user');
+            userTokenCookie.value = response.user.auth_token;
+            console.log('User token is save in cookie', userTokenCookie.value);
+        } else {
+            console.warn('Токен не получен в ответе сервера');
+        }
+
+        return { data: response, error: null };
+    } catch (err: any) {
+        console.error('Ошибка при входе:', err.message || err);
+        let errorMessage = 'Произошла ошибка при входе';
+        if (err.response?.status === 401) {
+            errorMessage = 'Неверный email или пароль';
+        } else if (err.response?.data?.message) {
+            errorMessage = err.response.data.message;
+        }
+        console.error('Детали ошибки:', err.response?.data || err.response);
+        return { data: null, error: errorMessage };
     }
-
-    if (data.value?.user?.auth_token) {
-        const userTokenCookie = useCookie('auth_user');
-        userTokenCookie.value = data.value?.user?.auth_token;
-        console.log('User token is save in cookie', userTokenCookie.value);
-    }
-
-    return data.value;
-}
+};

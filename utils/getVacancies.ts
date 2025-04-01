@@ -30,8 +30,13 @@ export const getVacancies = async () => {
 
         console.log('Полный ответ сервера:', response);
         return response?.data?.data || null;
-    } catch (err) {
+    } catch (err: any) {
         console.error('Ошибка при запросе:', err);
+        if (err.response?.status === 401) {
+            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
+            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            // Middleware сработает автоматически при следующем роутинге
+        }
         return null;
     }
 };

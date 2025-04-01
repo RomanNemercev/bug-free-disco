@@ -1,7 +1,7 @@
 <template>
   <div class="body">
     <div class="reg-wrapper">
-      <div class="reg form" id="reg">
+      <div class="reg form" id="reg" v-if="currentStep !== 'fourth'">
         <div
           v-if="currentStep === 'first'"
           class="reg__first-step child-form"
@@ -290,6 +290,8 @@
                   type="radio"
                   class="reg__quiz-radio checkbox-hide"
                   name="source"
+                  value="Социальные сети"
+                  v-model="from"
                 />
                 <span class="reg__quiz-value f14w400 radio-visible">
                   Социальные сети
@@ -300,6 +302,8 @@
                   type="radio"
                   class="reg__quiz-radio checkbox-hide"
                   name="source"
+                  value="Поисковые системы (Яндекс, Google)"
+                  v-model="from"
                 />
                 <span class="reg__quiz-value f14w400 radio-visible">
                   Поисковые системы (Яндекс, Google)
@@ -310,6 +314,8 @@
                   type="radio"
                   class="reg__quiz-radio checkbox-hide"
                   name="source"
+                  value="Рекомендация"
+                  v-model="from"
                 />
                 <span class="reg__quiz-value f14w400 radio-visible">
                   Рекомендация
@@ -320,6 +326,8 @@
                   type="radio"
                   class="reg__quiz-radio checkbox-hide"
                   name="source"
+                  value="Рекламная кампания (звонок, смс)"
+                  v-model="from"
                 />
                 <span class="reg__quiz-value f14w400 radio-visible">
                   Рекламная кампания (звонок, смс)
@@ -329,11 +337,14 @@
             <div class="reg__third-btns">
               <button
                 class="btn-reset btn reg__btn-send f14w600 c-white"
-                @click="finishReg"
+                @click="finishReg(false)"
               >
                 Принять ответ
               </button>
-              <button class="btn-reset reg__btn-skip f14w400 c-dodger">
+              <button
+                class="btn-reset reg__btn-skip f14w400 c-dodger"
+                @click="finishReg(true)"
+              >
                 Пропустить
               </button>
             </div>
@@ -351,7 +362,7 @@
           ></div>
         </div>
       </div>
-      <div class="video-block">
+      <div class="video-block" v-if="currentStep !== 'fourth'">
         <video-player
           src="/assets/demo1.mp4"
           poster="/assets/cover2.png"
@@ -362,12 +373,37 @@
           style="height: 100%"
         />
       </div>
+      <div
+        v-if="currentStep === 'fourth'"
+        class="reg__fourth-step absolute bg-white rounded-fifteen p-50px text-center"
+      >
+        <p class="text-lg font-semibold text-gray-800 mb-4">
+          Регистрация завершена успешно!
+          <br />
+          Используйте введенные данные для входа.
+        </p>
+        <p class="text-sm text-gray-600 mb-4">
+          Пожалуйста, проверьте ваш электронный почтовый ящик для подтверждения
+          регистрации.
+        </p>
+        <p class="text-sm text-gray-600 mb-6">
+          Перенаправление на страницу авторизации через
+          <span class="font-medium text-blue-600">{{ finishTime }} сек.</span>
+        </p>
+        <button
+          @click="goToAuth"
+          class="w-full bg-dodger text-white py-2 px-4 rounded-lg hover:bg-dodger/80 transition-colors duration-200"
+        >
+          Перейти сейчас
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch, onUnmounted } from 'vue'
+  import { navigateTo } from '#app'
   import { VideoPlayer } from '@videojs-player/vue'
   import 'video.js/dist/video-js.css'
   import { registerUser } from '~/utils/registerUser'
@@ -384,10 +420,20 @@
   const repeatPassword = ref('')
   const passwordError = ref(null)
   const repeatPasswordError = ref(null)
+  const from = ref(null)
+  const isSubmitting = ref(false)
+  const finishTime = ref(10)
+  let timer = null
 
   const changeStep = step => {
     currentStep.value = step
   }
+
+  const props = defineProps({
+    currentForm: String,
+  })
+
+  const emit = defineEmits(['changeForm'])
 
   // Переход к следующему шагу
   function nextStep() {
@@ -572,8 +618,68 @@
     return ''
   })
 
-  const finishReg = async () => {
+  const startTimer = () => {
+    timer = setInterval(() => {
+      if (finishTime.value > 0) {
+        finishTime.value -= 1
+      } else {
+        clearInterval(timer)
+        goToAuth()
+      }
+    }, 1000)
+  }
+
+  const goToAuth = () => {
+    if (timer) {
+      clearInterval(timer)
+    }
+    emit('changeForm', 'enter')
+    currentStep.value = 'first'
+    email.value = ''
+    name.value = ''
+    phone_formatted.value = ''
+    password.value = ''
+    repeatPassword.value = ''
+    web.value = ''
+    from.value = null
+  }
+
+  watch(currentStep, newStep => {
+    if (newStep === 'fourth') {
+      finishTime.value = 10
+      startTimer()
+    }
+  })
+
+  onUnmounted(() => {
+    if (timer) {
+      clearInterval(timer)
+    }
+  })
+
+  const finishReg = async (skip = false) => {
+    if (isSubmitting.value) {
+      console.log('Запрос уже выполняется, пропускаем повторный вызов.')
+      return
+    }
+
+    isSubmitting.value = true
+
     try {
+      if (
+        !email.value ||
+        !name.value ||
+        !phone_formatted.value ||
+        !password.value ||
+        !repeatPassword.value
+      ) {
+        throw new Error('Пожалуйста, заполните все поля.')
+      }
+
+      if (password.value !== repeatPassword.value) {
+        throw new Error('Пароли не совпадают.')
+      }
+
       const userData = {
         login: email.value,
         name: name.value,
@@ -582,14 +688,23 @@
         password: password.value,
         password_confirmation: repeatPassword.value,
         site: web.value || null,
+        from: skip ? null : from.value,
       }
 
+      console.log('Данные для регистрации:', userData)
+
       const result = await registerUser(userData)
+      if (!result) {
+        throw new Error('Произошла ошибка при регистрации.')
+      }
       console.log('Регистрация прошла успешно: ', result)
-      alert('Регистрация прошла успешно!')
+      console.log('Данные отправлены на сервер: ', userData)
+      currentStep.value = 'fourth'
     } catch (error) {
-      console.error('Ошибка регистрации: ', error)
+      console.error('Ошибка регистрации: ', error.message || error)
       alert('Ошибка при регистрации. Проверьте данные.')
+    } finally {
+      isSubmitting.value = false
     }
   }
 </script>
@@ -983,5 +1098,12 @@
   .checkbox-hide:checked + .radio-visible::after {
     opacity: 1;
     visibility: visible;
+  }
+
+  .reg__fourth-step {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 </style>

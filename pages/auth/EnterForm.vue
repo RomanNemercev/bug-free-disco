@@ -75,6 +75,7 @@
 <script setup>
   import { ref, nextTick } from 'vue'
   import { loginUser } from '~/utils/loginUser'
+  import { navigateTo } from '#app'
 
   const email = ref('')
   const password = ref('')
@@ -130,8 +131,18 @@
 
     if (!isValid) return
 
-    const result = await loginUser(email.value, password.value)
-    console.log('result login: ', result)
+    const { data, error } = await loginUser(email.value, password.value)
+    console.log('result login:', { data, error })
+
+    if (error) {
+      authError.value = error
+      return
+    }
+
+    if (data) {
+      // Успешная авторизация, перенаправляем на главную страницу
+      await navigateTo('/')
+    }
   }
 </script>
 
