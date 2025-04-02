@@ -114,10 +114,11 @@
               </div>
             </div>
           </div>
-          <div class="rounded-fifteen w-[200px] h-[200px]">
+          <div class="w-[200px] h-[200px]">
             <img
-              src="@/assets/img/candidates-photo.png"
+              :src="candidate.photo"
               alt="photo of candidate"
+              class="rounded-fifteen h-full w-full object-cover"
             />
           </div>
         </div>
@@ -216,16 +217,18 @@
             </div>
           </div>
           <div v-if="activeTab === 'fields'">
-            <div class="bg-white p-25px mb-px">
-              <div class="flex items-center">
-                <p class="text-lg text-space font-bold mr-2.5">Форма отклика</p>
+            <div class="bg-white p-25px mb-px pl-30px">
+              <div class="flex items-center mb-22px">
+                <p class="text-lg text-space font-bold mr-2.5 leading-normal">
+                  Форма отклика
+                </p>
                 <span
                   class="rounded-fifteen text-xs font-normal px-2.5 py-[3.5px] bg-feta h-fit"
                 >
                   Заполнено
                 </span>
               </div>
-              <div class="flex gap-2.5">
+              <div class="flex gap-2.5 mb-5">
                 <p class="text-sm font-normal text-space min-w-[250px]">
                   Фамилия Имя Отчество
                 </p>
@@ -234,13 +237,168 @@
                   {{ candidate.patronymic || '' }}
                 </p>
               </div>
-              <div class="flex gap-2.5">
+              <div class="flex gap-2.5 mb-5">
                 <p class="text-sm font-normal text-space min-w-[250px]">
                   Электронная почта
                 </p>
                 <p class="text-sm font-normal text-space leading-150">
                   {{ candidate.email }}
                 </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Телефон
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.phone }}
+                </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Заголовок
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.header }}
+                </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Адрес проживания
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.locationFull }}
+                </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Образование
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.educationLevel }}
+                </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Опыт работы
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.experience }}
+                </p>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">Фото</p>
+                <a
+                  :href="candidate.photo"
+                  target="_blank"
+                  class="text-dodger text-sm font-normal"
+                >
+                  {{ candidate.photo?.split('/').pop() ?? 'Фото не загружено' }}
+                </a>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Загрузка резюме
+                </p>
+                <a
+                  :href="candidate.resumeDownload"
+                  target="_blank"
+                  class="text-dodger text-sm font-normal"
+                >
+                  {{
+                    candidate.resumeDownload?.split('/').pop() ??
+                    'Резюме не загружено'
+                  }}
+                </a>
+              </div>
+              <div class="flex gap-2.5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Сопроводительное письмо
+                </p>
+                <a
+                  :href="candidate.coverLetter"
+                  target="_blank"
+                  class="text-dodger text-sm font-normal"
+                >
+                  {{
+                    candidate.coverLetter?.split('/').pop() ??
+                    'Файл не загружен'
+                  }}
+                </a>
+              </div>
+            </div>
+            <div class="bg-white p-25px mb-px pl-30px">
+              <div class="flex items-center mb-22px">
+                <p class="text-lg text-space font-bold mr-2.5 leading-normal">
+                  Анкета
+                </p>
+                <span
+                  class="rounded-fifteen text-xs font-normal px-2.5 py-[3.5px] bg-serenade h-fit"
+                >
+                  Отправлено, ожидает заполнения
+                </span>
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Фамилия Имя Отчество
+                </p>
+                <MyInputSecond v-model="newName" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Электронная почта
+                </p>
+                <MyInputSecond v-model="newEmail" type="email" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Телефон
+                </p>
+                <PhoneInputSecond v-model="newPhone" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Заголовок
+                </p>
+                <MyInputSecond v-model="newHeader" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Адрес проживания
+                </p>
+                <MyInputSecond v-model="newLocation" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Образование
+                </p>
+                <MyInputSecond v-model="newEducation" />
+              </div>
+              <div class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Опыт работы
+                </p>
+                <MyInputSecond v-model="newExperience" />
+              </div>
+              <div>
+                <FileUpload
+                  label="Фото"
+                  inputId="photo"
+                  @update:file="uploadPhoto = $event"
+                />
+              </div>
+              <div>
+                <FileUpload
+                  label="Загрузка резюме"
+                  inputId="resume"
+                  @update:file="uploadResume = $event"
+                />
+              </div>
+              <div>
+                <FileUpload
+                  label="Сопроводительное письмо"
+                  inputId="letter"
+                  @update:file="uploadLetter = $event"
+                />
               </div>
             </div>
           </div>
@@ -263,6 +421,9 @@
   import DotsDropdown from '~/components/custom/DotsDropdown.vue'
   import MyTooltip from '~/components/custom/MyTooltip.vue'
   import BtnTab from '~/components/custom/BtnTab.vue'
+  import MyInputSecond from '~/components/custom/MyInputSecond.vue'
+  import PhoneInputSecond from '~/components/custom/PhoneInputSecond.vue'
+  import FileUpload from '~/components/custom/FileUpload.vue'
 
   const route = useRoute()
 
@@ -279,7 +440,7 @@
     'Служба безопасности',
   ]
 
-  const activeTab = ref('resume') // Начальный таб
+  const activeTab = ref('fields') // Начальный таб
   const tabs = [
     { label: 'Резюме', value: 'resume' },
     { label: 'Поля', value: 'fields' },
@@ -289,4 +450,15 @@
   const dropdownOptions = ['Опция 1', 'Опция 2', 'Опция 3']
 
   const selectedLabel = ref('Подумать')
+
+  const newName = ref('')
+  const newEmail = ref('')
+  const newPhone = ref('')
+  const newHeader = ref('')
+  const newLocation = ref('')
+  const newEducation = ref('')
+  const newExperience = ref('')
+  const uploadPhoto = ref(null)
+  const uploadResume = ref(null)
+  const uploadLetter = ref(null)
 </script>

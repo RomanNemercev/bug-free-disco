@@ -47,6 +47,8 @@ export const loginUser = async (email: string, password: string) => {
         let errorMessage = 'Произошла ошибка при входе';
         if (err.response?.status === 401) {
             errorMessage = 'Неверный email или пароль';
+        } else if (err.response?.status === 404) {
+            errorMessage = 'Пользователь не найден';
         } else if (err.response?.data?.message) {
             errorMessage = err.response.data.message;
         }
