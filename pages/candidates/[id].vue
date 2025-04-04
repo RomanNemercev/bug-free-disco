@@ -490,8 +490,6 @@
   import PhoneInputSecond from '~/components/custom/PhoneInputSecond.vue'
   import FileUpload from '~/components/custom/FileUpload.vue'
   import MinDropdownSecond from '~/components/custom/MinDropdownSecond.vue'
-  import ChatDivider from '~/components/custom/ChatDivider.vue'
-  import BtnIconText from '~/components/custom/BtnIconText.vue'
   import Timeline from '@/components/timeline/index.vue'
 
   const route = useRoute()
@@ -558,26 +556,6 @@
   const newCustomSecond = ref('')
   const newCustomThird = ref('')
 
-  const handleSendEmail = () => {
-    // Implementation of handleSendEmail
-    console.log('handleSendEmail')
-  }
-
-  const handleReplyInChat = () => {
-    // Implementation of handleReplyInChat
-    console.log('handleReplyInChat')
-  }
-
-  const handleReplyInTelegram = () => {
-    // Implementation of handleReplyInTelegram
-    console.log('handleReplyInTelegram')
-  }
-
-  const handleReplyInThread = () => {
-    // Implementation of handleReplyInThread
-    console.log('handleReplyInThread')
-  }
-
   const timelineGroups = ref([
     {
       date: '13/12/2025',
@@ -628,6 +606,52 @@
           author: 'Анатолий Семенов',
           content:
             'Кандидат утверждает что у него есть знакомые которые работали в компании и отзываются не очень хорошо, но самому ему все нравится. Ему нужно время подумать.',
+        },
+        {
+          id: 6,
+          type: 'email',
+          emails: [
+            {
+              time: '18.01.2024 15:04',
+              direction: 'входящее',
+              from: 'Анатолий Семенов',
+              to: 'Марго Роби',
+              subject: 'Реквизиты компании',
+              content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+            },
+            {
+              time: '18.01.2024 15:04',
+              direction: 'входящее',
+              from: 'Марго Роби',
+              to: 'Анатолий Семенов',
+              status: 'Доставлено',
+              subject: 'Реквизиты компании',
+              content: `Благодарю за обращение. Вот реквизиты нашей компании: Название организации: [Название] ИНН: [Ваш ИНН] КПП: [Ваш КПП] Расчётный счёт: [Ваш счёт] Банк: [Название банка] БИК: [Ваш БИК] Корреспондентский счёт: [Ваш корр. счёт] Если потребуется дополнительная информация, пожалуйста, дайте знать. С уважением, [Имя клиента] [Должность, если есть] [Контактные данные] [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+            },
+          ],
+        },
+        {
+          id: 7,
+          type: 'email',
+          emails: [
+            {
+              time: '18.01.2024 15:04',
+              direction: 'входящее',
+              from: 'Марго Роби',
+              to: 'Анатолий Семенов',
+              subject: 'Реквизиты компании',
+              content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+            },
+          ],
+        },
+        {
+          id: 8,
+          type: 'hh_chat',
+          time: '18.01.2024 15:04',
+          author: 'Марго Роби',
+          company: 'ООО КОМПАНИЯ',
+          content: 'Здравствуйте! Посмотрите пожалуйста мой отклик',
+          initials: 'МР',
         },
       ],
     },

@@ -4,9 +4,15 @@
       class="shrink-0 w-50px h-50px rounded-full flex items-center justify-center mr-15px"
       :class="iconBackground"
     >
-      <svg-icon :name="iconName" :width="26" :height="26" :class="iconColor" />
+      <svg-icon
+        v-if="iconName"
+        :name="iconName"
+        :width="26"
+        :height="26"
+        :class="iconColor"
+      />
     </div>
-    <div class="flex-1">
+    <div class="flex-1 min-w-0">
       <slot name="content"></slot>
     </div>
   </div>
@@ -16,7 +22,7 @@
   defineProps({
     iconName: {
       type: String,
-      required: true,
+      required: false,
     },
     iconBackground: {
       type: String,

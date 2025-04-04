@@ -13,12 +13,55 @@
         </p>
 
         <!-- Пропущенные звонки -->
-        <TimelineCall v-else-if="event.type === 'call'" :calls="event.calls" />
+        <TimelineCall
+          v-else-if="event.type === 'call'"
+          :calls="event.calls"
+          @complete="handleComplete"
+        />
 
         <!-- Заметки -->
         <TimelineNote v-else-if="event.type === 'note'" :note="event" />
 
-        <!-- TODO: Добавить остальные типы событий -->
+        <!-- Задачи -->
+        <TimelineTask
+          v-else-if="event.type === 'task'"
+          :task="event"
+          @complete="handleComplete"
+        />
+
+        <!-- Email -->
+        <TimelineEmail
+          v-else-if="event.type === 'email'"
+          :emails="event.emails"
+          @send="handleSendEmail"
+        />
+
+        <!-- HH.ru чат -->
+        <TimelineChat
+          v-else-if="event.type === 'hh_chat'"
+          :message="event"
+          @reply="handleReplyInChat"
+        />
+
+        <!-- Telegram -->
+        <TimelineTelegram
+          v-else-if="event.type === 'telegram'"
+          :message="event"
+          @reply="handleReplyInTelegram"
+        />
+
+        <!-- WhatsApp -->
+        <TimelineWhatsApp
+          v-else-if="event.type === 'whatsapp'"
+          :message="event"
+        />
+
+        <!-- Комментарии -->
+        <TimelineComment
+          v-else-if="event.type === 'comment'"
+          :comment="event"
+          @reply="handleReplyInThread"
+        />
       </template>
     </template>
   </div>
@@ -28,12 +71,40 @@
   import ChatDivider from '@/components/custom/ChatDivider.vue'
   import TimelineCall from './items/TimelineCall.vue'
   import TimelineNote from './items/TimelineNote.vue'
+  import TimelineTask from './items/TimelineTask.vue'
+  import TimelineEmail from './items/TimelineEmail.vue'
+  import TimelineChat from './items/TimelineChat.vue'
+  import TimelineTelegram from './items/TimelineTelegram.vue'
+  import TimelineWhatsApp from './items/TimelineWhatsApp.vue'
+  import TimelineComment from './items/TimelineComment.vue'
 
-  defineProps({
+  const props = defineProps({
     timelineGroups: {
       type: Array,
       required: true,
       default: () => [],
     },
   })
+
+  const emit = defineEmits(['complete', 'send', 'reply'])
+
+  const handleComplete = task => {
+    emit('complete', task)
+  }
+
+  const handleSendEmail = emails => {
+    emit('send', emails)
+  }
+
+  const handleReplyInChat = message => {
+    emit('reply', { type: 'chat', message })
+  }
+
+  const handleReplyInTelegram = message => {
+    emit('reply', { type: 'telegram', message })
+  }
+
+  const handleReplyInThread = comment => {
+    emit('reply', { type: 'thread', comment })
+  }
 </script>
