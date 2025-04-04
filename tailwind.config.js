@@ -131,6 +131,7 @@ module.exports = {
         '30px': '30px',
         '35px': '35px',
         '50px': '50px',
+        '70px': '70px',
         '75px': '75px',
         128: '32rem',
         '275px': '275px',
@@ -159,6 +160,7 @@ module.exports = {
       },
       lineHeight: {
         normal: 'normal',
+        125: '125%',
         130: '130%',
         150: '150%',
       },

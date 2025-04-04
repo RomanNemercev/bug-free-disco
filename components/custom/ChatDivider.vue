@@ -1,8 +1,8 @@
 <template>
-  <div class="relative flex items-center my-4">
+  <div class="relative flex items-center my-3.5">
     <div class="flex-grow border-t border-athens"></div>
     <span
-      class="mx-5px px-3 py-1 bg-transparent text-slate-custom text-xs rounded-fifteen border-2 border-athens font-normal"
+      class="mx-5px px-3 py-1 bg-transparent text-slate-custom text-xs rounded-fifteen border-2 border-athens font-normal leading-normal"
     >
       {{ text }}
     </span>

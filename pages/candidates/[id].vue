@@ -450,207 +450,21 @@
           </div>
           <div v-if="activeTab === 'chat'">
             <div>
-              <div class="bg-athens-gray p-25px">
-                <ChatDivider text="13/12/2025" />
-                <p class="text-13px font-normal text-slate-custom px-20">
-                  <span>18.01.2024 15:04</span>
-                  создан кандидат Анатольев Дмитрий Корсаров
-                </p>
-                <p class="text-13px font-normal text-slate-custom px-20">
-                  <span>18.01.2024 15:04</span>
-                  кандидат Анатольев Дмитрий Корсаров откликнулся на вакансию
-                  Консультант продавцов
-                </p>
-                <p class="text-13px font-normal text-slate-custom px-20">
-                  <span>18.01.2024 15:04</span>
-                  Перемещение на этап Подумать пользователем Анатолий Семенов
-                </p>
-                <ChatDivider text="Сегодня" />
-                <div
-                  class="w-full p-15px bg-white rounded-fifteen flex mb-15px"
-                >
-                  <div
-                    class="shrink-0 w-50px h-50px rounded-full bg-pink flex items-center justify-center mr-15px"
-                  >
-                    <svg-icon name="missed-call" width="26" height="26" />
-                  </div>
-                  <div>
-                    <p class="text-13px font-normal text-slate-custom">
-                      <span>18.01.2024 15:04</span>
-                      от кандидата Марго Роби
-                    </p>
-                    <p class="text-space text-sm font-normal">
-                      Пропущенный вызов
-                    </p>
-                    <p class="text-13px font-normal text-slate-custom">
-                      <span>18.01.2024 15:04</span>
-                      от кандидата Марго Роби
-                    </p>
-                    <p class="text-space text-sm font-normal">
-                      Пропущенный вызов
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="w-full p-15px bg-white rounded-fifteen flex mb-15px"
-                >
-                  <div
-                    class="shrink-0 w-50px h-50px rounded-full bg-athens-gray flex items-center justify-center mr-15px"
-                  >
-                    <svg-icon name="document" width="26" height="26" />
-                  </div>
-                  <div>
-                    <p class="text-13px font-normal text-slate-custom">
-                      <span>18.01.2024 15:04</span>
-                      Анатолий Семенов оставил заметку
-                    </p>
-                    <p class="text-space text-sm font-normal">
-                      Кандидат утверждает что у него есть знакомые которые
-                      работали в компании и отзываются не очень хорошо, но
-                      самому ему все нравится. Ему нужно время подумать.
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="w-full p-15px bg-white rounded-fifteen flex mb-15px"
-                >
-                  <div
-                    class="shrink-0 w-50px h-50px rounded-full bg-zumthor flex items-center justify-center mr-15px text-dodger"
-                  >
-                    <svg-icon name="calendar" width="26" height="26" />
-                  </div>
-                  <div>
-                    <p class="text-13px font-normal text-slate-custom">
-                      <span>18.01.2024 15:04</span>
-                      для пользователя Анатолий Семенов
-                    </p>
-                    <div class="flex">
-                      <p class="text-sm font-normal text-space min-w-40">
-                        Название задачи
-                      </p>
-                      <p class="text-sm font-normal text-dodger">
-                        Интервью с кандидатом
-                      </p>
-                    </div>
-                    <div class="flex">
-                      <p class="text-sm font-normal text-space min-w-40">
-                        Запланировано:
-                      </p>
-                      <p class="text-sm font-normal text-dodger">
-                        13/02/2024 в 13:30
-                      </p>
-                    </div>
-                    <button class="text-sm text-dodger font-medium">
-                      Выполнить
-                    </button>
-                  </div>
-                </div>
-                <div
-                  class="w-full p-15px bg-white rounded-fifteen flex mb-15px"
-                >
-                  <div
-                    class="shrink-0 w-50px h-50px rounded-full bg-chilean flex items-center justify-center mr-15px text-dodger"
-                  >
-                    <svg-icon name="mail" width="26" height="26" />
-                  </div>
-                  <div class="truncate">
-                    <div class="mb-15px">
-                      <p class="text-13px font-normal text-slate-custom">
-                        <span>18.01.2024 15:04</span>
-                        входящее письмо от Марго Роби для Анатолий Семенов
-                      </p>
-                      <div>
-                        <p class="underline text-sm font-medium text-space">
-                          Реквизиты компании
-                        </p>
-                        <p class="text-sm font-normal text-space truncate">
-                          Здравствуйте, [Имя клиента]! Для завершения оформления
-                          документов нам необходимо уточнить ваши реквизиты.
-                          Пожалуйста, отправьте следующую информацию:
-                          [Запрашиваемые данные, например: название организации,
-                          ИНН, расчётный счёт и т.д.] Если у вас возникнут
-                          вопросы, буду рад помочь! Спасибо за оперативность. С
-                          уважением, [Ваше имя] [Ваша должность] [Контактные
-                          данные]
-                        </p>
-                      </div>
-                    </div>
-                    <div class="relative">
-                      <p class="text-13px font-normal text-slate-custom">
-                        <span>18.01.2024 15:04</span>
-                        входящее письмо от Марго Роби для Анатолий Семенов
-                      </p>
-                      <div
-                        class="flex absolute right-0 top-0 items-center gap-x-5px"
-                      >
-                        <svg-icon name="sended" width="15" height="15" />
-                        <p class="text-13px font-normal text-slate-custom">
-                          Доставлено
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <p class="underline text-sm font-medium text-space">
-                        Реквизиты компании
-                      </p>
-                      <p class="text-sm font-normal text-space truncate">
-                        Благодарю за обращение. Вот реквизиты нашей компании:
-                        Название организации: [Название] ИНН: [Ваш ИНН] КПП:
-                        [Ваш КПП] Расчётный счёт: [Ваш счёт] Банк: [Название
-                        банка] БИК: [Ваш БИК] Корреспондентский счёт: [Ваш корр.
-                        счёт] Если потребуется дополнительная информация,
-                        пожалуйста, дайте знать. С уважением, [Имя клиента]
-                        [Должность, если есть] [Контактные данные]
-                        [Запрашиваемые данные, например: название организации,
-                        ИНН, расчётный счёт и т.д.] Если у вас возникнут
-                        вопросы, буду рад помочь! Спасибо за оперативность. С
-                        уважением, [Ваше имя] [Ваша должность] [Контактные
-                        данные]
-                      </p>
-                    </div>
-                    <button
-                      class="flex items-center text-sm text-dodger gap-x-5px"
-                    >
-                      <span>
-                        <svg-icon name="resend" width="18" height="18" />
-                      </span>
-                      Отправить письмо
-                    </button>
-                  </div>
-                </div>
-                <div
-                  class="w-full p-15px bg-white rounded-fifteen flex mb-15px"
-                >
-                  <div
-                    class="shrink-0 w-50px h-50px rounded-full bg-chilean flex items-center justify-center mr-15px text-dodger"
-                  >
-                    <svg-icon name="mail" width="26" height="26" />
-                  </div>
-                  <div class="truncate">
-                    <p class="text-13px font-normal text-slate-custom">
-                      <span>18.01.2024 15:04</span>
-                      входящее письмо от Марго Роби для Анатолий Семенов
-                    </p>
-                    <div>
-                      <p class="underline text-sm font-medium text-space">
-                        Другая тема письма
-                      </p>
-                      <p class="text-sm font-normal text-space truncate">
-                        Здравствуйте, [Имя клиента]! Для завершения оформления
-                        документов нам необходимо уточнить ваши реквизиты.
-                        Пожалуйста, отправьте следующую информацию:
-                      </p>
-                    </div>
-                    <button
-                      class="flex items-center text-sm text-dodger gap-x-5px"
-                    >
-                      <span>
-                        <svg-icon name="resend" width="18" height="18" />
-                      </span>
-                      Отправить письмо
-                    </button>
-                  </div>
-                </div>
+              <Timeline :timeline-groups="timelineGroups" />
+              <div
+                class="w-full p-15px pb-25px bg-white rounded-b-fifteen flex items-center"
+              >
+                <button class="text-sm text-dodger font-medium">Чат</button>
+                &nbsp;
+                <span class="text-sm text-space font-normal">для</span>
+                &nbsp;
+                <button class="text-sm text-dodger font-medium">
+                  {{ candidate.firstName }} {{ candidate.surname }}
+                </button>
+                &nbsp;
+                <span class="text-sm text-slate-custom font-normal">
+                  введите текст...
+                </span>
               </div>
             </div>
           </div>
@@ -677,6 +491,8 @@
   import FileUpload from '~/components/custom/FileUpload.vue'
   import MinDropdownSecond from '~/components/custom/MinDropdownSecond.vue'
   import ChatDivider from '~/components/custom/ChatDivider.vue'
+  import BtnIconText from '~/components/custom/BtnIconText.vue'
+  import Timeline from '@/components/timeline/index.vue'
 
   const route = useRoute()
 
@@ -741,4 +557,79 @@
   const newCustomFirst = ref('')
   const newCustomSecond = ref('')
   const newCustomThird = ref('')
+
+  const handleSendEmail = () => {
+    // Implementation of handleSendEmail
+    console.log('handleSendEmail')
+  }
+
+  const handleReplyInChat = () => {
+    // Implementation of handleReplyInChat
+    console.log('handleReplyInChat')
+  }
+
+  const handleReplyInTelegram = () => {
+    // Implementation of handleReplyInTelegram
+    console.log('handleReplyInTelegram')
+  }
+
+  const handleReplyInThread = () => {
+    // Implementation of handleReplyInThread
+    console.log('handleReplyInThread')
+  }
+
+  const timelineGroups = ref([
+    {
+      date: '13/12/2025',
+      events: [
+        {
+          id: 1,
+          type: 'system',
+          time: '18.01.2024 15:04',
+          content: 'создан кандидат Анатольев Дмитрий Корсаров',
+        },
+        {
+          id: 2,
+          type: 'system',
+          time: '18.01.2024 15:04',
+          content:
+            'кандидат Анатольев Дмитрий Корсаров откликнулся на вакансию Консультант продавцов',
+        },
+        {
+          id: 3,
+          type: 'system',
+          time: '18.01.2024 15:04',
+          content:
+            'Перемещение на этап Подумать пользователем Анатолий Семенов',
+        },
+      ],
+    },
+    {
+      date: 'Сегодня',
+      events: [
+        {
+          id: 4,
+          type: 'call',
+          calls: [
+            {
+              time: '18.01.2024 15:04',
+              candidateName: 'Марго Роби',
+            },
+            {
+              time: '18.01.2024 15:04',
+              candidateName: 'Марго Роби',
+            },
+          ],
+        },
+        {
+          id: 5,
+          type: 'note',
+          time: '18.01.2024 15:04',
+          author: 'Анатолий Семенов',
+          content:
+            'Кандидат утверждает что у него есть знакомые которые работали в компании и отзываются не очень хорошо, но самому ему все нравится. Ему нужно время подумать.',
+        },
+      ],
+    },
+  ])
 </script>
