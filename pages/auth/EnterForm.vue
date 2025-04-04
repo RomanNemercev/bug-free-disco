@@ -46,7 +46,7 @@
     <button class="btn-reset btn enter__btn-in f14w600 c-white" @click="login">
       Войти
     </button>
-    <p v-if="authError" class="text-center text-red mt-[-15px] text-sm">
+    <p v-if="authError" class="text-center text-red-custom mt-[-15px] text-sm">
       {{ authError }}
     </p>
     <div class="enter__btns">

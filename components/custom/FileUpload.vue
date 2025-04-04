@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center gap-x-2.5">
     <!-- label -->
-    <label :for="inputId" class="text-space font-normal text-sm min-w-[250px]">
+    <label :for="inputId" class="text-space font-normal text-sm min-w-[235px]">
       {{ label }}
     </label>
 
