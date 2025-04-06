@@ -1,6 +1,7 @@
 <template>
   <div class="w-full p-15px bg-white rounded-fifteen flex mb-15px">
     <div
+      v-if="showIcon"
       class="shrink-0 w-50px h-50px rounded-full flex items-center justify-center mr-15px"
       :class="iconBackground"
     >
@@ -12,7 +13,7 @@
         :class="iconColor"
       />
     </div>
-    <div class="flex-1 min-w-0">
+    <div class="flex-1 min-w-0 flex">
       <slot name="content"></slot>
     </div>
   </div>
@@ -31,6 +32,10 @@
     iconColor: {
       type: String,
       default: '',
+    },
+    showIcon: {
+      type: Boolean,
+      default: true,
     },
   })
 </script>

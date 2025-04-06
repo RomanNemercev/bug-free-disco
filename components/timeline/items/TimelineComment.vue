@@ -1,10 +1,14 @@
 <template>
-  <TimelineItem>
+  <TimelineItem :show-icon="false">
     <template #content>
       <div class="mr-15px">
         <UiAvatar size="chat">
-          <UiAvatarImage :src="comment.avatar" :alt="comment.author" />
-          <UiAvatarFallback>{{ comment.initials }}</UiAvatarFallback>
+          <UiAvatarImage
+            v-if="avatarProps.hasImage && avatarProps.imageProps.src"
+            :src="avatarProps.imageProps.src"
+            :alt="avatarProps.imageProps.alt"
+          />
+          <UiAvatarFallback>{{ avatarProps.fallback }}</UiAvatarFallback>
         </UiAvatar>
       </div>
       <div>
@@ -29,25 +33,21 @@
   </TimelineItem>
 </template>
 
-<script setup>
-  import TimelineItem from '../TimelineItem.vue'
+<script setup lang="ts">
+  import { getAvatarProps } from '@/lib/avatar'
+  import type { TimelineMessage } from '@/types/timeline'
   import BtnIconText from '@/components/custom/BtnIconText.vue'
+  import TimelineItem from '@/components/timeline/TimelineItem.vue'
 
-  const props = defineProps({
-    comment: {
-      type: Object,
-      required: true,
-      default: () => ({
-        time: '',
-        author: '',
-        content: '',
-        avatar: '',
-        initials: '',
-      }),
-    },
-  })
+  const props = defineProps<{
+    comment: TimelineMessage
+  }>()
 
-  const emit = defineEmits(['reply'])
+  const emit = defineEmits<{
+    reply: [comment: TimelineMessage]
+  }>()
+
+  const avatarProps = computed(() => getAvatarProps(props.comment))
 
   const handleReply = () => {
     emit('reply', props.comment)

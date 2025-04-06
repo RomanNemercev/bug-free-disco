@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-athens-gray p-25px pt-70px">
+  <div
+    class="bg-athens-gray p-25px pt-70px pb-2.5 max-h-[calc(100vh-680px)] overflow-y-auto"
+  >
     <template v-for="(group, index) in timelineGroups" :key="index">
       <ChatDivider :text="group.date" />
       <template v-for="event in group.events" :key="event.id">

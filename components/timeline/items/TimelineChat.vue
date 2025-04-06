@@ -1,5 +1,5 @@
 <template>
-  <TimelineItem>
+  <TimelineItem :show-icon="false">
     <template #content>
       <div class="relative mr-15px">
         <div class="absolute right-0 top-[-5px]">
