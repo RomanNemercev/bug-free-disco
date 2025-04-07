@@ -451,21 +451,10 @@
           <div v-if="activeTab === 'chat'">
             <div>
               <Timeline :timeline-groups="timelineGroups" />
-              <div
-                class="w-full p-15px pb-25px bg-white rounded-b-fifteen flex items-center"
-              >
-                <button class="text-sm text-dodger font-medium">Чат</button>
-                &nbsp;
-                <span class="text-sm text-space font-normal">для</span>
-                &nbsp;
-                <button class="text-sm text-dodger font-medium">
-                  {{ candidate.firstName }} {{ candidate.surname }}
-                </button>
-                &nbsp;
-                <span class="text-sm text-slate-custom font-normal">
-                  введите текст...
-                </span>
-              </div>
+              <ChatInput
+                :initial-recipient="`${candidate.firstName} ${candidate.surname}`"
+                @send="handleChatSend"
+              />
             </div>
           </div>
           <div v-if="activeTab === 'review'">Рассмотрения</div>
@@ -491,6 +480,7 @@
   import FileUpload from '~/components/custom/FileUpload.vue'
   import MinDropdownSecond from '~/components/custom/MinDropdownSecond.vue'
   import Timeline from '@/components/timeline/index.vue'
+  import ChatInput from '@/components/chat/ChatInput.vue'
 
   const route = useRoute()
 
@@ -691,4 +681,9 @@
       ],
     },
   ])
+
+  const handleChatSend = ({ format, message, attachments, recipient }) => {
+    console.log('Sending message:', { format, message, attachments, recipient })
+    // TODO: Implement message sending logic
+  }
 </script>

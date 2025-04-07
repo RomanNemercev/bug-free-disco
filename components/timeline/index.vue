@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="timelineContainer"
     class="bg-athens-gray p-25px pt-70px pb-2.5 max-h-[calc(100vh-680px)] overflow-y-auto"
   >
     <template v-for="(group, index) in timelineGroups" :key="index">
@@ -79,6 +80,7 @@
   import TimelineTelegram from './items/TimelineTelegram.vue'
   import TimelineWhatsApp from './items/TimelineWhatsApp.vue'
   import TimelineComment from './items/TimelineComment.vue'
+  import { ref, onMounted, nextTick } from 'vue'
 
   const props = defineProps({
     timelineGroups: {
@@ -109,4 +111,27 @@
   const handleReplyInThread = comment => {
     emit('reply', { type: 'thread', comment })
   }
+
+  const timelineContainer = ref(null)
+
+  onMounted(() => {
+    nextTick(() => {
+      timelineContainer.value.scrollTop = timelineContainer.value.scrollHeight
+    })
+  })
 </script>
+
+<style scoped>
+  ::-webkit-scrollbar {
+    width: 10px;
+    background-color: #f4f6f8;
+    border-bottom-right-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #79869a;
+    /* Your preferred color */
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
