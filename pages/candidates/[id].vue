@@ -682,8 +682,8 @@
     },
   ])
 
-  const handleChatSend = ({ format, message, attachments, recipient }) => {
-    console.log('Sending message:', { format, message, attachments, recipient })
+  const handleChatSend = messageData => {
+    console.log('Получены данные в родительском компоненте:', messageData)
     // TODO: Implement message sending logic
   }
 </script>

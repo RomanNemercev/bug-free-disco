@@ -13,15 +13,20 @@
         :style="{ maxHeight: hasOverflow ? '271px' : '101px' }"
       >
         <!-- Прикрепленные файлы -->
-        <div v-if="attachments.length > 0" class="px-15px pt-15px">
+        <div v-if="attachments.length > 0" class="px-15px py-2.5 bg-zumthor">
           <div class="flex flex-wrap gap-2">
-            <span
-              v-for="file in attachments"
+            <div
+              v-for="(file, index) in attachments"
               :key="file.name"
-              class="text-sm text-space"
+              class="text-sm text-dodger font-medium flex items-center gap-1"
             >
-              {{ file.name }}
-            </span>
+              <span class="text-sm text-dodger font-medium">
+                {{ file.name }}
+              </span>
+              <button @click="removeFile(index)" class="p-[2.5px]">
+                <svg-icon name="dropdown-cross" width="15" height="15" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -77,9 +82,7 @@
         <div
           v-if="showControls"
           class="px-15px flex items-center gap-2"
-          :style="{
-            transform: isExpanded ? 'translateY(-35px)' : 'translateY(0)',
-          }"
+          style="transform: translateY(-35px)"
         >
           <UiButton
             class="font-semibold"
@@ -108,11 +111,12 @@
             <button
               class="text-sm text-slate-custom font-medium flex items-center gap-1 bg-athens-gray rounded-full p-2.5px hover:bg-space hover:text-white transition-colors duration-300 w-10 h-10 justify-center"
               @click="triggerFileInput"
+              :class="{ 'bg-space text-white': attachments.length > 0 }"
             >
               <svg-icon name="clip20" width="16" height="16" />
               <span
                 v-if="attachments.length"
-                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center"
+                class="absolute -top-5px -right-5px bg-dodger text-white rounded-full w-[18px] h-[18px] text-xs flex items-center justify-center"
               >
                 {{ attachments.length }}
               </span>
@@ -151,8 +155,8 @@
   // State
   const message = ref('')
   const selectedFormat = ref(chatStore.currentFormat)
-  const isExpanded = ref(false)
-  const isFocused = ref(false)
+  const isExpanded = ref(true)
+  const isFocused = ref(true)
   const attachments = ref<File[]>([])
   const fileInput = ref<HTMLInputElement | null>(null)
   const textareaHeight = ref('auto')
@@ -164,12 +168,17 @@
   })
 
   const showControls = computed(() => {
-    return isExpanded.value || isFocused.value || message.value.length > 0
+    return (
+      isExpanded.value ||
+      isFocused.value ||
+      message.value.length > 0 ||
+      attachments.value.length > 0
+    )
   })
 
   const expandHeight = computed(() => {
     // Вычисляем высоту расширяющегося блока (без padding)
-    const baseHeight = hasOverflow.value ? 271 : 101
+    const baseHeight = hasOverflow.value ? 261 : 101
     // Учитываем padding (pt-15px для файлов + p-15px для textarea)
     const padding = attachments.value.length > 0 ? 30 : 15 // 15px + 15px если есть файлы, иначе только 15px
     return baseHeight - padding
@@ -234,6 +243,13 @@
       recipient: recipient.value,
     }
 
+    console.log('Отправка сообщения:', {
+      format: messageData.format,
+      message: messageData.message,
+      attachmentsCount: messageData.attachments.length,
+      recipient: messageData.recipient,
+    })
+
     chatStore.addMessage(messageData)
     emit('send', messageData)
     handleCancel()
@@ -246,6 +262,10 @@
     if (!isFocused.value) {
       isExpanded.value = false
     }
+  }
+
+  const removeFile = (index: number) => {
+    attachments.value = attachments.value.filter((_, i) => i !== index)
   }
 </script>
 

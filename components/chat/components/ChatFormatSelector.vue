@@ -11,16 +11,16 @@
     <Transition name="slide-up">
       <div
         v-if="isOpen"
-        class="absolute bottom-full left-0 mb-1 w-[200px] bg-white rounded-fifteen shadow-md py-2"
+        class="absolute bottom-full left-0 mb-1 min-w-[124px] bg-athens rounded-plus shadow-md [&>*:not(:last-child)]:mb-px"
         @click.stop
       >
         <button
           v-for="(label, format) in formatLabels"
           :key="format"
-          class="w-full text-left px-4 py-2 text-sm hover:bg-athens-gray transition-colors"
+          class="w-full text-left px-4 py-2.5 text-sm hover:bg-athens-gray transition-colors first:rounded-t-plus last:rounded-b-plus bg-white leading-normal"
           :class="{
             'text-dodger': modelValue === format,
-            'text-space': modelValue !== format,
+            'text-slate-custom': modelValue !== format,
           }"
           @click="selectFormat(format)"
         >
