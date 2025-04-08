@@ -1,7 +1,7 @@
 <template>
   <div class="container pt-25px">
     <p class="text-25px font-bold text-space leading-normal mb-26px">
-      Здравствуйте, Денис Максимов!
+      Здравствуйте, {{ userName }}!
     </p>
     <div class="flex justify-between gap-x-25px">
       <div
@@ -12,13 +12,13 @@
             src="https://github.com/radix-vue.png"
             alt="@radix-vue"
           />
-          <UiAvatarFallback>ДМ</UiAvatarFallback>
+          <UiAvatarFallback>{{ userStore.initials }}</UiAvatarFallback>
         </UiAvatar>
         <p class="text-lg font-medium text-space leading-normal mb-2.5">
-          Денис Максимов
+          {{ userName }}
         </p>
         <p class="text-13px font-normal text-slate-custom">
-          denmaksimov@gmail.com
+          {{ userEmail }}
         </p>
       </div>
       <div
@@ -118,7 +118,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
+  import { useUserStore } from '@/stores/user'
   // import { useCalendarStore } from '@/stores/calendarStore';
 
   // const store = useCalendarStore();
@@ -133,6 +134,9 @@
   })
 
   const currentLevel = ref('user')
+  const userStore = useUserStore()
+  const userName = computed(() => userStore.name || 'Гость')
+  const userEmail = computed(() => userStore.email || 'Почта не указана')
 
   interface EventData {
     date: string

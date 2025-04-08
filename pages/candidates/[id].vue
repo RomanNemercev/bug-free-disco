@@ -2,9 +2,46 @@
   <div class="container py-25px">
     <div class="flex justify-between mb-25px">
       <NuxtLink to="/candidates" class="text-blue-500 hover:underline">
-        ← Вернуться к списку
+        <div class="flex items-center gap-2.5 justify-center">
+          <svg-icon name="arrow-left-dodger" width="18" height="18" />
+          <span class="text-sm font-medium text-dodger">
+            Вернуться к списку
+          </span>
+        </div>
       </NuxtLink>
-      <div>кнопки для навигации</div>
+      <div class="flex items-center gap-2.5">
+        <!-- Кнопка "Назад" -->
+        <button
+          class="p-2.5 rounded-ten bg-white text-slate-custom"
+          :class="{ 'opacity-50 cursor-not-allowed': currentIndex === 0 }"
+          :disabled="currentIndex === 0"
+          @click="goToPrevious"
+        >
+          <svg-icon name="pagination-arrow-left" width="20" height="20" />
+        </button>
+
+        <!-- Индикатор текущей позиции -->
+        <div
+          class="bg-white rounded-ten py-3 px-15px text-13px font-bold text-space leading-normal"
+        >
+          <span>{{ currentIndex + 1 }}</span>
+          из
+          <span>{{ totalCandidates }}</span>
+        </div>
+
+        <!-- Кнопка "Вперёд" -->
+        <button
+          class="p-2.5 rounded-ten bg-white text-slate-custom"
+          :class="{
+            'opacity-50 cursor-not-allowed':
+              currentIndex === totalCandidates - 1,
+          }"
+          :disabled="currentIndex === totalCandidates - 1"
+          @click="goToNext"
+        >
+          <svg-icon name="pagination-arrow-right" width="20" height="20" />
+        </button>
+      </div>
     </div>
     <div class="w-full">
       <div class="bg-white rounded-fifteen p-25px relative mb-15px pt-15px">
@@ -482,7 +519,49 @@
   import Timeline from '@/components/timeline/index.vue'
   import ChatInput from '@/components/chat/ChatInput.vue'
 
+  // get current route from candidateFull
   const route = useRoute()
+  const candidateId = parseInt(route.params.id)
+
+  // create a map of candidate ids to their indices
+  const candidateIndexMap = computed(() => {
+    const map = {}
+    candidatesFull.forEach((candidate, index) => {
+      map[candidate.id] = index
+    })
+    return map
+  })
+
+  // get current index from candidateFull
+  const currentIndex = computed(() => {
+    const index = candidateIndexMap.value[candidateId]
+    return index !== undefined ? index : -1
+  })
+
+  // get total candidates from candidateFull
+  const totalCandidates = candidatesFull.length
+
+  // if candidate not found, throw 404 error
+  if (currentIndex.value === -1) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Candidate not found',
+    })
+  }
+
+  const goToPrevious = () => {
+    if (currentIndex.value > 0) {
+      const previousId = candidatesFull[currentIndex.value - 1].id
+      navigateTo(`/candidates/${previousId}`)
+    }
+  }
+
+  const goToNext = () => {
+    if (currentIndex.value < totalCandidates - 1) {
+      const nextId = candidatesFull[currentIndex.value + 1].id
+      navigateTo(`/candidates/${nextId}`)
+    }
+  }
 
   const candidate = computed(() => {
     return candidatesFull.find(c => c.id === Number(route.params.id))
@@ -520,7 +599,7 @@
     },
   ]
 
-  const activeTab = ref('chat') // Начальный таб
+  const activeTab = ref('resume') // Начальный таб
   const tabs = [
     { label: 'Резюме', value: 'resume' },
     { label: 'Поля', value: 'fields' },

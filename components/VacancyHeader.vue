@@ -85,7 +85,7 @@
                 src="https://github.com/radix-vue.png"
                 alt="@radix-vue"
               />
-              <UiAvatarFallback>ДМ</UiAvatarFallback>
+              <UiAvatarFallback>{{ userStore.initials }}</UiAvatarFallback>
             </UiAvatar>
           </div>
         </li>
@@ -96,9 +96,11 @@
 
 <script setup>
   import { useRoute } from 'vue-router'
+  import { useUserStore } from '@/stores/user'
 
   const route = useRoute()
   const isVacanciesActive = computed(() => route.path.startsWith('/vacancies'))
+  const userStore = useUserStore()
 </script>
 
 <style lang="scss" scoped>

@@ -1,3 +1,11 @@
+import { useUserStore } from '@/stores/user';
+
+interface VacancyResponse {
+    data: {
+        data: any[]
+    }
+}
+
 export const getVacancies = async () => {
     const config = useRuntimeConfig();
 
@@ -18,9 +26,9 @@ export const getVacancies = async () => {
     }
 
     try {
-        const response = await $fetch('/vacancies', {
+        const response = await $fetch<VacancyResponse>('/vacancies', {
             method: 'GET',
-            baseURL: config.public.apiBase, // https://admin.job-ly.ru/api
+            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${serverToken}`,
@@ -33,9 +41,14 @@ export const getVacancies = async () => {
     } catch (err: any) {
         console.error('Ошибка при запросе:', err);
         if (err.response?.status === 401) {
+            const userStore = useUserStore();
+            userStore.clearUserData();
+
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
+            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+            navigateTo('/auth');
         }
         return null;
     }

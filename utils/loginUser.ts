@@ -1,8 +1,11 @@
 import { getServerToken } from './getServerToken';
+import { useUserStore } from '@/stores/user';
 
 interface LoginResponse {
     user: {
         auth_token: string;
+        name: string;
+        email: string;
     }
 }
 
@@ -20,7 +23,7 @@ export const loginUser = async (email: string, password: string) => {
 
         const response = await $fetch<LoginResponse>('/login', {
             method: 'POST',
-            baseURL: config.public.apiBase,
+            baseURL: config.public.apiBase as string,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${serverToken}`,
@@ -32,11 +35,21 @@ export const loginUser = async (email: string, password: string) => {
         });
 
         console.log('Server response:', response);
+        console.log('User:', response.user.name);
+        console.log('Email:', response.user.email);
 
         if (response?.user?.auth_token) {
             const userTokenCookie = useCookie('auth_user');
             userTokenCookie.value = response.user.auth_token;
             console.log('User token is save in cookie', userTokenCookie.value);
+        }
+        if (response.user.name && response.user.email) {
+            const userStore = useUserStore();
+            userStore.setUserData({
+                name: response.user.name,
+                email: response.user.email,
+            });
+            console.log('User data is save in store', userStore.name, userStore.email);
         } else {
             console.warn('Токен не получен в ответе сервера');
         }

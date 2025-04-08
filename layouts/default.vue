@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <vacancy-header />
-        <slot />
-        <!-- there is a footer block -->
-    </div>
+  <div>
+    <vacancy-header />
+    <slot />
+    <!-- there is a footer block -->
+  </div>
 </template>

@@ -155,8 +155,8 @@
   // State
   const message = ref('')
   const selectedFormat = ref(chatStore.currentFormat)
-  const isExpanded = ref(true)
-  const isFocused = ref(true)
+  const isExpanded = ref(false)
+  const isFocused = ref(false)
   const attachments = ref<File[]>([])
   const fileInput = ref<HTMLInputElement | null>(null)
   const textareaHeight = ref('auto')
