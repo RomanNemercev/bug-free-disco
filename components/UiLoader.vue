@@ -3,35 +3,16 @@
     <div class="loader">
       <div class="spinner"></div>
       <span>Загрузка...</span>
-      <div v-if="showDebug" class="timer">Активен: {{ elapsedTime }}с</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import { computed } from 'vue'
+  import { useNuxtApp } from '#app'
+
   const { $loader } = useNuxtApp()
   const isLoading = computed(() => $loader.isLoading.value)
-  const elapsedTime = ref(0)
-  const showDebug = ref(process.dev)
-
-  watch(isLoading, newValue => {
-    if (newValue) {
-      const startTime = Date.now()
-      const timer = setInterval(() => {
-        elapsedTime.value = ((Date.now() - startTime) / 1000).toFixed(1)
-      }, 100)
-
-      watch(
-        isLoading,
-        isLoading => {
-          if (!isLoading) {
-            clearInterval(timer)
-          }
-        },
-        { once: true }
-      )
-    }
-  })
 </script>
 
 <style scoped>

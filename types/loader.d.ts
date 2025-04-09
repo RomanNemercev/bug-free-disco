@@ -1,9 +1,13 @@
+import type { Ref, ComputedRef } from 'vue'
+
 declare module '#app' {
     interface NuxtApp {
         $loader: {
             show: () => void
             hide: () => void
-            isLoading: Ref<boolean>
+            isLoading: ComputedRef<boolean>
         }
     }
 }
+
+export { }

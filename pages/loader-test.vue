@@ -1,5 +1,6 @@
 <template>
   <div class="p-4">
+    <UiLoader />
     <h1 class="text-2xl mb-4">Тестирование лоадера</h1>
     <div class="space-y-2">
       <button
@@ -25,6 +26,7 @@
 </template>
 
 <script setup>
+  import UiLoader from '~/components/UiLoader.vue'
   const { $loader } = useNuxtApp()
 
   const testLoader = async () => {

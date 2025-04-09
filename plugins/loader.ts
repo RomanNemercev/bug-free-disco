@@ -1,3 +1,5 @@
+import { ref, computed } from 'vue'
+
 export default defineNuxtPlugin((nuxtApp) => {
     const loading = ref(false)
     let activeRequests = 0

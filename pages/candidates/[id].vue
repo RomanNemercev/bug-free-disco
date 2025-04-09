@@ -13,7 +13,7 @@
         <!-- Кнопка "Назад" -->
         <button
           class="p-2.5 rounded-ten bg-white text-slate-custom"
-          :class="{ 'opacity-50 cursor-not-allowed': currentIndex === 0 }"
+          :class="{ 'opacity-0 cursor-auto': currentIndex === 0 }"
           :disabled="currentIndex === 0"
           @click="goToPrevious"
         >
@@ -33,8 +33,7 @@
         <button
           class="p-2.5 rounded-ten bg-white text-slate-custom"
           :class="{
-            'opacity-50 cursor-not-allowed':
-              currentIndex === totalCandidates - 1,
+            'opacity-0 cursor-auto': currentIndex === totalCandidates - 1,
           }"
           :disabled="currentIndex === totalCandidates - 1"
           @click="goToNext"

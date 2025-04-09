@@ -44,6 +44,7 @@ module.exports = {
         catskill: '#f9fafc',
         chilean: '#fffce4',
         'border-pink': 'rgba(245, 10, 10, 0.2)',
+        'border-feta': 'rgba(4, 182, 0, 0.1)',
         pattens: '#d2e3ff',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
@@ -194,6 +195,34 @@ module.exports = {
           },
         },
       }),
+      keyframes: {
+        'dot-up': {
+          '0%': {
+            transform: 'translateY(20px)',
+          },
+          '50%': {
+            transform: 'translateY(-20px)',
+          },
+          '100%': {
+            transform: 'translateY(20px)',
+          },
+        },
+        'dot-down': {
+          '0%': {
+            transform: 'translateY(-20px)',
+          },
+          '50%': {
+            transform: 'translateY(20px)',
+          },
+          '100%': {
+            transform: 'translateY(-20px)',
+          },
+        },
+      },
+      animation: {
+        'dot-up': 'dot-up 1s ease-in-out infinite',
+        'dot-down': 'dot-down 1s ease-in-out infinite',
+      },
     },
   },
   plugins: [animate, require('@tailwindcss/typography')],

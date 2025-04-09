@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
   import { ref, defineAsyncComponent, computed } from 'vue'
+  import { useNuxtApp } from '#app'
   import UiLoader from '~/components/UiLoader.vue'
   const { $loader } = useNuxtApp()
 
@@ -37,7 +38,7 @@
     funnel: () => import('@/pages/create-tabs/FunnelTab.vue'),
   }
 
-  const currentTab = ref<keyof typeof tabs>('info')
+  const currentTab = ref<keyof typeof tabs>('funnel')
   const showLoader = ref(false)
   let loaderTimeout: NodeJS.Timeout | null = null
 
@@ -62,7 +63,10 @@
 
   const onResolve = () => {
     console.log('Suspense: Loading finished')
-    clearTimeout(loaderTimeout)
+    if (loaderTimeout) {
+      clearTimeout(loaderTimeout)
+      loaderTimeout = null
+    }
     showLoader.value = false
     $loader.hide()
   }
