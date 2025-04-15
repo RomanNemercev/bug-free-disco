@@ -46,6 +46,9 @@ module.exports = {
         'border-pink': 'rgba(245, 10, 10, 0.2)',
         'border-feta': 'rgba(4, 182, 0, 0.1)',
         pattens: '#d2e3ff',
+        malachite: '#1bd741',
+        picton: '#41b4e6',
+        royal: '#7d3daf',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
