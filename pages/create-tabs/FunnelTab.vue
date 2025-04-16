@@ -3,17 +3,34 @@
   import draggable from 'vuedraggable'
   import MyInput from '@/components/custom/MyInput.vue'
   import Popup from '~/components/custom/Popup.vue'
+  import StatusService from '~/components/custom/ServiceStatus.vue'
+  import MyDropdown from '~/components/custom/MyDropdown.vue'
 
   const items = ref([])
   const isDragging = ref(false)
   const newFunnelName = ref('')
 
+  const openPopups = ref([])
   const openActionPopup = ref(false)
   const openInvitePopup = ref(false)
   const openMovePopup = ref(false)
   const openMailPopup = ref(false)
   const openFormPopup = ref(false)
-
+  const inviteFieldIfValue = ref('')
+  const inviteFieldConditionValue = ref('')
+  const inviteFieldWhenValue = ref('')
+  const moveFieldLevelValue = ref('')
+  const moveFieldIfValue = ref('')
+  const moveFieldConditionValue = ref('')
+  const moveFieldWhenValue = ref('')
+  const mailFieldSendValue = ref('')
+  const mailFieldItemValue = ref('')
+  const mailFieldConditionValue = ref('')
+  const mailFieldWhenValue = ref('')
+  const formFieldSendValue = ref('')
+  const formFieldIfValue = ref('')
+  const formFieldConditionValue = ref('')
+  const formFieldWhenValue = ref('')
   const fetchItems = async () => {
     try {
       items.value = [
@@ -152,60 +169,528 @@
 
   await fetchItems()
 
-  function enableBodyScroll() {
-    document.body.style.overflow = '' // Включаем прокрутку
+  function enableBodyScroll(popupId) {
+    openPopups.value = openPopups.value.filter(id => id !== popupId)
+    if (openPopups.value.length === 0) {
+      document.body.style.overflow = '' // Включаем прокрутку
+    }
   }
 
   // config for control scroll
-  function disableBodyScroll() {
-    document.body.style.overflow = 'hidden' // Отключаем прокрутку
+  function disableBodyScroll(popupId) {
+    if (!openPopups.value.includes(popupId)) {
+      openPopups.value.push(popupId)
+    }
+    if (openPopups.value.length > 0) {
+      document.body.style.overflow = 'hidden' // Отключаем прокрутку
+    }
   }
 
   function handleOpenAction() {
     openActionPopup.value = true
-    disableBodyScroll()
+    disableBodyScroll('action')
   }
 
   function handleCloseActionPopup() {
     openActionPopup.value = false
-    enableBodyScroll()
   }
 
   function handleOpenInvite() {
     openInvitePopup.value = true
-    disableBodyScroll()
+    openActionPopup.value = false
+    disableBodyScroll('invite')
   }
 
   function handleCloseInvitePopup() {
     openInvitePopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
   }
 
   function handleOpenMove() {
     openMovePopup.value = true
-    disableBodyScroll()
+    openActionPopup.value = false
+    disableBodyScroll('move')
   }
 
   function handleCloseMovePopup() {
     openMovePopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
   }
 
   function handleOpenMail() {
     openMailPopup.value = true
-    disableBodyScroll()
+    openActionPopup.value = false
+    disableBodyScroll('mail')
   }
 
   function handleCloseMailPopup() {
     openMailPopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
   }
 
   function handleOpenForm() {
     openFormPopup.value = true
-    disableBodyScroll()
+    openActionPopup.value = false
+    disableBodyScroll('form')
   }
 
   function handleCloseFormPopup() {
     openFormPopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
   }
+
+  const inviteFieldIf = [
+    {
+      name: 'Номер телефона',
+      value: 1,
+    },
+    {
+      name: 'Возраст',
+      value: 2,
+    },
+    {
+      name: 'Город',
+      value: 3,
+    },
+    {
+      name: 'Регион',
+      value: 4,
+    },
+    {
+      name: 'Ссылка',
+      value: 5,
+    },
+    {
+      name: 'Файл',
+      value: 6,
+    },
+  ]
+
+  const inviteFieldCondition = [
+    {
+      name: 'Присутствует',
+      value: 1,
+    },
+    {
+      name: 'Отсутствует',
+      value: 2,
+    },
+    {
+      name: 'Отличается в большую сторону',
+      value: 3,
+    },
+    {
+      name: 'Отличается в меньшую сторону',
+      value: 4,
+    },
+    {
+      name: 'Верный ответ',
+      value: 5,
+    },
+    {
+      name: 'Неверный ответ',
+      value: 6,
+    },
+    {
+      name: 'Флаг установлен',
+      value: 7,
+    },
+    {
+      name: 'Флаг не установлен',
+      value: 8,
+    },
+    {
+      name: 'Интервал',
+      value: 9,
+    },
+  ]
+
+  const inviteFieldWhen = [
+    {
+      name: 'Выполнить сразу',
+      value: 1,
+    },
+    {
+      name: 'Через 10 минут',
+      value: 2,
+    },
+    {
+      name: 'Через 30 минут',
+      value: 3,
+    },
+    {
+      name: 'Через 1 час',
+      value: 4,
+    },
+    {
+      name: 'Через 3 часа',
+      value: 5,
+    },
+    {
+      name: 'Через 12 часов',
+      value: 6,
+    },
+    {
+      name: 'Спустя сутки',
+      value: 7,
+    },
+  ]
+
+  const moveFieldLevel = [
+    {
+      name: 'Подумать',
+      value: 1,
+    },
+    {
+      name: 'Подходящие',
+      value: 2,
+    },
+    {
+      name: 'Отклоненные',
+      value: 3,
+    },
+    {
+      name: 'Не разобранное',
+      value: 4,
+    },
+    {
+      name: 'Служба безопасности',
+      value: 5,
+    },
+    {
+      name: 'У заказчика',
+      value: 6,
+    },
+  ]
+
+  const moveFieldIf = [
+    {
+      name: 'Номер телефона',
+      value: 1,
+    },
+    {
+      name: 'Возраст',
+      value: 2,
+    },
+    {
+      name: 'Город',
+      value: 3,
+    },
+    {
+      name: 'Регион',
+      value: 4,
+    },
+    {
+      name: 'Ссылка',
+      value: 5,
+    },
+    {
+      name: 'Файл',
+      value: 6,
+    },
+  ]
+
+  const moveFieldCondition = [
+    {
+      name: 'Присутствует',
+      value: 1,
+    },
+    {
+      name: 'Отсутствует',
+      value: 2,
+    },
+    {
+      name: 'Отличается в большую сторону',
+      value: 3,
+    },
+    {
+      name: 'Отличается в меньшую сторону',
+      value: 4,
+    },
+    {
+      name: 'Верный ответ',
+      value: 5,
+    },
+    {
+      name: 'Неверный ответ',
+      value: 6,
+    },
+    {
+      name: 'Флаг установлен',
+      value: 7,
+    },
+    {
+      name: 'Флаг не установлен',
+      value: 8,
+    },
+    {
+      name: 'Флаг не установлен',
+      value: 9,
+    },
+  ]
+
+  const moveFieldWhen = [
+    {
+      name: 'Выполнить сразу',
+      value: 1,
+    },
+    {
+      name: 'Через 10 минут',
+      value: 2,
+    },
+    {
+      name: 'Через 30 минут',
+      value: 3,
+    },
+    {
+      name: 'Через 1 час',
+      value: 4,
+    },
+    {
+      name: 'Через 3 часа',
+      value: 5,
+    },
+    {
+      name: 'Через 12 часов',
+      value: 6,
+    },
+    {
+      name: 'Спустя сутки',
+      value: 7,
+    },
+  ]
+
+  const mailFieldSend = [
+    {
+      name: 'Отказ',
+      value: 1,
+    },
+    {
+      name: 'Приглашение',
+      value: 2,
+    },
+    {
+      name: 'Не дозвонились',
+      value: 3,
+    },
+  ]
+
+  const mailFieldItems = [
+    {
+      name: 'Номер телефона',
+      value: 1,
+    },
+    {
+      name: 'Возраст',
+      value: 2,
+    },
+    {
+      name: 'Город',
+      value: 3,
+    },
+    {
+      name: 'Регион',
+      value: 4,
+    },
+    {
+      name: 'Ссылка',
+      value: 5,
+    },
+    {
+      name: 'Файл',
+      value: 6,
+    },
+  ]
+
+  const mailFieldConditions = [
+    {
+      name: 'Присутствует',
+      value: 1,
+    },
+    {
+      name: 'Отсутствует',
+      value: 2,
+    },
+    {
+      name: 'Отличается в большую сторону',
+      value: 3,
+    },
+    {
+      name: 'Отличается в меньшую сторону',
+      value: 4,
+    },
+    {
+      name: 'Верный ответ',
+      value: 5,
+    },
+    {
+      name: 'Неверный ответ',
+      value: 6,
+    },
+    {
+      name: 'Флаг установлен',
+      value: 7,
+    },
+    {
+      name: 'Флаг не установлен',
+      value: 8,
+    },
+    {
+      name: 'Интервал',
+      value: 9,
+    },
+  ]
+
+  const mailFieldWhen = [
+    {
+      name: 'Выполнить сразу',
+      value: 1,
+    },
+    {
+      name: 'Через 10 минут',
+      value: 2,
+    },
+    {
+      name: 'Через 30 минут',
+      value: 3,
+    },
+    {
+      name: 'Через 1 час',
+      value: 4,
+    },
+    {
+      name: 'Через 3 часа',
+      value: 5,
+    },
+    {
+      name: 'Через 12 часов',
+      value: 6,
+    },
+    {
+      name: 'Спустя сутки',
+      value: 7,
+    },
+  ]
+
+  const formFieldSend = [
+    {
+      name: 'Анкета на менеджера',
+      value: 1,
+    },
+    {
+      name: '19 вопросов',
+      value: 2,
+    },
+    {
+      name: 'Психологический тест',
+      value: 3,
+    },
+    {
+      name: 'Профориентация',
+      value: 4,
+    },
+  ]
+
+  const formFieldIf = [
+    {
+      name: 'Номер телефона',
+      value: 1,
+    },
+    {
+      name: 'Возраст',
+      value: 2,
+    },
+    {
+      name: 'Город',
+      value: 3,
+    },
+    {
+      name: 'Регион',
+      value: 4,
+    },
+    {
+      name: 'Ссылка',
+      value: 5,
+    },
+    {
+      name: 'Файл',
+      value: 6,
+    },
+  ]
+
+  const formFieldConditions = [
+    {
+      name: 'Присутствует',
+      value: 1,
+    },
+    {
+      name: 'Отсутствует',
+      value: 2,
+    },
+    {
+      name: 'Отличается в большую сторону',
+      value: 3,
+    },
+    {
+      name: 'Отличается в меньшую сторону',
+      value: 4,
+    },
+    {
+      name: 'Верный ответ',
+      value: 5,
+    },
+    {
+      name: 'Неверный ответ',
+      value: 6,
+    },
+    {
+      name: 'Флаг установлен',
+      value: 7,
+    },
+    {
+      name: 'Флаг не установлен',
+      value: 8,
+    },
+    {
+      name: 'Интервал',
+      value: 9,
+    },
+  ]
+
+  const formFieldWhen = [
+    {
+      name: 'Выполнить сразу',
+      value: 1,
+    },
+    {
+      name: 'Через 10 минут',
+      value: 2,
+    },
+    {
+      name: 'Через 30 минут',
+      value: 3,
+    },
+    {
+      name: 'Через 1 час',
+      value: 4,
+    },
+    {
+      name: 'Через 3 часа',
+      value: 5,
+    },
+    {
+      name: 'Через 12 часов',
+      value: 6,
+    },
+    {
+      name: 'Спустя сутки',
+      value: 7,
+    },
+  ]
 </script>
 
 <template>
@@ -322,7 +807,7 @@
       </div>
     </div>
   </div>
-  <transition name="fade" @after-leave="enableBodyScroll">
+  <transition name="fade" @after-leave="enableBodyScroll('action')">
     <Popup
       :isOpen="openActionPopup"
       @close="handleCloseActionPopup"
@@ -376,56 +861,267 @@
       </UiButton>
     </Popup>
   </transition>
-  <transition name="fade" @after-leave="enableBodyScroll">
+  <transition name="fade" @after-leave="enableBodyScroll('invite')">
     <Popup
       :isOpen="openInvitePopup"
       @close="handleCloseInvitePopup"
       :show-close-button="false"
       :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
     >
-      <p class="text-xl font-semibold text-space mb-35px leading-normal">
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
         Назначение действия
       </p>
-      <p>Пригласить кандидата</p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'hand'"
+        :status="'Пригласить кандидата'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px">Если</p>
+      <MyDropdown
+        :defaultValue="'Выберите поле'"
+        :options="inviteFieldIf"
+        class="mb-15px"
+        v-model="inviteFieldIfValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px">Условие</p>
+      <MyDropdown
+        :defaultValue="'Выберите условие'"
+        :options="inviteFieldCondition"
+        class="mb-15px"
+        v-model="inviteFieldConditionValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите время'"
+        :options="inviteFieldWhen"
+        v-model="inviteFieldWhenValue"
+        class="mb-25px"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseInvitePopup"
+        >
+          Назад
+        </UiButton>
+      </div>
     </Popup>
   </transition>
-  <transition name="fade" @after-leave="enableBodyScroll">
+  <transition name="fade" @after-leave="enableBodyScroll('move')">
     <Popup
       :isOpen="openMovePopup"
       @close="handleCloseMovePopup"
       :show-close-button="false"
       :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
     >
-      <p class="text-xl font-semibold text-space mb-35px leading-normal">
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
         Назначение действия
       </p>
-      <p>Переместить на другой этап</p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'move-arrow'"
+        :status="'Пригласить кандидата'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Выбор этапа
+      </p>
+      <MyDropdown
+        :defaultValue="'Выберите этап'"
+        :options="moveFieldLevel"
+        class="mb-15px"
+        v-model="moveFieldLevelValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Если</p>
+      <MyDropdown
+        :defaultValue="'Выберите поле'"
+        :options="moveFieldIf"
+        class="mb-15px"
+        v-model="moveFieldIfValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px">Условие</p>
+      <MyDropdown
+        :defaultValue="'Выберите условие'"
+        :options="moveFieldCondition"
+        class="mb-15px"
+        v-model="moveFieldConditionValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите время'"
+        :options="moveFieldWhen"
+        class="mb-25px"
+        v-model="moveFieldWhenValue"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseMovePopup"
+        >
+          Назад
+        </UiButton>
+      </div>
     </Popup>
   </transition>
-  <transition name="fade" @after-leave="enableBodyScroll">
+  <transition name="fade" @after-leave="enableBodyScroll('mail')">
     <Popup
       :isOpen="openMailPopup"
       @close="handleCloseMailPopup"
       :show-close-button="false"
       :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
     >
-      <p class="text-xl font-semibold text-space mb-35px leading-normal">
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
         Назначение действия
       </p>
-      <p>Отправить письмо на почту</p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'envelope20'"
+        :status="'Отправить письмо на почту'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Выбор письма
+      </p>
+      <MyDropdown
+        :defaultValue="'Выберите шаблон'"
+        :options="mailFieldSend"
+        class="mb-15px"
+        v-model="mailFieldSendValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Если</p>
+      <MyDropdown
+        :defaultValue="'Выберите поле'"
+        :options="mailFieldItems"
+        class="mb-15px"
+        v-model="mailFieldItemValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px">Условие</p>
+      <MyDropdown
+        :defaultValue="'Выберите условие'"
+        :options="mailFieldConditions"
+        class="mb-15px"
+        v-model="mailFieldConditionValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите условие'"
+        :options="mailFieldWhen"
+        class="mb-25px"
+        v-model="mailFieldWhenValue"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseMailPopup"
+        >
+          Назад
+        </UiButton>
+      </div>
     </Popup>
   </transition>
-  <transition name="fade" @after-leave="enableBodyScroll">
+  <transition name="fade" @after-leave="enableBodyScroll('form')">
     <Popup
       :isOpen="openFormPopup"
       @close="handleCloseFormPopup"
       :show-close-button="false"
       :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
     >
-      <p class="text-xl font-semibold text-space mb-35px leading-normal">
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
         Назначение действия
       </p>
-      <p>Отправить анкету</p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'form-user'"
+        :status="'Отправить анкету'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Выбор анкеты
+      </p>
+      <MyDropdown
+        :defaultValue="'Выберите шаблон'"
+        :options="formFieldSend"
+        class="mb-15px"
+        v-model="formFieldSendValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Если</p>
+      <MyDropdown
+        :defaultValue="'Выберите поле'"
+        :options="formFieldIf"
+        class="mb-15px"
+        v-model="formFieldIfValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px">Условие</p>
+      <MyDropdown
+        :defaultValue="'Выберите условие'"
+        :options="formFieldConditions"
+        class="mb-15px"
+        v-model="formFieldConditionValue"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите время'"
+        :options="formFieldWhen"
+        class="mb-25px"
+        v-model="formFieldWhenValue"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseFormPopup"
+        >
+          Назад
+        </UiButton>
+      </div>
     </Popup>
   </transition>
 </template>
