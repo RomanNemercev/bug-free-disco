@@ -11,7 +11,7 @@
     <div v-else>
       <div
         v-if="modelValue"
-        class="text-sm font-medium text-dodger p-2.5"
+        class="text-sm font-medium text-dodger p-2.5 pl-0"
         @click="openInput"
       >
         {{ modelValue }}
@@ -20,7 +20,7 @@
         v-else
         ref="addButton"
         @click="openInput"
-        class="text-sm font-medium text-dodger p-2.5"
+        class="text-sm font-medium text-dodger p-2.5 pl-0"
       >
         Добавить
       </button>

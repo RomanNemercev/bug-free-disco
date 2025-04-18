@@ -38,7 +38,7 @@
     funnel: () => import('@/pages/create-tabs/FunnelTab.vue'),
   }
 
-  const currentTab = ref<keyof typeof tabs>('funnel')
+  const currentTab = ref<keyof typeof tabs>('info')
   const showLoader = ref(false)
   let loaderTimeout: NodeJS.Timeout | null = null
 

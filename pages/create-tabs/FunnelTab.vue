@@ -6,9 +6,11 @@
   import StatusService from '~/components/custom/ServiceStatus.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import ResponseChoose from '~/components/custom/ResponseChoose.vue'
+  import Autocomplete from '~/components/custom/Autocomplete.vue'
 
   import * as DropdownData from '~/src/data/funnelDropdowns.json'
   import responses from '~/src/data/responses.json'
+  import ActiveTasks from '~/src/data/active-tasks.json'
 
   const items = ref([])
   const isDragging = ref(false)
@@ -25,7 +27,10 @@
   const openChangeResponsePopup = ref(false)
   const openChangeTextPopup = ref(false)
   const showInput = ref(false)
+  const showInputTask = ref(false)
   const openWebhookPopup = ref(false)
+  const openCreateTaskPopup = ref(false)
+  const openFinishTaskPopup = ref(false)
   const inviteFieldIfValue = ref('')
   const inviteFieldConditionValue = ref('')
   const inviteFieldWhenValue = ref('')
@@ -47,6 +52,11 @@
   const newResponsible = ref('')
   const changeText = ref('')
   const sendWebhook = ref('')
+  const createTask = ref('')
+  const newResponseTask = ref('')
+  const taskCreateFieldWhenValue = ref('')
+  const targetToFinishTask = ref('')
+  const taskFinishFieldWhenValue = ref('')
 
   const removingItemTitle = ref('')
 
@@ -151,11 +161,13 @@
       id: 9,
       icon: 'task-create',
       title: 'Создать задачу',
+      handler: handleCreateTaskPopup,
     },
     {
       id: 10,
       icon: 'task-complete',
       title: 'Завершить задачу',
+      handler: handleFinishTaskPopup,
     },
   ]
 
@@ -315,6 +327,10 @@
     showInput.value = value
   }
 
+  function handleShowInputTask(value) {
+    showInputTask.value = value
+  }
+
   function handleOpenChangeTextPopup() {
     openChangeTextPopup.value = true
     openActionPopup.value = false
@@ -335,6 +351,30 @@
 
   function handleCloseWebhookPopup() {
     openWebhookPopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
+  }
+
+  function handleCreateTaskPopup() {
+    openCreateTaskPopup.value = true
+    openActionPopup.value = false
+    disableBodyScroll('create-task')
+  }
+
+  function handleCloseCreateTaskPopup() {
+    openCreateTaskPopup.value = false
+    openActionPopup.value = true
+    disableBodyScroll('action')
+  }
+
+  function handleFinishTaskPopup() {
+    openFinishTaskPopup.value = true
+    openActionPopup.value = false
+    disableBodyScroll('finish-task')
+  }
+
+  function handleCloseFinishTaskPopup() {
+    openFinishTaskPopup.value = false
     openActionPopup.value = true
     disableBodyScroll('action')
   }
@@ -860,6 +900,8 @@
       @close="handleCloseChangeResponsePopup"
       :show-close-button="false"
       :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
     >
       <p class="text-xl font-semibold text-space mb-25px leading-normal">
         Назначение действия
@@ -990,6 +1032,123 @@
           size="second-back"
           variant="back"
           @click="handleCloseWebhookPopup"
+        >
+          Назад
+        </UiButton>
+      </div>
+    </Popup>
+  </transition>
+  <transition name="fade" @after-leave="enableBodyScroll('create-task')">
+    <Popup
+      :isOpen="openCreateTaskPopup"
+      @close="handleCloseCreateTaskPopup"
+      :show-close-button="false"
+      :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
+    >
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
+        Назначение действия
+      </p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'task-create'"
+        :status="'Создать задачу'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Название задачи
+      </p>
+      <MyInput
+        :placeholder="'Введите название'"
+        v-model="createTask"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Ответственный
+      </p>
+      <ResponseChoose
+        v-model="newResponseTask"
+        :showInput="showInputTask"
+        :responses="responses"
+        @update:showInputTask="handleShowInputTask"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите время'"
+        :options="DropdownData.taskCreateFieldWhen"
+        v-model="taskCreateFieldWhenValue"
+        class="mb-25px"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseCreateTaskPopup"
+        >
+          Назад
+        </UiButton>
+      </div>
+    </Popup>
+  </transition>
+  <transition name="fade" @after-leave="enableBodyScroll('finish-task')">
+    <Popup
+      :isOpen="openFinishTaskPopup"
+      @close="handleCloseFinishTaskPopup"
+      :show-close-button="false"
+      :width="'400px'"
+      :disableOverflowHidden="true"
+      :overflowContainer="true"
+    >
+      <p class="text-xl font-semibold text-space mb-25px leading-normal">
+        Назначение действия
+      </p>
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Этап воронки
+      </p>
+      <StatusService :status="'Подумать'" class="mb-15px" />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Действие
+      </p>
+      <StatusService
+        :nameIcon="'task-complete'"
+        :status="'Завершить задачу'"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">
+        Выбрать задачу
+      </p>
+      <Autocomplete
+        :source="ActiveTasks"
+        v-model="targetToFinishTask"
+        placeholder="Начните ввод для поиска"
+        class="mb-15px"
+      />
+      <p class="text-sm font-medium text-space mb-15px leading-normal">Когда</p>
+      <MyDropdown
+        :defaultValue="'Выберите время'"
+        :options="DropdownData.taskFinishFieldWhen"
+        v-model="taskFinishFieldWhenValue"
+        class="mb-25px"
+      />
+      <div>
+        <UiButton size="semiaction" variant="action" class="mr-15px">
+          Добавить
+        </UiButton>
+        <UiButton
+          size="second-back"
+          variant="back"
+          @click="handleCloseFinishTaskPopup"
         >
           Назад
         </UiButton>

@@ -3,11 +3,11 @@
     <div
       class="max-w-2xl px-50px py-[12.8px] mx-auto flex leading-normal items-center"
     >
-      <router-link to="/">
+      <NuxtLink to="/">
         <h1 class="text-white text-25px font-bold uppercase px-3 py-0.5 mr-4">
           jobly
         </h1>
-      </router-link>
+      </NuxtLink>
       <ul class="flex gap-x-5px items-center">
         <li>
           <NuxtLink to="/applications" exact-active-class="active-link">
@@ -52,31 +52,33 @@
       <ul class="flex ml-auto items-center">
         <li class="mr-5px">
           <div
-            class="w-10 h-10 rounded-plus flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
+            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
           >
             <svg-icon name="pulse" width="20" height="20" />
           </div>
         </li>
         <li class="mr-5px">
           <div
-            class="w-10 h-10 rounded-plus flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer text-white"
+            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer text-white"
           >
             <svg-icon name="calendar" width="20" height="20" />
           </div>
         </li>
         <li class="mr-5px">
           <div
-            class="w-10 h-10 rounded-plus flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
+            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
           >
             <svg-icon name="bell" width="20" height="20" />
           </div>
         </li>
         <li class="mr-5">
-          <div
-            class="w-10 h-10 rounded-plus flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
-          >
-            <svg-icon name="settings" width="20" height="20" />
-          </div>
+          <NuxtLink to="/settings" exact-active-class="active-link">
+            <div
+              class="page-name w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
+            >
+              <svg-icon name="settings" width="20" height="20" />
+            </div>
+          </NuxtLink>
         </li>
         <li>
           <div class="cursor-pointer max-h-[40px]">
