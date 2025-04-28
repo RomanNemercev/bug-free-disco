@@ -16,7 +16,7 @@
           v-if="userRole === 'admin'"
           size="semiaction"
           variant="action"
-          @click="isNewAppPopup = true"
+          @click="isNewAppPopupAdmin = true"
         >
           Новая заявка
         </UiButton>
@@ -184,7 +184,7 @@
       </div>
     </div>
     <div v-if="userRole === 'admin'">
-      <transition
+      <!-- <transition
         name="fade"
         @after-leave="enableBodyScroll"
         @enter="disableBodyScroll"
@@ -197,6 +197,7 @@
           :disableOverflowHidden="true"
           :overflowContainer="true"
           maxHeight
+          :lgSize="true"
         >
           <p class="leading-normal text-xl font-semibold text-space mb-[39px]">
             Новая заявка
@@ -317,6 +318,99 @@
             >
               Отмена
             </UiButton>
+          </div>
+        </Popup>
+      </transition> -->
+      <transition
+        name="fade"
+        @after-leave="enableBodyScroll"
+        @enter="disableBodyScroll"
+      >
+        <Popup
+          :isOpen="isNewAppPopupAdmin"
+          @close="() => (isNewAppPopupAdmin = false)"
+          :width="'740px'"
+          :showCloseButton="false"
+          :disableOverflowHidden="true"
+          :overflowContainer="true"
+          maxHeight
+          :lgSize="true"
+        >
+          <p class="leading-normal text-xl font-semibold text-space mb-[39px]">
+            Новая заявка (администратор)
+          </p>
+          <div class="mb-22">
+            <div class="mb-15px">
+              <p class="text-sm font-medium text-space mb-7px">
+                Ответственный заявки
+              </p>
+              <response-input
+                class="w-full"
+                :responses="responseRoles"
+                v-model="newResponseAdmin"
+                :showRoles="true"
+              />
+            </div>
+            <div class="w-full flex justify-between gap-x-[25px] mb-15px">
+              <div class="w-full max-w-[400px]">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Заказчик
+                </p>
+                <response-input
+                  class="w-full"
+                  :responses="responseRoles"
+                  v-model="newCustomerAdmin"
+                  :showRoles="true"
+                />
+              </div>
+              <div class="w-full">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Email
+                </p>
+                <response-input
+                  class="w-full"
+                  :responses="responseRoles"
+                  v-model="newExecutorAdmin"
+                  :showRoles="true"
+                />
+              </div>
+            </div>
+            <div class="w-full flex justify-between gap-x-[25px] mb-15px">
+              <div class="w-full max-w-[400px]">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Должность
+                </p>
+                <MyInput
+                  placeholder="Введите должность"
+                  v-model="newPostAdmin"
+                />
+              </div>
+              <div class="w-full">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Подразделение
+                </p>
+                <MyInput
+                  placeholder="Введите название подразделения"
+                  v-model="newDepartmentAdmin"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Регион поиска
+              </p>
+              <geo-input class="mb-2.5" v-model="newLocationAdmin" />
+            </div>
+            <div class="w-full">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Количество позиций
+              </p>
+              <MyInput
+                placeholder="Введите число позиций на вакансию"
+                v-model="newQuantsPositionsAdmin"
+                :type="'Number'"
+              />
+            </div>
           </div>
         </Popup>
       </transition>
@@ -791,8 +885,11 @@
   import InputCalendar from '~/components/custom/InputCalendar.vue'
   import BtnResponseInput from '~/components/custom/BtnResponseInput.vue'
   import BtnAddBindVacancy from '~/components/custom/BtnAddBindVacancy.vue'
+  import MyInput from '~/components/custom/MyInput.vue'
+  import GeoInput from '@/components/custom/GeoInput.vue'
 
   import responses from '~/src/data/responses.json'
+  import responseRoles from '~/src/data/response-roles.json'
   import dataList from '~/src/data/roles-data-admin.json'
   import vacancyForBind from '~/src/data/vacancies-for-btnBind.json'
 
@@ -827,28 +924,32 @@
   const sortOrder = ref('asc')
   const userRole = ref('admin') // Change to "admin" or "responsible" and "customer" for testing
   const dropdownOptions = ['Управлять', 'Копировать заявку', 'Удалить']
-  const isNewAppPopup = ref(false)
+  // const isNewAppPopup = ref(false)
+  const isNewAppPopupAdmin = ref(true)
   const isNewAppPopupCustomer = ref(false)
   const isNewAppPopupResponsible = ref(false)
   const showNewResponse = ref(false)
   const newResponse = ref('')
   const responseContainer = ref(null)
-  const newPosition = ref('')
-  const newDepartment = ref('')
-  const newRegion = ref('')
-  const newReason = ref('')
-  const salaryMin = ref('')
-  const salaryMax = ref('')
-  const vacancyCount = ref('')
-  const requirements = ref('')
-  const responsibilities = ref('')
+  // const newPosition = ref('')
+  // const newDepartment = ref('')
+  // const newRegion = ref('')
+  // const newReason = ref('')
+  // const salaryMin = ref('')
+  // const salaryMax = ref('')
+  // const vacancyCount = ref('')
+  // const requirements = ref('')
+  // const responsibilities = ref('')
+  const newResponseAdmin = ref('')
   const newResponseResponsible = ref('')
   const showNewResponseResponsible = ref(false)
   const responseContainerResponsible = ref(null)
   const newExecutor = ref('')
+  const newExecutorAdmin = ref('')
   const showNewExecutor = ref(false)
   const executorContainer = ref(null)
   const newCustomer = ref('')
+  const newCustomerAdmin = ref('')
   const showNewCustomer = ref(false)
   const customerContainer = ref(false)
   const newPositionResponsible = ref('')
@@ -875,6 +976,10 @@
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
   const popupResponse = ref('')
+  const newPostAdmin = ref('')
+  const newDepartmentAdmin = ref('')
+  const newLocationAdmin = ref('')
+  const newQuantsPositionsAdmin = ref('')
 
   const statusLabels = {
     new: 'Новая заявка',
@@ -1032,17 +1137,17 @@
     document.body.style.overflow = '' // Включаем прокрутку
   }
 
-  const openNewResponse = event => {
-    event.stopPropagation()
-    showNewResponse.value = true
-  }
+  // const openNewResponse = event => {
+  //   event.stopPropagation()
+  //   showNewResponse.value = true
+  // }
 
-  const updateNewResponse = value => {
-    if (value) {
-      newResponse.value = value
-      showNewResponse.value = false
-    }
-  }
+  // const updateNewResponse = value => {
+  //   if (value) {
+  //     newResponse.value = value
+  //     showNewResponse.value = false
+  //   }
+  // }
 
   const openNewResponseResponsible = event => {
     event.stopPropagation()

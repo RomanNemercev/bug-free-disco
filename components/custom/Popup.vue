@@ -10,7 +10,11 @@
   >
     <div
       class="w-full"
-      :style="{ maxWidth: width, height: lgSize ? '142%' : '' }"
+      :style="{
+        maxWidth: width,
+        height: lgSize ? '142%' : '',
+        marginBottom: lgSize ? '35px' : '',
+      }"
     >
       <!-- Внешний контейнер с закруглениями -->
       <div
