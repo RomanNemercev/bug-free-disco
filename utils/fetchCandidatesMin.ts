@@ -10,12 +10,13 @@ export async function fetchCandidatesMin(page = 1) {
         surname: item.surname,
         tags: item.tags || [],
         icon: item.icon,
-        isPng: item.isPng,
+        isPng: false, // temporary before backend integration boolean values
         imagePath: item.imagePath,
         resume: item.resume,
         vacancy: item.vacancy,
         stage: item.stage
     }));
 
+    console.log("Response min data", minified);
     return { candidates: minified, pagination };
 }

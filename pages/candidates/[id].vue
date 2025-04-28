@@ -42,7 +42,7 @@
         </button>
       </div>
     </div>
-    <div class="w-full">
+    <div class="w-full" v-if="candidate">
       <div class="bg-white rounded-fifteen p-25px relative mb-15px pt-15px">
         <div class="justify-between flex mb-[41px]">
           <ButtonSelector :options="options" v-model="selectedLabel" />
@@ -138,7 +138,10 @@
                 >
                   {{ tag }}
                 </span>
-                <button class="text-slate-custom flex items-center ml-2.5">
+                <button
+                  :class="{ 'ml-2.5': candidate.tags.length > 0 }"
+                  class="text-slate-custom flex items-center"
+                >
                   <svg-icon
                     name="plus-gray20"
                     width="18"
@@ -497,11 +500,14 @@
         </div>
       </div>
     </div>
+    <div v-else>Загрузка...</div>
   </div>
 </template>
 
 <script setup>
-  import { candidatesFull } from '~/utils/candidatesFull'
+  import { ref, onMounted, watch } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { fetchCandidateById } from '~/utils/fetchCandidatesById'
 
   import ButtonSelector from '~/components/custom/ButtonSelector.vue'
   import BtnMessage from '~/components/custom/BtnMessage.vue'
@@ -520,25 +526,15 @@
 
   // get current route from candidateFull
   const route = useRoute()
-  const candidateId = parseInt(route.params.id)
-
-  // create a map of candidate ids to their indices
-  const candidateIndexMap = computed(() => {
-    const map = {}
-    candidatesFull.forEach((candidate, index) => {
-      map[candidate.id] = index
-    })
-    return map
-  })
+  const router = useRouter()
 
   // get current index from candidateFull
-  const currentIndex = computed(() => {
-    const index = candidateIndexMap.value[candidateId]
-    return index !== undefined ? index : -1
-  })
+  // Тут currentIndex и totalCandidates НЕ МОЖЕМ корректно посчитать без списка всех кандидатов!
+  // Можно временно использовать заглушки:
+  const currentIndex = ref(0) // пока 0
 
   // get total candidates from candidateFull
-  const totalCandidates = candidatesFull.length
+  const totalCandidates = ref(1) // пока 1
 
   // if candidate not found, throw 404 error
   if (currentIndex.value === -1) {
@@ -548,23 +544,8 @@
     })
   }
 
-  const goToPrevious = () => {
-    if (currentIndex.value > 0) {
-      const previousId = candidatesFull[currentIndex.value - 1].id
-      navigateTo(`/candidates/${previousId}`)
-    }
-  }
-
-  const goToNext = () => {
-    if (currentIndex.value < totalCandidates - 1) {
-      const nextId = candidatesFull[currentIndex.value + 1].id
-      navigateTo(`/candidates/${nextId}`)
-    }
-  }
-
-  const candidate = computed(() => {
-    return candidatesFull.find(c => c.id === Number(route.params.id))
-  })
+  const candidate = ref(null)
+  const loading = ref(true)
 
   const options = [
     'Все',
@@ -760,8 +741,100 @@
     },
   ])
 
+  // fnc for check load data
+  function sanitazeCandidate(data) {
+    if (!data) return null
+
+    return {
+      id: data.id ?? null,
+      created: data.created_at ?? null,
+      age: data.age ?? null,
+      firstName: data.firstname ?? '',
+      surname: data.surname ?? '',
+      patronymic: data.patronymic ?? '',
+      email: data.email ?? '',
+      phone: data.phone ?? '',
+      location: data.location ?? '',
+      vacancy: data.vacancy ?? '',
+      status: data.status ?? '',
+      skills: ['Excel', 'Коммуникабельность'],
+      experience: data.experience ?? '',
+      skype: data.skype ?? '',
+      telegram: data.telegram ?? '',
+      tags: data.tags ?? '',
+      quickInfo: data.quickInfo ?? '',
+      education: data.education ?? '',
+      attachedFiles: data.attachments ?? [],
+      links: [
+        'www.testlink-null.com',
+        'www.testlink-one.com',
+        'www.testlink-second.com',
+      ],
+      header: data.header ?? '',
+      locationFull: data.locationFull ?? '',
+      educationLevel: data.educationLevel ?? '',
+      resumeDownloadLink: data.resumeDownloadLink ?? '',
+      coverLetter: data.coverPath ?? '',
+      comments: data.comments ?? [],
+      timeline: data.timeline ?? [],
+      customFields: data.customFields ?? null,
+      customer: data.customer ?? null,
+      icon: data.icon ?? null,
+      photo:
+        'https://avatars.mds.yandex.net/i?id=91c6021eb7bcff5e3d9cbafed2b385a4502d4cf7-5236630-images-thumbs&n=13',
+    }
+  }
+
   const handleChatSend = messageData => {
     console.log('Получены данные в родительском компоненте:', messageData)
     // TODO: Implement message sending logic
+  }
+
+  const loadCandidate = async id => {
+    loading.value = true
+    try {
+      const rawData = await fetchCandidateById(id)
+      console.log('candidate data processed:', rawData)
+      candidate.value = sanitazeCandidate(rawData)
+      console.log('Candidate loaded:', candidate)
+    } catch (error) {
+      console.error(error)
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Candidate not found',
+      })
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // load cans on visit page
+  onMounted(() => {
+    const id = parseInt(route.params.id)
+    if (!isNaN(id)) {
+      loadCandidate(id)
+    }
+  })
+
+  // load cans on route change
+  watch(
+    () => route.params.id,
+    newId => {
+      const id = parseInt(newId)
+      if (!isNaN(id)) {
+        loadCandidate(id)
+      }
+    }
+  )
+
+  // next or prev candidate moving
+  const goToPrevious = () => {
+    const prevId = candidate.value?.id - 1
+    if (prevId > 0) router.push(`/candidates/${prevId}`)
+  }
+
+  const goToNext = () => {
+    const nextId = candidate.value?.id + 1
+    router.pust(`/candidates/${nextId}`)
   }
 </script>

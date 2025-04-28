@@ -1,13 +1,13 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref } from 'vue'
   import { useRouter } from 'vue-router'
+  import { fetchCandidatesMin } from '~/utils/fetchCandidatesMin'
+  import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
 
   import MyInput from '~/components/custom/MyInput.vue'
   import MyCheckbox from '~/components/custom/MyCheckbox.vue'
   import CardIcon from '~/components/custom/CardIcon.vue'
   import Pagination from '@/components/custom/Pagination.vue'
-
-  import { candidatesMin } from '~/utils/candidatesMin'
 
   const isHoveredFunnel = ref(false)
   const isActiveFunnel = ref(false)
@@ -17,27 +17,25 @@
   const allSelected = ref(false)
   const itemsPerPage = 10
   const currentPage = ref(1)
+  const candidates = ref([])
 
   const router = useRouter()
 
-  const totalPages = computed(() =>
-    Math.max(1, Math.ceil(data.value.length / itemsPerPage))
-  )
+  const totalPages = ref(1)
 
-  function handlePageChange(page) {
+  const handlePageChange = async page => {
     currentPage.value = page
+    const { candidates: data, pagination } = await fetchCandidatesMin(page)
+    paginatedCandidates.value = data
+    totalPages.value = pagination.totalPages
   }
 
   function funnelToggleActive() {
     isActiveFunnel.value = !isActiveFunnel.value
-    // cardsBlock.value.style.borderBottomLeftRadius = isActiveFunnel.value ? "0px" : "15px";
-    // cardsBlock.value.style.borderBottomRightRadius = isActiveFunnel.value ? "0px" : "15px";
   }
 
   function sortToggleActive() {
     isActiveSort.value = !isActiveSort.value
-    // cardsBlock.value.style.borderBottomLeftRadius = isActiveSort.value ? "0px" : "15px";
-    // cardsBlock.value.style.borderBottomRightRadius = isActiveSort.value ? "0px" : "15px";
   }
 
   const toggleAll = isChecked => {
@@ -61,30 +59,32 @@
     { deep: true }
   )
 
-  // const data = ref([
-  //     { id: 1, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 2, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 3, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 4, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 5, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 6, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 7, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 8, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 9, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 10, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  //     { id: 11, name: 'Сидоренко Валентин', tags: ['#подходящий', '#IT'], icon: "hh20", isPng: false, imagePath: "", resume: 'Пекарь электромонтер', vacancy: 'Менеджер по продажам', stage: 'Новый' },
-  // ]);
+  const data = ref(null)
 
-  const data = ref(candidatesMin)
-
-  const paginatedCandidates = computed(() => {
-    const startIndex = (currentPage.value - 1) * itemsPerPage
-    return data.value.slice(startIndex, startIndex + itemsPerPage)
-  })
+  const paginatedCandidates = ref([])
 
   function goToCandidate(id) {
     router.push(`/candidates/${id}`)
   }
+
+  const loadingCandidates = ref(false)
+
+  const loadCandidates = async () => {
+    try {
+      loadingCandidates.value = true
+      const { candidates: data, pagination } = await fetchCandidatesMin(
+        currentPage.value
+      )
+      paginatedCandidates.value = data
+      totalPages.value = pagination.lastPage
+    } catch (error) {
+      console.error('Ошибка при загрузке кандидатов:', error)
+    } finally {
+      loadingCandidates.value = false
+    }
+  }
+
+  loadCandidates()
 </script>
 
 <template>
@@ -132,84 +132,89 @@
         </div>
       </div>
     </div>
-    <!-- table cans on grid -->
-    <div class="table-container">
-      <!-- header -->
-      <div class="table-header">
-        <div>
-          <MyCheckbox
-            id="select-all"
-            :label="''"
-            v-model="allSelected"
-            @update:modelValue="toggleAll"
-            :emptyLabel="true"
-          />
-        </div>
-        <div class="px-2.5">Кандидат</div>
-        <div class="px-2.5">Источник</div>
-        <div class="px-2.5">Резюме</div>
-        <div class="px-2.5">Вакансия</div>
-        <div class="px-2.5">Этап</div>
+    <div>
+      <div v-if="loadingCandidates" class="absolute top-1/2 left-1/2">
+        <UiDotsLoader />
       </div>
-
-      <!-- body -->
-      <div class="table-body">
-        <div
-          v-for="item in paginatedCandidates"
-          :key="item.id"
-          class="table-row"
-        >
+      <!-- table cans on grid -->
+      <div class="table-container" v-else>
+        <!-- header -->
+        <div class="table-header">
           <div>
             <MyCheckbox
-              :id="item.id"
+              id="select-all"
               :label="''"
-              v-model="selected[item.id]"
+              v-model="allSelected"
+              @update:modelValue="toggleAll"
               :emptyLabel="true"
             />
           </div>
-          <div class="flex gap-2.5 p-2.5">
-            <UiAvatar size="candidate">
-              <UiAvatarImage
-                src="https://github.com/radix-vue.png"
-                alt="@radix-vue"
-              />
-              <UiAvatarFallback>АА</UiAvatarFallback>
-            </UiAvatar>
+          <div class="px-2.5">Кандидат</div>
+          <div class="px-2.5">Источник</div>
+          <div class="px-2.5">Резюме</div>
+          <div class="px-2.5">Вакансия</div>
+          <div class="px-2.5">Этап</div>
+        </div>
+
+        <!-- body -->
+        <div class="table-body">
+          <div
+            v-for="item in paginatedCandidates"
+            :key="item.id"
+            class="table-row"
+          >
             <div>
-              <p
-                class="text-sm font-medium text-space mb-5px leading-[170%] cursor-pointer"
-                @click="goToCandidate(item.id)"
-              >
-                {{ item.surname }} {{ item.firstName }}
-              </p>
-              <div class="flex gap-2.5">
-                <span
-                  v-for="tag in item.tags"
-                  :key="tag"
-                  class="text-dodger text-13px font-normal"
+              <MyCheckbox
+                :id="item.id"
+                :label="''"
+                v-model="selected[item.id]"
+                :emptyLabel="true"
+              />
+            </div>
+            <div class="flex gap-2.5 p-2.5">
+              <UiAvatar size="candidate">
+                <UiAvatarImage
+                  src="https://github.com/radix-vue.png"
+                  alt="@radix-vue"
+                />
+                <UiAvatarFallback>АА</UiAvatarFallback>
+              </UiAvatar>
+              <div>
+                <p
+                  class="text-sm font-medium text-space mb-5px leading-[170%] cursor-pointer"
+                  @click="goToCandidate(item.id)"
                 >
-                  {{ tag }}
-                </span>
+                  {{ item.surname }} {{ item.firstName }}
+                </p>
+                <div class="flex gap-2.5">
+                  <span
+                    v-for="tag in item.tags"
+                    :key="tag"
+                    class="text-dodger text-13px font-normal"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="px-2.5">
-            <CardIcon
-              :icon="item.icon"
-              :isPng="item.isPng"
-              :imagePath="item.imagePath"
-              :width="21"
-              :height="21"
-            />
-          </div>
-          <div class="px-2.5 text-sm font-normal text-space">
-            {{ item.resume }}
-          </div>
-          <div class="px-2.5 text-sm font-normal text-space">
-            {{ item.vacancy }}
-          </div>
-          <div class="px-2.5 text-sm font-normal text-space">
-            {{ item.stage }}
+            <div class="px-2.5">
+              <CardIcon
+                :icon="item.icon"
+                :isPng="item.isPng"
+                :imagePath="item.imagePath"
+                :width="21"
+                :height="21"
+              />
+            </div>
+            <div class="px-2.5 text-sm font-normal text-space">
+              {{ item.resume }}
+            </div>
+            <div class="px-2.5 text-sm font-normal text-space">
+              {{ item.vacancy }}
+            </div>
+            <div class="px-2.5 text-sm font-normal text-space">
+              {{ item.stage }}
+            </div>
           </div>
         </div>
       </div>
