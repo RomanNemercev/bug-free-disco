@@ -1,83 +1,98 @@
 <template>
-    <div class="w-full flex gap-x-2.5">
-        <!-- Поле "От" -->
-        <input type="text" v-model="localFrom" @input="handleInput('from', $event.target.value)"
-          @blur="handleBlurAndValidate('from')"
-          class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px" placeholder="От"
-          @focus="handleFocus('from')" :class="{ 'focused': isFocused.from }" />
+  <div class="w-full flex gap-x-2.5">
+    <!-- Поле "От" -->
+    <input
+      type="text"
+      v-model="localFrom"
+      @input="handleInput('from', $event.target.value)"
+      @blur="handleBlurAndValidate('from')"
+      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
+      placeholder="От"
+      @focus="handleFocus('from')"
+      :class="{ focused: isFocused.from }"
+    />
 
-        <!-- Поле "До" -->
-        <input type="text" v-model="localTo" @input="handleInput('to', $event.target.value)"
-          @blur="handleBlurAndValidate('to')"
-          class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px" placeholder="До"
-          @focus="handleFocus('to')" :class="{ 'focused': isFocused.to }" />
-    </div>
+    <!-- Поле "До" -->
+    <input
+      type="text"
+      v-model="localTo"
+      @input="handleInput('to', $event.target.value)"
+      @blur="handleBlurAndValidate('to')"
+      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
+      placeholder="До"
+      @focus="handleFocus('to')"
+      :class="{ focused: isFocused.to }"
+    />
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+  import { ref, watch } from 'vue'
 
-const props = defineProps({
+  const props = defineProps({
     modelValue: {
-        type: Object,
-        default: () => ({ from: null, to: null })
+      type: Object,
+      default: () => ({ from: null, to: null }),
+    },
+  })
+
+  const emit = defineEmits(['update:modelValue'])
+
+  const localFrom = ref(props.modelValue.from || '')
+  const localTo = ref(props.modelValue.to || '')
+  const isFocused = ref({ from: false, to: false })
+
+  const handleInput = (field, value) => {
+    const sanitizedValue = value.replace(/\D/g, '')
+
+    if (field === 'from') {
+      localFrom.value = sanitizedValue
+    } else if (field === 'to') {
+      localTo.value = sanitizedValue
     }
-});
 
-const emit = defineEmits(["update:modelValue"]);
+    emit('update:modelValue', { from: localFrom.value, to: localTo.value })
+  }
 
-const localFrom = ref(props.modelValue.from || "");
-const localTo = ref(props.modelValue.to || "");
-const isFocused = ref({ from: false, to: false });
-
-const handleInput = (field, value) => {
-    const sanitizedValue = value.replace(/\D/g, "");
-
-    if (field === "from") {
-        localFrom.value = sanitizedValue;
-    } else if (field === "to") {
-        localTo.value = sanitizedValue;
-    }
-
-    emit("update:modelValue", { from: localFrom.value, to: localTo.value });
-};
-
-const validateRange = () => {
-    const fromValue = parseInt(localFrom.value, 10);
-    const toValue = parseInt(localTo.value, 10);
+  const validateRange = () => {
+    const fromValue = parseInt(localFrom.value, 10)
+    const toValue = parseInt(localTo.value, 10)
 
     if (fromValue && toValue && fromValue > toValue) {
-        localFrom.value = toValue.toString();
+      localFrom.value = toValue.toString()
     }
 
-    emit("update:modelValue", { from: localFrom.value, to: localTo.value });
-};
+    emit('update:modelValue', { from: localFrom.value, to: localTo.value })
+  }
 
-const handleBlurAndValidate = (field) => {
-    isFocused.value[field] = false;
-    validateRange();
-};
+  const handleBlurAndValidate = field => {
+    isFocused.value[field] = false
+    validateRange()
+  }
 
-const handleFocus = (field) => {
-    isFocused.value[field] = true;
-};
+  const handleFocus = field => {
+    isFocused.value[field] = true
+  }
 
-// Следим за обновлением modelValue из родителя
-watch(() => props.modelValue, (newValue) => {
-    localFrom.value = newValue.from || "";
-    localTo.value = newValue.to || "";
-}, { deep: true });
-
+  // Следим за обновлением modelValue из родителя
+  watch(
+    () => props.modelValue,
+    newValue => {
+      localFrom.value = newValue.from || ''
+      localTo.value = newValue.to || ''
+    },
+    { deep: true }
+  )
 </script>
 
 <style scoped>
-input::placeholder {
+  input::placeholder {
     font-size: 14px;
     font-weight: 400;
     font-family: 'Inter', sans-serif;
-}
+  }
 
-.focused {
-    outline: 1px solid #5898FF;
-}
+  .focused {
+    outline: 1px solid #5898ff;
+  }
 </style>

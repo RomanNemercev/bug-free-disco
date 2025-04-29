@@ -351,7 +351,7 @@
                 :showRoles="true"
               />
             </div>
-            <div class="w-full flex justify-between gap-x-[25px] mb-15px">
+            <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Заказчик
@@ -365,7 +365,7 @@
               </div>
               <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
-                  Email
+                  Исполнитель
                 </p>
                 <response-input
                   class="w-full"
@@ -375,7 +375,7 @@
                 />
               </div>
             </div>
-            <div class="w-full flex justify-between gap-x-[25px] mb-15px">
+            <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Должность
@@ -395,13 +395,16 @@
                 />
               </div>
             </div>
-            <div class="w-full">
+            <div class="w-full mb-2.5">
               <p class="text-sm font-medium text-space leading-normal mb-4">
                 Регион поиска
               </p>
-              <geo-input class="mb-2.5" v-model="newLocationAdmin" />
+              <geo-input
+                v-model="newLocationAdmin"
+                :placeholder="'Введите город'"
+              />
             </div>
-            <div class="w-full">
+            <div class="w-full mb-2.5">
               <p class="text-sm font-medium text-space leading-normal mb-4">
                 Количество позиций
               </p>
@@ -410,6 +413,83 @@
                 v-model="newQuantsPositionsAdmin"
                 :type="'Number'"
               />
+            </div>
+            <div class="w-full mb-2.5 flex gap-x-15px">
+              <div class="w-full">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Зарплата
+                </p>
+                <SalaryRange v-model="newSalaryAdmin" />
+              </div>
+              <div class="w-full">
+                <p class="text-sm font-medium text-space leading-normal mb-4">
+                  Валюта
+                </p>
+                <my-dropdown
+                  :defaultValue="'Валюта'"
+                  :options="ArrayCurrency"
+                  :selected="0"
+                  v-model="newCurrencyTypeAdmin"
+                />
+              </div>
+            </div>
+            <div class="w-full">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Требования кандидата
+              </p>
+              <MyTextarea
+                v-model="newRequirementsAdmin"
+                :placeholder="'Опишите ключевые требования'"
+              />
+            </div>
+            <div class="w-full">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Обязанности кандидата
+              </p>
+              <MyTextarea
+                v-model="newResponsibilitiesAdmin"
+                :placeholder="'Опишите ключевые обязанности кандидата'"
+              />
+            </div>
+            <div class="w-full mb-15px">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Обязанности кандидата
+              </p>
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Причина открытия вакансии
+              </p>
+              <my-dropdown
+                :options="reasonsForOpenVacancy"
+                v-model="newReasonsForVacancyAdmin"
+                :defaultValue="'Укажите вариант ответа'"
+              />
+            </div>
+            <div class="w-full gap-x-15px flex mb-25px">
+              <div class="w-full">
+                <p class="text-sm font-medium text-space mb-1">
+                  Начать подбор не позднее
+                </p>
+                <InputCalendar :fullStyles="true" />
+              </div>
+              <div class="w-full">
+                <p class="text-sm font-medium text-space mb-1">
+                  Желаемая дата выхода кандидата
+                </p>
+                <InputCalendar :fullStyles="true" />
+              </div>
+            </div>
+            <div class="flex gap-15px justify-between w-fit">
+              <UiButton variant="action" size="semiaction" class="font-bold">
+                Создать
+              </UiButton>
+              <UiButton
+                variant="back"
+                size="second-back"
+                class="font-medium"
+                @click="isNewAppPopupAdmin = false"
+              >
+                Отмена
+              </UiButton>
             </div>
           </div>
         </Popup>
@@ -887,11 +967,15 @@
   import BtnAddBindVacancy from '~/components/custom/BtnAddBindVacancy.vue'
   import MyInput from '~/components/custom/MyInput.vue'
   import GeoInput from '@/components/custom/GeoInput.vue'
+  import SalaryRange from '~/components/custom/SalaryRange.vue'
+  import MyDropdown from '~/components/custom/MyDropdown.vue'
+  import MyTextarea from '~/components/custom/MyTextarea.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
   import dataList from '~/src/data/roles-data-admin.json'
   import vacancyForBind from '~/src/data/vacancies-for-btnBind.json'
+  import currency from '~/src/data/currency.json'
 
   const data = ref(
     dataList.map(vacancy => ({
@@ -925,7 +1009,7 @@
   const userRole = ref('admin') // Change to "admin" or "responsible" and "customer" for testing
   const dropdownOptions = ['Управлять', 'Копировать заявку', 'Удалить']
   // const isNewAppPopup = ref(false)
-  const isNewAppPopupAdmin = ref(true)
+  const isNewAppPopupAdmin = ref(false)
   const isNewAppPopupCustomer = ref(false)
   const isNewAppPopupResponsible = ref(false)
   const showNewResponse = ref(false)
@@ -980,6 +1064,12 @@
   const newDepartmentAdmin = ref('')
   const newLocationAdmin = ref('')
   const newQuantsPositionsAdmin = ref('')
+  const newSalaryAdmin = ref({ from: null, to: null })
+  const ArrayCurrency = currency
+  const newCurrencyTypeAdmin = ref('RUB (рубль)')
+  const newRequirementsAdmin = ref('')
+  const newResponsibilitiesAdmin = ref('')
+  const newReasonsForVacancyAdmin = ref('')
 
   const statusLabels = {
     new: 'Новая заявка',
@@ -1205,6 +1295,29 @@
 
   // Следим за изменением выбранного таба и обновляем высоту
   watch(popupSelectedTab, updateTabHeight)
+
+  const reasonsForOpenVacancy = [
+    {
+      name: 'Замена позиции',
+      value: 0,
+    },
+    {
+      name: 'Расширения',
+      value: 1,
+    },
+    {
+      name: 'Причина 3',
+      value: 2,
+    },
+    {
+      name: 'Причина 4',
+      value: 3,
+    },
+    {
+      name: 'Причина 5',
+      value: 4,
+    },
+  ]
 </script>
 
 <style scoped>
