@@ -1,142 +1,160 @@
 <script setup>
-import { ref } from "vue";
-import debounce from 'lodash/debounce';
+  import { ref } from 'vue'
+  import debounce from 'lodash/debounce'
 
-const currentVacancy = ref('');
-const filteredVacancies = ref([]);
-const isFocused = ref(false);
-const showInput = ref(false);
+  const currentVacancy = ref('')
+  const filteredVacancies = ref([])
+  const isFocused = ref(false)
+  const showInput = ref(false)
 
-const props = defineProps({
+  const props = defineProps({
     placeholder: {
-        type: String,
-        default: 'Выберите вакансию',
+      type: String,
+      default: 'Выберите вакансию',
     },
     vacancies: {
-        type: Array,
-        required: true,
+      type: Array,
+      required: true,
     },
-});
+  })
 
-const emit = defineEmits(['update:modelValue']);
+  const emit = defineEmits(['update:modelValue'])
 
-// Дебаунс-функция для фильтрации списка
-const filterVacancies = debounce(() => {
-    const input = currentVacancy.value.toLowerCase();
+  // Дебаунс-функция для фильтрации списка
+  const filterVacancies = debounce(() => {
+    const input = currentVacancy.value.toLowerCase()
     filteredVacancies.value = props.vacancies.filter(vacancy =>
-        vacancy.name.toLowerCase().includes(input)
-    );
-}, 300);
+      vacancy.name.toLowerCase().includes(input)
+    )
+  }, 300)
 
-const selectVacancy = (vacancy) => {
-    currentVacancy.value = vacancy;
-    filteredVacancies.value = [];
-    isFocused.value = false;
-    showInput.value = false;
-    emit('update:modelValue', vacancy);
-};
+  const selectVacancy = vacancy => {
+    currentVacancy.value = vacancy
+    filteredVacancies.value = []
+    isFocused.value = false
+    showInput.value = false
+    emit('update:modelValue', vacancy)
+  }
 </script>
 
 <template>
-    <div class="vacancy-selector relative">
-        <!-- Кнопки -->
-        <div v-if="!showInput && !currentVacancy" class="text-dodger text-sm font-medium flex py-2.5 px-15px">
-            <button disabled class="cursor-not-allowed">Создать</button>
-            <div class="cursor-default">&nbsp;/&nbsp;</div>
-            <button @click="showInput = true">Привязать</button>
-        </div>
-
-        <!-- Отображение выбранной вакансии -->
-        <div v-if="currentVacancy" class="pl-15px">
-            <p class="py-2.5 text-sm font-medium text-dodger">{{ currentVacancy.name }}</p>
-            <p class="text-slate-custom text-13px font-normal">ID {{ currentVacancy.id }}</p>
-        </div>
-
-        <!-- Поле ввода с фильтрацией -->
-        <div v-if="showInput">
-            <input type="text" v-model="currentVacancy" @input="filterVacancies" @focus="isFocused = true"
-              @blur="isFocused = false" :placeholder="isFocused ? '' : placeholder"
-              class="vacancy-input w-full py-[9px] pl-[42px] pr-[42px] text-ellipsis border border-athens rounded-ten bg-athens-gray text-sm font-normal focus:outline-none focus:border focus:border-dodger" />
-
-            <transition name="slide-fade">
-                <ul v-if="filteredVacancies.length && currentVacancy"
-                  class="absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10 overflow-y-auto max-h-40">
-                    <li v-for="(vacancy, index) in filteredVacancies" :key="index"
-                      class="vacancy text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer"
-                      @mousedown="selectVacancy(vacancy)">
-                        {{ vacancy.name }}
-                    </li>
-                </ul>
-
-                <div v-else-if="currentVacancy && isFocused"
-                  class="no-vacancy absolute w-full bg-white border rounded shadow top-12 z-10">
-                    <div class="text-gray-500 py-2 px-4">
-                        Вакансия не найдена
-                    </div>
-                </div>
-            </transition>
-        </div>
+  <div class="vacancy-selector relative">
+    <!-- Кнопки -->
+    <div
+      v-if="!showInput && !currentVacancy"
+      class="text-dodger text-sm font-medium flex py-2.5 w-fit"
+    >
+      <button disabled class="cursor-not-allowed">Создать</button>
+      <div class="cursor-default">&nbsp;/&nbsp;</div>
+      <button @click="showInput = true">Привязать</button>
     </div>
+
+    <!-- Отображение выбранной вакансии -->
+    <div v-if="currentVacancy && !showInput" class="pl-15px">
+      <p class="py-2.5 text-sm font-medium text-dodger leading-normal">
+        {{ currentVacancy.name }}
+      </p>
+      <p class="text-slate-custom text-13px font-normal leading-normal">
+        ID {{ currentVacancy.id }}
+      </p>
+    </div>
+
+    <!-- Поле ввода с фильтрацией -->
+    <div v-if="showInput">
+      <input
+        type="text"
+        v-model="currentVacancy"
+        @input="filterVacancies"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+        :placeholder="isFocused ? '' : placeholder"
+        class="vacancy-input w-full py-[9px] pl-[42px] pr-[42px] text-ellipsis border border-athens rounded-ten bg-athens-gray text-sm font-normal focus:outline-none focus:border focus:border-dodger"
+      />
+
+      <transition name="slide-fade">
+        <ul
+          v-if="filteredVacancies.length && currentVacancy"
+          class="absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10 overflow-y-auto max-h-40"
+        >
+          <li
+            v-for="(vacancy, index) in filteredVacancies"
+            :key="index"
+            class="vacancy text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer"
+            @mousedown="selectVacancy(vacancy)"
+          >
+            {{ vacancy.name }}
+          </li>
+        </ul>
+
+        <div
+          v-else-if="currentVacancy && isFocused"
+          class="no-vacancy absolute w-full bg-white border rounded shadow top-12 z-10"
+        >
+          <div class="text-gray-500 py-2 px-4">Вакансия не найдена</div>
+        </div>
+      </transition>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.vacancy-selector {
+  .vacancy-selector {
     position: relative;
-}
+  }
 
-.vacancy-list {
+  .vacancy-list {
     max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ddd;
     background: #fff;
-}
+  }
 
-.vacancy-input {
+  .vacancy-input {
     background-image: url('../../assets/sprite/svg/search.svg');
     background-repeat: no-repeat;
     background-position: 15px center;
-}
+  }
 
-.vacancy-input::placeholder {
+  .vacancy-input::placeholder {
     color: #9098b4;
     font-size: 14px;
     font-weight: 400;
     font-family: 'Inter', sans-serif;
-}
+  }
 
-.vacancy:not(:last-child) {
+  .vacancy:not(:last-child) {
     border-bottom: 1px solid #f4f6f8;
-}
+  }
 
-.clear-vacancy {
+  .clear-vacancy {
     transform: translateY(-50%);
     cursor: pointer;
-}
+  }
 
-::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 10px;
     background-color: #f4f6f8;
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
-}
+  }
 
-::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background-color: #79869a;
     /* Your preferred color */
     border-radius: 5px;
-}
+  }
 
-.slide-fade-enter-active {
+  .slide-fade-enter-active {
     transition: all 0.3s ease-out;
-}
+  }
 
-.slide-fade-leave-active {
+  .slide-fade-leave-active {
     transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
+  }
 
-.slide-fade-enter-from,
-.slide-fade-leave-to {
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
     transform: translateY(-4px);
     opacity: 0;
-}
+  }
 </style>

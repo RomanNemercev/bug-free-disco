@@ -23,6 +23,10 @@
       type: String,
       default: '',
     },
+    minStyles: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -62,7 +66,12 @@
           @focus="isFocused = true"
           @blur="isFocused = false"
           :placeholder="isFocused ? '' : placeholder"
-          class="response-input w-full py-[9px] pl-[42px] pr-[42px] text-ellipsis border border-athens rounded-ten bg-athens-gray text-sm font-normal focus:outline-none focus:border focus:border-dodger"
+          class="response-input w-full py-[9px] pl-[42px] pr-[42px] text-ellipsis border rounded-ten text-sm font-normal focus:outline-none focus:border focus:border-dodger"
+          :class="
+            minStyles
+              ? 'bg-transparent border-none'
+              : 'bg-athens-gray border-athens'
+          "
         />
         <button
           class="clear-response absolute top-2/4 right-4 text-slate-custom"

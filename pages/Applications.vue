@@ -453,13 +453,10 @@
             </div>
             <div class="w-full mb-15px">
               <p class="text-sm font-medium text-space leading-normal mb-4">
-                Обязанности кандидата
-              </p>
-              <p class="text-sm font-medium text-space leading-normal mb-4">
                 Причина открытия вакансии
               </p>
               <my-dropdown
-                :options="reasonsForOpenVacancy"
+                :options="reasonseForOpenVacancy"
                 v-model="newReasonsForVacancyAdmin"
                 :defaultValue="'Укажите вариант ответа'"
               />
@@ -825,11 +822,12 @@
         v-if="selectedVacancy"
         :isOpen="!!selectedVacancy"
         @close="closePopup"
-        :width="'740px'"
+        :width="'750px'"
         :showCloseButton="false"
         :disableOverflowHidden="true"
         :overflowContainer="true"
         maxHeight
+        :lgSize="true"
       >
         <template #default>
           <h3 class="text-xl font-semibold text-space mb-5">
@@ -883,12 +881,10 @@
             >
               <div v-if="popupSelectedTab === 'popupMainInfo'">
                 <div
-                  class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen mb-2.5"
+                  class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
                 >
                   <div class="w-full">
-                    <p class="text-sm pl-15px font-medium mb-5px">
-                      Исполнитель
-                    </p>
+                    <p class="text-sm font-medium mb-5px">Исполнитель</p>
                     <BtnResponseInput
                       v-model="popupResponse"
                       :responses="responses"
@@ -905,10 +901,10 @@
                   </div>
                 </div>
                 <div
-                  class="flex gap-x-5 py-15px px-2.5 bg-white rounded-fifteen"
+                  class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
                 >
                   <div class="w-full">
-                    <p class="text-sm font-medium mb-15px pl-15px">Вакансия</p>
+                    <p class="text-sm font-medium mb-15px">Вакансия</p>
                     <BtnAddBindVacancy :vacancies="vacancyForBind" />
                   </div>
                   <div class="w-full">
@@ -918,8 +914,129 @@
                     </p>
                   </div>
                 </div>
+                <div class="p-25px bg-white rounded-fifteen">
+                  <div class="flex gap-x-15px mb-5">
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Заказчик</p>
+                      <BtnResponseInput
+                        :responses="customersRoles"
+                        v-model="addNewCustomer"
+                        :placeholder="'ФИО заказчика'"
+                        :minStyles="true"
+                        :showRoles="true"
+                      />
+                    </div>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">
+                        Ответственный заявки
+                      </p>
+                      <BtnResponseInput
+                        :responses="responsiblesRoles"
+                        v-model="addNewResponsible"
+                        :placeholder="'ФИО ответственного'"
+                        :minStyles="true"
+                        :showRoles="true"
+                      />
+                    </div>
+                  </div>
+                  <div class="flex gap-x-15px mb-5">
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Департамент</p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        Разработка
+                      </p>
+                    </div>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">
+                        Причина открытия вакансии
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        Расширение штата
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex gap-x-15px mb-5">
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Зарплата</p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        от 80 000 до 150 000 (руб)
+                      </p>
+                    </div>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">
+                        Количество позиций
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">2</p>
+                    </div>
+                  </div>
+                  <div class="mb-5">
+                    <p class="text-sm font-medium mb-15px">
+                      Требования кандидата
+                    </p>
+                    <p class="text-slate-custom font-normal text-sm">
+                      Глубокие знания языка 1С:Предприятие. Программист должен
+                      хорошо знать синтаксис языка и иметь опыт работы с
+                      различными функциями и возможностями этой системы.
+                    </p>
+                  </div>
+                  <div class="mb-5">
+                    <p class="text-sm font-medium mb-15px">
+                      Обязанности кандидата
+                    </p>
+                    <p class="text-slate-custom font-normal text-sm">
+                      Создание конфигураций. Настройка программы под нужды
+                      конкретной компании. Например, если у компании уникальная
+                      система учёта товаров, программист создаст конфигурацию,
+                      которая будет учитывать все особенности бизнеса
+                    </p>
+                  </div>
+                  <div class="flex gap-x-15px">
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">
+                        Начать подбор не позднее
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        10/05/2024
+                      </p>
+                    </div>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">
+                        Желаемая дата выхода кандидата
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        10/05/2024
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div v-if="popupSelectedTab === 'popupHistory'">Tab History</div>
+              <div v-if="popupSelectedTab === 'popupHistory'">
+                <div class="[&>*:not(:last-of-type)]:mb-2.5">
+                  <div
+                    v-for="event in historyTabEvents"
+                    :key="event.id"
+                    class="flex bg-white rounded-fifteen px-25px py-15px"
+                  >
+                    <div>
+                      <p class="font-medium text-sm text-space mb-5px">
+                        {{ event.eventTitle }}
+                      </p>
+                      <p class="text-sm font-normal text-slate-custom">
+                        {{ event.eventContent }}
+                      </p>
+                    </div>
+                    <div class="ml-auto">
+                      <p class="text-sm font-normal text-slate-custom">
+                        {{
+                          formatDateTime(event.eventLogDateTime).date
+                        }}&nbsp;/&nbsp;{{
+                          formatDateTime(event.eventLogDateTime).time
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div v-if="popupSelectedTab === 'popupComments'">
                 Tab Comments
               </div>
@@ -970,6 +1087,7 @@
   import SalaryRange from '~/components/custom/SalaryRange.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import MyTextarea from '~/components/custom/MyTextarea.vue'
+  import dayjs from 'dayjs'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1070,6 +1188,8 @@
   const newRequirementsAdmin = ref('')
   const newResponsibilitiesAdmin = ref('')
   const newReasonsForVacancyAdmin = ref('')
+  const addNewCustomer = ref('')
+  const addNewResponsible = ref('')
 
   const statusLabels = {
     new: 'Новая заявка',
@@ -1296,7 +1416,7 @@
   // Следим за изменением выбранного таба и обновляем высоту
   watch(popupSelectedTab, updateTabHeight)
 
-  const reasonsForOpenVacancy = [
+  const reasonseForOpenVacancy = [
     {
       name: 'Замена позиции',
       value: 0,
@@ -1318,6 +1438,52 @@
       value: 4,
     },
   ]
+
+  const customersRoles = [
+    { name: 'Семен Семенович ', role: 'Заказчик' },
+    { name: 'Саймон Алексеевич', role: 'Заказчик' },
+    { name: 'Мария Сидорова' },
+  ]
+
+  const responsiblesRoles = [
+    { name: 'Александр Васильев ', role: 'Администратор' },
+    { name: 'Савелий Платонов', role: 'Администратор' },
+    { name: 'Мария Сидорова' },
+  ]
+
+  const EVENT_TYPES = {
+    CREATED: 'Создана заявка',
+    UNDER_REVIEW: 'Принята к рассмотрению',
+    ASSIGNED: 'Назначен ответственный',
+  }
+
+  const historyTabEvents = [
+    {
+      id: 1,
+      eventTitle: EVENT_TYPES.CREATED,
+      eventContent: 'Программист 1С на неполный день',
+      eventLogDateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 2,
+      eventTitle: EVENT_TYPES.UNDER_REVIEW,
+      eventContent: 'Василисов Василий Сергеевич',
+      eventLogDateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 3,
+      eventTitle: EVENT_TYPES.ASSIGNED,
+      eventContent: 'Михайлов Михаил Михайлович',
+      eventLogDateTime: '2024-09-11T18:03:00',
+    },
+  ]
+
+  const formatDateTime = dateTime => {
+    return {
+      date: dayjs(dateTime).format('DD.MM.YYYY'),
+      time: dayjs(dateTime).format('HH:mm'),
+    }
+  }
 </script>
 
 <style scoped>
