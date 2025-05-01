@@ -877,7 +877,8 @@
           >
             <div
               ref="tabContentInner"
-              class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px] p-15px"
+              class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px]"
+              :class="popupSelectedTab === 'popupComments' ? 'p-0' : 'p-15px'"
             >
               <div v-if="popupSelectedTab === 'popupMainInfo'">
                 <div
@@ -1038,7 +1039,14 @@
                 </div>
               </div>
               <div v-if="popupSelectedTab === 'popupComments'">
-                Tab Comments
+                <div>
+                  <div
+                    class="pt-1 pb-25px px-15px max-h-[400px] overflow-auto custom-webkit"
+                  >
+                    <MinTimeline />
+                  </div>
+                  <MinChat />
+                </div>
               </div>
             </div>
           </div>
@@ -1069,6 +1077,7 @@
     nextTick,
     watch,
   } from 'vue'
+  import dayjs from 'dayjs'
 
   // import { getMovieList } from "@/src/api";
   // const apiTest = getMovieList('movie');
@@ -1087,7 +1096,8 @@
   import SalaryRange from '~/components/custom/SalaryRange.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import MyTextarea from '~/components/custom/MyTextarea.vue'
-  import dayjs from 'dayjs'
+  import MinTimeline from '~/components/custom/MinTimeline.vue'
+  import MinChat from '~/components/custom/MinChat.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1508,5 +1518,21 @@
 
   .fade-leave-from {
     opacity: 1;
+  }
+
+  /* Стилизация скроллбара для WebKit-браузеров (Chrome, Safari, Edge) */
+  .custom-webkit::-webkit-scrollbar {
+    width: 10px; /* Ширина скроллбара */
+  }
+
+  .custom-webkit::-webkit-scrollbar-track {
+    background: transparent; /* Цвет фона дорожки */
+    border-radius: 10px; /* Закругление краёв дорожки */
+    margin-top: 4px;
+  }
+
+  .custom-webkit::-webkit-scrollbar-thumb {
+    background-color: #79869a; /* Цвет ползунка */
+    border-radius: 5px; /* Закругление краёв ползунка */
   }
 </style>

@@ -38,7 +38,7 @@ export async function fetchCandidatesFull(page = 1) {
     } catch (error: any) {
         if (error.response.status === 401) {
             alert('Ваша сессия истекла! Пожалуйста, авторизуйтесь снова.');
-            useRouter().replace('/login');
+            useRouter().replace('/auth');
         } else {
             console.error('Ошибка при получении кандидатов:', error);
         }
