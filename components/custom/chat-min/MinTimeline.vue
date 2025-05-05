@@ -1,55 +1,12 @@
 <!-- components/custom/MinTimeline.vue -->
 <script setup>
-  import { ref } from 'vue'
+  import dayjs from 'dayjs'
 
-  // Начальные данные (позже можно заменить на API)
-  const messages = ref([
-    {
-      id: 1,
-      type: 'standard',
-      author: 'Василисов Василий Сергеевич',
-      content: 'Пожалуйста, кто-то, закройте окно в коридоре, уже ДУЕТ!',
-      dateTime: '2024-09-11T18:03:00',
-    },
-    {
-      id: 2,
-      type: 'with-recipient',
-      author: 'Алексеев Алексей Алексеевич',
-      recipients: ['Василисов Василий Сергеевич'],
-      content: 'Коллега уважаемый, попробуй сделать это самостоятельно!',
-      dateTime: '2024-09-11T18:03:00',
-    },
-    {
-      id: 3,
-      type: 'with-file',
-      author: 'Георгиева Настасья Самбурская',
-      recipients: [
-        'Василисов Василий Сергеевич',
-        'Алексеев Алексей Алексеевич',
-      ],
-      content:
-        'Коллеги! Отчет готов! Прошу ознакомиться и дать обратную связь ближайшее время',
-      file: { name: 'Какой-то отчет.pdf', format: 'pdf' },
-      dateTime: '2024-09-11T18:03:00',
-    },
-    {
-      id: 4,
-      type: 'standard',
-      author: 'Денисов Василис Алексеевич',
-      content: 'Благодарность за отчет!',
-      dateTime: '2024-09-11T18:03:00',
-    },
-    {
-      id: 5,
-      type: 'standard',
-      author: 'Василисов Василий Сергеевич',
-      content: 'Пожалуйста, кто-то, откройте окно в коридоре, уже не ДУЕТ!',
-      dateTime: '2024-09-11T18:03:00',
-    },
-  ])
+  const props = defineProps({
+    messages: { type: Array, default: () => [] },
+  })
 
   // Форматирование даты и времени
-  import dayjs from 'dayjs'
   const formatDateTime = dateTime => {
     return dayjs(dateTime).format('DD.MM.YYYY / HH:mm')
   }

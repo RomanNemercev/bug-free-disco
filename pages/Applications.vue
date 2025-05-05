@@ -872,8 +872,9 @@
             </button>
           </div>
           <div
-            class="relative mb-25px"
+            class="relative"
             :style="{ height: tabContentHeight + 'px' }"
+            :class="popupSelectedTab === 'popupComments' ? 'mb-0' : 'mb-25px'"
           >
             <div
               ref="tabContentInner"
@@ -1040,12 +1041,19 @@
               </div>
               <div v-if="popupSelectedTab === 'popupComments'">
                 <div>
-                  <div
-                    class="pt-1 pb-25px px-15px max-h-[400px] overflow-auto custom-webkit"
-                  >
-                    <MinTimeline />
+                  <!-- <div>
+                    <MinTimeline
+                      :messages="messages"
+                      :container-height="400"
+                      :padding="{ top: 4, bottom: 25, left: 25, right: 25 }"
+                    />
                   </div>
-                  <MinChat />
+                  <MinChat /> -->
+                  <ChatMin
+                    :container-height="400"
+                    :initial-messages="messages"
+                    :padding="{ top: 10, bottom: 20, left: 25, right: 25 }"
+                  />
                 </div>
               </div>
             </div>
@@ -1072,6 +1080,7 @@
     ref,
     computed,
     onMounted,
+    onUnmounted,
     onBeforeUnmount,
     watchEffect,
     nextTick,
@@ -1096,8 +1105,7 @@
   import SalaryRange from '~/components/custom/SalaryRange.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import MyTextarea from '~/components/custom/MyTextarea.vue'
-  import MinTimeline from '~/components/custom/MinTimeline.vue'
-  import MinChat from '~/components/custom/MinChat.vue'
+  import ChatMin from '~/components/custom/chat-min'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1200,6 +1208,20 @@
   const newReasonsForVacancyAdmin = ref('')
   const addNewCustomer = ref('')
   const addNewResponsible = ref('')
+  //  used resizeObserver for dinamycly correct popup's height
+  let resizeObserver = null
+
+  // Функция обновления высоты контента
+  const updateTabHeight = () => {
+    nextTick(() => {
+      if (tabContentInner.value) {
+        tabContentHeight.value = tabContentInner.value.offsetHeight
+        console.log('Correct height in popup - enabled.')
+      } else {
+        console.warn('tabContent is null when updating height')
+      }
+    })
+  }
 
   const statusLabels = {
     new: 'Новая заявка',
@@ -1340,6 +1362,14 @@
     document.removeEventListener('click', handleClickOutsideNewAppPopupCustomer)
   })
 
+  onUnmounted(() => {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+      console.log('correct height in popup is - disabled.')
+    }
+  })
+
   const updateResponseChoose = (vacancy, value) => {
     if (value) {
       vacancy.responseChoose = value
@@ -1405,26 +1435,49 @@
     }
   }
 
-  // Функция обновления высоты контента
-  const updateTabHeight = () => {
-    nextTick(() => {
-      if (tabContentInner.value) {
-        tabContentHeight.value = tabContentInner.value.offsetHeight
+  watch(selectedVacancy, newValue => {
+    if (newValue) {
+      // popup is opening
+      nextTick(() => {
+        if (tabContentInner.value) {
+          let isInitialUpdate = true
+          resizeObserver = new ResizeObserver(() => {
+            if (isInitialUpdate) {
+              isInitialUpdate = false
+            } else {
+              updateTabHeight()
+              console.log('call fnc second time')
+            }
+          })
+          resizeObserver.observe(tabContentInner.value)
+          updateTabHeight()
+          console.log('call fnc first time')
+        } else {
+          console.warn('tabContentInner is null after popup open')
+        }
+      })
+    } else {
+      // popup is closing
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+        console.log('correct height container in popup is disabled')
       }
-    })
-  }
+    }
+  })
+
+  // Следим за изменением выбранного таба и обновляем высоту
+  watch(popupSelectedTab, () => {
+    updateTabHeight()
+  })
 
   const openPopup = vacancy => {
     selectedVacancy.value = vacancy
-    updateTabHeight()
   }
 
   const closePopup = () => {
     selectedVacancy.value = null
   }
-
-  // Следим за изменением выбранного таба и обновляем высоту
-  watch(popupSelectedTab, updateTabHeight)
 
   const reasonseForOpenVacancy = [
     {
@@ -1494,6 +1547,52 @@
       time: dayjs(dateTime).format('HH:mm'),
     }
   }
+
+  // Начальные данные (позже можно заменить на API)
+  const messages = ref([
+    {
+      id: 1,
+      type: 'standard',
+      author: 'Василисов Василий Сергеевич',
+      content: 'Пожалуйста, кто-то, закройте окно в коридоре, уже ДУЕТ!',
+      dateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 2,
+      type: 'with-recipient',
+      author: 'Алексеев Алексей Алексеевич',
+      recipients: ['Василисов Василий Сергеевич'],
+      content: 'Коллега уважаемый, попробуй сделать это самостоятельно!',
+      dateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 3,
+      type: 'with-file',
+      author: 'Георгиева Настасья Самбурская',
+      recipients: [
+        'Василисов Василий Сергеевич',
+        'Алексеев Алексей Алексеевич',
+      ],
+      content:
+        'Коллеги! Отчет готов! Прошу ознакомиться и дать обратную связь ближайшее время',
+      file: { name: 'Какой-то отчет.pdf', format: 'pdf' },
+      dateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 4,
+      type: 'standard',
+      author: 'Денисов Василис Алексеевич',
+      content: 'Благодарность за отчет!',
+      dateTime: '2024-09-11T18:03:00',
+    },
+    {
+      id: 5,
+      type: 'standard',
+      author: 'Василисов Василий Сергеевич',
+      content: 'Пожалуйста, кто-то, откройте окно в коридоре, уже не ДУЕТ!',
+      dateTime: '2024-09-11T18:03:00',
+    },
+  ])
 </script>
 
 <style scoped>
@@ -1518,21 +1617,5 @@
 
   .fade-leave-from {
     opacity: 1;
-  }
-
-  /* Стилизация скроллбара для WebKit-браузеров (Chrome, Safari, Edge) */
-  .custom-webkit::-webkit-scrollbar {
-    width: 10px; /* Ширина скроллбара */
-  }
-
-  .custom-webkit::-webkit-scrollbar-track {
-    background: transparent; /* Цвет фона дорожки */
-    border-radius: 10px; /* Закругление краёв дорожки */
-    margin-top: 4px;
-  }
-
-  .custom-webkit::-webkit-scrollbar-thumb {
-    background-color: #79869a; /* Цвет ползунка */
-    border-radius: 5px; /* Закругление краёв ползунка */
   }
 </style>
