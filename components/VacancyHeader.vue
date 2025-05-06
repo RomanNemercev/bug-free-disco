@@ -80,8 +80,12 @@
             </div>
           </NuxtLink>
         </li>
-        <li>
-          <div class="cursor-pointer max-h-[40px]">
+        <li class="relative">
+          <button
+            ref="toggleButtonRef"
+            class="cursor-pointer max-h-[40px]"
+            @click="toggleNotification"
+          >
             <UiAvatar>
               <UiAvatarImage
                 src="https://github.com/radix-vue.png"
@@ -89,7 +93,56 @@
               />
               <UiAvatarFallback>{{ userStore.initials }}</UiAvatarFallback>
             </UiAvatar>
-          </div>
+          </button>
+          <PopupNotification
+            :is-visible="showNotification"
+            position="top-right"
+            :ignore-elements="[toggleButtonRef]"
+            @update:isVisible="showNotification = $event"
+          >
+            <div>
+              <div
+                class="p-15px flex gap-x-15px items-center border-b border-athens"
+              >
+                <UiAvatar size="fourtyfive">
+                  <UiAvatarImage
+                    src="https://github.com/radix-vue.png"
+                    alt="@radix-vue"
+                  />
+                  <UiAvatarFallback class="text-dodger">
+                    {{ userStore.initials }}
+                  </UiAvatarFallback>
+                </UiAvatar>
+                <div>
+                  <p
+                    class="text-sm font-medium leading-150 mb-5px whitespace-nowrap"
+                  >
+                    {{ userName }}
+                  </p>
+                  <span class="text-13px text-slate-custom leading-130">
+                    Администратор
+                  </span>
+                </div>
+              </div>
+              <ul class="[&>*:not(:last-of-type)]:border-b border-athens">
+                <li>
+                  <button
+                    class="w-full py-2.5 px-15px text-left text-sm text-slate-custom"
+                  >
+                    Помощь
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="w-full py-2.5 px-15px text-left text-sm text-slate-custom"
+                    @click="handleLogout"
+                  >
+                    Выйти из системы
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </PopupNotification>
         </li>
       </ul>
     </div>
@@ -99,10 +152,25 @@
 <script setup>
   import { useRoute } from 'vue-router'
   import { useUserStore } from '@/stores/user'
+  import { ref, computed } from 'vue'
+  import { logout } from '~/utils/logout'
+
+  import PopupNotification from '~/components/custom/PopupNotification.vue'
 
   const route = useRoute()
   const isVacanciesActive = computed(() => route.path.startsWith('/vacancies'))
   const userStore = useUserStore()
+  const showNotification = ref(false)
+  const toggleButtonRef = ref(null)
+  const userName = computed(() => userStore.name || 'Гость')
+
+  const toggleNotification = () => {
+    showNotification.value = !showNotification.value
+  }
+
+  const handleLogout = () => {
+    logout()
+  }
 </script>
 
 <style lang="scss" scoped>

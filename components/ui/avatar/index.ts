@@ -13,6 +13,7 @@ export const avatarVariant = cva(
         base: 'h-16 w-16 text-2xl',
         lg: 'h-32 w-32 text-5xl',
         custom: 'h-10 w-10 text-[13px] font-medium border-solid border border-borderAvatar',
+        fourtyfive: 'h-45px w-45px text-15px font-medium font-medium border-solid border border-borderAvatar',
         user: 'h-[124px] w-[124px] text-5xl',
         candidate: 'w-50px h-50px bg-athens-gray text-slate-custom',
         chat: 'w-50px h-50px bg-zumthor text-dodger border border-solid border-borderAvatar',

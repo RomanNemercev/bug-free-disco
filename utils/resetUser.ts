@@ -1,7 +1,7 @@
 // resetUser.ts
 import { getServerToken } from "./getServerToken";
 
-export const resetUser = async (email) => {
+export const resetUser = async (email: string) => {
     const serverToken = await getServerToken();
 
     if (!serverToken) {
@@ -13,7 +13,7 @@ export const resetUser = async (email) => {
 
     const { data, error } = await useFetch('/restore-access', {
         method: 'POST',
-        baseURL: config.public.apiBase,
+        baseURL: config.public.apiBase as string,
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${serverToken}`,
