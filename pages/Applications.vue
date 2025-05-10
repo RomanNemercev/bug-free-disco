@@ -74,8 +74,12 @@
         <div></div>
       </div>
     </div>
-
+    <div class="bg-white p-25px rounded-b-fifteen" v-if="loading">
+      <UiDotsLoader />
+    </div>
+    <div v-else-if="error">{{ error }}</div>
     <div
+      v-else
       v-for="(vacancy, index) in sortedData"
       :key="index"
       :data-vacancy="vacancy.title"
@@ -101,7 +105,7 @@
       </div>
       <!-- status vacancy -->
       <div class="text-sm font-medium text-space py-5 pl-2.5">
-        {{ statusLabels[vacancy.status] }}
+        {{ getStatusLabel(vacancy.status) }}
       </div>
       <!-- admin or responsible column on user role -->
       <div
@@ -183,7 +187,7 @@
         <DotsDropdown :items="dropdownOptions" />
       </div>
     </div>
-    <div v-if="userRole === 'admin'">
+    <div v-if="userRole === 'admin' && isNewAppPopupAdmin">
       <!-- <transition
         name="fade"
         @after-leave="enableBodyScroll"
@@ -896,8 +900,7 @@
                     <p class="text-sm font-medium mb-15px">Статус заявки</p>
                     <p class="text-sm text-slate-custom">
                       {{
-                        statusLabels[selectedVacancy.status] ||
-                        'Неизвестный статус'
+                        getStatusLabel(vacancy.status) || 'Неизвестный статус'
                       }}
                     </p>
                   </div>
@@ -1106,6 +1109,7 @@
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import MyTextarea from '~/components/custom/MyTextarea.vue'
   import ChatMin from '~/components/custom/chat-min'
+  import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1115,13 +1119,17 @@
 
   import { fetchApplications } from '~/utils/applicationsList'
 
-  const data = ref(
-    dataList.map(vacancy => ({
-      ...vacancy,
-      showResponseInput: false, // Добавляем состояние для каждого элемента
-      responseChoose: '', // Выбранный ответственный
-    }))
-  )
+  const applications = ref([])
+  // const data = ref(
+  //   dataList.map(vacancy => ({
+  //     ...vacancy,
+  //     showResponseInput: false, // Добавляем состояние для каждого элемента
+  //     responseChoose: '', // Выбранный ответственный
+  //   }))
+  // )
+  const data = ref([])
+  const error = ref(null)
+  const loading = ref(true)
 
   const headers = computed(() => {
     const baseHeaders = [
@@ -1345,13 +1353,31 @@
     }
   }
 
-  onMounted(() => {
+  onMounted(async () => {
     document.addEventListener('click', handleClickOutside)
     document.addEventListener('click', handleClickOutsideNewAppPopup)
     document.addEventListener('click', handleClickOutsideNewAppPopupResponsible)
     document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
     document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
-    fetchApplications()
+
+    // load data applications
+    loading.value = true
+    try {
+      applications.value = await fetchApplications()
+      data.value = applications.value.map(vacancy => ({
+        ...vacancy,
+        responsible: 'Статический ответственный', // TODO: Заменить на данные из API
+        candidates: 0, // TODO: Заменить на данные из API
+        showResponseInput: false,
+        responseChoose: '',
+      }))
+      console.log('Загруженные данные:', applications.value)
+    } catch (error) {
+      error.value = 'Ошибка загрузки заявок.'
+      console.error(error)
+    } finally {
+      loading.value = false
+    }
   })
 
   onBeforeUnmount(() => {
@@ -1549,6 +1575,13 @@
       date: dayjs(dateTime).format('DD.MM.YYYY'),
       time: dayjs(dateTime).format('HH:mm'),
     }
+  }
+
+  const getStatusLabel = statusId => {
+    const statusKey = Object.keys(statusWeights).find(
+      key => statusWeights[key] === statusId
+    )
+    return statusKey ? statusLabels[statusKey] : 'Не указан'
   }
 
   // Начальные данные (позже можно заменить на API)
