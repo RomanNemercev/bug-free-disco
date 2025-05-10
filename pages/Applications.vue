@@ -1113,6 +1113,8 @@
   import vacancyForBind from '~/src/data/vacancies-for-btnBind.json'
   import currency from '~/src/data/currency.json'
 
+  import { fetchApplications } from '~/utils/applicationsList'
+
   const data = ref(
     dataList.map(vacancy => ({
       ...vacancy,
@@ -1349,6 +1351,7 @@
     document.addEventListener('click', handleClickOutsideNewAppPopupResponsible)
     document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
     document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
+    fetchApplications()
   })
 
   onBeforeUnmount(() => {

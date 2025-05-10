@@ -51,28 +51,34 @@
       </ul>
       <ul class="flex ml-auto items-center">
         <li class="mr-5px">
-          <div
-            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
-          >
-            <svg-icon name="pulse" width="20" height="20" />
-          </div>
+          <NuxtLink to="/activity" exact-active-class="active-link">
+            <div
+              class="page-name w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
+            >
+              <svg-icon name="pulse" width="20" height="20" />
+            </div>
+          </NuxtLink>
         </li>
         <li class="mr-5px">
-          <div
-            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer text-white"
-          >
-            <svg-icon name="calendar" width="20" height="20" />
-          </div>
+          <NuxtLink to="/tasks" exact-active-class="active-link">
+            <div
+              class="page-name w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer text-white"
+            >
+              <svg-icon name="calendar" width="20" height="20" />
+            </div>
+          </NuxtLink>
         </li>
         <li class="mr-5px">
-          <div
-            class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
-          >
-            <svg-icon name="bell" width="20" height="20" />
-          </div>
+          <NuxtLink to="/notifications" exact-active-class="active-link">
+            <div
+              class="page-name w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
+            >
+              <svg-icon name="bell" width="20" height="20" />
+            </div>
+          </NuxtLink>
         </li>
         <li class="mr-5">
-          <NuxtLink to="/settings" exact-active-class="active-link">
+          <NuxtLink to="/settings" :class="{ 'active-link': isSettingsActive }">
             <div
               class="page-name w-10 h-10 rounded-full flex items-center justify-center hover:bg-hoverbtn transition-all cursor-pointer"
             >
@@ -159,6 +165,7 @@
 
   const route = useRoute()
   const isVacanciesActive = computed(() => route.path.startsWith('/vacancies'))
+  const isSettingsActive = computed(() => route.path.startsWith('/settings'))
   const userStore = useUserStore()
   const showNotification = ref(false)
   const toggleButtonRef = ref(null)
