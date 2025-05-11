@@ -78,113 +78,118 @@
       <UiDotsLoader />
     </div>
     <div v-else-if="error">{{ error }}</div>
-    <div
-      v-else
-      v-for="(vacancy, index) in sortedData"
-      :key="index"
-      :data-vacancy="vacancy.title"
-      class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen"
-    >
-      <!-- simple values -->
-      <div class="text-sm font-medium text-space py-5 pl-2.5">
-        <button
-          @click="openPopup(vacancy)"
-          class="underline text-dodger text-left"
+    <div v-else>
+      <div
+        v-for="(vacancy, index) in sortedData"
+        :key="index"
+        :data-vacancy="vacancy.title"
+        class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen"
+      >
+        <!-- simple values -->
+        <div class="text-sm font-medium text-space py-5 pl-2.5">
+          <button
+            @click="openPopup(vacancy)"
+            class="underline text-dodger text-left"
+          >
+            {{ vacancy.title }}
+          </button>
+        </div>
+        <div class="text-sm font-medium text-space py-5 pl-2.5">
+          {{ vacancy.region }}
+        </div>
+        <div class="text-sm font-medium text-space py-5 pl-2.5">
+          {{ vacancy.createdAt }}
+        </div>
+        <div class="text-sm font-medium text-space py-5 pl-2.5">
+          {{ vacancy.closeDate }}
+        </div>
+        <!-- status vacancy -->
+        <div class="text-sm font-medium text-space py-5 pl-2.5">
+          {{ getStatusLabel(vacancy.status) }}
+        </div>
+        <!-- admin or responsible column on user role -->
+        <div
+          class="text-sm font-medium text-space py-5 pl-2.5"
+          v-if="['admin', 'responsible'].includes(userRole)"
         >
-          {{ vacancy.title }}
-        </button>
-      </div>
-      <div class="text-sm font-medium text-space py-5 pl-2.5">
-        {{ vacancy.region }}
-      </div>
-      <div class="text-sm font-medium text-space py-5 pl-2.5">
-        {{ vacancy.createdAt }}
-      </div>
-      <div class="text-sm font-medium text-space py-5 pl-2.5">
-        {{ vacancy.closeDate }}
-      </div>
-      <!-- status vacancy -->
-      <div class="text-sm font-medium text-space py-5 pl-2.5">
-        {{ getStatusLabel(vacancy.status) }}
-      </div>
-      <!-- admin or responsible column on user role -->
-      <div
-        class="text-sm font-medium text-space py-5 pl-2.5"
-        v-if="['admin', 'responsible'].includes(userRole)"
-      >
-        {{ vacancy.customer }}
-      </div>
-      <div
-        v-if="userRole === 'customer'"
-        class="text-sm font-medium text-space py-5 pl-5px"
-      >
-        {{ vacancy.responsible }}
-      </div>
+          {{ vacancy.customer }}
+        </div>
+        <div
+          v-if="userRole === 'customer'"
+          class="text-sm font-medium text-space py-5 pl-5px"
+        >
+          {{ vacancy.responsible }}
+        </div>
 
-      <!-- admin or customer column -->
-      <div>
-        <div v-if="userRole === 'admin'">
-          <div
-            class="text-sm font-medium text-space py-5 pl-2.5"
-            v-if="vacancy.executor"
-          >
-            {{ vacancy.executor }}
-          </div>
-          <div v-else>
-            <!-- Если выбрано значение, показываем его -->
+        <!-- admin or customer column -->
+        <div>
+          <div v-if="userRole === 'admin'">
             <div
-              v-if="vacancy.responseChoose"
-              class="text-sm font-medium text-dodger py-5 pl-2.5"
+              class="text-sm font-medium text-space py-5 pl-2.5"
+              v-if="vacancy.executor"
             >
-              {{ vacancy.responseChoose }}
+              {{ vacancy.executor }}
             </div>
-            <button
-              v-else-if="!vacancy.showResponseInput"
-              @click="openResponseInput(vacancy, $event)"
-              class="text-sm font-medium text-dodger py-5 pl-2.5"
+            <div v-else>
+              <!-- Если выбрано значение, показываем его -->
+              <div
+                v-if="vacancy.responseChoose"
+                class="text-sm font-medium text-dodger py-5 pl-2.5"
+              >
+                {{ vacancy.responseChoose }}
+              </div>
+              <button
+                v-else-if="!vacancy.showResponseInput"
+                @click="openResponseInput(vacancy, $event)"
+                class="text-sm font-medium text-dodger py-5 pl-2.5"
+              >
+                Добавить
+              </button>
+              <response-input
+                v-model="vacancy.responseChoose"
+                v-show="vacancy.showResponseInput"
+                @update:modelValue="
+                  value => updateResponseChoose(vacancy, value)
+                "
+                class="mb-0 w-full max-w-input py-5"
+                :responses="responses"
+              />
+            </div>
+          </div>
+          <div v-if="userRole === 'responsible'">
+            <div
+              v-if="vacancy.executor"
+              class="text-sm font-medium text-space py-5 pl-2.5"
             >
-              Добавить
-            </button>
-            <response-input
-              v-model="vacancy.responseChoose"
-              v-show="vacancy.showResponseInput"
-              @update:modelValue="value => updateResponseChoose(vacancy, value)"
-              class="mb-0 w-full max-w-input py-5"
-              :responses="responses"
-            />
+              {{ vacancy.executor }}
+            </div>
+            <div v-else>
+              <button
+                @click="takeInWork(vacancy)"
+                class="py-5 pl-2.5 text-sm font-medium text-dodger"
+              >
+                Взять в работу
+              </button>
+            </div>
           </div>
-        </div>
-        <div v-if="userRole === 'responsible'">
-          <div
-            v-if="vacancy.executor"
-            class="text-sm font-medium text-space py-5 pl-2.5"
-          >
-            {{ vacancy.executor }}
-          </div>
-          <div v-else>
-            <button
-              @click="takeInWork(vacancy)"
-              class="py-5 pl-2.5 text-sm font-medium text-dodger"
+          <div div v-if="userRole === 'customer'">
+            <div
+              v-if="vacancy.executor"
+              class="text-sm font-medium text-space py-5 pl-2.5"
             >
-              Взять в работу
-            </button>
+              {{ vacancy.responsible }}
+            </div>
+            <div v-else>
+              <p class="py-5 text-bali text-sm font-normal pl-2.5">
+                Не назначен
+              </p>
+            </div>
           </div>
         </div>
-        <div div v-if="userRole === 'customer'">
-          <div
-            v-if="vacancy.executor"
-            class="text-sm font-medium text-space py-5 pl-2.5"
-          >
-            {{ vacancy.responsible }}
-          </div>
-          <div v-else>
-            <p class="py-5 text-bali text-sm font-normal pl-2.5">Не назначен</p>
-          </div>
+        <!-- dropdown item -->
+        <div class="py-2.5">
+          <DotsDropdown :items="dropdownOptions" />
         </div>
-      </div>
-      <!-- dropdown item -->
-      <div class="py-2.5">
-        <DotsDropdown :items="dropdownOptions" />
       </div>
     </div>
     <div v-if="userRole === 'admin' && isNewAppPopupAdmin">
@@ -834,247 +839,258 @@
         :lgSize="true"
       >
         <template #default>
-          <h3 class="text-xl font-semibold text-space mb-5">
-            {{ selectedVacancy.title }}
-          </h3>
-          <p class="text-sm text-slate-custom font-normal mb-25px">
-            {{ selectedVacancy.region }}
-          </p>
-          <div class="relative z-10">
-            <button
-              @click="popupSelectedTab = 'popupMainInfo'"
-              class="text-15px font-medium p-15px transition-colors"
-              :class="
-                popupSelectedTab === 'popupMainInfo'
-                  ? 'text-space border-b-2 border-space'
-                  : 'text-slate-custom border-none'
-              "
-            >
-              Основная информация
-            </button>
-            <button
-              @click="popupSelectedTab = 'popupHistory'"
-              class="text-15px font-medium p-15px transition-colors"
-              :class="
-                popupSelectedTab === 'popupHistory'
-                  ? 'text-space border-b-2 border-space'
-                  : 'text-slate-custom border-none'
-              "
-            >
-              История
-            </button>
-            <button
-              @click="popupSelectedTab = 'popupComments'"
-              class="text-15px font-medium p-15px transition-colors"
-              :class="
-                popupSelectedTab === 'popupComments'
-                  ? 'text-space border-b-2 border-space'
-                  : 'text-slate-custom border-none'
-              "
-            >
-              Комментарии
-            </button>
-          </div>
-          <div
-            class="relative"
-            :style="{ height: tabContentHeight + 'px' }"
-            :class="popupSelectedTab === 'popupComments' ? 'mb-0' : 'mb-25px'"
-          >
+          <div v-if="errorItem">{{ errorItem }}</div>
+          <div v-else-if="detailedVacancy">
+            <h3 class="text-xl font-semibold text-space mb-5">
+              {{ selectedVacancy.title }}
+            </h3>
+            <p class="text-sm text-slate-custom font-normal mb-25px">
+              {{ selectedVacancy.region }}
+            </p>
+            <div class="relative z-10">
+              <button
+                @click="popupSelectedTab = 'popupMainInfo'"
+                class="text-15px font-medium p-15px transition-colors"
+                :class="
+                  popupSelectedTab === 'popupMainInfo'
+                    ? 'text-space border-b-2 border-space'
+                    : 'text-slate-custom border-none'
+                "
+              >
+                Основная информация
+              </button>
+              <button
+                @click="popupSelectedTab = 'popupHistory'"
+                class="text-15px font-medium p-15px transition-colors"
+                :class="
+                  popupSelectedTab === 'popupHistory'
+                    ? 'text-space border-b-2 border-space'
+                    : 'text-slate-custom border-none'
+                "
+              >
+                История
+              </button>
+              <button
+                @click="popupSelectedTab = 'popupComments'"
+                class="text-15px font-medium p-15px transition-colors"
+                :class="
+                  popupSelectedTab === 'popupComments'
+                    ? 'text-space border-b-2 border-space'
+                    : 'text-slate-custom border-none'
+                "
+              >
+                Комментарии
+              </button>
+            </div>
             <div
-              ref="tabContentInner"
-              class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px]"
-              :class="popupSelectedTab === 'popupComments' ? 'p-0' : 'p-15px'"
+              class="relative"
+              :style="{ height: tabContentHeight + 'px' }"
+              :class="popupSelectedTab === 'popupComments' ? 'mb-0' : 'mb-25px'"
             >
-              <div v-if="popupSelectedTab === 'popupMainInfo'">
-                <div
-                  class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
-                >
-                  <div class="w-full">
-                    <p class="text-sm font-medium mb-5px">Исполнитель</p>
-                    <BtnResponseInput
-                      v-model="popupResponse"
-                      :responses="responses"
-                    />
-                  </div>
-                  <div class="w-full">
-                    <p class="text-sm font-medium mb-15px">Статус заявки</p>
-                    <p class="text-sm text-slate-custom">
-                      {{
-                        getStatusLabel(vacancy.status) || 'Неизвестный статус'
-                      }}
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
-                >
-                  <div class="w-full">
-                    <p class="text-sm font-medium mb-15px">Вакансия</p>
-                    <BtnAddBindVacancy :vacancies="vacancyForBind" />
-                  </div>
-                  <div class="w-full">
-                    <p class="text-sm font-medium mb-15px">Кандидаты</p>
-                    <p class="text-sm text-slate-custom">
-                      {{ selectedVacancy.candidates }}
-                    </p>
-                  </div>
-                </div>
-                <div class="p-25px bg-white rounded-fifteen">
-                  <div class="flex gap-x-15px mb-5">
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">Заказчик</p>
-                      <BtnResponseInput
-                        :responses="customersRoles"
-                        v-model="addNewCustomer"
-                        :placeholder="'ФИО заказчика'"
-                        :minStyles="true"
-                        :showRoles="true"
-                      />
-                    </div>
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">
-                        Ответственный заявки
-                      </p>
-                      <BtnResponseInput
-                        :responses="responsiblesRoles"
-                        v-model="addNewResponsible"
-                        :placeholder="'ФИО ответственного'"
-                        :minStyles="true"
-                        :showRoles="true"
-                      />
-                    </div>
-                  </div>
-                  <div class="flex gap-x-15px mb-5">
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">Департамент</p>
-                      <p class="text-slate-custom font-normal text-sm">
-                        Разработка
-                      </p>
-                    </div>
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">
-                        Причина открытия вакансии
-                      </p>
-                      <p class="text-slate-custom font-normal text-sm">
-                        Расширение штата
-                      </p>
-                    </div>
-                  </div>
-                  <div class="flex gap-x-15px mb-5">
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">Зарплата</p>
-                      <p class="text-slate-custom font-normal text-sm">
-                        от 80 000 до 150 000 (руб)
-                      </p>
-                    </div>
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">
-                        Количество позиций
-                      </p>
-                      <p class="text-slate-custom font-normal text-sm">2</p>
-                    </div>
-                  </div>
-                  <div class="mb-5">
-                    <p class="text-sm font-medium mb-15px">
-                      Требования кандидата
-                    </p>
-                    <p class="text-slate-custom font-normal text-sm">
-                      Глубокие знания языка 1С:Предприятие. Программист должен
-                      хорошо знать синтаксис языка и иметь опыт работы с
-                      различными функциями и возможностями этой системы.
-                    </p>
-                  </div>
-                  <div class="mb-5">
-                    <p class="text-sm font-medium mb-15px">
-                      Обязанности кандидата
-                    </p>
-                    <p class="text-slate-custom font-normal text-sm">
-                      Создание конфигураций. Настройка программы под нужды
-                      конкретной компании. Например, если у компании уникальная
-                      система учёта товаров, программист создаст конфигурацию,
-                      которая будет учитывать все особенности бизнеса
-                    </p>
-                  </div>
-                  <div class="flex gap-x-15px">
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">
-                        Начать подбор не позднее
-                      </p>
-                      <p class="text-slate-custom font-normal text-sm">
-                        10/05/2024
-                      </p>
-                    </div>
-                    <div class="w-full">
-                      <p class="text-sm font-medium mb-15px">
-                        Желаемая дата выхода кандидата
-                      </p>
-                      <p class="text-slate-custom font-normal text-sm">
-                        10/05/2024
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-if="popupSelectedTab === 'popupHistory'">
-                <div class="[&>*:not(:last-of-type)]:mb-2.5">
+              <div
+                ref="tabContentInner"
+                class="absolute bg-athens-gray w-[calc(100%+50px)] left-[-25px] top-[-2px]"
+                :class="popupSelectedTab === 'popupComments' ? 'p-0' : 'p-15px'"
+              >
+                <div v-if="popupSelectedTab === 'popupMainInfo'">
                   <div
-                    v-for="event in historyTabEvents"
-                    :key="event.id"
-                    class="flex bg-white rounded-fifteen px-25px py-15px"
+                    class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
                   >
-                    <div>
-                      <p class="font-medium text-sm text-space mb-5px">
-                        {{ event.eventTitle }}
-                      </p>
-                      <p class="text-sm font-normal text-slate-custom">
-                        {{ event.eventContent }}
-                      </p>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-5px">Исполнитель</p>
+                      <BtnResponseInput
+                        v-model="popupResponse"
+                        :responses="responses"
+                      />
                     </div>
-                    <div class="ml-auto">
-                      <p class="text-sm font-normal text-slate-custom">
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Статус заявки</p>
+                      <p class="text-sm text-slate-custom">
                         {{
-                          formatDateTime(event.eventLogDateTime).date
-                        }}&nbsp;/&nbsp;{{
-                          formatDateTime(event.eventLogDateTime).time
+                          getStatusLabel(selectedVacancy.status) ||
+                          'Неизвестный статус'
                         }}
                       </p>
                     </div>
                   </div>
+                  <div
+                    class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
+                  >
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Вакансия</p>
+                      <BtnAddBindVacancy :vacancies="vacancyForBind" />
+                    </div>
+                    <div class="w-full">
+                      <p class="text-sm font-medium mb-15px">Кандидаты</p>
+                      <p class="text-sm text-slate-custom">
+                        {{ selectedVacancy.candidates }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="p-25px bg-white rounded-fifteen">
+                    <div class="flex gap-x-15px mb-5">
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">Заказчик</p>
+                        <BtnResponseInput
+                          :responses="customersRoles"
+                          v-model="addNewCustomer"
+                          :placeholder="'ФИО заказчика'"
+                          :minStyles="true"
+                          :showRoles="true"
+                        />
+                      </div>
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">
+                          Ответственный заявки
+                        </p>
+                        <BtnResponseInput
+                          :responses="responsiblesRoles"
+                          v-model="addNewResponsible"
+                          :placeholder="'ФИО ответственного'"
+                          :minStyles="true"
+                          :showRoles="true"
+                        />
+                      </div>
+                    </div>
+                    <div class="flex gap-x-15px mb-5">
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">Департамент</p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          Разработка
+                        </p>
+                      </div>
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">
+                          Причина открытия вакансии
+                        </p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          Расширение штата
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex gap-x-15px mb-5">
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">Зарплата</p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          от 80 000 до 150 000 (руб)
+                        </p>
+                      </div>
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">
+                          Количество позиций
+                        </p>
+                        <p class="text-slate-custom font-normal text-sm">2</p>
+                      </div>
+                    </div>
+                    <div class="mb-5">
+                      <p class="text-sm font-medium mb-15px">
+                        Требования кандидата
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        Глубокие знания языка 1С:Предприятие. Программист должен
+                        хорошо знать синтаксис языка и иметь опыт работы с
+                        различными функциями и возможностями этой системы.
+                      </p>
+                    </div>
+                    <div class="mb-5">
+                      <p class="text-sm font-medium mb-15px">
+                        Обязанности кандидата
+                      </p>
+                      <p class="text-slate-custom font-normal text-sm">
+                        Создание конфигураций. Настройка программы под нужды
+                        конкретной компании. Например, если у компании
+                        уникальная система учёта товаров, программист создаст
+                        конфигурацию, которая будет учитывать все особенности
+                        бизнеса
+                      </p>
+                    </div>
+                    <div class="flex gap-x-15px">
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">
+                          Начать подбор не позднее
+                        </p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          10/05/2024
+                        </p>
+                      </div>
+                      <div class="w-full">
+                        <p class="text-sm font-medium mb-15px">
+                          Желаемая дата выхода кандидата
+                        </p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          10/05/2024
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div v-if="popupSelectedTab === 'popupComments'">
-                <div>
-                  <!-- <div>
-                    <MinTimeline
-                      :messages="messages"
+                <div v-if="popupSelectedTab === 'popupHistory'">
+                  <div class="[&>*:not(:last-of-type)]:mb-2.5">
+                    <div
+                      v-for="event in historyTabEvents"
+                      :key="event.id"
+                      class="flex bg-white rounded-fifteen px-25px py-15px"
+                    >
+                      <div>
+                        <p class="font-medium text-sm text-space mb-5px">
+                          {{ event.eventTitle }}
+                        </p>
+                        <p class="text-sm font-normal text-slate-custom">
+                          {{ event.eventContent }}
+                        </p>
+                      </div>
+                      <div class="ml-auto">
+                        <p class="text-sm font-normal text-slate-custom">
+                          {{
+                            formatDateTime(event.eventLogDateTime).date
+                          }}&nbsp;/&nbsp;{{
+                            formatDateTime(event.eventLogDateTime).time
+                          }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="popupSelectedTab === 'popupComments'">
+                  <div>
+                    <!-- <div>
+                      <MinTimeline
+                        :messages="messages"
+                        :container-height="400"
+                        :padding="{ top: 4, bottom: 25, left: 25, right: 25 }"
+                      />
+                    </div>
+                    <MinChat /> -->
+                    <ChatMin
                       :container-height="400"
-                      :padding="{ top: 4, bottom: 25, left: 25, right: 25 }"
+                      :initial-messages="messages"
+                      :padding="{ top: 10, bottom: 20, left: 25, right: 25 }"
                     />
                   </div>
-                  <MinChat /> -->
-                  <ChatMin
-                    :container-height="400"
-                    :initial-messages="messages"
-                    :padding="{ top: 10, bottom: 20, left: 25, right: 25 }"
-                  />
                 </div>
               </div>
             </div>
-          </div>
-          <div class="flex gap-x-15px">
-            <UiButton variant="action" size="semiaction">Готово</UiButton>
-            <UiButton
-              variant="back"
-              size="second-back"
-              class="font-medium"
-              @click="closePopup"
-            >
-              Отмена
-            </UiButton>
+            <div class="flex gap-x-15px">
+              <UiButton variant="action" size="semiaction">Готово</UiButton>
+              <UiButton
+                variant="back"
+                size="second-back"
+                class="font-medium"
+                @click="closePopup"
+              >
+                Отмена
+              </UiButton>
+            </div>
           </div>
         </template>
       </Popup>
     </transition>
+    <div
+      v-if="loadingItem"
+      class="absolute bg-black bg-opacity-50 inset-0 flex items-center justify-center"
+    >
+      <UiCircleLoader />
+    </div>
   </div>
 </template>
 
@@ -1110,6 +1126,7 @@
   import MyTextarea from '~/components/custom/MyTextarea.vue'
   import ChatMin from '~/components/custom/chat-min'
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
+  import UiCircleLoader from '~/components/custom/UiCircleLoader.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1118,6 +1135,7 @@
   import currency from '~/src/data/currency.json'
 
   import { fetchApplications } from '~/utils/applicationsList'
+  import { fetchApplicationDetail } from '~/utils/applicationItem'
 
   const applications = ref([])
   // const data = ref(
@@ -1130,6 +1148,8 @@
   const data = ref([])
   const error = ref(null)
   const loading = ref(true)
+  const loadingItem = ref(false)
+  const errorItem = ref(null)
 
   const headers = computed(() => {
     const baseHeaders = [
@@ -1202,6 +1222,7 @@
   const requirementsCustomer = ref('')
   const responsibilitiesCustomer = ref('')
   const selectedVacancy = ref(null)
+  const detailedVacancy = ref(null) // Для хранения полной информации о заявке
   const popupSelectedTab = ref('popupMainInfo')
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
@@ -1500,12 +1521,25 @@
     updateTabHeight()
   })
 
-  const openPopup = vacancy => {
-    selectedVacancy.value = vacancy
+  const openPopup = async vacancy => {
+    loadingItem.value = true
+    console.log('Open popup for app-s id:', vacancy.id)
+    try {
+      const fullData = await fetchApplicationDetail(vacancy.id)
+      detailedVacancy.value = fullData // save full response.data
+      selectedVacancy.value = vacancy // open popup
+    } catch (error) {
+      error.value = 'Ошибка загрузки деталей заявки.'
+      console.error(error)
+    } finally {
+      loadingItem.value = false
+    }
   }
 
   const closePopup = () => {
+    console.log('Close popup. Clear fullData.')
     selectedVacancy.value = null
+    detailedVacancy.value = null
   }
 
   const reasonseForOpenVacancy = [
