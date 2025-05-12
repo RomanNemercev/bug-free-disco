@@ -79,116 +79,119 @@
     </div>
     <div v-else-if="error">{{ error }}</div>
     <div v-else>
-      <div
-        v-for="(vacancy, index) in sortedData"
-        :key="index"
-        :data-vacancy="vacancy.title"
-        class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen"
-      >
-        <!-- simple values -->
-        <div class="text-sm font-medium text-space py-5 pl-2.5">
-          <button
-            @click="openPopup(vacancy)"
-            class="underline text-dodger text-left"
+      <div v-if="data.length === 0">Заявки не найдены.</div>
+      <div v-else>
+        <div
+          v-for="(vacancy, index) in data"
+          :key="index"
+          :data-vacancy="vacancy.title"
+          class="items-wrapper grid grid-cols-8 gap-x-2.5 mb-px min-h-[61px] pl-15px pr-25px bg-white last-of-type:rounded-b-fifteen"
+        >
+          <!-- simple values -->
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            <button
+              @click="openPopup(vacancy)"
+              class="underline text-dodger text-left"
+            >
+              {{ vacancy.title }}
+            </button>
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.region }}
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.createdAt }}
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.closeDate }}
+          </div>
+          <!-- status vacancy -->
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ getStatusLabel(vacancy.status) }}
+          </div>
+          <!-- admin or responsible column on user role -->
+          <div
+            class="text-sm font-medium text-space py-5 pl-2.5"
+            v-if="['admin', 'responsible'].includes(userRole)"
           >
-            {{ vacancy.title }}
-          </button>
-        </div>
-        <div class="text-sm font-medium text-space py-5 pl-2.5">
-          {{ vacancy.region }}
-        </div>
-        <div class="text-sm font-medium text-space py-5 pl-2.5">
-          {{ vacancy.createdAt }}
-        </div>
-        <div class="text-sm font-medium text-space py-5 pl-2.5">
-          {{ vacancy.closeDate }}
-        </div>
-        <!-- status vacancy -->
-        <div class="text-sm font-medium text-space py-5 pl-2.5">
-          {{ getStatusLabel(vacancy.status) }}
-        </div>
-        <!-- admin or responsible column on user role -->
-        <div
-          class="text-sm font-medium text-space py-5 pl-2.5"
-          v-if="['admin', 'responsible'].includes(userRole)"
-        >
-          {{ vacancy.customer }}
-        </div>
-        <div
-          v-if="userRole === 'customer'"
-          class="text-sm font-medium text-space py-5 pl-5px"
-        >
-          {{ vacancy.responsible }}
-        </div>
+            {{ vacancy.customer }}
+          </div>
+          <div
+            v-if="userRole === 'customer'"
+            class="text-sm font-medium text-space py-5 pl-5px"
+          >
+            {{ vacancy.responsible }}
+          </div>
 
-        <!-- admin or customer column -->
-        <div>
-          <div v-if="userRole === 'admin'">
-            <div
-              class="text-sm font-medium text-space py-5 pl-2.5"
-              v-if="vacancy.executor"
-            >
-              {{ vacancy.executor }}
-            </div>
-            <div v-else>
-              <!-- Если выбрано значение, показываем его -->
+          <!-- admin or customer column -->
+          <div>
+            <div v-if="userRole === 'admin'">
               <div
-                v-if="vacancy.responseChoose"
-                class="text-sm font-medium text-dodger py-5 pl-2.5"
+                class="text-sm font-medium text-space py-5 pl-2.5"
+                v-if="vacancy.executor"
               >
-                {{ vacancy.responseChoose }}
+                {{ vacancy.executor }}
               </div>
-              <button
-                v-else-if="!vacancy.showResponseInput"
-                @click="openResponseInput(vacancy, $event)"
-                class="text-sm font-medium text-dodger py-5 pl-2.5"
+              <div v-else>
+                <!-- Если выбрано значение, показываем его -->
+                <div
+                  v-if="vacancy.responseChoose"
+                  class="text-sm font-medium text-dodger py-5 pl-2.5"
+                >
+                  {{ vacancy.responseChoose }}
+                </div>
+                <button
+                  v-else-if="!vacancy.showResponseInput"
+                  @click="openResponseInput(vacancy, $event)"
+                  class="text-sm font-medium text-dodger py-5 pl-2.5"
+                >
+                  Добавить
+                </button>
+                <response-input
+                  v-model="vacancy.responseChoose"
+                  v-show="vacancy.showResponseInput"
+                  @update:modelValue="
+                    value => updateResponseChoose(vacancy, value)
+                  "
+                  class="mb-0 w-full max-w-input py-5"
+                  :responses="responses"
+                />
+              </div>
+            </div>
+            <div v-if="userRole === 'responsible'">
+              <div
+                v-if="vacancy.executor"
+                class="text-sm font-medium text-space py-5 pl-2.5"
               >
-                Добавить
-              </button>
-              <response-input
-                v-model="vacancy.responseChoose"
-                v-show="vacancy.showResponseInput"
-                @update:modelValue="
-                  value => updateResponseChoose(vacancy, value)
-                "
-                class="mb-0 w-full max-w-input py-5"
-                :responses="responses"
-              />
+                {{ vacancy.executor }}
+              </div>
+              <div v-else>
+                <button
+                  @click="takeInWork(vacancy)"
+                  class="py-5 pl-2.5 text-sm font-medium text-dodger"
+                >
+                  Взять в работу
+                </button>
+              </div>
             </div>
-          </div>
-          <div v-if="userRole === 'responsible'">
-            <div
-              v-if="vacancy.executor"
-              class="text-sm font-medium text-space py-5 pl-2.5"
-            >
-              {{ vacancy.executor }}
-            </div>
-            <div v-else>
-              <button
-                @click="takeInWork(vacancy)"
-                class="py-5 pl-2.5 text-sm font-medium text-dodger"
+            <div div v-if="userRole === 'customer'">
+              <div
+                v-if="vacancy.executor"
+                class="text-sm font-medium text-space py-5 pl-2.5"
               >
-                Взять в работу
-              </button>
+                {{ vacancy.responsible }}
+              </div>
+              <div v-else>
+                <p class="py-5 text-bali text-sm font-normal pl-2.5">
+                  Не назначен
+                </p>
+              </div>
             </div>
           </div>
-          <div div v-if="userRole === 'customer'">
-            <div
-              v-if="vacancy.executor"
-              class="text-sm font-medium text-space py-5 pl-2.5"
-            >
-              {{ vacancy.responsible }}
-            </div>
-            <div v-else>
-              <p class="py-5 text-bali text-sm font-normal pl-2.5">
-                Не назначен
-              </p>
-            </div>
+          <!-- dropdown item -->
+          <div class="py-2.5">
+            <DotsDropdown :items="dropdownOptions" />
           </div>
-        </div>
-        <!-- dropdown item -->
-        <div class="py-2.5">
-          <DotsDropdown :items="dropdownOptions" />
         </div>
       </div>
     </div>
@@ -1091,6 +1094,12 @@
     >
       <UiCircleLoader />
     </div>
+    <Pagination
+      v-if="pagination.total_page > 1"
+      :currentPage="pagination.current_page"
+      :totalPages="pagination.last_page"
+      @page-changed="handlePageChange"
+    />
   </div>
 </template>
 
@@ -1106,6 +1115,7 @@
     watch,
   } from 'vue'
   import dayjs from 'dayjs'
+  // import { useUserStore } from '@/stores/user'
 
   // import { getMovieList } from "@/src/api";
   // const apiTest = getMovieList('movie');
@@ -1127,6 +1137,7 @@
   import ChatMin from '~/components/custom/chat-min'
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
   import UiCircleLoader from '~/components/custom/UiCircleLoader.vue'
+  import Pagination from '@/components/custom/Pagination.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1146,6 +1157,13 @@
   //   }))
   // )
   const data = ref([])
+  const pagination = ref({
+    current_page: 1,
+    total: 1,
+    per_page: 10,
+    last_page: 1,
+    links: [],
+  })
   const error = ref(null)
   const loading = ref(true)
   const loadingItem = ref(false)
@@ -1226,7 +1244,7 @@
   const popupSelectedTab = ref('popupMainInfo')
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
-  const popupResponse = ref('')
+  const popupResponse = ref(null)
   const newPostAdmin = ref('')
   const newDepartmentAdmin = ref('')
   const newLocationAdmin = ref('')
@@ -1241,6 +1259,8 @@
   const addNewResponsible = ref('')
   //  used resizeObserver for dinamycly correct popup's height
   let resizeObserver = null
+  // const userStore = useUserStore()
+  // const userName = computed(() => userStore.name || 'Гость')
 
   // Функция обновления высоты контента
   const updateTabHeight = () => {
@@ -1374,17 +1394,15 @@
     }
   }
 
-  onMounted(async () => {
-    document.addEventListener('click', handleClickOutside)
-    document.addEventListener('click', handleClickOutsideNewAppPopup)
-    document.addEventListener('click', handleClickOutsideNewAppPopupResponsible)
-    document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
-    document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
-
+  const loadApplications = async (page = 1) => {
     // load data applications
     loading.value = true
     try {
-      applications.value = await fetchApplications()
+      const {
+        applications: fetchedApplications,
+        pagination: fetchedPagination,
+      } = await fetchApplications(page)
+      applications.value = fetchedApplications
       data.value = applications.value.map(vacancy => ({
         ...vacancy,
         responsible: 'Статический ответственный', // TODO: Заменить на данные из API
@@ -1392,13 +1410,29 @@
         showResponseInput: false,
         responseChoose: '',
       }))
-      console.log('Загруженные данные:', applications.value)
+      pagination.value = fetchedPagination
+      console.log('Loaded data: ', applications.value)
+      console.log('Pagination: ', pagination.value)
     } catch (error) {
       error.value = 'Ошибка загрузки заявок.'
       console.error(error)
     } finally {
       loading.value = false
     }
+  }
+
+  const handlePageChange = async page => {
+    pagination.value.current_page = page
+    await loadApplications(page)
+  }
+
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('click', handleClickOutsideNewAppPopup)
+    document.addEventListener('click', handleClickOutsideNewAppPopupResponsible)
+    document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
+    document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
+    loadApplications()
   })
 
   onBeforeUnmount(() => {

@@ -42,7 +42,7 @@
   })
   const emit = defineEmits(['update:modelValue'])
 
-  const showInput = ref(true)
+  const showInput = ref(false)
   const inputValue = ref(props.modelValue)
   const responseContainer = ref(null)
 
