@@ -190,7 +190,12 @@
           </div>
           <!-- dropdown item -->
           <div class="py-2.5">
-            <DotsDropdown :items="dropdownOptions" />
+            <DotsDropdown
+              :items="dropdownOptions"
+              @select-item="
+                selectedItem => handleRemoveApplication(selectedItem, vacancy)
+              "
+            />
           </div>
         </div>
       </div>
@@ -362,6 +367,9 @@
                 v-model="newResponseAdmin"
                 :showRoles="true"
               />
+              <div v-if="errors.response" class="text-red-500 text-xs mt-1">
+                {{ errors.response }}
+              </div>
             </div>
             <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
@@ -374,6 +382,9 @@
                   v-model="newCustomerAdmin"
                   :showRoles="true"
                 />
+                <div v-if="errors.customer" class="text-red-500 text-xs mt-1">
+                  {{ errors.customer }}
+                </div>
               </div>
               <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -385,6 +396,9 @@
                   v-model="newExecutorAdmin"
                   :showRoles="true"
                 />
+                <div v-if="errors.executor" class="text-red-500 text-xs mt-1">
+                  {{ errors.executor }}
+                </div>
               </div>
             </div>
             <div class="w-full flex justify-between gap-x-15px mb-15px">
@@ -396,6 +410,9 @@
                   placeholder="Введите должность"
                   v-model="newPostAdmin"
                 />
+                <div v-if="errors.post" class="text-red-500 text-xs mt-1">
+                  {{ errors.post }}
+                </div>
               </div>
               <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -405,6 +422,9 @@
                   placeholder="Введите название подразделения"
                   v-model="newDepartmentAdmin"
                 />
+                <div v-if="errors.department" class="text-red-500 text-xs mt-1">
+                  {{ errors.department }}
+                </div>
               </div>
             </div>
             <div class="w-full mb-2.5">
@@ -415,6 +435,9 @@
                 v-model="newLocationAdmin"
                 :placeholder="'Введите город'"
               />
+              <div v-if="errors.location" class="text-red-500 text-xs mt-1">
+                {{ errors.location }}
+              </div>
             </div>
             <div class="w-full mb-2.5">
               <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -425,6 +448,9 @@
                 v-model="newQuantsPositionsAdmin"
                 :type="'Number'"
               />
+              <div v-if="errors.positions" class="text-red-500 text-xs mt-1">
+                {{ errors.positions }}
+              </div>
             </div>
             <div class="w-full mb-2.5 flex gap-x-15px">
               <div class="w-full">
@@ -432,6 +458,12 @@
                   Зарплата
                 </p>
                 <SalaryRange v-model="newSalaryAdmin" />
+                <div v-if="errors.salaryFrom" class="text-red-500 text-xs mt-1">
+                  {{ errors.salaryFrom }}
+                </div>
+                <div v-if="errors.salaryTo" class="text-red-500 text-xs mt-1">
+                  {{ errors.salaryTo }}
+                </div>
               </div>
               <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -443,6 +475,9 @@
                   :selected="0"
                   v-model="newCurrencyTypeAdmin"
                 />
+                <div v-if="errors.currency" class="text-red-500 text-xs mt-1">
+                  {{ errors.currency }}
+                </div>
               </div>
             </div>
             <div class="w-full">
@@ -453,6 +488,9 @@
                 v-model="newRequirementsAdmin"
                 :placeholder="'Опишите ключевые требования'"
               />
+              <div v-if="errors.requirements" class="text-red-500 text-xs mt-1">
+                {{ errors.requirements }}
+              </div>
             </div>
             <div class="w-full">
               <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -462,6 +500,12 @@
                 v-model="newResponsibilitiesAdmin"
                 :placeholder="'Опишите ключевые обязанности кандидата'"
               />
+              <div
+                v-if="errors.responsibilities"
+                class="text-red-500 text-xs mt-1"
+              >
+                {{ errors.responsibilities }}
+              </div>
             </div>
             <div class="w-full mb-15px">
               <p class="text-sm font-medium text-space leading-normal mb-4">
@@ -472,23 +516,40 @@
                 v-model="newReasonsForVacancyAdmin"
                 :defaultValue="'Укажите вариант ответа'"
               />
+              <div v-if="errors.reason" class="text-red-500 text-xs mt-1">
+                {{ errors.reason }}
+              </div>
             </div>
             <div class="w-full gap-x-15px flex mb-25px">
               <div class="w-full">
                 <p class="text-sm font-medium text-space mb-1">
                   Начать подбор не позднее
                 </p>
-                <InputCalendar :fullStyles="true" />
+                <!-- <InputCalendar :fullStyles="true" /> -->
+                <CustomCalendar v-model="dateStartAdmin" />
+                <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
+                  {{ errors.dateStart }}
+                </div>
               </div>
               <div class="w-full">
                 <p class="text-sm font-medium text-space mb-1">
                   Желаемая дата выхода кандидата
                 </p>
-                <InputCalendar :fullStyles="true" />
+                <!-- <InputCalendar :fullStyles="true" /> -->
+                <CustomCalendar v-model="dateWorkAdmin" />
+                <div v-if="errors.dateWork" class="text-red-500 text-xs mt-1">
+                  {{ errors.dateWork }}
+                </div>
               </div>
             </div>
+            <div></div>
             <div class="flex gap-15px justify-between w-fit">
-              <UiButton variant="action" size="semiaction" class="font-bold">
+              <UiButton
+                variant="action"
+                size="semiaction"
+                class="font-bold"
+                @click="createApplicationHandler()"
+              >
                 Создать
               </UiButton>
               <UiButton
@@ -845,10 +906,10 @@
           <div v-if="errorItem">{{ errorItem }}</div>
           <div v-else-if="detailedVacancy">
             <h3 class="text-xl font-semibold text-space mb-5">
-              {{ selectedVacancy.title }}
+              {{ detailedVacancy.position }}
             </h3>
             <p class="text-sm text-slate-custom font-normal mb-25px">
-              {{ selectedVacancy.region }}
+              {{ detailedVacancy.city }}
             </p>
             <div class="relative z-10">
               <button
@@ -902,7 +963,7 @@
                     <div class="w-full">
                       <p class="text-sm font-medium mb-5px">Исполнитель</p>
                       <BtnResponseInput
-                        v-model="popupResponse"
+                        v-model="selectedVacancy.executor"
                         :responses="responses"
                       />
                     </div>
@@ -936,7 +997,7 @@
                         <p class="text-sm font-medium mb-15px">Заказчик</p>
                         <BtnResponseInput
                           :responses="customersRoles"
-                          v-model="addNewCustomer"
+                          v-model="clientName"
                           :placeholder="'ФИО заказчика'"
                           :minStyles="true"
                           :showRoles="true"
@@ -959,7 +1020,7 @@
                       <div class="w-full">
                         <p class="text-sm font-medium mb-15px">Департамент</p>
                         <p class="text-slate-custom font-normal text-sm">
-                          Разработка
+                          {{ detailedVacancy.division }}
                         </p>
                       </div>
                       <div class="w-full">
@@ -967,7 +1028,7 @@
                           Причина открытия вакансии
                         </p>
                         <p class="text-slate-custom font-normal text-sm">
-                          Расширение штата
+                          {{ detailedVacancy.reason }}
                         </p>
                       </div>
                     </div>
@@ -975,14 +1036,18 @@
                       <div class="w-full">
                         <p class="text-sm font-medium mb-15px">Зарплата</p>
                         <p class="text-slate-custom font-normal text-sm">
-                          от 80 000 до 150 000 (руб)
+                          от {{ detailedVacancy.salaryFrom }} до
+                          {{ detailedVacancy.salaryTo }}
+                          {{ detailedVacancy.currency }}
                         </p>
                       </div>
                       <div class="w-full">
                         <p class="text-sm font-medium mb-15px">
                           Количество позиций
                         </p>
-                        <p class="text-slate-custom font-normal text-sm">2</p>
+                        <p class="text-slate-custom font-normal text-sm">
+                          {{ detailedVacancy.count }}
+                        </p>
                       </div>
                     </div>
                     <div class="mb-5">
@@ -990,9 +1055,7 @@
                         Требования кандидата
                       </p>
                       <p class="text-slate-custom font-normal text-sm">
-                        Глубокие знания языка 1С:Предприятие. Программист должен
-                        хорошо знать синтаксис языка и иметь опыт работы с
-                        различными функциями и возможностями этой системы.
+                        {{ detailedVacancy.require }}
                       </p>
                     </div>
                     <div class="mb-5">
@@ -1000,11 +1063,7 @@
                         Обязанности кандидата
                       </p>
                       <p class="text-slate-custom font-normal text-sm">
-                        Создание конфигураций. Настройка программы под нужды
-                        конкретной компании. Например, если у компании
-                        уникальная система учёта товаров, программист создаст
-                        конфигурацию, которая будет учитывать все особенности
-                        бизнеса
+                        {{ detailedVacancy.duty }}
                       </p>
                     </div>
                     <div class="flex gap-x-15px">
@@ -1013,7 +1072,7 @@
                           Начать подбор не позднее
                         </p>
                         <p class="text-slate-custom font-normal text-sm">
-                          10/05/2024
+                          {{ detailedVacancy.dateStart }}
                         </p>
                       </div>
                       <div class="w-full">
@@ -1021,7 +1080,7 @@
                           Желаемая дата выхода кандидата
                         </p>
                         <p class="text-slate-custom font-normal text-sm">
-                          10/05/2024
+                          {{ detailedVacancy.dateWork }}
                         </p>
                       </div>
                     </div>
@@ -1138,6 +1197,7 @@
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
   import UiCircleLoader from '~/components/custom/UiCircleLoader.vue'
   import Pagination from '@/components/custom/Pagination.vue'
+  import CustomCalendar from '@/components/custom/CustomCalendar.vue'
 
   import responses from '~/src/data/responses.json'
   import responseRoles from '~/src/data/response-roles.json'
@@ -1147,6 +1207,8 @@
 
   import { fetchApplications } from '~/utils/applicationsList'
   import { fetchApplicationDetail } from '~/utils/applicationItem'
+  import { createApplication } from '~/utils/applicationCreate'
+  import { deleteApplication } from '~/utils/applicationRemove'
 
   const applications = ref([])
   // const data = ref(
@@ -1248,7 +1310,7 @@
   const newPostAdmin = ref('')
   const newDepartmentAdmin = ref('')
   const newLocationAdmin = ref('')
-  const newQuantsPositionsAdmin = ref('')
+  const newQuantsPositionsAdmin = ref(null)
   const newSalaryAdmin = ref({ from: null, to: null })
   const ArrayCurrency = currency
   const newCurrencyTypeAdmin = ref('RUB (рубль)')
@@ -1261,6 +1323,9 @@
   let resizeObserver = null
   // const userStore = useUserStore()
   // const userName = computed(() => userStore.name || 'Гость')
+  const dateStartAdmin = ref('')
+  const dateWorkAdmin = ref('')
+  const errors = ref({})
 
   // Функция обновления высоты контента
   const updateTabHeight = () => {
@@ -1433,6 +1498,7 @@
     document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
     document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
     loadApplications()
+    console.log('Applications data for check: ', applications)
   })
 
   onBeforeUnmount(() => {
@@ -1560,8 +1626,9 @@
     console.log('Open popup for app-s id:', vacancy.id)
     try {
       const fullData = await fetchApplicationDetail(vacancy.id)
-      detailedVacancy.value = fullData // save full response.data
+      detailedVacancy.value = fullData.data // save full response.data
       selectedVacancy.value = vacancy // open popup
+      console.log('Detailed vacancy data:', detailedVacancy.value)
     } catch (error) {
       error.value = 'Ошибка загрузки деталей заявки.'
       console.error(error)
@@ -1697,6 +1764,129 @@
       dateTime: '2024-09-11T18:03:00',
     },
   ])
+
+  const validateForm = () => {
+    const newErrors = {}
+
+    if (!newResponseAdmin.value)
+      newErrors.response = 'Укажите ответственного заявки'
+    if (!newCustomerAdmin.value) newErrors.customer = 'Укажите заказчика'
+    if (!newExecutorAdmin.value) newErrors.executor = 'Укажите исполнителя'
+    if (!newPostAdmin.value) newErrors.post = 'Укажите должность'
+    if (!newDepartmentAdmin.value)
+      newErrors.department = 'Укажите подразделение'
+    if (!newLocationAdmin.value) newErrors.location = 'Укажите регион поиска'
+    if (!newQuantsPositionsAdmin.value || newQuantsPositionsAdmin.value <= 0) {
+      newErrors.positions = 'Укажите корректное количество позиций'
+    }
+    if (!newSalaryAdmin.value.from || newSalaryAdmin.value.from < 0) {
+      newErrors.salaryFrom = 'Укажите корректную минимальную зарплату'
+    }
+    if (
+      !newSalaryAdmin.value.to ||
+      newSalaryAdmin.value.to < newSalaryAdmin.value.from
+    ) {
+      newErrors.salaryTo =
+        'Максимальная зарплата должна быть больше минимальной'
+    }
+    if (!newCurrencyTypeAdmin.value) newErrors.currency = 'Укажите валюту'
+    if (!newRequirementsAdmin.value)
+      newErrors.requirements = 'Укажите требования кандидата'
+    if (!newResponsibilitiesAdmin.value)
+      newErrors.responsibilities = 'Укажите обязанности кандидата'
+    if (!newReasonsForVacancyAdmin.value)
+      newErrors.reason = 'Укажите причину открытия вакансии'
+    if (!dateStartAdmin.value)
+      newErrors.dateStart = 'Укажите дату начала подбора'
+    if (!dateWorkAdmin.value)
+      newErrors.dateWork = 'Укажите желаемую дату выхода кандидата'
+
+    errors.value = newErrors
+    return Object.keys(newErrors).length === 0 // Возвращаем true, если ошибок нет
+  }
+
+  const applicationData = computed(() => {
+    return {
+      position: newPostAdmin.value,
+      division: newDepartmentAdmin.value,
+      count: newQuantsPositionsAdmin.value,
+      salaryFrom: newSalaryAdmin.value.from,
+      salaryTo: newSalaryAdmin.value.to,
+      currency: newCurrencyTypeAdmin.value,
+      require: newRequirementsAdmin.value,
+      duty: newResponsibilitiesAdmin.value,
+      city: newLocationAdmin.value,
+      reason: newReasonsForVacancyAdmin.value,
+      dateStart: dateStartAdmin.value,
+      dateWork: dateWorkAdmin.value,
+      vacancy: 44,
+      status: 1,
+      executor: 28,
+      client: 28,
+    }
+  })
+
+  const createApplicationHandler = async () => {
+    if (validateForm()) {
+      try {
+        const { createData, createError } = await createApplication(
+          applicationData.value
+        )
+
+        if (createData) {
+          console.log('Success:', createData.message)
+          isNewAppPopupAdmin.value = false // Закрываем попап
+        } else if (createError) {
+          const status = createError.status
+          const message = createError.data?.message || createError.message
+
+          if (status === 422) {
+            console.warn('Validate error:', message)
+          } else {
+            console.warn('Error:', message)
+          }
+        }
+      } catch (error) {
+        console.error('Network error:', error.message)
+      }
+    } else {
+      console.log('Form validation failed')
+    }
+  }
+
+  const clientName = computed({
+    get: () => {
+      // Безопасная проверка на client и client.name
+      return detailedVacancy.value.client?.name || ''
+    },
+    set: newValue => {
+      // Обновляем detailedVacancy.client, если это необходимо
+      if (detailedVacancy.value.client) {
+        detailedVacancy.value.client.name = newValue
+      } else {
+        // Если client === null, создаем объект client
+        detailedVacancy.value.client = { id: 0, name: newValue } // Или другой id
+      }
+    },
+  })
+
+  const handleRemoveApplication = async (item, vacancy) => {
+    if (item === 'Удалить') {
+      console.log('Application for removing, ID:', vacancy.id)
+      try {
+        const { data, error } = await deleteApplication(vacancy.id)
+        if (error) {
+          console.error('Failed to delete application:', error)
+          return
+        }
+        console.log('Application deleted successfully:', data)
+        // Опционально: обнови список заявок после удаления
+        loadApplications() // Если нужно перезагрузить список
+      } catch (err) {
+        console.error('Unexpected error during deletion:', err)
+      }
+    }
+  }
 </script>
 
 <style scoped>
