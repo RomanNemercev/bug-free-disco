@@ -1,61 +1,61 @@
 <script setup>
-  import { ref, defineAsyncComponent } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 
-  import CopyBoard from '~/components/custom/CopyBoard.vue'
-  import UiLoader from '~/components/UiLoader.vue'
+import CopyBoard from '~/components/custom/CopyBoard.vue'
+import UiLoader from '~/components/UiLoader.vue'
 
-  //   get global loader
-  const { $loader } = useNuxtApp()
+//   get global loader
+const { $loader } = useNuxtApp()
 
-  // Состояние для управления отображением лоадера
-  const showLoader = ref(false)
-  let loaderTimeout = null
+// Состояние для управления отображением лоадера
+const showLoader = ref(false)
+let loaderTimeout = null
 
-  // Состояние для определения текущей активной страницы
-  const currentPage = ref('')
+// Состояние для определения текущей активной страницы
+const currentPage = ref('responseSettings')
 
-  // Лениво загружаемые компоненты
-  const pages = {
-    premiumPlatforms: defineAsyncComponent(() =>
-      import('~/pages/create-tabs/search-tab/PremiumPlatforms.vue')
-    ),
-    freePlatforms: defineAsyncComponent(() =>
-      import('~/pages/create-tabs/search-tab/FreePlatforms.vue')
-    ),
-    responseSettings: defineAsyncComponent(() =>
-      import('~/pages/create-tabs/search-tab/ResponseSettings.vue')
-    ),
-  }
+// Лениво загружаемые компоненты
+const pages = {
+  premiumPlatforms: defineAsyncComponent(() =>
+    import('~/pages/create-tabs/search-tab/PremiumPlatforms.vue')
+  ),
+  freePlatforms: defineAsyncComponent(() =>
+    import('~/pages/create-tabs/search-tab/FreePlatforms.vue')
+  ),
+  responseSettings: defineAsyncComponent(() =>
+    import('~/pages/create-tabs/search-tab/ResponseSettings.vue')
+  ),
+}
 
-  // Функция переключения страницы
-  function openPage(pageName) {
-    currentPage.value = pageName
-  }
+// Функция переключения страницы
+function openPage(pageName) {
+  currentPage.value = pageName
+}
 
-  function goBack() {
-    currentPage.value = null
-  }
+function goBack() {
+  currentPage.value = null
+}
 
-  // Обработчики событий Suspense
-  const onPending = () => {
-    console.log('Suspense: Loading started')
-    // Добавляем минимальную задержку, чтобы избежать мигания
-    loaderTimeout = setTimeout(() => {
-      showLoader.value = true
-      $loader.show()
-    }, 300) // Показываем лоадер только если загрузка длится дольше 300 мс
-  }
+// Обработчики событий Suspense
+const onPending = () => {
+  console.log('Suspense: Loading started')
+  // Добавляем минимальную задержку, чтобы избежать мигания
+  loaderTimeout = setTimeout(() => {
+    showLoader.value = true
+    $loader.show()
+  }, 300) // Показываем лоадер только если загрузка длится дольше 300 мс
+}
 
-  const onResolve = () => {
-    console.log('Suspense: Loading finished')
-    clearTimeout(loaderTimeout)
-    showLoader.value = false
-    $loader.hide()
-  }
+const onResolve = () => {
+  console.log('Suspense: Loading finished')
+  clearTimeout(loaderTimeout)
+  showLoader.value = false
+  $loader.hide()
+}
 
-  const onFallback = () => {
-    console.log('Suspense: Showing fallback')
-  }
+const onFallback = () => {
+  console.log('Suspense: Showing fallback')
+}
 </script>
 
 <template>
@@ -68,67 +68,39 @@
         Все что нужно, чтобы начать быстро и эффективно
       </p>
       <div class="flex gap-x-15px mb-9">
-        <div
-          class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-        >
+        <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
           <div class="bg-img star mb-25px"></div>
-          <p
-            class="text-base font-medium text-space text-center mb-3 leading-normal"
-          >
+          <p class="text-base font-medium text-space text-center mb-3 leading-normal">
             Премиальные доски объявлений
           </p>
-          <p
-            class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-          >
+          <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
             Используйте работные сайты и&nbsp;доски объявлений с&nbsp;премиум
             публикацией, что&nbsp;бы повысить узнаваемость вашей вакансии
           </p>
-          <UiButton
-            variant="semiaction"
-            size="semiaction"
-            class="w-full"
-            @click="openPage('premiumPlatforms')"
-          >
+          <UiButton variant="semiaction" size="semiaction" class="w-full" @click="openPage('premiumPlatforms')">
             Выбрать площадки
           </UiButton>
         </div>
-        <div
-          class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-        >
+        <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
           <div class="bg-img planet mb-25px"></div>
-          <p
-            class="text-base font-medium text-space text-center mb-3 leading-normal"
-          >
+          <p class="text-base font-medium text-space text-center mb-3 leading-normal">
             Бесплатные доски&nbsp;объявлений
           </p>
-          <p
-            class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-          >
+          <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
             Более 100+ бесплатных площадок для размещения в один клик
           </p>
-          <UiButton
-            variant="semiaction"
-            size="semiaction"
-            class="w-full"
-            @click="openPage('freePlatforms')"
-          >
+          <UiButton variant="semiaction" size="semiaction" class="w-full" @click="openPage('freePlatforms')">
             Выбрать площадки
           </UiButton>
         </div>
-        <div
-          class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-        >
+        <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
           <div class="bg-img message mb-25px"></div>
-          <p
-            class="text-base font-medium text-space text-center mb-3 leading-normal"
-          >
+          <p class="text-base font-medium text-space text-center mb-3 leading-normal">
             Поделиться
             <br />
             в социальных сетях
           </p>
-          <p
-            class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-          >
+          <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
             Расскажите о&nbsp;вашей вакансии в&nbsp;социальных сетях у&nbsp;себя
             на&nbsp;странице или поделитесь с&nbsp;контактами
           </p>
@@ -147,45 +119,28 @@
           Ускорьте существующие процессы найма
         </p>
         <div class="flex gap-x-15px">
-          <div
-            class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-          >
+          <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
             <div class="bg-img form mb-25px"></div>
-            <p
-              class="text-base font-medium text-space text-center mb-3 leading-normal"
-            >
+            <p class="text-base font-medium text-space text-center mb-3 leading-normal">
               Настройте форму отклика
             </p>
-            <p
-              class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-            >
+            <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
               Кнопка импорта поможет легко скопировать и&nbsp;импортировать
               контакт со&nbsp;странице браузера, на&nbsp;которой
               вы&nbsp;находитесь
             </p>
-            <UiButton
-              variant="semiaction"
-              size="semiaction"
-              class="w-full"
-              @click="openPage('responseSettings')"
-            >
+            <UiButton variant="semiaction" size="semiaction" class="w-full" @click="openPage('responseSettings')">
               Настроить
             </UiButton>
           </div>
-          <div
-            class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-          >
+          <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
             <div class="bg-img import mb-25px"></div>
-            <p
-              class="text-base font-medium text-space text-center mb-3 leading-normal"
-            >
+            <p class="text-base font-medium text-space text-center mb-3 leading-normal">
               Установите
               <br />
               кнопку импорта
             </p>
-            <p
-              class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-            >
+            <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
               Кнопка импорта поможет легко скопировать и&nbsp;импортировать
               контакт со&nbsp;странице браузера, на&nbsp;которой
               вы&nbsp;находитесь
@@ -194,67 +149,42 @@
               Установить расширение
             </UiButton>
           </div>
-          <div
-            class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-          >
+          <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
             <div class="bg-img link mb-25px"></div>
-            <p
-              class="text-base font-medium text-space text-center mb-3 leading-normal"
-            >
+            <p class="text-base font-medium text-space text-center mb-3 leading-normal">
               Короткая ссылка
               <br />
               на вакансию
             </p>
-            <p
-              class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-            >
+            <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
               Расскажите о вашей вакансии в социальных сетях, у себя на странице
               или отправьте контакту
             </p>
-            <copy-board
-              url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries"
-            />
+            <copy-board url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries" />
           </div>
-          <div
-            class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px"
-          >
+          <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
             <div class="bg-img inbox mb-25px"></div>
-            <p
-              class="text-base font-medium text-space text-center mb-3 leading-normal"
-            >
+            <p class="text-base font-medium text-space text-center mb-3 leading-normal">
               Почтовый ящик
               <br />
               для резюме
             </p>
-            <p
-              class="text-13px text-slate-custom font-normal text-center mb-auto leading-130"
-            >
+            <p class="text-13px text-slate-custom font-normal text-center mb-auto leading-130">
               Отправляйте резюме непосредственно на электронную почту,
               отправленные резюме будут автоматиски добавлены в раздел кандидаты
             </p>
-            <copy-board
-              url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries"
-            />
+            <copy-board url="https://example.com/very-long-url-that-will-overflow-the-container-boundaries" />
           </div>
         </div>
       </div>
     </div>
     <div v-else>
       <!-- Динамическая загрузка страницы с лоадером -->
-      <Suspense
-        @pending="onPending"
-        @resolve="onResolve"
-        @fallback="onFallback"
-      >
+      <Suspense @pending="onPending" @resolve="onResolve" @fallback="onFallback">
         <template #default>
           <component :is="pages[currentPage]">
             <template #back>
-              <UiButton
-                variant="black"
-                size="black"
-                @click="goBack"
-                class="mb-35px"
-              >
+              <UiButton variant="black" size="black" @click="goBack" class="mb-35px">
                 Назад
               </UiButton>
             </template>
@@ -269,38 +199,38 @@
 </template>
 
 <style scoped>
-  .bg-img {
-    width: 50px;
-    height: 50px;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
+.bg-img {
+  width: 50px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
 
-  .star {
-    background-image: url('../../assets/img/star.svg');
-  }
+.star {
+  background-image: url('../../assets/img/star.svg');
+}
 
-  .planet {
-    background-image: url('../../assets/img/planet.svg');
-  }
+.planet {
+  background-image: url('../../assets/img/planet.svg');
+}
 
-  .message {
-    background-image: url('../../assets/img/message.svg');
-  }
+.message {
+  background-image: url('../../assets/img/message.svg');
+}
 
-  .form {
-    background-image: url('../../assets/img/form.svg');
-  }
+.form {
+  background-image: url('../../assets/img/form.svg');
+}
 
-  .import {
-    background-image: url('../../assets/img/import.svg');
-  }
+.import {
+  background-image: url('../../assets/img/import.svg');
+}
 
-  .link {
-    background-image: url('../../assets/img/vacancy-link.svg');
-  }
+.link {
+  background-image: url('../../assets/img/vacancy-link.svg');
+}
 
-  .inbox {
-    background-image: url('../../assets/img/inbox.svg');
-  }
+.inbox {
+  background-image: url('../../assets/img/inbox.svg');
+}
 </style>

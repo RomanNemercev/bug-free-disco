@@ -346,7 +346,7 @@
         <div class="w-full justify-between flex gap-25px mb-6">
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
-              <span class="text-red">*</span>
+              <span class="text-red-custom">*</span>
               Название должности
             </p>
             <Autocomplete
@@ -386,7 +386,7 @@
         <div class="w-full">
           <div class="w-full flex justify-between">
             <p class="text-sm font-medium text-space">
-              <span class="text-red">*</span>
+              <span class="text-red-custom">*</span>
               Описание вакансии
             </p>
             <generate-button />
