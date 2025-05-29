@@ -36,7 +36,6 @@ export const getVacancies = async () => {
             },
         });
 
-        console.log('Полный ответ сервера:', response);
         return response?.data?.data || null;
     } catch (err: any) {
         console.error('Ошибка при запросе:', err);
@@ -52,4 +51,13 @@ export const getVacancies = async () => {
         }
         return null;
     }
+};
+
+export const getVacanciesNames = async () => {
+    const vacancies: any = await getVacancies();
+    return vacancies?.map((vacancy: string | number, key: keyof any) => {
+        (vacancy as any)['name'] = (vacancy as any)['title']
+
+        return vacancy
+    }) || [];
 };

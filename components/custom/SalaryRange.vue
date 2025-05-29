@@ -3,7 +3,7 @@
     <!-- Поле "От" -->
     <input
       type="text"
-      v-model="localFrom"
+      :value="props.from"
       @input="handleInput('from', $event.target.value)"
       @blur="handleBlurAndValidate('from')"
       class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
@@ -15,7 +15,7 @@
     <!-- Поле "До" -->
     <input
       type="text"
-      v-model="localTo"
+      :value="props.to"
       @input="handleInput('to', $event.target.value)"
       @blur="handleBlurAndValidate('to')"
       class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
@@ -29,17 +29,29 @@
 <script setup>
   import { ref, watch } from 'vue'
 
+  // const props = defineProps({
+  //   modelValue: {
+  //     type: Object | Number,
+  //     default: () => ({ from: null, to: null }),
+  //   },
+  // })
   const props = defineProps({
-    modelValue: {
-      type: Object,
-      default: () => ({ from: null, to: null }),
+    from: {
+      type: Number,
+      default: null,
     },
+    to: {
+      type: Number,
+      default: null,
+    }
   })
 
   const emit = defineEmits(['update:modelValue'])
+  const localFrom = ref(props.from || '')
+  const localTo = ref(props.to || '')
+  // const localFrom = ref(props.modelValue.from || '')
+  // const localTo = ref(props.modelValue.to || '')
 
-  const localFrom = ref(props.modelValue.from || '')
-  const localTo = ref(props.modelValue.to || '')
   const isFocused = ref({ from: false, to: false })
 
   const handleInput = (field, value) => {
@@ -51,7 +63,7 @@
       localTo.value = sanitizedValue
     }
 
-    emit('update:modelValue', { from: localFrom.value, to: localTo.value })
+    emit('update:modelValue', localFrom.value, localTo.value )
   }
 
   const validateRange = () => {
@@ -76,7 +88,7 @@
 
   // Следим за обновлением modelValue из родителя
   watch(
-    () => props.modelValue,
+    () => props.from,
     newValue => {
       localFrom.value = newValue.from || ''
       localTo.value = newValue.to || ''

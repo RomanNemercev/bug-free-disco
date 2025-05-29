@@ -7,6 +7,7 @@ interface ServerResponse {
 export const getServerToken = async () => {
     const config = useRuntimeConfig();
 
+    console.log(config.public.apiBase);
     try {
         const response = await $fetch<ServerResponse>('/login-jwt', {
             method: 'POST',

@@ -2,10 +2,6 @@
   import { ref } from 'vue'
   import debounce from 'lodash/debounce'
 
-  const currentResponse = ref('')
-  const filteredResponses = ref([])
-  const isFocused = ref(false)
-
   const props = defineProps({
     placeholder: {
       type: String,
@@ -29,7 +25,12 @@
     },
   })
 
-  const emit = defineEmits(['update:modelValue'])
+  const currentResponse = ref('')
+  currentResponse.value = props.modelValue
+  const filteredResponses = ref([])
+  const isFocused = ref(false)
+  
+  const emit = defineEmits({'update:modelValue': [String | null, Number | null]})
 
   // Дебаунс-функция для фильтрации списка
   const filterResponses = debounce(() => {
@@ -44,14 +45,15 @@
   const clearResponse = () => {
     currentResponse.value = ''
     filteredResponses.value = []
-    emit('update:modelValue', '')
+    emit('update:modelValue', '', null)
   }
 
   const selectResponse = response => {
-    currentResponse.value = response.name // Записываем только имя в поле ввода
+    currentResponse.value = response.name// Записываем только имя в поле ввода
     filteredResponses.value = []
     isFocused.value = false
-    emit('update:modelValue', response.name)
+    emit('update:modelValue', response.name, response.id)
+    alert(response.name);
   }
 </script>
 

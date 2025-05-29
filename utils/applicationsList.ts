@@ -9,6 +9,7 @@ interface RawApplication {
     client: { id: number; name: string } | null;
     executor: { id: number; name: string; role: { id: number; name: string } } | null;
     vacancy?: { id: number; name: string } | null; // vacancy опционально, так как не используется
+    responsible?: { id: number; name: string } | null;
 }
 
 // Интерфейс для целевых данных (после маппинга)
@@ -80,8 +81,8 @@ export async function fetchApplications(page = 1) {
             closeDate: application.dateWork,
             status: application.status?.name ?? 'Не указан',
             customer: application.client?.name ?? 'Не указан',
-            executor: application.executor?.name ?? 'Не указан',
-            responsible: 'Не указан', // Временное значение
+            executor: application.executor?.name ?? null,
+            responsible: application.responsible?.name ?? 'Не указан', // Временное значение
             candidates: '0', // Временное значение
         }));
 

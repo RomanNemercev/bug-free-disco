@@ -16,25 +16,35 @@
       type: Array,
       required: true,
     },
+    modelValue: Object | null,
   })
 
-  const emit = defineEmits(['update:modelValue'])
-
+  currentVacancy.value = props.modelValue
+  const emit = defineEmits({'update:modelValue': [String, Number | null, String]})
   // Дебаунс-функция для фильтрации списка
   const filterVacancies = debounce(() => {
     const input = currentVacancy.value.toLowerCase()
-    filteredVacancies.value = props.vacancies.filter(vacancy =>
-      vacancy.name.toLowerCase().includes(input)
+    filteredVacancies.value = props.vacancies.filter(vacancy => {
+      if (input) {
+        
+        return vacancy?.name.toLowerCase().includes(input) | null
+      }
+    }
+    
+      // vacancy.title.toLowerCase().includes(input)
     )
+    console.log('filteredVacancies', filteredVacancies.value)
   }, 300)
 
   const selectVacancy = vacancy => {
+    console.log('vacancy', vacancy)
     currentVacancy.value = vacancy
     filteredVacancies.value = []
     isFocused.value = false
     showInput.value = false
-    emit('update:modelValue', vacancy)
+    emit('update:modelValue', vacancy, vacancy.id, 'vacancy')
   }
+
 </script>
 
 <template>
