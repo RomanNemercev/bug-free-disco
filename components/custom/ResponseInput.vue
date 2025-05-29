@@ -53,7 +53,6 @@
     filteredResponses.value = []
     isFocused.value = false
     emit('update:modelValue', response.name, response.id)
-    alert(response.name);
   }
 </script>
 

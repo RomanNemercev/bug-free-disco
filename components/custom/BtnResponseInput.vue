@@ -46,7 +46,6 @@
   const inputValue = ref(props.modelValue)
   const responseContainer = ref(null)
 
-  console.log('props response', props.responses)
   const openInput = event => {
     event.stopPropagation()
     showInput.value = true
