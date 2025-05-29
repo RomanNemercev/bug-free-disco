@@ -107,7 +107,7 @@
           </div>
           <!-- status vacancy -->
           <div class="text-sm font-medium text-space py-5 pl-2.5">
-            {{ getStatusLabel(vacancy.status) }}
+            {{ vacancy.status }}
           </div>
           <!-- admin or responsible column on user role -->
           <div
@@ -363,9 +363,10 @@
               </p>
               <response-input
                 class="w-full"
-                :responses="responseRoles"
-                v-model="newResponseAdmin"
+                :responses="executors"
+                :model-value="newApplication.responsible ? newApplication.responsible.name : null"
                 :showRoles="true"
+                @update:modelValue="updateNewResponsible"
               />
               <div v-if="errors.response" class="text-red-500 text-xs mt-1">
                 {{ errors.response }}
@@ -378,9 +379,11 @@
                 </p>
                 <response-input
                   class="w-full"
-                  :responses="responseRoles"
-                  v-model="newCustomerAdmin"
+                  :responses="clients"
+                  :model-value="newApplication.client ?newApplication.client.name : ''"
+                  :client="newApplication"
                   :showRoles="true"
+                  @update:modelValue="updateNewClient"
                 />
                 <div v-if="errors.customer" class="text-red-500 text-xs mt-1">
                   {{ errors.customer }}
@@ -392,9 +395,10 @@
                 </p>
                 <response-input
                   class="w-full"
-                  :responses="responseRoles"
-                  v-model="newExecutorAdmin"
+                  :responses="executors"
+                  :model-value="newApplication.executor ? newApplication.executor.name : ''"
                   :showRoles="true"
+                  @update:modelValue="updateNewExecutor"
                 />
                 <div v-if="errors.executor" class="text-red-500 text-xs mt-1">
                   {{ errors.executor }}
@@ -408,7 +412,7 @@
                 </p>
                 <MyInput
                   placeholder="Введите должность"
-                  v-model="newPostAdmin"
+                  v-model="newApplication.position"
                 />
                 <div v-if="errors.post" class="text-red-500 text-xs mt-1">
                   {{ errors.post }}
@@ -420,7 +424,7 @@
                 </p>
                 <MyInput
                   placeholder="Введите название подразделения"
-                  v-model="newDepartmentAdmin"
+                  v-model="newApplication.division"
                 />
                 <div v-if="errors.department" class="text-red-500 text-xs mt-1">
                   {{ errors.department }}
@@ -432,7 +436,7 @@
                 Регион поиска
               </p>
               <geo-input
-                v-model="newLocationAdmin"
+                v-model="newApplication.city"
                 :placeholder="'Введите город'"
               />
               <div v-if="errors.location" class="text-red-500 text-xs mt-1">
@@ -445,7 +449,7 @@
               </p>
               <MyInput
                 placeholder="Введите число позиций на вакансию"
-                v-model="newQuantsPositionsAdmin"
+                v-model="newApplication.count"
                 :type="'Number'"
               />
               <div v-if="errors.positions" class="text-red-500 text-xs mt-1">
@@ -457,7 +461,7 @@
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Зарплата
                 </p>
-                <SalaryRange v-model="newSalaryAdmin" />
+                <SalaryRange  :from="newApplication.salaryFrom" :to="newApplication.salaryTo" />
                 <div v-if="errors.salaryFrom" class="text-red-500 text-xs mt-1">
                   {{ errors.salaryFrom }}
                 </div>
@@ -473,7 +477,7 @@
                   :defaultValue="'Валюта'"
                   :options="ArrayCurrency"
                   :selected="0"
-                  v-model="newCurrencyTypeAdmin"
+                  v-model="newApplication.currency"
                 />
                 <div v-if="errors.currency" class="text-red-500 text-xs mt-1">
                   {{ errors.currency }}
@@ -485,7 +489,7 @@
                 Требования кандидата
               </p>
               <MyTextarea
-                v-model="newRequirementsAdmin"
+                v-model="newApplication.require"
                 :placeholder="'Опишите ключевые требования'"
               />
               <div v-if="errors.requirements" class="text-red-500 text-xs mt-1">
@@ -497,7 +501,7 @@
                 Обязанности кандидата
               </p>
               <MyTextarea
-                v-model="newResponsibilitiesAdmin"
+                v-model="newApplication.duty"
                 :placeholder="'Опишите ключевые обязанности кандидата'"
               />
               <div
@@ -513,7 +517,7 @@
               </p>
               <my-dropdown
                 :options="reasonseForOpenVacancy"
-                v-model="newReasonsForVacancyAdmin"
+                v-model="newApplication.reason"
                 :defaultValue="'Укажите вариант ответа'"
               />
               <div v-if="errors.reason" class="text-red-500 text-xs mt-1">
@@ -526,7 +530,7 @@
                   Начать подбор не позднее
                 </p>
                 <!-- <InputCalendar :fullStyles="true" /> -->
-                <CustomCalendar v-model="dateStartAdmin" />
+                <CustomCalendar v-model="newApplication.dateStart" />
                 <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
                   {{ errors.dateStart }}
                 </div>
@@ -536,7 +540,7 @@
                   Желаемая дата выхода кандидата
                 </p>
                 <!-- <InputCalendar :fullStyles="true" /> -->
-                <CustomCalendar v-model="dateWorkAdmin" />
+                <CustomCalendar v-model="newApplication.dateWork" />
                 <div v-if="errors.dateWork" class="text-red-500 text-xs mt-1">
                   {{ errors.dateWork }}
                 </div>
@@ -556,7 +560,7 @@
                 variant="back"
                 size="second-back"
                 class="font-medium"
-                @click="isNewAppPopupAdmin = false"
+                @click="closeNewApplicationPopup"
               >
                 Отмена
               </UiButton>
@@ -621,10 +625,10 @@
                 </p>
                 <div ref="executorContainer">
                   <div
-                    v-if="newExecutor"
+                    v-if="newExecutor.name"
                     class="text-sm font-medium text-dodger pl-15px"
                   >
-                    {{ newExecutor }}
+                    {{ newExecutor.name }}
                   </div>
                   <button
                     v-else-if="!showNewExecutor"
@@ -638,7 +642,7 @@
                     :responses="responses"
                     v-model="newExecutor"
                     v-show="showNewExecutor"
-                    @update:modelValue="value => updateNewExecutor(value)"
+                    @update:modelValue="(value, id) => updateNewExecutor(value, id)"
                   />
                 </div>
               </div>
@@ -648,10 +652,10 @@
                 </p>
                 <div ref="customerContainer">
                   <div
-                    v-if="newCustomer"
+                    v-if="newCustomer.name"
                     class="text-sm font-medium text-dodger pl-15px"
                   >
-                    {{ newCustomer }}
+                    {{ newCustomer.name }}
                   </div>
                   <button
                     v-else-if="!showNewCustomer"
@@ -663,9 +667,9 @@
                   <response-input
                     class="w-full"
                     :responses="responses"
-                    v-model="newCustomer"
+                    v-model="newCustomer.name"
                     v-show="showNewCustomer"
-                    @update:modelValue="value => updateNewCustomer(value)"
+                    @update:modelValue="(value, id) => updateNewCustomer(value, id)"
                   />
                 </div>
               </div>
@@ -790,6 +794,7 @@
               <BtnResponseInput
                 v-model="newResponseCustomer"
                 :responses="responses"
+                :customer="'responsible'"
               />
             </div>
             <div class="grid gap-x-5 grid-flow-col mb-6">
@@ -964,14 +969,16 @@
                       <p class="text-sm font-medium mb-5px">Исполнитель</p>
                       <BtnResponseInput
                         v-model="selectedVacancy.executor"
-                        :responses="responses"
+                        :responses="executors"
+                        :customer="'executor'"
+                        @update:modelValue="updateResponse"
                       />
                     </div>
                     <div class="w-full">
                       <p class="text-sm font-medium mb-15px">Статус заявки</p>
                       <p class="text-sm text-slate-custom">
                         {{
-                          getStatusLabel(selectedVacancy.status) ||
+                          selectedVacancy.status ||
                           'Неизвестный статус'
                         }}
                       </p>
@@ -982,12 +989,16 @@
                   >
                     <div class="w-full">
                       <p class="text-sm font-medium mb-15px">Вакансия</p>
-                      <BtnAddBindVacancy :vacancies="vacancyForBind" />
+                      <BtnAddBindVacancy 
+                        v-model="vacancy"
+                        :vacancies="vacancies"
+                        @update:modelValue="updateResponse"
+                      />
                     </div>
                     <div class="w-full">
                       <p class="text-sm font-medium mb-15px">Кандидаты</p>
                       <p class="text-sm text-slate-custom">
-                        {{ selectedVacancy.candidates }}
+                        {{ detailedVacancy.vacancy ? detailedVacancy.vacancy.candidates_count : '0' }}
                       </p>
                     </div>
                   </div>
@@ -996,11 +1007,13 @@
                       <div class="w-full">
                         <p class="text-sm font-medium mb-15px">Заказчик</p>
                         <BtnResponseInput
-                          :responses="customersRoles"
+                          :responses="clients"
                           v-model="clientName"
                           :placeholder="'ФИО заказчика'"
                           :minStyles="true"
                           :showRoles="true"
+                          :customer="'client'"
+                          @update:modelValue="updateResponse"
                         />
                       </div>
                       <div class="w-full">
@@ -1008,11 +1021,13 @@
                           Ответственный заявки
                         </p>
                         <BtnResponseInput
-                          :responses="responsiblesRoles"
-                          v-model="addNewResponsible"
+                          :responses="executors"
+                          v-model="responsibleName"
                           :placeholder="'ФИО ответственного'"
                           :minStyles="true"
                           :showRoles="true"
+                          :customer="'responsible'"
+                          @update:modelValue="updateResponse"
                         />
                       </div>
                     </div>
@@ -1133,7 +1148,7 @@
               </div>
             </div>
             <div class="flex gap-x-15px">
-              <UiButton variant="action" size="semiaction">Готово</UiButton>
+              <UiButton variant="action" size="semiaction" @click="() => handlerUpdateApplication([], selectedVacancy)">Готово</UiButton>
               <UiButton
                 variant="back"
                 size="second-back"
@@ -1200,15 +1215,16 @@
   import CustomCalendar from '@/components/custom/CustomCalendar.vue'
 
   import responses from '~/src/data/responses.json'
-  import responseRoles from '~/src/data/response-roles.json'
-  import dataList from '~/src/data/roles-data-admin.json'
-  import vacancyForBind from '~/src/data/vacancies-for-btnBind.json'
   import currency from '~/src/data/currency.json'
 
   import { fetchApplications } from '~/utils/applicationsList'
   import { fetchApplicationDetail } from '~/utils/applicationItem'
   import { createApplication } from '~/utils/applicationCreate'
   import { deleteApplication } from '~/utils/applicationRemove'
+  import { clientsList } from '~/utils/clientsList'
+  import { executorsList } from '~/utils/executorsList'
+  import { fetchApplicationUpdate } from '~/utils/applicationUpdate'
+  import { getVacancies, getVacanciesNames } from '~/utils/getVacancies'
 
   const applications = ref([])
   // const data = ref(
@@ -1261,26 +1277,16 @@
   const showNewResponse = ref(false)
   const newResponse = ref('')
   const responseContainer = ref(null)
-  // const newPosition = ref('')
-  // const newDepartment = ref('')
-  // const newRegion = ref('')
-  // const newReason = ref('')
-  // const salaryMin = ref('')
-  // const salaryMax = ref('')
-  // const vacancyCount = ref('')
-  // const requirements = ref('')
-  // const responsibilities = ref('')
-  const newResponseAdmin = ref('')
+  const newApplication = ref({})
   const newResponseResponsible = ref('')
   const showNewResponseResponsible = ref(false)
   const responseContainerResponsible = ref(null)
-  const newExecutor = ref('')
-  const newExecutorAdmin = ref('')
+  const newExecutor = ref({id: null, name: ''})
   const showNewExecutor = ref(false)
   const executorContainer = ref(null)
-  const newCustomer = ref('')
-  const newCustomerAdmin = ref('')
+  const newCustomer = ref({id: null, name: ''})
   const showNewCustomer = ref(false)
+  const newClient = ref({id: null, name: ''})
   const customerContainer = ref(false)
   const newPositionResponsible = ref('')
   const newDepartmentResponsible = ref('')
@@ -1307,25 +1313,16 @@
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
   const popupResponse = ref(null)
-  const newPostAdmin = ref('')
-  const newDepartmentAdmin = ref('')
-  const newLocationAdmin = ref('')
-  const newQuantsPositionsAdmin = ref(null)
-  const newSalaryAdmin = ref({ from: null, to: null })
+
   const ArrayCurrency = currency
-  const newCurrencyTypeAdmin = ref('RUB (рубль)')
-  const newRequirementsAdmin = ref('')
-  const newResponsibilitiesAdmin = ref('')
-  const newReasonsForVacancyAdmin = ref('')
   const addNewCustomer = ref('')
   const addNewResponsible = ref('')
-  //  used resizeObserver for dinamycly correct popup's height
+  const clients = ref([])
+  const executors = ref([])
+  const vacancies = ref([])
   let resizeObserver = null
-  // const userStore = useUserStore()
-  // const userName = computed(() => userStore.name || 'Гость')
-  const dateStartAdmin = ref('')
-  const dateWorkAdmin = ref('')
   const errors = ref({})
+  const updateData = ref({});
 
   // Функция обновления высоты контента
   const updateTabHeight = () => {
@@ -1339,12 +1336,12 @@
     })
   }
 
-  const statusLabels = {
-    new: 'Новая заявка',
-    in_review: 'На рассмотрении',
-    in_work: 'В работе',
-    paused: 'Приостановлена',
-  }
+  // const statusLabels = {
+  //   new: 'Новая заявка',
+  //   in_review: 'На рассмотрении',
+  //   in_work: 'В работе',
+  //   paused: 'Приостановлена',
+  // }
 
   const statusWeights = {
     new: 1,
@@ -1398,6 +1395,12 @@
   }
 
   const handleClickOutside = event => {
+    if (!isNewAppPopupAdmin.value && newApplication.value) {
+      newApplication.value = {}
+      console.log('Close popup. Clear fullData.')
+    } else {
+      console.log('Don`t close popup. ')
+    }
     data.value.forEach(vacancy => {
       if (vacancy.showResponseInput) {
         const element = document.querySelector(
@@ -1442,7 +1445,7 @@
       executorContainer.value &&
       !executorContainer.value.contains(event.target)
     ) {
-      if (!newExecutor.value) {
+      if (!newExecutor.value.name) {
         showNewExecutor.value = false // Закрываем input, если ничего не выбрано
       }
     }
@@ -1453,7 +1456,7 @@
       customerContainer.value &&
       !customerContainer.value.contains(event.target)
     ) {
-      if (!newCustomer.value) {
+      if (!newCustomer.value.name) {
         showNewCustomer.value = false // Закрываем input, если ничего не выбрано
       }
     }
@@ -1468,9 +1471,10 @@
         pagination: fetchedPagination,
       } = await fetchApplications(page)
       applications.value = fetchedApplications
+      console.log('Loaded applications: ', applications.value)
       data.value = applications.value.map(vacancy => ({
         ...vacancy,
-        responsible: 'Статический ответственный', // TODO: Заменить на данные из API
+        responsible: vacancy.responsible, // TODO: Заменить на данные из API
         candidates: 0, // TODO: Заменить на данные из API
         showResponseInput: false,
         responseChoose: '',
@@ -1478,17 +1482,41 @@
       pagination.value = fetchedPagination
       console.log('Loaded data: ', applications.value)
       console.log('Pagination: ', pagination.value)
+
+      // получаем динамический список клиентов
+      const {clients: clientData} = await clientsList();
+      clients.value = clientData
     } catch (error) {
       error.value = 'Ошибка загрузки заявок.'
       console.error(error)
     } finally {
       loading.value = false
     }
+
+    // получаем динамический список вакансий
+      vacancies.value = await getVacanciesNames();
+      console.log('vacancies', vacancies.value)
+
+    // получаем динамический список исполнителей
+    const {executors: executorData} = await executorsList();
+    executors.value = executorData
   }
 
   const handlePageChange = async page => {
     pagination.value.current_page = page
     await loadApplications(page)
+  }
+
+  const getClients = async () => {
+    const { clients } = await clientsList();
+    
+    return clients;
+  }
+
+  const getExecutors = async () => {
+    const { executors } = await executorsList();
+    
+    return executors;
   }
 
   onMounted(() => {
@@ -1571,18 +1599,53 @@
     }
   }
 
-  const updateNewExecutor = value => {
+  function updateNewExecutor(value, id) {
+    сonsole.log('value executor ', value)
     if (value) {
-      newExecutor.value = value
+      newExecutor.value.name = value
+      newExecutor.value.id = id
       showNewExecutor.value = false
+      newApplication.value.executor.id = id
+      newApplication.value.executor.name = value
+      сonsole.log('newApplication.value.executor.id ', newApplication.value.executor.id)
     }
   }
 
-  const updateNewCustomer = value => {
+  function updateNewResponsible(value, id) {
+    alert('update')
     if (value) {
-      newCustomer.value = value
+      newExecutor.value.name = value
+      newExecutor.value.id = id
+      showNewExecutor.value = false
+      newApplication.value.responsible.id = id
+      newApplication.value.responsible.name = value
+    }
+    console.log('newApplication updated - ', newApplication.value)
+  }
+
+  const updateNewCustomer = (value, id) => {
+    console.log('id - ', id)
+    if (value) {
+      newCustomer.value.name = value
+      newCustomer.value.id = id
       showNewCustomer.value = false
     }
+  }
+
+  const updateNewClient = (value, id) => {
+    if (value) {
+      newClient.value.name = value
+      newClient.value.id = id
+      showNewCustomer.value = false
+    }
+  }
+
+  const closeNewApplicationPopup = () => {
+    if (newApplication.value) {
+      newApplication.value = {}
+    }
+    
+    isNewAppPopupAdmin.value = false
   }
 
   watch(selectedVacancy, newValue => {
@@ -1623,14 +1686,13 @@
 
   const openPopup = async vacancy => {
     loadingItem.value = true
-    console.log('Open popup for app-s id:', vacancy.id)
     try {
       const fullData = await fetchApplicationDetail(vacancy.id)
       detailedVacancy.value = fullData.data // save full response.data
+    
       selectedVacancy.value = vacancy // open popup
-      console.log('Detailed vacancy data:', detailedVacancy.value)
     } catch (error) {
-      error.value = 'Ошибка загрузки деталей заявки.'
+      error.value = 'Ошибка загрузки деталей заявки.' 
       console.error(error)
     } finally {
       loadingItem.value = false
@@ -1666,17 +1728,6 @@
     },
   ]
 
-  const customersRoles = [
-    { name: 'Семен Семенович ', role: 'Заказчик' },
-    { name: 'Саймон Алексеевич', role: 'Заказчик' },
-    { name: 'Мария Сидорова' },
-  ]
-
-  const responsiblesRoles = [
-    { name: 'Александр Васильев ', role: 'Администратор' },
-    { name: 'Савелий Платонов', role: 'Администратор' },
-    { name: 'Мария Сидорова' },
-  ]
 
   const EVENT_TYPES = {
     CREATED: 'Создана заявка',
@@ -1712,12 +1763,13 @@
     }
   }
 
-  const getStatusLabel = statusId => {
-    const statusKey = Object.keys(statusWeights).find(
-      key => statusWeights[key] === statusId
-    )
-    return statusKey ? statusLabels[statusKey] : 'Не указан'
-  }
+  // const getStatusLabel = statusId => {
+  //   console.log('Статус: ', statusId)
+  //   const statusKey = Object.keys(statusWeights).find(
+  //     key => statusWeights[key] === statusId
+  //   )
+  //   return statusKey ? statusLabels[statusKey] : 'Не указан'
+  // }
 
   // Начальные данные (позже можно заменить на API)
   const messages = ref([
@@ -1768,37 +1820,37 @@
   const validateForm = () => {
     const newErrors = {}
 
-    if (!newResponseAdmin.value)
+    if (!newApplication.value.responsible)
       newErrors.response = 'Укажите ответственного заявки'
-    if (!newCustomerAdmin.value) newErrors.customer = 'Укажите заказчика'
-    if (!newExecutorAdmin.value) newErrors.executor = 'Укажите исполнителя'
-    if (!newPostAdmin.value) newErrors.post = 'Укажите должность'
-    if (!newDepartmentAdmin.value)
+    if (!newApplication.value.client) newErrors.customer = 'Укажите заказчика'
+    if (!newApplication.value.executor) newErrors.executor = 'Укажите исполнителя'
+    if (!newApplication.value.position) newErrors.post = 'Укажите должность'
+    if (!newApplication.value.division)
       newErrors.department = 'Укажите подразделение'
-    if (!newLocationAdmin.value) newErrors.location = 'Укажите регион поиска'
-    if (!newQuantsPositionsAdmin.value || newQuantsPositionsAdmin.value <= 0) {
+    if (!newApplication.value.city) newErrors.location = 'Укажите регион поиска'
+    if (!newApplication.value.count || newApplication.value.count <= 0) {
       newErrors.positions = 'Укажите корректное количество позиций'
     }
-    if (!newSalaryAdmin.value.from || newSalaryAdmin.value.from < 0) {
+    if (!newApplication.value.salaryFrom || newApplication.value.salaryFrom < 0) {
       newErrors.salaryFrom = 'Укажите корректную минимальную зарплату'
     }
     if (
-      !newSalaryAdmin.value.to ||
-      newSalaryAdmin.value.to < newSalaryAdmin.value.from
+      !newApplication.value.salaryTo ||
+      newApplication.value.salaryTo < newApplication.value.salaryTo
     ) {
       newErrors.salaryTo =
         'Максимальная зарплата должна быть больше минимальной'
     }
-    if (!newCurrencyTypeAdmin.value) newErrors.currency = 'Укажите валюту'
-    if (!newRequirementsAdmin.value)
+    if (!newApplication.value.currency) newErrors.currency = 'Укажите валюту'
+    if (!newApplication.value.require)
       newErrors.requirements = 'Укажите требования кандидата'
-    if (!newResponsibilitiesAdmin.value)
+    if (!newApplication.value.duty)
       newErrors.responsibilities = 'Укажите обязанности кандидата'
-    if (!newReasonsForVacancyAdmin.value)
+    if (!newApplication.value.reason)
       newErrors.reason = 'Укажите причину открытия вакансии'
-    if (!dateStartAdmin.value)
+    if (!newApplication.value.dateStart)
       newErrors.dateStart = 'Укажите дату начала подбора'
-    if (!dateWorkAdmin.value)
+    if (!newApplication.value.dateWork)
       newErrors.dateWork = 'Укажите желаемую дату выхода кандидата'
 
     errors.value = newErrors
@@ -1807,22 +1859,23 @@
 
   const applicationData = computed(() => {
     return {
-      position: newPostAdmin.value,
-      division: newDepartmentAdmin.value,
-      count: newQuantsPositionsAdmin.value,
-      salaryFrom: newSalaryAdmin.value.from,
-      salaryTo: newSalaryAdmin.value.to,
-      currency: newCurrencyTypeAdmin.value,
-      require: newRequirementsAdmin.value,
-      duty: newResponsibilitiesAdmin.value,
-      city: newLocationAdmin.value,
-      reason: newReasonsForVacancyAdmin.value,
-      dateStart: dateStartAdmin.value,
-      dateWork: dateWorkAdmin.value,
-      vacancy: 44,
-      status: 1,
-      executor: 28,
-      client: 28,
+      position: newApplication.value.position,
+      division: newApplication.value.division,
+      count: newApplication.value.count,
+      salaryFrom: newApplication.value.salaryFrom,
+      salaryTo: newApplication.value.salaryTo,
+      currency: newApplication.value.currency,
+      require: newApplication.value.require,
+      duty: newApplication.value.duty,
+      city: newApplication.value.city,
+      reason: newApplication.value.reason,
+      dateStart: newApplication.value.dateStart,
+      dateWork: newApplication.value.dateWork,
+      vacancy: newApplication.value.vacancy?.id,
+      status: newApplication.value.status?.id,
+      executor: newApplication.value.executor?.id,
+      client: newApplication.value.client?.id,
+      responsible: newApplication.value.responsible?.id,
     }
   })
 
@@ -1870,6 +1923,51 @@
     },
   })
 
+  const responsibleName = computed({
+    get: () => {
+      // Безопасная проверка на responsible и responsible.name
+      return detailedVacancy.value.responsible?.name || ''
+    },
+    set: newValue => {
+      // Обновляем detailedVacancy.responsible, если это необходимо
+      
+      if (detailedVacancy.value.name) {
+        detailedVacancy.value.responsible.name = newValue
+      } else {
+        // Если responsible === null, создаем объект responsible
+        detailedVacancy.value.responsible = { id: 0, name: newValue } // Или другой id
+      }
+    },
+  })
+
+  const vacancy = computed({
+    get: () => {
+      // Безопасная проверка на responsible и responsible.name
+      return detailedVacancy.value?.vacancy || null
+    },
+    set: newValue => {
+      // Обновляем detailedVacancy.responsible, если это необходимо
+      
+      if (detailedVacancy.value.name) {
+        detailedVacancy.value.vacancy.name = newValue
+      } else {
+        // Если responsible === null, создаем объект responsible
+        detailedVacancy.value.vacancy = { id: 0, name: newValue } // Или другой id
+      }
+    },
+  })
+
+  const updateResponse = (value, id, key = null) => {
+    console.log('key', key)
+    if (key) {
+      updateData.value[key] = id
+    }
+  }
+
+  const updateExecutor = () => {
+    updateData.value.append('executor', id)
+  }
+
   const handleRemoveApplication = async (item, vacancy) => {
     if (item === 'Удалить') {
       console.log('Application for removing, ID:', vacancy.id)
@@ -1886,6 +1984,22 @@
         console.error('Unexpected error during deletion:', err)
       }
     }
+    if (item === 'Копировать заявку') {
+      const { data, error} = await fetchApplicationDetail(vacancy.id)
+      newApplication.value = data
+      console.log('dat ' , newApplication.value)
+      isNewAppPopupAdmin.value = true
+    }
+  }
+
+  const handlerUpdateApplication = async (dataForm, vacancy) => {
+    if (Object.keys(updateData.value).length > 0) {
+      const { data, error } = await fetchApplicationUpdate(updateData.value, vacancy.id)
+      updateData.value = {}
+      loadApplications() 
+    } 
+    
+    closePopup()
   }
 </script>
 

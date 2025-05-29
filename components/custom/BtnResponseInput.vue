@@ -30,7 +30,8 @@
   const props = defineProps({
     modelValue: String, // Данные из v-model
     responses: Array, // Передаваемые ответы
-    placeholder: String,
+    placeholder: String | null,
+    customer:  String | null,
     minStyles: {
       type: Boolean,
       default: false,
@@ -40,21 +41,20 @@
       default: false,
     },
   })
-  const emit = defineEmits(['update:modelValue'])
-
+  const emit = defineEmits({'update:modelValue': [String, Number | null, String]})
   const showInput = ref(false)
   const inputValue = ref(props.modelValue)
   const responseContainer = ref(null)
 
+  console.log('props response', props.responses)
   const openInput = event => {
     event.stopPropagation()
     showInput.value = true
   }
-
-  const updateResponse = value => {
+const updateResponse = (value, id, key = props.customer) => {
     if (value) {
       inputValue.value = value
-      emit('update:modelValue', value)
+      emit('update:modelValue', value, id, key)
       showInput.value = false
     }
   }
