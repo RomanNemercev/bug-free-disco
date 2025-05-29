@@ -10,7 +10,7 @@ export async function fetchApplicationDetail(id: number) {
     const authUser = useCookie('auth_user').value;
 
     try {
-        const response: Application | NotData= await $fetch(`${config.public.apiBase}/applications/${id}`, {
+        const response: Application | NotData = await $fetch(`${config.public.apiBase}/applications/${id}`, {
             headers: {
                 Accept: 'application/json',
                 Authorization: `Bearer ${authToken}`,

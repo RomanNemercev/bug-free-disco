@@ -50,20 +50,20 @@
           :key="header.key"
           class="text-sm font-medium text-slate-custom flex pl-2.5"
           @click="
-            ;['createdAt', 'closeDate', 'status'].includes(header.key) &&
+            ;['dateStart', 'dateWork', 'status'].includes(header.key) &&
               sortBy(header.key)
           "
           :class="{
             'cursor-pointer select-none': [
-              'createdAt',
-              'closeDate',
+              'dateStart',
+              'dateWork',
               'status',
             ].includes(header.key),
           }"
         >
           <span>{{ header.label }}</span>
           <button
-            v-if="['createdAt', 'closeDate', 'status'].includes(header.key)"
+            v-if="['dateStart', 'dateWork', 'status'].includes(header.key)"
             class="relative flex items-center justify-center ml-[2.2px] custom-button"
           >
             <span :style="sortArrowStyle(header.key)" class="ml-1">
@@ -154,7 +154,7 @@
                     value => updateResponseChoose(vacancy, value)
                   "
                   class="mb-0 w-full max-w-input py-5"
-                  :responses="responses"
+                  :responses="executors"
                 />
               </div>
             </div>
@@ -642,7 +642,7 @@
                     :responses="responses"
                     v-model="newExecutor"
                     v-show="showNewExecutor"
-                    @update:modelValue="(value, id) => updateNewExecutor(value, id)"
+                    @update:modelValue="updateNewExecutor"
                   />
                 </div>
               </div>
@@ -1251,8 +1251,8 @@
     const baseHeaders = [
       { key: 'title', label: 'Вакансия' },
       { key: 'region', label: 'Регион' },
-      { key: 'createdAt', label: 'Создана от' },
-      { key: 'closeDate', label: 'Закрыть до' },
+      { key: 'dateStart', label: 'Создана от' },
+      { key: 'dateWork', label: 'Закрыть до' },
       { key: 'status', label: 'Статус' },
       { key: 'executor', label: 'Исполнитель' },
     ]
@@ -1367,12 +1367,17 @@
   })
 
   const sortBy = key => {
+    
     if (sortKey.value === key) {
       sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
     } else {
       sortKey.value = key
       sortOrder.value = 'asc'
     }
+    let asc = sortOrder.value === 'asc' ? '' : '&asc=0'
+     loadApplications(1, `sort=${sortKey.value}${asc}`)
+    console.log('key sort', sortKey.value)
+    console.log('type sort', sortOrder.value)
   }
 
   const sortArrowStyle = key => {
@@ -1397,9 +1402,6 @@
   const handleClickOutside = event => {
     if (!isNewAppPopupAdmin.value && newApplication.value) {
       newApplication.value = {}
-      console.log('Close popup. Clear fullData.')
-    } else {
-      console.log('Don`t close popup. ')
     }
     data.value.forEach(vacancy => {
       if (vacancy.showResponseInput) {
@@ -1462,14 +1464,14 @@
     }
   }
 
-  const loadApplications = async (page = 1) => {
+  const loadApplications = async (page = 1, params = '') => {
     // load data applications
     loading.value = true
     try {
       const {
         applications: fetchedApplications,
         pagination: fetchedPagination,
-      } = await fetchApplications(page)
+      } = await fetchApplications(page, params)
       applications.value = fetchedApplications
       console.log('Loaded applications: ', applications.value)
       data.value = applications.value.map(vacancy => ({
@@ -1600,19 +1602,21 @@
   }
 
   function updateNewExecutor(value, id) {
-    сonsole.log('value executor ', value)
+    // сonsole.log('value executor ', value)
     if (value) {
       newExecutor.value.name = value
       newExecutor.value.id = id
       showNewExecutor.value = false
+      if (!newApplication.value.executor) {
+        newApplication.value.executor = {}
+      }
       newApplication.value.executor.id = id
       newApplication.value.executor.name = value
-      сonsole.log('newApplication.value.executor.id ', newApplication.value.executor.id)
+      // сonsole.log('newApplication.value.executor.id ', newApplication.value.executor.id)
     }
   }
 
   function updateNewResponsible(value, id) {
-    alert('update')
     if (value) {
       newExecutor.value.name = value
       newExecutor.value.id = id
@@ -1620,11 +1624,9 @@
       newApplication.value.responsible.id = id
       newApplication.value.responsible.name = value
     }
-    console.log('newApplication updated - ', newApplication.value)
   }
 
   const updateNewCustomer = (value, id) => {
-    console.log('id - ', id)
     if (value) {
       newCustomer.value.name = value
       newCustomer.value.id = id
@@ -1882,16 +1884,17 @@
   const createApplicationHandler = async () => {
     if (validateForm()) {
       try {
-        const { createData, createError } = await createApplication(
+        const { data, error } = await createApplication(
           applicationData.value
         )
-
-        if (createData) {
-          console.log('Success:', createData.message)
+        console.log('error', error)
+        if (!error) {
+          console.log('Success:', data.message)
           isNewAppPopupAdmin.value = false // Закрываем попап
-        } else if (createError) {
-          const status = createError.status
-          const message = createError.data?.message || createError.message
+          loadApplications()
+        } else if (error) {
+          const status = error.status
+          const message = error.data?.message || error.message
 
           if (status === 422) {
             console.warn('Validate error:', message)
@@ -1989,6 +1992,9 @@
       newApplication.value = data
       console.log('dat ' , newApplication.value)
       isNewAppPopupAdmin.value = true
+    }
+    if (item === 'Управлять') {
+      openPopup(vacancy)
     }
   }
 

@@ -52,13 +52,14 @@ interface ApiResponse {
     };
 }
 
-export async function fetchApplications(page = 1) {
+export async function fetchApplications(page = 1, params = '') {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
+    params = params != '' ?  `&${params}` : ''
 
     try {
-        const response: ApiResponse = await $fetch(`${config.public.apiBase}/applications?page=${page}`, {
+        const response: ApiResponse = await $fetch(`${config.public.apiBase}/applications?page=${page}${params}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
