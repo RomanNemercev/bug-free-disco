@@ -12,6 +12,10 @@
       type: String,
       default: 'Введите значение',
     },
+    maxHeight: {
+      type: Number,
+      default: null,
+    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -40,6 +44,7 @@
       @blur="isFocused = false"
       :value="localValue"
       @input="updateValue"
+      :style="{ maxHeight: maxHeight ? maxHeight + 'px' : undefined }"
     ></textarea>
   </div>
 </template>
