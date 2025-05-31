@@ -9,7 +9,5 @@ export default defineNuxtRouteMiddleware((to: RouteLocationNormalized, from: Rou
   }
   if (!tokenCookie.value) {
     return navigateTo('/auth');
-  } else {
-    console.log('Токен есть! middleware работает');
   }
 });
