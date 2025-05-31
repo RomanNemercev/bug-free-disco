@@ -461,7 +461,12 @@
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Зарплата
                 </p>
-                <SalaryRange  :from="newApplication.salaryFrom" :to="newApplication.salaryTo" />
+                <SalaryRange  
+                  :from="newApplication.salaryFrom" 
+                  :to="newApplication.salaryTo" 
+                  @update:from="newApplication.salaryFrom = $event"
+                  @update:to="newApplication.salaryTo = $event"
+                />
                 <div v-if="errors.salaryFrom" class="text-red-500 text-xs mt-1">
                   {{ errors.salaryFrom }}
                 </div>
@@ -530,7 +535,8 @@
                   Начать подбор не позднее
                 </p>
                 <!-- <InputCalendar :fullStyles="true" /> -->
-                <CustomCalendar v-model="newApplication.dateStart" />
+                 <DropdownCalendarStatic @update:model-value="newApplication.dateStart = $event"/>
+                
                 <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
                   {{ errors.dateStart }}
                 </div>
@@ -539,8 +545,7 @@
                 <p class="text-sm font-medium text-space mb-1">
                   Желаемая дата выхода кандидата
                 </p>
-                <!-- <InputCalendar :fullStyles="true" /> -->
-                <CustomCalendar v-model="newApplication.dateWork" />
+                <DropdownCalendarStatic @update:model-value="newApplication.dateWork = $event" />
                 <div v-if="errors.dateWork" class="text-red-500 text-xs mt-1">
                   {{ errors.dateWork }}
                 </div>
@@ -1196,24 +1201,23 @@
   // const initTop = await useAsyncData('top10', async () => await getMovieList('movie'));
   // console.log(apiTest);
 
-  import ResponseInput from '@/components/custom/ResponseInput.vue'
-  import DotsDropdown from '@/components/custom/DotsDropdown.vue'
+  import ResponseInput from '~/components/custom/ResponseInput.vue'
+  import DotsDropdown from '~/components/custom/DotsDropdown.vue'
   import Popup from '~/components/custom/Popup.vue'
   import SimpleInput from '~/components/custom/SimpleInput.vue'
   import InputCalendar from '~/components/custom/InputCalendar.vue'
   import BtnResponseInput from '~/components/custom/BtnResponseInput.vue'
   import BtnAddBindVacancy from '~/components/custom/BtnAddBindVacancy.vue'
   import MyInput from '~/components/custom/MyInput.vue'
-  import GeoInput from '@/components/custom/GeoInput.vue'
+  import GeoInput from '~/components/custom/GeoInput.vue'
   import SalaryRange from '~/components/custom/SalaryRange.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import MyTextarea from '~/components/custom/MyTextarea.vue'
   import ChatMin from '~/components/custom/chat-min'
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
   import UiCircleLoader from '~/components/custom/UiCircleLoader.vue'
-  import Pagination from '@/components/custom/Pagination.vue'
-  import CustomCalendar from '@/components/custom/CustomCalendar.vue'
-
+  import Pagination from '~/components/custom/Pagination.vue'
+  import DropdownCalendarStatic from '~/components/custom/DropdownCalendarStatic.vue'
   import responses from '~/src/data/responses.json'
   import currency from '~/src/data/currency.json'
 
@@ -1225,6 +1229,7 @@
   import { executorsList } from '~/utils/executorsList'
   import { fetchApplicationUpdate } from '~/utils/applicationUpdate'
   import { getVacancies, getVacanciesNames } from '~/utils/getVacancies'
+
 
   const applications = ref([])
   // const data = ref(
@@ -1402,6 +1407,7 @@
   const handleClickOutside = event => {
     if (!isNewAppPopupAdmin.value && newApplication.value) {
       newApplication.value = {}
+      errors.value = {}
     }
     data.value.forEach(vacancy => {
       if (vacancy.showResponseInput) {
@@ -1621,6 +1627,9 @@
       newExecutor.value.name = value
       newExecutor.value.id = id
       showNewExecutor.value = false
+      if (!newApplication.value.responsible) {
+        newApplication.value.responsible = {}
+      }
       newApplication.value.responsible.id = id
       newApplication.value.responsible.name = value
     }
@@ -1639,6 +1648,11 @@
       newClient.value.name = value
       newClient.value.id = id
       showNewCustomer.value = false
+      if (!newApplication.value.client) {
+        newApplication.value.client = {}
+      }
+      newApplication.value.client.id = id
+      newApplication.value.client.name = value
     }
   }
 
@@ -1834,16 +1848,18 @@
       newErrors.positions = 'Укажите корректное количество позиций'
     }
     if (!newApplication.value.salaryFrom || newApplication.value.salaryFrom < 0) {
+      console.log('От ', newApplication.value.salaryFrom)
+      console.log('До ', newApplication.value.salaryTo)
       newErrors.salaryFrom = 'Укажите корректную минимальную зарплату'
     }
     if (
       !newApplication.value.salaryTo ||
-      newApplication.value.salaryTo < newApplication.value.salaryTo
+      newApplication.value.salaryFrom > newApplication.value.salaryTo
     ) {
       newErrors.salaryTo =
         'Максимальная зарплата должна быть больше минимальной'
     }
-    if (!newApplication.value.currency) newErrors.currency = 'Укажите валюту'
+    if (!newApplication.value.currency) newApplication.value.currency = currency[0]['name']
     if (!newApplication.value.require)
       newErrors.requirements = 'Укажите требования кандидата'
     if (!newApplication.value.duty)
@@ -1856,6 +1872,7 @@
       newErrors.dateWork = 'Укажите желаемую дату выхода кандидата'
 
     errors.value = newErrors
+
     return Object.keys(newErrors).length === 0 // Возвращаем true, если ошибок нет
   }
 
@@ -1882,6 +1899,7 @@
   })
 
   const createApplicationHandler = async () => {
+    console.log('data' , newApplication.value)
     if (validateForm()) {
       try {
         const { data, error } = await createApplication(
@@ -1970,6 +1988,7 @@
   const updateExecutor = () => {
     updateData.value.append('executor', id)
   }
+
 
   const handleRemoveApplication = async (item, vacancy) => {
     if (item === 'Удалить') {

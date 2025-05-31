@@ -29,12 +29,6 @@
 <script setup>
   import { ref, watch } from 'vue'
 
-  // const props = defineProps({
-  //   modelValue: {
-  //     type: Object | Number,
-  //     default: () => ({ from: null, to: null }),
-  //   },
-  // })
   const props = defineProps({
     from: {
       type: Number,
@@ -46,12 +40,9 @@
     }
   })
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue', 'update:from', 'update:to'])
   const localFrom = ref(props.from || '')
   const localTo = ref(props.to || '')
-  // const localFrom = ref(props.modelValue.from || '')
-  // const localTo = ref(props.modelValue.to || '')
-
   const isFocused = ref({ from: false, to: false })
 
   const handleInput = (field, value) => {
@@ -59,8 +50,10 @@
 
     if (field === 'from') {
       localFrom.value = sanitizedValue
+      emit('update:from', parseInt(localFrom.value, 10))
     } else if (field === 'to') {
       localTo.value = sanitizedValue
+      emit('update:to', parseInt(localTo.value, 10))
     }
 
     emit('update:modelValue', localFrom.value, localTo.value )
@@ -70,20 +63,20 @@
     const fromValue = parseInt(localFrom.value, 10)
     const toValue = parseInt(localTo.value, 10)
 
-    if (fromValue && toValue && fromValue > toValue) {
-      localFrom.value = toValue.toString()
+    if (fromValue && toValue && fromValue <= toValue) {
+      // localFrom.value = toValue.toString()
     }
 
     emit('update:modelValue', { from: localFrom.value, to: localTo.value })
   }
 
   const handleBlurAndValidate = field => {
-    isFocused.value[field] = false
+    // isFocused.value[field] = false
     validateRange()
   }
 
   const handleFocus = field => {
-    isFocused.value[field] = true
+    // isFocused.value[field] = true
   }
 
   // Следим за обновлением modelValue из родителя
