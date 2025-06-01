@@ -1,13 +1,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import companies from '~/src/data/companies.json'
 
 // const props = defineProps({ id: String })
 const router = useRouter()
 const id = router.currentRoute.value.params.id
 
 // Импорт данных
-import companies from '~/src/data/companies.json'
 
 // Находим вакансию и её компанию
 const vacancy = computed(() => {
