@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import companies from '~/src/data/companies.json'
+import ResponseForm from '~/components/custom/page-parts/ResponseForm.vue'
 
 // const props = defineProps({ id: String })
 const router = useRouter()
@@ -26,7 +27,7 @@ const vacancy = computed(() => {
 const companyId = computed(() => vacancy.value.companyId || null)
 const company = computed(() => companies.find(c => c.id === companyId.value) || {})
 
-const activeTab = ref('about')
+const activeTab = ref('form')
 const formData = ref({ name: '', email: '' })
 
 
@@ -101,10 +102,12 @@ useHead({ title: vacancy.value.title || 'Вакансия не найдена' }
                     </div>
                 </div>
             </div>
-            <UiButton variant="action" size="semiaction" class="w-full uppercase min-h-[50px]">Откликнуться на вакансию
+            <UiButton variant="action" size="semiaction" class="w-full uppercase min-h-[50px]"
+              @click="activeTab = 'form'">Откликнуться на вакансию
             </UiButton>
         </div>
-        <div v-if="activeTab === 'form'">
+        <div v-if="activeTab === 'form'" class="max-w-[775px] mx-auto px-25px pt-35px pb-[170px]">
+            <ResponseForm />
             <form @submit.prevent="handleSubmit">
                 <input v-model="formData.name" placeholder="Имя" />
                 <input v-model="formData.email" placeholder="Email" />

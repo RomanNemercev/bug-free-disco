@@ -45,6 +45,7 @@ module.exports = {
         chilean: '#fffce4',
         semired: '#f50a0a33',
         'border-feta': 'rgba(4, 182, 0, 0.1)',
+        'science-opacity': 'rgba(0, 82, 208, 0.2)',
         pattens: '#d2e3ff',
         malachite: '#1bd741',
         picton: '#41b4e6',

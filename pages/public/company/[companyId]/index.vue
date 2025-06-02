@@ -9,7 +9,7 @@ const companyId = router.currentRoute.value.params.companyId
 
 const company = computed(() => companies.find(c => c.id === companyId) || {})
 
-const activeTab = ref('company')
+const activeTab = ref('vacancies')
 
 definePageMeta({
     layout: 'blank',
