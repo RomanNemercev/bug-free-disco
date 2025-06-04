@@ -2,7 +2,7 @@
   { "id": "industry", "label": "Промышленность" },
   { "id": "agriculture", "label": "Сельское хозяйство" },
   { "id": "construction", "label": "Строительство" },
-  { "id": "health_care", "label": "Здавоохранение" },
+  { "id": "health_care", "label": "Здравоохранение" },
   { "id": "culture_art", "label": "Культура и искусство" },
   { "id": "education", "label": "Образование" },
   { "id": "trade_catering", "label": "Торговля и общественное питание" },

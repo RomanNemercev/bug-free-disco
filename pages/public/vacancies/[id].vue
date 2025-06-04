@@ -8,8 +8,6 @@ import ResponseForm from '~/components/custom/page-parts/ResponseForm.vue'
 const router = useRouter()
 const id = router.currentRoute.value.params.id
 
-// Импорт данных
-
 // Находим вакансию и её компанию
 const vacancy = computed(() => {
     // console.log('Searching for id:', id) // Отладка
@@ -28,11 +26,16 @@ const companyId = computed(() => vacancy.value.companyId || null)
 const company = computed(() => companies.find(c => c.id === companyId.value) || {})
 
 const activeTab = ref('form')
-const formData = ref({ name: '', email: '' })
+// Переменная для получения данных из формы
+const responseFormData = ref({})
 
+// Обработчик отправки формы
+const handleFormSubmit = (formData) => {
+    console.log('=== ФОРМА ОТПРАВЛЕНА ===')
+    console.log('Получены данные:', formData)
 
-const handleSubmit = () => {
-    console.log('Отклик отправлен', formData.value)
+    // Здесь можно отправить данные на бэкенд
+    // await sendToBackend(formData)
 }
 
 const goToCompany = () => {
@@ -45,6 +48,11 @@ definePageMeta({
     layout: 'blank',
 })
 useHead({ title: vacancy.value.title || 'Вакансия не найдена' })
+
+// Можно отслеживать изменения в реальном времени
+// watch(responseFormData, (newData) => {
+//     console.log('Данные формы изменились:', newData)
+// }, { deep: true })
 </script>
 
 <template>
@@ -106,13 +114,8 @@ useHead({ title: vacancy.value.title || 'Вакансия не найдена' }
               @click="activeTab = 'form'">Откликнуться на вакансию
             </UiButton>
         </div>
-        <div v-if="activeTab === 'form'" class="max-w-[775px] mx-auto px-25px pt-35px pb-[170px]">
-            <ResponseForm />
-            <form @submit.prevent="handleSubmit">
-                <input v-model="formData.name" placeholder="Имя" />
-                <input v-model="formData.email" placeholder="Email" />
-                <button type="submit">Отправить отклик</button>
-            </form>
+        <div v-if="activeTab === 'form'" class="max-w-[775px] mx-auto px-25px pt-35px pb-[135px]">
+            <ResponseForm v-model="responseFormData" @submit="handleFormSubmit" />
         </div>
         <div class="shadow-shadow-droplist absolute bottom-0 w-full">
             <div class="w-full bg-white text-center py-[11.5px] px-15px">

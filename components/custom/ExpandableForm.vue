@@ -107,14 +107,15 @@ watch(() => props.modelValue, (newValue) => {
 <template>
     <div>
         <button v-if="!isSubmitted" @click="toggleExpand">
-            <span class="flex items-center">
+            <span class="flex items-center gap-x-5px">
                 <span class="transition-transform duration-300" :class="{ 'rotate-45': isExpanded }">
                     <svg-icon name="plus-blue20" width="20" height="20" />
                 </span>
                 <span class="text-dodger text-sm font-medium"><span v-if="!isExpanded">{{ initialText }}</span><span
                       v-else>Скрыть</span></span>
             </span></button>
-        <div v-if="isSubmitted" class="bg-athens-gray rounded-fifteen p-25px border border-athens flex justify-between">
+        <div v-if="isSubmitted" class="bg-athens-gray rounded-fifteen p-25px border border-athens flex justify-between gap-x-15px
+          ">
             <div>
                 <slot name="summary" :data="formData">
                     <p>{{ JSON.stringify(formData) }}</p>
@@ -131,10 +132,10 @@ watch(() => props.modelValue, (newValue) => {
                 </button>
             </div>
         </div>
-        <div v-if="isExpanded" class="mt-15px border border-athens rounded-fifteen p-15px">
+        <div v-if="isExpanded" class="mt-2 border border-athens rounded-fifteen p-15px">
             <slot name="form" :data="formData" :errors="errors" :validateField="validateField"
               @update:data="updateFormData"></slot>
-            <div class="mt-25px grid grid-cols-2 gap-x-15px">
+            <div class="mt-27px grid grid-cols-2 gap-x-15px">
                 <UiButton size="action" variant="action" @click="handleApply">Сохранить</UiButton>
                 <UiButton size="back" variant="back" @click="handleCancel">Отмена</UiButton>
             </div>
