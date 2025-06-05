@@ -54,6 +54,7 @@ const packageDocuments = ref(false)
 const reliableInformation = ref(false)
 const photoLoad = ref('')
 const educationData = ref(null)
+const animalResponse = ref('')
 
 const communityOptions = [
   {
@@ -110,6 +111,7 @@ function handleCloseAddQuestionPopup() {
   openAddQuestionPopup.value = false
   enableBodyScroll()
 }
+// created dev branch
 </script>
 
 <template>
@@ -134,6 +136,7 @@ function handleCloseAddQuestionPopup() {
           </UiButton>
         </div>
       </div>
+      <!-- box of the below is hidden -->
       <div class="max-w-[375px] w-full flex-none rounded-twentyfive bg-white max-h-[76.564vh] sticky top-4 hidden">
         <div class="pt-3.5 pl-[53.5px] pr-2.5 pb-2.5">
           <svg-icon name="abstract" width="243" height="16" />
@@ -291,7 +294,7 @@ function handleCloseAddQuestionPopup() {
                     <p class="text-sm font-medium mb-4 leading-normal text-space">
                       Как вы относитесь к животным?
                     </p>
-                    <MyInput :placeholder="'Введите ваш ответ'" v-model="fio" class="mb-25px" />
+                    <MyInput :placeholder="'Введите ваш ответ'" v-model="animalResponse" class="mb-25px" />
                   </div>
                   <div class="mb-35px">
                     <p class="text-sm font-medium mb-4 leading-normal text-space">

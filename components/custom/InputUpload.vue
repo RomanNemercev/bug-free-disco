@@ -32,8 +32,8 @@ const buttonText = ref('') // Реактивный текст кнопки
 // Устанавливаем начальный текст кнопки
 const setInitialButtonText = () => {
     buttonText.value = `
-    <span class="text-dodger text-sm font-medium">Загрузить ${localizedFileType}</span><br>
-    <span class="text-13px text-slate-custom">или перетащите его в область рамки</span>
+    <span class="text-dodger text-sm font-medium inline-block mb-[3px]">Загрузить ${localizedFileType}</span><br>
+    <span class="text-13px text-slate-custom inline-block w-[75%]">или перетащите его в область рамки</span>
   `
 }
 setInitialButtonText()
@@ -129,14 +129,15 @@ watch(() => props.modelValue, (newValue) => {
 </script>
 
 <template>
-    <div class="relative w-full bg-athens-gray rounded-fifteen border border-athens p-25px flex flex-col items-center"
+    <div
+      class="relative w-full bg-athens-gray rounded-fifteen border border-athens p-25px flex flex-col items-center pt-35px pb-[22px]"
       @dragover.prevent @drop="handleDrop">
         <div ref="imgContainer" class="file-preview mb-25px w-[100px] h-[100px] overflow-hidden rounded-[50%]"
           style="display: none;">
             <img ref="img" :src="previewUrl" alt="Preview" class="file-image w-[100px] h-[100px] object-cover" />
         </div>
         <input ref="fileInput" type="file" class="hidden" id="file-upload" @change="handleFileChange">
-        <label for="file-upload" class="cursor-pointer flex flex-col items-center gap-y-25px"
+        <label for="file-upload" class="cursor-pointer flex flex-col items-center gap-y-[24px]"
           @click="handleButtonClick">
             <div class="file-icon w-[100px] h-[100px] bg-white rounded-full flex items-center justify-center"
               v-if="!previewUrl">
