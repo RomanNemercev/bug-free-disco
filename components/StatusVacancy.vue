@@ -89,10 +89,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useVacancyStore } from '@/stores/vacancy';
+// import { useVacancyStore } from '@/stores/vacancy';
 
-const vacancyStore = useVacancyStore();
-const nameVacancy = computed(() => vacancyStore.nameVacancy);
+// const vacancyStore = useVacancyStore();
+// const nameVacancy = computed(() => vacancyStore.nameVacancy);
+const nameVacancy = ref('Новая вакансия');
 
 // Объявляем переменную для состояния табов
 const isHovered = ref(false)

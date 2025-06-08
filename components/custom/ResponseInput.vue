@@ -30,7 +30,7 @@
   const filteredResponses = ref([])
   const isFocused = ref(false)
   
-  const emit = defineEmits({'update:modelValue': [String | null, Number | null]})
+  const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null]})
 
   // Дебаунс-функция для фильтрации списка
   const filterResponses = debounce(() => {
@@ -40,6 +40,9 @@
       const role = response.role ? response.role.toLowerCase() : ''
       return name.includes(input) || (props.showRoles && role.includes(input))
     })
+    if (!filteredResponses.value.length) {
+      emit('input:modelValue', currentResponse.value, null)
+    } 
   }, 300)
 
   const clearResponse = () => {
@@ -49,6 +52,7 @@
   }
 
   const selectResponse = response => {
+    console.log('value executors', response)
     currentResponse.value = response.name// Записываем только имя в поле ввода
     filteredResponses.value = []
     isFocused.value = false

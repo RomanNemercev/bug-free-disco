@@ -6,12 +6,13 @@ import debounce from 'lodash/debounce';
 const currentTag = ref('');
 
 const isFocused = ref(false);
+const tags = ref([]);
 
 // Массив тегов
-const tags = computed({
-    get: () => props.modelValue,
-    set: (value) => emit('update:modelValue', value)
-});
+// const tags = computed({
+//     get: () => props.modelValue,
+//     set: (value) => emit('update:modelValue', value)
+// });
 
 // Отфильтрованные варианты для автокомплита
 const filteredOptions = ref([]);
@@ -20,9 +21,11 @@ const filteredOptions = ref([]);
 const filterOptions = debounce(() => {
     const input = currentTag.value.toLowerCase();
     filteredOptions.value = props.options.filter(option =>
-        option.toLowerCase().includes(input) &&
+        option.name.toLowerCase().includes(input) &&
         !tags.value.includes(option)
+        
     );
+    emit('update:modelValue', tags.value)
 }, 300);
 
 // Добавление нового тега
@@ -36,15 +39,17 @@ const addTag = () => {
 // Выбор тега из автокомплита
 const selectOption = (option) => {
     tags.value = [...tags.value, option];
+    emit('update:modelValue', tags.value);
     clearInput();
 };
 
 // Удаление тега
 const removeTag = (index) => {
     tags.value = tags.value.filter((_, i) => i !== index);
+    emit('delete', tags.value);
 };
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'delete']);
 
 // Очистка поля ввода
 const clearInput = () => {
@@ -63,7 +68,15 @@ const props = defineProps({
     },
     options: {
         type: Array,
-        default: () => ['Дизайн', 'Аналитика', 'Разработка', 'Тестирование', 'Продажи', 'Маркетинг']
+        default: () => [
+            { id: 1, name: 'Дизайн'},
+            { id: 2, name: 'Аналитика'},
+            { id: 3, name: 'Разработка'},
+            { id: 4, name: 'Тестирование'},
+            { id: 5, name: 'Продажи'},
+            { id: 6, name: 'Маркетинг'},
+            { id: 7, name: 'Менеджмент'}
+        ]
     }
 });
 </script>
@@ -75,7 +88,7 @@ const props = defineProps({
         <div class="tags flex flex-wrap gap-x-5px">
             <div v-for="(tag, index) in tags" :key="index"
               class="tag flex items-center bg-zumthor py-5px rounded-ten font-medium text-dodger text-sm px-10px mb-[15px]">
-                {{ tag }}
+                {{ tag.name }}
                 <button class="remove-button cursor-pointer ml-1" @click="removeTag(index)"><svg-icon name="reset-tag"
                       width="20" height="20" /></button>
             </div>
@@ -83,7 +96,11 @@ const props = defineProps({
         <div class="relative">
             <!-- Поле ввода -->
             <div class="input-container relative w-full">
-                <input type="text" v-model="currentTag" @keyup.enter="addTag" @input="filterOptions"
+                <input 
+                  type="text" 
+                  v-model="currentTag" 
+                  @keyup.enter="addTag" 
+                  @input="filterOptions"
                   :placeholder="isFocused ? '' : placeholder" @focus="isFocused = true" @blur="isFocused = false"
                   class="input-skills w-full py-[9px] pl-[42px] border border-athens rounded-ten bg-athens-gray text-sm font-normal focus:outline-none focus:border focus:border-dodger" />
                 <button class="clear-input absolute top-2/4 right-4 text-slate-custom" v-if="currentTag"
@@ -96,7 +113,7 @@ const props = defineProps({
                   class="autocomplete-list absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10">
                     <li v-for="(option, index) in filteredOptions" :key="index" @click="selectOption(option)"
                       class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer">
-                        {{ option }}
+                        {{ option.name }}
                     </li>
                 </ul>
             </transition>

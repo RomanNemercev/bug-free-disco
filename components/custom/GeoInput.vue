@@ -31,7 +31,10 @@
     const input = currentCity.value.toLowerCase()
     filteredCities.value = cities.value.filter(city =>
       city.toLowerCase().includes(input)
-    )
+    ) 
+    if (!filteredCities.value.length) {
+      emit('update:modelValue', currentCity.value)
+    } 
   }, 300)
 
   const clearCity = () => {
@@ -48,13 +51,6 @@
   }
 
   const emit = defineEmits(['update:modelValue'])
-
-  watch(
-    () => props.modelValue,
-    newValue => {
-      currentCity.value = newValue
-    }
-  )
 </script>
 
 <template>

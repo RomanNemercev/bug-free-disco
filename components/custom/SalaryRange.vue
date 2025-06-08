@@ -3,7 +3,7 @@
     <!-- Поле "От" -->
     <input
       type="text"
-      :value="props.from"
+      v-model="localFrom"
       @input="handleInput('from', $event.target.value)"
       @blur="handleBlurAndValidate('from')"
       class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
@@ -15,7 +15,7 @@
     <!-- Поле "До" -->
     <input
       type="text"
-      :value="props.to"
+      v-model="localTo"
       @input="handleInput('to', $event.target.value)"
       @blur="handleBlurAndValidate('to')"
       class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px"
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-  import { ref, watch } from 'vue'
+  import { ref } from 'vue'
 
   const props = defineProps({
     from: {
@@ -40,54 +40,30 @@
     }
   })
 
-  const emit = defineEmits(['update:modelValue', 'update:from', 'update:to'])
-  const localFrom = ref(props.from || '')
-  const localTo = ref(props.to || '')
+  const emit = defineEmits(['update:modelValue'])
+  const localFrom = ref( '')
+  const localTo = ref( '')
   const isFocused = ref({ from: false, to: false })
 
   const handleInput = (field, value) => {
-    const sanitizedValue = value.replace(/\D/g, '')
+    const sanitizedValue = Number(value.replace(/[^\d]/g, ''));
+    emit('update:modelValue', field, sanitizedValue.toString())
 
     if (field === 'from') {
-      localFrom.value = sanitizedValue
-      emit('update:from', parseInt(localFrom.value, 10))
+      localFrom.value = sanitizedValue ? sanitizedValue.toLocaleString('ru-RU') : ''
     } else if (field === 'to') {
-      localTo.value = sanitizedValue
-      emit('update:to', parseInt(localTo.value, 10))
+      localTo.value = sanitizedValue ? sanitizedValue.toLocaleString('ru-RU') : ''
     }
 
-    emit('update:modelValue', localFrom.value, localTo.value )
-  }
-
-  const validateRange = () => {
-    const fromValue = parseInt(localFrom.value, 10)
-    const toValue = parseInt(localTo.value, 10)
-
-    if (fromValue && toValue && fromValue <= toValue) {
-      // localFrom.value = toValue.toString()
-    }
-
-    emit('update:modelValue', { from: localFrom.value, to: localTo.value })
   }
 
   const handleBlurAndValidate = field => {
-    // isFocused.value[field] = false
-    validateRange()
+    isFocused.value[field] = false
   }
 
   const handleFocus = field => {
-    // isFocused.value[field] = true
+    isFocused.value[field] = true
   }
-
-  // Следим за обновлением modelValue из родителя
-  watch(
-    () => props.from,
-    newValue => {
-      localFrom.value = newValue.from || ''
-      localTo.value = newValue.to || ''
-    },
-    { deep: true }
-  )
 </script>
 
 <style scoped>

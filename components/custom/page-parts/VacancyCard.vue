@@ -28,7 +28,7 @@
       >
         <div class="columns grid grid-flow-col auto-cols-fr">
           <span
-            v-for="(column, index) in columns"
+            v-for="(column, index) in vacancy.stages"
             :key="index"
             class="title-parent [&:not(:last-child)]:border-r [&:not(:last-child)]:border-athens"
           >
@@ -44,13 +44,13 @@
                   class="text-sm font-normal mb-1 transition-colors cursor-default"
                   :class="hovered[index] ? 'text-dodger' : 'text-space'"
                 >
-                  {{ column.value }}
+                  {{ column.count }}
                 </div>
                 <div
                   class="text-13px text-slate-custom font-normal truncate cursor-default"
-                  :title="column.label"
+                  :title="column.name"
                 >
-                  {{ column.label }}
+                  {{ column.name }}
                 </div>
               </div>
             </div>
@@ -112,17 +112,8 @@
   import { ref, defineProps, defineEmits } from 'vue'
   import DotsDropdown from '~/components/custom/DotsDropdown.vue'
   import { useRouter } from 'vue-router'
-  import { useVacancyStore } from '~/stores/vacancy'
   import { deleteVacancy } from '~/utils/deleteVacancy'
 
-  const columns = ref([
-    { label: 'Все', value: 328 },
-    { label: 'Не разобранное', value: 41 },
-    { label: 'Подумать', value: 13 },
-    { label: 'Подходящие', value: 43 },
-    { label: 'Отклоненные', value: 201 },
-    { label: 'Удаленные', value: 17 },
-  ])
 
   const props = defineProps({
     vacancy: {
@@ -169,7 +160,7 @@
 
   const emit = defineEmits(['vacancy-deleted'])
   const router = useRouter()
-  const vacancyStore = useVacancyStore()
+  // const vacancyStore = useVacancyStore()
 
   const handleDropdownSelect = item => {
     if (item === 'Удалить вакансию') {
@@ -177,7 +168,7 @@
         deleteVacancyHandler()
       }
     } else if (item === 'Редактировать') {
-      vacancyStore.setEditing(props.vacancy.id)
+      // vacancyStore.setEditing(props.vacancy.id)
       router.push('/vacancies/newvacancy')
     }
   }
