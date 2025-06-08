@@ -1,26 +1,22 @@
-import { getServerToken } from './getServerToken';
-
-export const createVacancy = async (vacancyData) => {
+export const createVacancy = async (vacancyData: any) => {
     const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
 
-    const { data, error } = await useFetch('/vacancies', {
-        method: 'POST',
-        baseURL: config.public.apiBase,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${useCookie('auth_token').value}`,
-            'X-Auth-User': `${useCookie('auth_user').value}`,
-        },
-        body: vacancyData,
-    });
 
-    console.log('Server response:', data.value);
-    console.log('Server error:', error.value);
+    try {
+        const response: {data: any, message: string } = await $fetch(`${config.public.apiBase}/vacancies`, {
+            method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${authToken}`,
+                    'X-Auth-User': `${authUser}`
+                },
+            body: vacancyData,
+        })
 
-    if (error.value) {
-        console.error('Vacancion creation error:', error.value);
-        return { data: null, error: error.value };
+        return { data: response, error: null };
+    } catch (error) {
+        return { data: null, error: error };
     }
-
-    return { data: data.value, error: null };
 }

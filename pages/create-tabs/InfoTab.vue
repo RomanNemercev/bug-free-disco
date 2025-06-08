@@ -29,11 +29,11 @@ import CarId from '~/src/data/car-id.json'
 import MoreOptions from '~/src/data/more-options.json'
 import industry from '~/src/data/industry.json'
 import specialization from '~/src/data/specialization.json'
-import responses from '~/src/data/responses.json'
 
 import { ref, onMounted, computed } from 'vue'
 import { createVacancy } from '~/utils/createVacancy'
-import { useVacancyStore } from '@/stores/vacancy'
+import { getPhrases } from '@/utils/getVacancies'
+import { executorsList } from '~/utils/executorsList'
 import { updateVacancy } from '~/utils/updateVacancy'
 import majors from '~/src/data/majors.json'
 
@@ -48,7 +48,7 @@ const ArraySchedule = schedule
 const ArrayMajors = majors
 const ArrayIndustry = industry
 
-const vacancyStore = useVacancyStore()
+// const vacancyStore = useVacancyStore()
 const options = ref([
   {
     name: 'Полная',
@@ -70,23 +70,29 @@ const options = ref([
 const selectedCard = ref(null)
 const hoveredCard = ref(null)
 
+const executors = ref([])
+
 const handleCheck = id => {
   selectedCard.value = id
   workSpace.value = id
 }
 
-onMounted(() => {
+onMounted(async () => {
   workSpace.value = '1'
   selectedCard.value = workSpace.value
-  if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
-    loadVacancyData(vacancyStore.editingVacancyId).then(() => {
-      selectedCard.value = workSpace.value
-      console.log(
-        'Значение selectedCard после загрузки: ',
-        selectedCard.value
-      )
-    })
-  }
+  
+    // получаем динамический список исполнителей
+    const {executors: executorData} = await executorsList();
+    executors.value = executorData
+  // if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
+  //   loadVacancyData(vacancyStore.editingVacancyId).then(() => {
+  //     selectedCard.value = workSpace.value
+  //     console.log(
+  //       'Значение selectedCard после загрузки: ',
+  //       selectedCard.value
+  //     )
+  //   })
+  // }
 })
 
 const handleHover = id => {
@@ -123,7 +129,7 @@ const showContacts = ref(true)
 const salaryType = ref('')
 
 // зависимости для отправки на сервер
-const newVacancy = ref('')
+const newVacancy = ref({place: 1, currency: 'RUB (рубль)'})
 const newCode = ref('')
 const jobDescription = ref('')
 // Автоматически форматируем перед отправкой
@@ -147,6 +153,10 @@ const location = ref('')
 const response = ref('')
 const phone = ref(null)
 const email = ref('')
+const errors = ref({})
+const { data, error} = await getPhrases()
+tags.value = data;
+
 
 const descriptionText = computed(() => {
   return formattedJobDescription.value
@@ -186,28 +196,34 @@ const vacancyData = computed(() => {
   }
 })
 
-const createVacancyHandler = async () => {
-  try {
-    const { data, error } = await createVacancy(vacancyData.value)
-
-    if (data) {
-      console.log('Success:', data.message)
-      vacancyStore.resetEditing()
-    } else if (error) {
-      const status = error.status
-      const message = error.data?.message || error.message
-
-      if (status === 409) {
-        console.warn('Conflict:', message)
-      } else if (status === 422) {
-        console.error('Validation Error:', message)
-      } else {
-        console.error('Error: ', message)
-      }
-    }
-  } catch (error) {
-    console.error('Network error: ', error.message)
+const validateVacancy = () => {
+  let errorsValid = true;
+  if (!newVacancy.value.name) {
+    errors.value.name = 'Поле обязательно к заполнению'
+    errorsValid = false
+  } else {
+    if (errors.value.name) delete errors.value.name
   }
+
+  if (!newVacancy.value.description) {
+    errors.value.description = 'Поле обязательно к заполнению'
+    errorsValid = false
+  } else {
+    if (errors.value.description) delete errors.value.description
+  }
+
+  if (newVacancy.value.salary_from && newVacancy.value.salary_to) {
+    if (newVacancy.value.salary_from > newVacancy.value.salary_to) {
+      errors.value.salary = 'Зарплата от должна быть меньше зарплаты до'
+      errorsValid = false
+    }
+  }
+
+  if (!errorsValid && errors.value.response) {
+    delete errors.value.response
+  }
+
+  return errorsValid
 }
 
 const loadVacancyData = async id => {
@@ -311,7 +327,7 @@ const updateVacancyHandler = async id => {
 
     if (data) {
       console.log('Успех обновления:', data.message)
-      vacancyStore.resetEditing()
+      // vacancyStore.resetEditing()
     } else if (error) {
       const status = error.status
       const message = error.data?.message || error.message
@@ -328,14 +344,75 @@ const updateVacancyHandler = async id => {
   }
 }
 
-function saveVacancy() {
-  vacancyStore.setNameVacancy(newVacancy.value) // Сохраняем в глобальное хранилище
-  if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
-    updateVacancyHandler(vacancyStore.editingVacancyId)
-  } else {
-    createVacancyHandler()
+async function saveVacancy() {
+  if (validateVacancy()) {
+    const { data: response, error} = await createVacancy(newVacancy.value)
+    console.log('ответ создания вакансии', response)
+    console.log('ошибка создания вакансии', error)
+    if (response == null) {
+      switch (error.status) {
+        case 409:
+          errors.value.response = 'Вакансия с таким названием/кодом уже существует'
+          break
+        case 422:
+          errors.value.response = 'Ошибка валидации вакансии'
+          break
+        default:
+          errors.value.response = 'Произошла ошибка при создании вакансии'
+          break
+      }
+    } else {
+      await navigateTo('/vacancies')
+    }
   }
 }
+
+
+const updateTags = (data) => {
+  if (data.length > 0) {
+    const phrases = []
+    data.forEach((item, key) => {
+      phrases.push(item.id)
+    })
+    newVacancy.value.phrases = phrases
+  } else {
+    if (newVacancy.value.phrases) 
+    delete newVacancy.value.phrases
+  }
+}
+
+const updateSalary = (type, value) => {
+  if (type == 'from') {
+    if (value) {
+      newVacancy.value.salary_from = value
+    } else {
+      delete newVacancy.value.salary_from
+    }
+    
+  } else {
+    if (value) {
+      newVacancy.value.salary_to = value
+    } else {
+      delete newVacancy.value.salary_to
+    }
+  }
+}
+
+const updateExecutor = (value, id) => {
+  console.log('fgdfgdf', id);
+  if (id == null) {
+    if (value == '') {
+      delete newVacancy.value.executor_name
+    } else {
+      newVacancy.value.executor_name = value
+    }
+    delete newVacancy.value.executor_id
+  } else {
+    newVacancy.value.executor_id = id
+  }
+}
+
+
 </script>
 
 <template>
@@ -349,8 +426,14 @@ function saveVacancy() {
               <span class="text-red-custom">*</span>
               Название должности
             </p>
-            <Autocomplete :source="ArrayMajors" v-model="newVacancy" :initial-value="newVacancy.value"
+            <Autocomplete 
+              :source="ArrayMajors" 
+              :model-value="newVacancy.name ? newVacancy.name : ''" 
+              @update:model-value="newVacancy.name = $event"
               placeholder="Например, Менеджер по продажам" class="mb-11px" />
+              <div v-if="errors.name" class="text-red-500 text-xs mt-1">
+                  {{ errors.name }}
+              </div>
             <p class="text-xs text-bali">
               Осталось 80 символов. Специальных символов нет.
             </p>
@@ -367,7 +450,7 @@ function saveVacancy() {
               </span>
             </div>
             <div class="max-w-400px">
-              <MyInput :placeholder="'Код вакансии'" type="number" v-model="newCode" />
+              <MyInput :placeholder="'Код вакансии'" type="number" v-model="newVacancy.code" />
             </div>
           </div>
         </div>
@@ -382,8 +465,14 @@ function saveVacancy() {
         </div>
         <div class="mt-15px mb-3.5">
           <client-only>
-            <tiptap-editor v-model="jobDescription" />
+            <tiptap-editor 
+              :v-model="newVacancy.description ? newVacancy.description : ''" 
+              @update:model-value="newVacancy.description = $event"
+            />
           </client-only>
+        </div>
+        <div v-if="errors.description" class="text-red-500 text-xs mt-1">
+                  {{ errors.description }}
         </div>
         <p class="text-xs text-bali font-normal">
           Максимум 700 символов. Использовано 0 символов.
@@ -410,7 +499,12 @@ function saveVacancy() {
               Отрасль компании
             </p>
             <div class="w-full relative">
-              <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль" v-model="selectedIndustry" />
+              <CustomDropdown 
+                :options="ArrayIndustry" 
+                placeholder="Выберите отрасль" 
+                v-model="selectedIndustry" 
+                @update:model-value="newVacancy.industry = $event"
+              />
             </div>
           </div>
           <div class="w-full">
@@ -418,8 +512,12 @@ function saveVacancy() {
               Выберите специализацию
             </p>
             <div>
-              <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
-                v-model="selectedSpecialization" />
+              <CustomDropdown 
+                :options="ArraySpecialization" 
+                placeholder="Выберите специализацию"
+                v-model="selectedSpecialization" 
+                @update:model-value="newVacancy.specializations = $event"
+              />
             </div>
           </div>
         </div>
@@ -442,45 +540,78 @@ function saveVacancy() {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-            <my-dropdown :defaultValue="'Тип занятости'" :options="options" v-model="selectEmployment"
-              :initialValue="selectEmployment" />
+            <my-dropdown 
+              :defaultValue="'Тип занятости'" 
+              :options="options" 
+              :v-model="newVacancy.employment ? newVacancy.employment : ''"
+              @update:model-value="newVacancy.employment = $event"
+            />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
-            <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule" v-model="selectedSchedule"
-              :initialValue="selectedSchedule" />
+            <my-dropdown 
+              :defaultValue="'График работы'" 
+              :options="ArraySchedule" 
+              :v-model="newVacancy.schedule ? newVacancy.schedule : ''"
+              @update:model-value="newVacancy.schedule = $event" 
+            />
           </div>
         </div>
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
-            <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience" v-model="selectedExperience"
-              :initialValue="selectedExperience" />
+            <my-dropdown 
+              :defaultValue="'Опыт работы'" 
+              :options="ArrayExperience" 
+              :v-model="newVacancy.experience ? newVacancy.experience : ''"
+              @update:model-value="newVacancy.experience = $event" 
+            />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Образование</p>
-            <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation" v-model="selectedEducation"
-              :initialValue="selectedEducation" />
+            <my-dropdown 
+              :defaultValue="'Образование'" 
+              :options="ArrayEducation" 
+              :v-model="newVacancy.education ? newVacancy.education : ''"
+              @update:model-value="newVacancy.education = $event"
+            />
           </div>
         </div>
         <div class="w-full mb-9 max-w-input">
           <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
-          <tag-select v-model="tags" />
+          <tag-select 
+            :options="tags"
+            :v-model="newVacancy.phrases ? newVacancy.phrases : ''"
+            @update:model-value="$event => updateTags($event)" 
+            @delete="$event => updateTags($event)"
+          />
         </div>
         <div class="w-fit">
           <MyAccordion title="дополнительные условия" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
-              <CheckboxGroup v-model="selectedAdditional" :options="ArrayAdditional" />
+              <CheckboxGroup 
+                v-model="newVacancy.conditions"
+                :options="ArrayAdditional" 
+                @update:model-value="newVacancy.conditions = $event"
+              />
             </div>
           </MyAccordion>
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup v-model="selectedCarId" :options="ArrayCarId" />
+              <CheckboxGroup 
+                v-model="newVacancy.drivers" 
+                :options="ArrayCarId" 
+                @update:model-value="newVacancy.drivers = $event"
+              />
             </div>
           </MyAccordion>
           <MyAccordion title="дополнительные пожелания">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup v-model="selectedOptions" :options="ArrayOptions" />
+              <CheckboxGroup 
+                v-model="newVacancy.additions" 
+                :options="ArrayOptions" 
+                @update:model-value="newVacancy.additions = $event"
+              />
             </div>
           </MyAccordion>
         </div>
@@ -505,9 +636,20 @@ function saveVacancy() {
             <p class="text-sm font-medium text-space mb-3.5">
               Заработная плата / мес
             </p>
-            <SalaryRange class="mb-4" v-model="salary" />
+            <SalaryRange 
+              class="mb-4" 
+              v-model="salary" 
+              @update:model-value="updateSalary"
+            />
+            <div v-if="errors.salary" class="text-red-500 text-xs mt-1">
+                  {{ errors.salary }}
+            </div>
             <div>
-              <RadioGroup default-value="past-cash" class="flex gap-[18px]" v-model="salaryType">
+              <RadioGroup 
+                default-value="past-cash" 
+                class="flex gap-[18px]" 
+                v-model="salaryType"
+              >
                 <div class="my-checkbox">
                   <Label for="past-cash" class="cursor-pointer flex items-center">
                     <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
@@ -525,7 +667,12 @@ function saveVacancy() {
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
-            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0" v-model="currencyType" />
+            <my-dropdown 
+              :defaultValue="'Валюта'" 
+              :options="ArrayCurrency" 
+              :selected="0" 
+              v-model="newVacancy.currency"
+            />
           </div>
         </div>
       </div>
@@ -544,14 +691,17 @@ function saveVacancy() {
         <p class="text-space text-xl font-semibold mb-[33px]">Место работы</p>
         <div class="mb-[23px]">
           <RadioGroup default-value="1" class="flex gap-x-15px w-full" v-model="workSpace"
-            @update:modelValue="handleWorkSpaceUpdate">
+            @update:modelValue="newVacancy.place = Number($event)">
             <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
               :description="card.description" :selectedCard="selectedCard" :hoveredCard="hoveredCard"
               @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" />
           </RadioGroup>
         </div>
         <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
-        <geo-input class="mb-2.5" v-model="location" />
+        <geo-input 
+          class="mb-2.5" 
+          v-model="newVacancy.location"
+        />
         <p class="leading-normal text-xs text-bali font-normal">
           Укажите расположение офиса для нового сотрудника.
         </p>
@@ -572,20 +722,26 @@ function saveVacancy() {
           Контактная информация
         </p>
         <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-        <response-input class="mb-6 w-full max-w-input" :responses="responses" v-model="response" />
+        <response-input 
+          class="mb-6 w-full max-w-input" 
+          :responses="executors" 
+          v-model="newVacancy.executor_name" 
+          @input:modelValue="updateExecutor"
+          @update:modelValue="updateExecutor"
+        />
         <div class="w-full flex justify-between gap-x-[25px]">
           <div class="w-full max-w-[400px]">
             <p class="text-sm font-medium text-space leading-normal mb-4">
               Номер телефона
             </p>
-            <phone-input v-model="phone" class="mb-25px" />
+            <phone-input v-model="newVacancy.executor_phone" @update:model-value="newVacancy.executor_phone" class="mb-25px" />
             <MyCheckbox :id="'show-contacts'" :label="'Отображать контакты в вакансии'" v-model="showContacts" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space leading-normal mb-4">
               Email
             </p>
-            <email-input v-model="email" />
+            <email-input v-model="newVacancy.executor_email" />
           </div>
         </div>
       </div>
@@ -602,6 +758,9 @@ function saveVacancy() {
     <UiButton @click="saveVacancy" variant="action" size="semiaction" class="font-semibold">
       Сохранить и продолжить
     </UiButton>
+    <div v-if="errors.response" class="text-red-500 text-xs mt-1">
+      {{ errors.response }}
+    </div>
   </div>
 </template>
 

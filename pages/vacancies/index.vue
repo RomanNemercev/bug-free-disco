@@ -162,6 +162,7 @@
     updateContainerHeight()
     loading.value = true
     const result = await getVacancies()
+    console.log('vacancies', result)
     if (result) {
       vacancies.value = result
       loading.value = false
