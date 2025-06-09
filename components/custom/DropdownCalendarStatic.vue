@@ -11,7 +11,8 @@
         { focused: isFocused },
       ]"
     >
-      {{ currectDate || 'Выберите дату' }}
+      {{ currectDate }}
+      <span v-if="!currectDate" class="color-gray">Выберите дату</span>
     </div>
     <transition name="slide-fade">
       <div class="absolute w-max bg-white border border-athens rounded-ten shadow-shadow-droplist bottom-0 z-10 right-0"
@@ -99,5 +100,9 @@ const updateDate = (newDate) => {
     outline: none;
     padding-left: 15px;
     background-image: none;
+  }
+
+  .color-gray {
+    color: #9098b4;
   }
 </style>

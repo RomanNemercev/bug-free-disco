@@ -353,19 +353,21 @@
           maxHeight
           :lgSize="true"
         >
+        <!-- администратор -->
           <p class="leading-normal text-xl font-semibold text-space mb-[39px]">
-            Новая заявка (администратор)
+            Новая заявка
           </p>
           <div class="mb-22">
             <div class="mb-15px">
               <p class="text-sm font-medium text-space mb-7px">
-                Ответственный заявки
+                Утверждение
               </p>
               <response-input
                 class="w-full"
                 :responses="executors"
                 :model-value="newApplication.responsible ? newApplication.responsible.name : null"
                 :showRoles="true"
+                placeholder="Кому отправить заявку"
                 @update:modelValue="updateNewResponsible"
               />
               <div v-if="errors.response" class="text-red-500 text-xs mt-1">
@@ -373,7 +375,7 @@
               </div>
             </div>
             <div class="w-full flex justify-between gap-x-15px mb-15px">
-              <div class="w-full max-w-[400px]">
+              <!-- <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Заказчик
                 </p>
@@ -388,8 +390,8 @@
                 <div v-if="errors.customer" class="text-red-500 text-xs mt-1">
                   {{ errors.customer }}
                 </div>
-              </div>
-              <div class="w-full">
+              </div> -->
+              <!-- <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Исполнитель
                 </p>
@@ -403,12 +405,12 @@
                 <div v-if="errors.executor" class="text-red-500 text-xs mt-1">
                   {{ errors.executor }}
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
-                  Должность
+                  Название должности<span class="text-red-500">*</span>
                 </p>
                 <MyInput
                   placeholder="Введите должность"
@@ -433,7 +435,7 @@
             </div>
             <div class="w-full mb-2.5">
               <p class="text-sm font-medium text-space leading-normal mb-4">
-                Регион поиска
+                Регион поиска<span class="text-red-500">*</span>
               </p>
               <geo-input
                 v-model="newApplication.city"
@@ -445,7 +447,7 @@
             </div>
             <div class="w-full mb-2.5">
               <p class="text-sm font-medium text-space leading-normal mb-4">
-                Количество позиций
+                Сколько человек нужно нанять<span class="text-red-500">*</span>
               </p>
               <MyInput
                 placeholder="Введите число позиций на вакансию"
@@ -489,36 +491,9 @@
                 </div>
               </div>
             </div>
-            <div class="w-full">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
-                Требования кандидата
-              </p>
-              <MyTextarea
-                v-model="newApplication.require"
-                :placeholder="'Опишите ключевые требования'"
-              />
-              <div v-if="errors.requirements" class="text-red-500 text-xs mt-1">
-                {{ errors.requirements }}
-              </div>
-            </div>
-            <div class="w-full">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
-                Обязанности кандидата
-              </p>
-              <MyTextarea
-                v-model="newApplication.duty"
-                :placeholder="'Опишите ключевые обязанности кандидата'"
-              />
-              <div
-                v-if="errors.responsibilities"
-                class="text-red-500 text-xs mt-1"
-              >
-                {{ errors.responsibilities }}
-              </div>
-            </div>
             <div class="w-full mb-15px">
               <p class="text-sm font-medium text-space leading-normal mb-4">
-                Причина открытия вакансии
+                Причина открытия вакансии<span class="text-red-500">*</span>
               </p>
               <my-dropdown
                 :options="reasonseForOpenVacancy"
@@ -529,7 +504,7 @@
                 {{ errors.reason }}
               </div>
             </div>
-            <div class="w-full gap-x-15px flex mb-25px">
+            <div class="w-full gap-x-15px flex mb-15px">
               <div class="w-full">
                 <p class="text-sm font-medium text-space mb-1">
                   Начать подбор не позднее
@@ -551,6 +526,33 @@
                 </div>
               </div>
             </div>
+            <div class="w-full">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Требования к кандидату
+              </p>
+              <MyTextarea
+                v-model="newApplication.require"
+                :placeholder="'Опишите ключевые требования'"
+              />
+              <div v-if="errors.requirements" class="text-red-500 text-xs mt-1">
+                {{ errors.requirements }}
+              </div>
+            </div>
+            <div class="w-full mb-25px">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Обязанности кандидата
+              </p>
+              <MyTextarea
+                v-model="newApplication.duty"
+                :placeholder="'Опишите ключевые обязанности кандидата'"
+              />
+              <div
+                v-if="errors.responsibilities"
+                class="text-red-500 text-xs mt-1"
+              >
+                {{ errors.responsibilities }}
+              </div>
+            </div>
             <div></div>
             <div class="flex gap-15px justify-between w-fit">
               <UiButton
@@ -559,7 +561,7 @@
                 class="font-bold"
                 @click="createApplicationHandler()"
               >
-                Создать
+                Отправить заявку
               </UiButton>
               <UiButton
                 variant="back"
@@ -1836,40 +1838,22 @@
   const validateForm = () => {
     const newErrors = {}
 
-    if (!newApplication.value.responsible)
-      newErrors.response = 'Укажите ответственного заявки'
-    if (!newApplication.value.client) newErrors.customer = 'Укажите заказчика'
-    if (!newApplication.value.executor) newErrors.executor = 'Укажите исполнителя'
     if (!newApplication.value.position) newErrors.post = 'Укажите должность'
-    if (!newApplication.value.division)
-      newErrors.department = 'Укажите подразделение'
     if (!newApplication.value.city) newErrors.location = 'Укажите регион поиска'
     if (!newApplication.value.count || newApplication.value.count <= 0) {
       newErrors.positions = 'Укажите корректное количество позиций'
     }
-    if (!newApplication.value.salaryFrom || newApplication.value.salaryFrom < 0) {
-      console.log('От ', newApplication.value.salaryFrom)
-      console.log('До ', newApplication.value.salaryTo)
-      newErrors.salaryFrom = 'Укажите корректную минимальную зарплату'
-    }
-    if (
-      !newApplication.value.salaryTo ||
-      newApplication.value.salaryFrom > newApplication.value.salaryTo
-    ) {
-      newErrors.salaryTo =
-        'Максимальная зарплата должна быть больше минимальной'
+    console.log('from', newApplication.value.salaryFrom, 'to', newApplication.value.salaryTo)
+    if (newApplication.value.salaryFrom && newApplication.value.salaryTo) {
+      console.log('from', newApplication.value.salaryFrom, 'to', newApplication.value.salaryTo)
+       if (newApplication.value.salaryFrom > newApplication.value.salaryTo) {
+        newErrors.salaryTo =
+          'Максимальная зарплата должна быть больше минимальной'
+      }
     }
     if (!newApplication.value.currency) newApplication.value.currency = currency[0]['name']
-    if (!newApplication.value.require)
-      newErrors.requirements = 'Укажите требования кандидата'
-    if (!newApplication.value.duty)
-      newErrors.responsibilities = 'Укажите обязанности кандидата'
     if (!newApplication.value.reason)
       newErrors.reason = 'Укажите причину открытия вакансии'
-    if (!newApplication.value.dateStart)
-      newErrors.dateStart = 'Укажите дату начала подбора'
-    if (!newApplication.value.dateWork)
-      newErrors.dateWork = 'Укажите желаемую дату выхода кандидата'
 
     errors.value = newErrors
 
