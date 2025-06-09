@@ -40,7 +40,7 @@
     }
   })
 
-  const emit = defineEmits(['update:modelValue'])
+  const emit = defineEmits(['update:modelValue', 'update:from', 'update:to'])
   const localFrom = ref( '')
   const localTo = ref( '')
   const isFocused = ref({ from: false, to: false })
@@ -51,8 +51,10 @@
 
     if (field === 'from') {
       localFrom.value = sanitizedValue ? sanitizedValue.toLocaleString('ru-RU') : ''
+      emit('update:from', sanitizedValue)
     } else if (field === 'to') {
       localTo.value = sanitizedValue ? sanitizedValue.toLocaleString('ru-RU') : ''
+      emit('update:to', sanitizedValue)
     }
 
   }
