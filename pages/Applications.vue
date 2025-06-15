@@ -510,7 +510,11 @@
                   Начать подбор не позднее
                 </p>
                 <!-- <InputCalendar :fullStyles="true" /> -->
-                 <DropdownCalendarStatic @update:model-value="newApplication.dateStart = $event"/>
+                 <DropdownCalendarStatic 
+                   @update:model-value="newApplication.dateStart = $event" 
+                   :is-open="isOpenDateFrom"
+                   @isOpen="isOpenFrom "
+                />
                 
                 <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
                   {{ errors.dateStart }}
@@ -520,7 +524,9 @@
                 <p class="text-sm font-medium text-space mb-1">
                   Желаемая дата выхода кандидата
                 </p>
-                <DropdownCalendarStatic @update:model-value="newApplication.dateWork = $event" />
+                <DropdownCalendarStatic 
+                  @update:model-value="newApplication.dateWork = $event" 
+                />
                 <div v-if="errors.dateWork" class="text-red-500 text-xs mt-1">
                   {{ errors.dateWork }}
                 </div>
@@ -1253,6 +1259,8 @@
   const loading = ref(true)
   const loadingItem = ref(false)
   const errorItem = ref(null)
+  const isOpenDateFrom = ref(true)
+  const isOpenDateTo = ref(true)
 
   const headers = computed(() => {
     const baseHeaders = [
@@ -1343,6 +1351,11 @@
     })
   }
 
+  const isOpenFrom = (value) => {
+    console.log('value', value)
+    isOpenDateFrom.value = value
+  }
+
   // const statusLabels = {
   //   new: 'Новая заявка',
   //   in_review: 'На рассмотрении',
@@ -1407,6 +1420,29 @@
   }
 
   const handleClickOutside = event => {
+    isOpenDateFrom.value = true
+    // обработчик события клика вне календаря
+    if (!event.target.classList.contains('dropdown-selected-option')) {
+      if (event.target.closest('.shadow-shadow-droplist')) {
+        console.log('date from', isOpenDateFrom.value)
+        console.log('date to', isOpenDateTo.value)
+        if (isOpenDateFrom.value)
+          isOpenDateFrom.value = false
+        
+        // if (isOpenDateTo.value)
+        //   isOpenDateTo.value = false
+      } else {
+        
+        if (isOpenDateFrom.value)
+          isOpenDateFrom.value = false
+        console.log('Клик вне', isOpenDateFrom.value)
+      }
+    } else {
+      console.log('Клик вне', isOpenDateFrom.value)
+      
+    }
+    
+    
     if (!isNewAppPopupAdmin.value && newApplication.value) {
       newApplication.value = {}
       errors.value = {}

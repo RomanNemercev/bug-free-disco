@@ -1,6 +1,13 @@
 <template>
-    <label v-for="option in options" :key="option.id" class="flex items-center cursor-pointer check-wrapper w-fit">
-        <input type="checkbox" :id="option.id" :value="option.id" v-model="selectedOptions" class="hidden" />
+    <label v-for="option in props.options" :key="option.id" class="flex items-center cursor-pointer check-wrapper w-fit">
+        <input 
+          type="checkbox" 
+          :id="option.id" 
+          :value="option.id" 
+          v-model="selectedOptions" 
+          class="hidden" 
+          @change="() => {emit('update:modelValue', selectedOptions)}" 
+        />
         <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
             'bg-dodger border-dodger': selectedOptions.includes(option.id),
             'border-athens bg-athens-gray': !selectedOptions.includes(option.id)
@@ -16,30 +23,21 @@
     </label>
 </template>
 
-<script>
-export default {
-    name: "CheckboxGroup",
-    props: {
-        options: {
+<script setup>
+const props = defineProps({
+    options: {
             type: Array,
             required: true,
         },
         modelValue: {
             type: Array,
-            default: () => [],
+            default: [],
         },
-    },
-    computed: {
-        selectedOptions: {
-            get() {
-                return this.modelValue;
-            },
-            set(value) {
-                this.$emit("update:modelValue", value);
-            },
-        },
-    },
-};
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const selectedOptions = ref(props.modelValue ? props.modelValue.map(item => item.id) : [])
 </script>
 
 <style scoped>

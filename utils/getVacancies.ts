@@ -53,6 +53,54 @@ export const getVacancies = async () => {
     }
 };
 
+export const getVacancy = async ( id: String) => {
+    const config = useRuntimeConfig();
+
+    // Токен сервера из cookie
+    const serverTokenCookie = useCookie('auth_token');
+    const serverToken = serverTokenCookie.value;
+    if (!serverToken) {
+        console.error('Токен сервера не найден в cookie');
+        return null;
+    }
+
+    // Токен пользователя из cookie
+    const userTokenCookie = useCookie('auth_user');
+    const userToken = userTokenCookie.value;
+    if (!userToken) {
+        console.error('Токен пользователя не найден в cookie');
+        return null;
+    }
+
+    try {
+        const response: any = await $fetch<VacancyResponse>(`/vacancies/${id}`, {
+            method: 'GET',
+            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${serverToken}`,
+                'X-Auth-User': userToken, // Новый заголовок
+            },
+        });
+
+
+        return response ? JSON.parse(response).data : null;
+    } catch (err: any) {
+        console.error('Ошибка при запросе:', err);
+        if (err.response?.status === 401) {
+            const userStore = useUserStore();
+            userStore.clearUserData();
+
+            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
+            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            // Middleware сработает автоматически при следующем роутинге
+            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+            navigateTo('/auth');
+        }
+        return null;
+    }
+};
+
 export const getVacanciesNames = async () => {
     const vacancies: any = await getVacancies();
     return vacancies?.map((vacancy: string | number, key: keyof any) => {

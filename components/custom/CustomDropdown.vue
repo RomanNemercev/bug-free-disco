@@ -6,7 +6,7 @@
           class="flex items-center gap-2 py-[9px] pl-15px pr-15px border border-athens rounded-ten cursor-pointer relative bg-athens-gray"
           :class="{ 'bg-white border-transparent': isOpen }">
 
-            <input v-if="isOpen" ref="inputRef" type="text" v-model="searchQuery" placeholder="Поиск"
+            <input v-if="isOpen" ref="inputRef" type="text" :v-model="searchQuery" placeholder="Поиск"
               class="dropdown-input w-full focus:outline-none bg-athens-gray text-bali text-sm font-normal border border-athens rounded-ten py-[9px] pl-[43px] pr-15px"
               @blur="handleBlur" />
 
@@ -69,18 +69,13 @@ const props = defineProps({
         default: null,
     },
 });
-
 const emit = defineEmits(["update:modelValue"]);
 
 const isOpen = ref(false);
 const searchQuery = ref("");
 const inputRef = ref(null);
 const dropdownRef = ref(null);
-
-// находим объект в options по label
-const selectedOption = computed(() => {
-    return props.options.find(option => option.label === props.modelValue) || null;
-});
+const selectedOption = ref(props.modelValue ? props.options.find((option) => option.label === props.modelValue) : null);
 
 const selectedValue = computed({
     get: () => props.modelValue,
@@ -117,9 +112,11 @@ const toggleDropdown = () => {
 
 // Выбор элемента
 const selectOption = (option) => {
+    selectedOption.value = option;
+    console.log('selectedOption.value', selectedOption.value)
     emit("update:modelValue", option.label); // Отправляем только label
     isOpen.value = false;
-    searchQuery.value = "";
+    searchQuery.value = '';
 };
 
 // Очистка выбора

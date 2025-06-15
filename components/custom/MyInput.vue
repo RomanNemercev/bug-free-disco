@@ -26,12 +26,12 @@ const emit = defineEmits(['update:modelValue', 'blur'])
 const localValue = ref(props.modelValue) // local state for control value
 
 // watch for value change
-watch(
-  () => props.modelValue,
-  newValue => {
-    localValue.value = newValue
-  }
-)
+// watch(
+//   () => props.modelValue,
+//   newValue => {
+//     localValue.value = newValue
+//   }
+// )
 
 // update value on enter at input
 const updateValue = event => {
@@ -50,7 +50,7 @@ const handleBlur = () => {
   <div class="w-full">
     <input :type="type"
       class="text-sm font-normal bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
-      :placeholder="isFocused ? '' : placeholder" :value="localValue" @input="updateValue" @focus="isFocused = true"
+      :placeholder="isFocused ? '' : placeholder" :value="props.modelValue" @input="updateValue" @focus="isFocused = true"
       :class="[{ focused: isFocused }, { search: search }]" @blur="handleBlur" />
   </div>
 </template>

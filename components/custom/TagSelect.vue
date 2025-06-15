@@ -2,11 +2,34 @@
 import { ref, computed } from 'vue';
 import debounce from 'lodash/debounce';
 
+const props = defineProps({
+    modelValue: {
+        type: Array,
+        default: () => []
+    },
+    placeholder: {
+        type: String,
+        default: 'Например, Аналитика'
+    },
+    options: {
+        type: Array,
+        default: () => [
+            { id: 1, name: 'Дизайн'},
+            { id: 2, name: 'Аналитика'},
+            { id: 3, name: 'Разработка'},
+            { id: 4, name: 'Тестирование'},
+            { id: 5, name: 'Продажи'},
+            { id: 6, name: 'Маркетинг'},
+            { id: 7, name: 'Менеджмент'}
+        ]
+    }
+})
+
 // Текущий ввод пользователя
 const currentTag = ref('');
 
 const isFocused = ref(false);
-const tags = ref([]);
+const tags = ref(props.modelValue ? props.modelValue : []);
 
 // Массив тегов
 // const tags = computed({
@@ -57,28 +80,6 @@ const clearInput = () => {
     filteredOptions.value = [];
 };
 
-const props = defineProps({
-    modelValue: {
-        type: Array,
-        default: () => []
-    },
-    placeholder: {
-        type: String,
-        default: 'Например, Аналитика'
-    },
-    options: {
-        type: Array,
-        default: () => [
-            { id: 1, name: 'Дизайн'},
-            { id: 2, name: 'Аналитика'},
-            { id: 3, name: 'Разработка'},
-            { id: 4, name: 'Тестирование'},
-            { id: 5, name: 'Продажи'},
-            { id: 6, name: 'Маркетинг'},
-            { id: 7, name: 'Менеджмент'}
-        ]
-    }
-});
 </script>
 
 

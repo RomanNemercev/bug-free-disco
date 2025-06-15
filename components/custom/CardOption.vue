@@ -10,11 +10,11 @@ const props = defineProps({
     hoveredCard: String
 })
 
+
 const emit = defineEmits(['update:selected', 'hover', 'leave'])
 
-const isSelected = computed(() => props.selectedCard === props.id)
-const isHovered = computed(() => props.hoveredCard === props.id)
-
+const isSelected = computed(() => props.selectedCard == props.id)
+const isHovered = computed(() => props.hoveredCard == props.id)
 const handleClick = () => emit('update:selected', props.id)
 const handleHover = () => emit('hover', props.id)
 const clearHover = () => emit('leave')
@@ -31,7 +31,7 @@ const clearHover = () => emit('leave')
                     isSelected ? 'text-dodger' : 'text-space',
                     isHovered && !isSelected ? 'text-white' : ''
                 ]" class="text-15px font-semibold transition-colors">{{ title }}</p>
-                <RadioGroupItem :id="id" :value="id" />
+                <RadioGroupItem :id="id" :value="id"/>
             </div>
             <p class="text-13px font-normal transition-colors leading-normal"
               :class="isHovered && !isSelected ? 'text-white' : 'text-slate-custom'" v-html="description"></p>

@@ -40,13 +40,15 @@
     }
   })
 
+  console.log('from', props.from)
+
   const emit = defineEmits(['update:modelValue', 'update:from', 'update:to'])
-  const localFrom = ref( '')
-  const localTo = ref( '')
+  const localFrom = ref( props.from ? props.from.toLocaleString('ru-RU') : '')
+  const localTo = ref( props.to ? props.to.toLocaleString('ru-RU') : '')
   const isFocused = ref({ from: false, to: false })
 
   const handleInput = (field, value) => {
-    const sanitizedValue = Number(value.replace(/[^\d]/g, ''));
+    const sanitizedValue = Number(value.replace(/[^\d]/g, ''))
     emit('update:modelValue', field, sanitizedValue.toString())
 
     if (field === 'from') {

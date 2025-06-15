@@ -31,42 +31,30 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 
-export default {
-  components: {
-    EditorContent,
-  },
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  }
+})
 
-  props: {
-    modelValue: String
-  },
+const emit = defineEmits(['update:modelValue'])
 
-  data() {
-    return {
-      editor: null,
-    }
-  },
+const editor = ref(null)
 
-  watch: {
-    modelValue(newValue) {
-      if (this.editor && this.editor.getHTML() !== newValue) {
-        this.editor.commands.setContent(newValue, false); // обновляем контент, но без триггера обновления
-      }
-    }
-  },
-
-  mounted() {
-    this.editor = new Editor({
+onMounted(() => {
+  editor.value = new Editor({
       editorProps: {
         attributes: {
           class: 'border border-athens py-15px px-3.5 min-h-[460px] max-h-[460px] overflow-y-auto outline-none prose max-w-none rounded-b-fifteen bg-athens-gray',
         },
       },
-      content: this.modelValue || `<div>
+      content: props.modelValue || `<div>
       <h4>О компании</h4>
       <ul>
         <li></li>
@@ -95,47 +83,117 @@ export default {
         defaultProtocol: 'https',
       }),],
       onUpdate: () => {
-        this.$emit('update:modelValue', this.editor.getHTML()); // обновляем данные в родительском компоненте
+        emit('update:modelValue', editor.value.getHTML()); // обновляем данные в родительском компоненте
       }
     });
-  },
+})
 
-  methods: {
-    setLink() {
-      const previousUrl = this.editor.getAttributes('link').href
-      const url = window.prompt('URL', previousUrl)
 
-      // cancelled
-      if (url === null) {
-        return
-      }
 
-      // empty
-      if (url === '') {
-        this.editor
-          .chain()
-          .focus()
-          .extendMarkRange('link')
-          .unsetLink()
-          .run()
+////////////////////////////////////////////
+// export default {
+//   components: {
+//     EditorContent,
+//   },
 
-        return
-      }
+//   props: {
+//     modelValue: String
+//   },
 
-      // update link
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .setLink({ href: url })
-        .run()
-    },
-  },
+//   data() {
+//     return {
+//       editor: null,
+//     }
+//   },
 
-  beforeUnmount() {
-    this.editor.destroy()
-  },
-}
+//   watch: {
+//     modelValue(newValue) {
+//       if (this.editor && this.editor.getHTML() !== newValue) {
+//         this.editor.commands.setContent(newValue, false); // обновляем контент, но без триггера обновления
+//       }
+//     }
+//   },
+
+//   mounted() {
+//     console.log('this', this.modelValue)
+//     this.editor = new Editor({
+//       editorProps: {
+//         attributes: {
+//           class: 'border border-athens py-15px px-3.5 min-h-[460px] max-h-[460px] overflow-y-auto outline-none prose max-w-none rounded-b-fifteen bg-athens-gray',
+//         },
+//       },
+//       content: this.modelValue || `<div>
+//       <h4>О компании</h4>
+//       <ul>
+//         <li></li>
+//         </ul>
+//     </div>
+//     <div>
+//       <h4>Требования</h4>
+//       <ul>
+//         <li></li>
+//       </ul>
+//     </div>
+//     <div>
+//       <h4>Обязанности</h4>
+//       <ul>
+//         <li></li>
+//       </ul>
+//     </div>
+//     <div>
+//       <h4>Условия</h4>
+//       <ul>
+//         <li></li>
+//       </ul>
+//     </div>`,
+//       extensions: [StarterKit, Link.configure({
+//         openOnClick: true,
+//         defaultProtocol: 'https',
+//       }),],
+//       onUpdate: () => {
+//         this.$emit('update:modelValue', this.editor.getHTML()); // обновляем данные в родительском компоненте
+//       }
+//     });
+//   },
+
+//   methods: {
+//     setLink() {
+//       const previousUrl = this.editor.getAttributes('link').href
+//       const url = window.prompt('URL', previousUrl)
+
+//       // cancelled
+//       if (url === null) {
+//         return
+//       }
+
+//       // empty
+//       if (url === '') {
+//         this.editor
+//           .chain()
+//           .focus()
+//           .extendMarkRange('link')
+//           .unsetLink()
+//           .run()
+
+//         return
+//       }
+
+//       // update link
+//       this.editor
+//         .chain()
+//         .focus()
+//         .extendMarkRange('link')
+//         .setLink({ href: url })
+//         .run()
+//     },
+//   },
+//   // beforeMount() {
+//   //   this.editor.destroy()
+//   //   console.log('editor', this.props)
+//   // },
+// }
+
+ 
 </script>
 
 <style lang="scss" scoped>

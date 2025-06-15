@@ -166,10 +166,13 @@
     if (item === 'Удалить вакансию') {
       if (confirm('Вы уверены что хотите удалить вакансию?')) {
         deleteVacancyHandler()
+        return
       }
-    } else if (item === 'Редактировать') {
+    } 
+    if (item === 'Редактировать') {
       // vacancyStore.setEditing(props.vacancy.id)
-      router.push('/vacancies/newvacancy')
+      router.push({path : '/vacancies/newvacancy', query: { id: props.vacancy.id, type: 'edit' } })
+      return
     }
   }
 </script>

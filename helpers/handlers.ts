@@ -3,7 +3,7 @@ export const clickOutside = (event: MouseEvent, ref: any, callback: () => void) 
         const target = event.target;
         if (ref.value) {
             console.log('ref', ref.value)
-            // callback()
+            callback()
         }
     }
     document.addEventListener('mousedown', handleClick)
