@@ -1,4 +1,4 @@
-export const updateVacancy = async (id, vacancyData) => {
+export const updateVacancy = async (id: number, vacancyData: any) => {
     const config = useRuntimeConfig();
 
     try {

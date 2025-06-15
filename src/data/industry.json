@@ -7,7 +7,7 @@
   { "id": "education", "label": "Образование" },
   { "id": "trade_catering", "label": "Торговля и общественное питание" },
   { "id": "finance_credit", "label": "Финансы и кредит" },
-  { "id": "tech_commun", "label": "IT и телекоммуникацаии" },
+  { "id": "tech_commun", "label": "IT и телекоммуникации" },
   { "id": "traffic", "label": "Транспорт" },
   { "id": "science", "label": "Наука" },
   {

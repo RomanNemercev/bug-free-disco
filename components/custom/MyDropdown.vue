@@ -137,7 +137,7 @@
     () => props.modelValue,
     newValue => {
       selectedOption.value =
-        props.options.find(option => option.value === newValue) ||
+        props.options.find(option => option.name === newValue) ||
         newValue ||
         null
     }

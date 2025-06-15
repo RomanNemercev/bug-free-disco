@@ -3,7 +3,7 @@
     <status-vacancy @update:currentTab="switchTab" />
     <Suspense @pending="onPending" @resolve="onResolve" @fallback="onFallback">
       <template #default>
-        <component :is="currentTabComponent" />
+        <component :is="currentTabComponent" :id="vacancyId":type="typeSave" />
       </template>
       <template #fallback>
         <UiLoader v-if="showLoader" />
@@ -16,7 +16,12 @@
 import { ref, defineAsyncComponent, computed } from 'vue'
 import { useNuxtApp } from '#app'
 import UiLoader from '~/components/UiLoader.vue'
+import { useRoute } from 'vue-router'
 const { $loader } = useNuxtApp()
+
+const route = useRoute()
+const vacancyId = ref(route.query.id)
+const typeSave = ref(route.query.type ? route.query.type : 'create')
 
 useSeoMeta({
   title: 'Создание вакансии — Jobly',

@@ -34,7 +34,7 @@
                             }}</div>
                     </div>
                     <div class="text-sm font-medium text-space px-2.5">{{ item.email }}</div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.role }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.role }} </div>
                     <div>
                         <DotsDropdonw :items="dropdownOptions" />
                     </div>

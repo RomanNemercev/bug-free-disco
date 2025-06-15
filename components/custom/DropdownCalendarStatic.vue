@@ -17,22 +17,27 @@
     <transition name="slide-fade">
       <div class="absolute w-max bg-white border border-athens rounded-ten shadow-shadow-droplist bottom-0 z-10 right-0"
         v-if="isDropDownVisible">
-        <CalendarBarStatic ref="calendareBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" />
+        <CalendarBarStatic ref="calendareBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible=false" />
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, useTemplateRef } from 'vue';
+import { ref } from 'vue';
 import CalendarBarStatic from '@/components/custom/CalendarBarStatic.vue';
 import { dateStringToDots } from '../../helpers/date'
-import { clickOutside } from '../../helpers/handlers'
 
-const emit = defineEmits(['update:modelValue'])
+const props = defineProps({
+  isOpen:  {
+    type: Boolean,
+    default: false
+  }
+})
+const emit = defineEmits(['update:modelValue', 'isOpen'])
 const calendareBar  = ref(null)
 
-const isDropDownVisible = ref(false);
+const isDropDownVisible = ref(props.isOpen);
 const minDropdown = ref(null);
 
 const isFocused = ref(false)
@@ -45,6 +50,7 @@ const handleBlur = () => {
   }
 const toggleDropdown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
+  emit('isOpen', isDropDownVisible.value)
 }
 
 const updateDate = (newDate) => {
@@ -57,7 +63,13 @@ const updateDate = (newDate) => {
 // })
 
 //  onMounted(() => {
-//     document.addEventListener('click', (event) => clickOutside(event, calendareBar, () => isDropDownVisible.value = false))
+//     document.addEventListener('click', (event) => clickOutside(event, calendareBar, () => {
+//       const parentModal = event.target.closest('.shadow-shadow-droplist')
+//       if (parentModal == null) {
+//         isDropDownVisible.value = false
+//       }
+//       console.log('event', parentModal)
+//     }))
 //   })
 </script>
 
