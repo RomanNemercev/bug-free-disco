@@ -236,7 +236,7 @@ const validateVacancy = () => {
   }
 
   if (newVacancy.value.salary_from && newVacancy.value.salary_to) {
-    if (newVacancy.value.salary_from > newVacancy.value.salary_to) {
+    if (Number(newVacancy.value.salary_from) > Number(newVacancy.value.salary_to)) {
       errors.value.salary = 'Зарплата от должна быть меньше зарплаты до'
       errorsValid = false
     }
@@ -304,7 +304,6 @@ const updateEvent = (data, property) => {
     editVacancyData.value[property] = data
   } else {
     newVacancy.value[property] = data
-    alert('update newVacancy')
   }
 }
 
