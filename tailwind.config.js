@@ -116,6 +116,7 @@ module.exports = {
         'collapsible-up': 'collapsible-up 0.2s ease-in-out',
       },
       spacing: {
+        '1px': '1px',
         '5px': '5px',
         '6px': '6px',
         '7px': '7px',
@@ -140,6 +141,7 @@ module.exports = {
         '38px': '38px',
         '45px': '45px',
         '50px': '50px',
+        '60px': '60px',
         '70px': '70px',
         '75px': '75px',
         128: '32rem',

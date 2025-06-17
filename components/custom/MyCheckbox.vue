@@ -9,6 +9,7 @@
                 'border-athens bg-athens-gray': !modelValue,
                 'mr-0': emptyLabel,
                 'mr-2.5': !emptyLabel,
+                'mr-5': twentyGap,
             }">
                 <svg v-if="modelValue" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20"
                   fill="currentColor">
@@ -18,7 +19,12 @@
                 </svg>
             </div>
             <!-- Текстовое значение -->
-            <span class="text-sm text-space select-none">{{ label }}</span>
+            <span class="text-sm select-none" :class="[
+                { 'text-space': labelColor === 'space' },
+                { 'text-dodger': labelColor === 'dodger' },
+                { 'text-bali': labelColor === 'bali' },
+                { 'font-medium': fontWeight === 'medium' },
+            ]">{{ label }}</span>
         </label>
     </div>
 </template>
@@ -33,13 +39,26 @@ export default {
         },
         label: {
             type: String,
-            required: true,
+            required: false,
+        },
+        labelColor: {
+            type: String,
+            default: "space", // Значение по умолчанию
+            validator: (value) => ["space", "dodger", "bali"].includes(value),
+        },
+        fontWeight: {
+            type: String,
+            default: "normal",
         },
         modelValue: {
             type: Boolean,
             default: false, // Значение по умолчанию
         },
         emptyLabel: {
+            type: Boolean,
+            default: false,
+        },
+        twentyGap: {
             type: Boolean,
             default: false,
         },
