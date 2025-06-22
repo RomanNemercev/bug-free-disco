@@ -23,9 +23,14 @@
   import PhoneInput from '~/components/custom/PhoneInput.vue'
   import EmailInput from '~/components/custom/EmailInput.vue'
   import MyCheckbox from '~/components/custom/MyCheckbox.vue'
+  import FormAuthPlatform from '~/components/custom/page-parts/FormAuthPlatform.vue'
+  import ConnectedPlatform from '~/components/custom/page-parts/ConnectedPlatform.vue'
+  import { getProfile as profileHh, auth as authHh, getCode as getCodeHh } from '@/utils/hhAccount'
 
   import { useCartStore } from '@/stores/cart'
   import { onMounted, ref, onBeforeUnmount } from 'vue'
+
+  import { useRoute } from 'vue-router'
 
   import optionsData from '~/src/data/options-data.json'
   import cardsData from '~/src/data/cards-data.json'
@@ -53,6 +58,52 @@
   const ArrayOptions = MoreOptions
   const ArrayCurrency = currency
   const cartStore = useCartStore()
+  const platforms = ref([
+    {
+        'platform': 'hh',
+        'svg': 'hh-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'rabota',
+        'svg': 'rabota-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'rabota',
+        'svg': 'zarplata-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'superjob',
+        'svg': 'superjob-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'careerist',
+        'svg': 'careerist-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'youla',
+        'svg': 'popup-youla',
+        'isAythenticated': false,
+        'data' : null
+    },
+    {
+        'platform': 'avito',
+        'svg': 'avito-50',
+        'isAythenticated': false,
+        'data' : null
+    },
+])
+  const activePlatform = ref(platforms.value.findIndex(platform => platform.platform === useRoute().query.platform) || 0)
+  const btnAuthDisabled = ref(false)
 
   onMounted(async () => {
     await Promise.all([
@@ -98,8 +149,6 @@
     return card ? card[key] : null // Если карта найдена, вернуть значение ключа
   }
 
-  const selectedRate = ref('')
-
   const dropItems = ['Импорт публикаций', 'Отвязать профиль']
 
   const isPopupOpen = ref(false) // control visibility popup
@@ -107,6 +156,11 @@
   const addProfilePopup = ref(false)
 
   const importPopup = ref(false)
+
+  const isAuthOpen = useRoute().query?.popup_account === 'true'
+  const addAuthPopup = ref(false)
+  const errorAuthPlatform = ref(null)
+  const authDataPlatform = ref({}) 
 
   const handleSelectItem = item => {
     if (item === 'Импорт публикаций') {
@@ -161,6 +215,7 @@
   })
 
   function addProfile() {
+    // platforms[index].isAythenticated = true
     addProfilePopup.value = true
     disableBodyScroll()
   }
@@ -168,6 +223,37 @@
   function closeAddProfilePopup() {
     addProfilePopup.value = false
     enableBodyScroll()
+  }
+
+  function openPopupAuth(index) {
+    activePlatform.value = index
+    addProfilePopup.value = false
+    addAuthPopup.value = true
+  }
+
+  function closeAddAuthPopup() {
+    addAuthPopup.value = false
+    enableBodyScroll()
+  }
+
+  async function authPlatform() {
+    btnAuthDisabled.value = true
+    errorAuthPlatform.value = null
+    if (!authDataPlatform.value.idClient || !authDataPlatform.value.idSecret) {
+        errorAuthPlatform.value = 'Пожалуйста, введите данные авторизации';
+        return;
+    }
+    const config = useRuntimeConfig();
+     const tokenCookie = useCookie('auth_user');
+     console.log('token user', tokenCookie.value)
+    window.location.href = 'https://admin.job-ly.ru' 
+        + `/code-hh?clientId=${authDataPlatform.value.idClient}` 
+        + `&clientSecret=${authDataPlatform.value.idSecret}`
+        + `&customerToken=${tokenCookie.value}`
+  }
+
+  function updateAuthDataPlatform(data) {
+    authDataPlatform.value = data
   }
 
   function publishVacancy() {
@@ -260,14 +346,28 @@
   const showContacts = ref(true)
   const phone = ref('')
   const responsePersone = ref('')
+  function goBack() {
+    window.history.back()
+}
+
+onBeforeMount(async () => {
+    // запрашиваем, есть ли авторизация на hh.ru
+    const { data, error } = await profileHh()
+    if (!error) {
+        platforms.value[0].isAythenticated = true
+        platforms.value[0].data = data
+    }
+    addAuthPopup.value = isAuthOpen ? true : false
+})
 </script>
 
 <template>
   <div class="container pb-72 pt-[34px]">
   <div>
     <!-- Кнопка "Назад" из слота -->
-    <slot name="back" />
-
+      <UiButton variant="black" size="black" @click="goBack" class="mb-35px">
+        Назад
+      </UiButton>
     <!-- Контент страницы -->
     <p class="text-xl font-semibold text-space mb-5px">Подключенные профили</p>
     <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">
@@ -928,27 +1028,14 @@
         </p>
         <div class="w-full mb-25px h-[1px] bg-athens"></div>
         <div class="flex gap-[15px] flex-wrap">
-          <button>
-            <svg-icon name="hh-50" width="50" height="50" />
-          </button>
-          <button>
-            <svg-icon name="rabota-50" width="50" height="50" />
-          </button>
-          <button>
-            <svg-icon name="zarplata-50" width="50" height="50" />
-          </button>
-          <button>
-            <svg-icon name="superjob-50" width="50" height="50" />
-          </button>
-          <button>
-            <svg-icon name="careerist-50" width="50" height="50" />
-          </button>
-          <button>
-            <div class="popup-youla"></div>
-          </button>
-          <button>
-            <svg-icon name="avito-50" width="50" height="50" />
-          </button>
+            <button 
+               v-for="(item, index)  in platforms" 
+               :key="index" 
+               @click="openPopupAuth(index)"
+            >
+              <svg-icon v-if="item.svg !== 'popup-youla'"  :name="item.svg" width="50" height="50" />
+              <div v-else :class="item.svg" @click="openPopupAuth(index)"></div>
+            </button>
         </div>
       </Popup>
     </transition>
@@ -991,6 +1078,51 @@
           </UiButton>
         </div>
       </Popup>
+    </transition>
+    <transition name="fade" @after-leave="enableBodyScroll">
+        <Popup
+        :isOpen="addAuthPopup"
+        @close="closeAddAuthPopup"
+        :showCloseButton="false"
+        :width="'361px'"
+        :height="'fit-content'">
+           <p class="text-xl font-semibold text-space mb-2.5">
+            Подключить свой аккаунт
+          </p>
+          <p class="text-sm font-normal text-slate-custom mb-25px">
+            Укажите данные авторизации вашего профиля
+          </p>
+          <div class="w-full mb-25px h-[1px] bg-athens"></div>
+          <div class="flex gap-[15px] flex-wrap">
+            <button 
+               v-for="(item, index)  in platforms" 
+               :key="index" 
+               :class="{ 'opacity-10': activePlatform !== index }"
+               @click="activePlatform = index"
+            >
+              <svg-icon v-if="item.svg !== 'popup-youla'"  :name="item.svg" width="50" height="50" />
+              <div v-else :class="item.svg" @click="openPopupAuth"></div>
+            </button>
+          </div>
+          <div class="w-full mb-25px mt-25px h-[1px] bg-athens"></div>
+          <ConnectedPlatform 
+            v-if="platforms[activePlatform].isAythenticated" 
+            :model-value="platforms[activePlatform]?.data?.email | ''"
+          ></ConnectedPlatform>
+          <FormAuthPlatform v-else @update:modelValue="updateAuthDataPlatform"></FormAuthPlatform>
+          <div v-if="errorAuthPlatform" class="text-red-500 text-xs mt-1">
+                {{ errorAuthPlatform }}
+          </div>
+          <UiButton
+          variant="action"
+          size="action"
+          class="mt-auto w-full"
+          :class="{ 'opacity-30': btnAuthDisabled , 'disabled:cursor-not-allowed' : btnAuthDisabled }"
+          @click="authPlatform"
+        >
+          Авторизовать
+        </UiButton>
+        </Popup>
     </transition>
   </div>
   </div>
