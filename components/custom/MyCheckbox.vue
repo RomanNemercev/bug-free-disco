@@ -19,11 +19,13 @@
                 </svg>
             </div>
             <!-- Текстовое значение -->
-            <span class="text-sm select-none" :class="[
+            <span class="select-none" :class="[
                 { 'text-space': labelColor === 'space' },
                 { 'text-dodger': labelColor === 'dodger' },
                 { 'text-bali': labelColor === 'bali' },
                 { 'font-medium': fontWeight === 'medium' },
+                { 'text-13px': fontSize === '13px' },
+                { 'text-sm': fontSize === 'sm' },
             ]">{{ label }}</span>
         </label>
     </div>
@@ -61,6 +63,10 @@ export default {
         twentyGap: {
             type: Boolean,
             default: false,
+        },
+        fontSize: {
+            type: String,
+            default: "sm",
         },
     },
     emits: ["update:modelValue"],

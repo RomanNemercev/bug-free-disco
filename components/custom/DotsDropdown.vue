@@ -7,7 +7,8 @@
         </button>
         <transition name="slide-fade">
             <div v-if="isOpen"
-              class="absolute right-0 mt-15px bg-white rounded-plus shadow-shadow-droplist cards z-10 min-w-[226px]">
+              class="absolute right-0 mt-15px bg-white rounded-plus shadow-shadow-droplist cards z-10 min-w-[226px]"
+              :class="{ 'min-w-fit': width === 'fit' }">
                 <div v-for="(item, index) in items" :key="index"
                   class="cards-item px-15px py-2.5 text-slate-custom text-sm font-normal cursor-pointer whitespace-nowrap hover:bg-gray-100 hover:text-space"
                   @click="handleClick(item)">
@@ -27,6 +28,10 @@ export default {
         items: {
             type: Array,
             required: true,
+        },
+        width: {
+            type: String,
+            required: false,
         },
     },
     emits: ['select-item'], // Добавляем emit события
@@ -71,6 +76,14 @@ export default {
 /***** Scoped styles не нужны, всё через Tailwind *****/
 .cards-item:not(:last-child) {
     border-bottom: 1px solid #f4f6f8;
+}
+
+.cards-item:last-of-type {
+    border-radius: 0 0 5px 5px;
+}
+
+.cards-item:first-of-type {
+    border-radius: 5px 5px 0 0;
 }
 
 .slide-fade-enter-active {

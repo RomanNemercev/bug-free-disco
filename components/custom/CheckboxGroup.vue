@@ -1,13 +1,8 @@
 <template>
-    <label v-for="option in props.options" :key="option.id" class="flex items-center cursor-pointer check-wrapper w-fit">
-        <input 
-          type="checkbox" 
-          :id="option.id" 
-          :value="option.id" 
-          v-model="selectedOptions" 
-          class="hidden" 
-          @change="() => {emit('update:modelValue', selectedOptions)}" 
-        />
+    <label v-for="option in props.options" :key="option.id"
+      class="flex items-center cursor-pointer check-wrapper w-fit">
+        <input type="checkbox" :id="option.id" :value="option.id" v-model="selectedOptions" class="hidden"
+          @change="() => { emit('update:modelValue', selectedOptions) }" />
         <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
             'bg-dodger border-dodger': selectedOptions.includes(option.id),
             'border-athens bg-athens-gray': !selectedOptions.includes(option.id)
@@ -24,20 +19,26 @@
 </template>
 
 <script setup>
+import { ref, watch } from 'vue'
+
 const props = defineProps({
     options: {
-            type: Array,
-            required: true,
-        },
-        modelValue: {
-            type: Array,
-            default: [],
-        },
+        type: Array,
+        required: true,
+    },
+    modelValue: {
+        type: Array,
+        default: [],
+    },
 })
 
 const emit = defineEmits(['update:modelValue'])
 
-const selectedOptions = ref(props.modelValue ? props.modelValue.map(item => item.id) : [])
+const selectedOptions = ref([...props.modelValue]) // Инициализация с копией modelValue
+
+watch(() => props.modelValue, (newValue) => {
+    selectedOptions.value = [...newValue] // Синхронизация при изменении props
+}, { immediate: true })
 </script>
 
 <style scoped>

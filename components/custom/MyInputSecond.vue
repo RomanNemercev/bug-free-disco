@@ -14,6 +14,10 @@ const props = defineProps({
     type: String,
     default: '...',
   },
+  placeholderFontSize: {
+    type: String,
+    default: '14px',
+  }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -34,14 +38,15 @@ const updateValue = event => {
 
 <template>
   <div class="w-full">
-    <input :type="type" :value="localValue" @input="updateValue" :placeholder="placeholder" />
+    <input :type="type" :value="localValue" @input="updateValue" :placeholder="placeholder"
+      :style="`--placeholder-font-size: ${props.placeholderFontSize}`" />
   </div>
 </template>
 
 <style scoped>
 ::placeholder {
   color: #79869a;
-  font-size: 14px;
+  font-size: var(--placeholder-font-size, 14px);
   font-weight: 400;
 }
 
