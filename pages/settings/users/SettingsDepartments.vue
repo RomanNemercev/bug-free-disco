@@ -27,7 +27,6 @@ const newCompanyName = ref('')
 const detailedDep = ref(null)
 const removeRoleData = ref(null)
 const removeExternalData = ref(null)
-const subDepartmentsCheckboxes = ref(null)
 
 definePageMeta({
   layout: 'settings',
