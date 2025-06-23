@@ -1,11 +1,13 @@
 <script setup>
 import { ref, defineAsyncComponent } from 'vue'
+import { useRoute } from 'vue-router'
 
 import CopyBoard from '~/components/custom/CopyBoard.vue'
 import UiLoader from '~/components/UiLoader.vue'
 
 //   get global loader
 const { $loader } = useNuxtApp()
+const router = useRoute()
 
 // Состояние для управления отображением лоадера
 const showLoader = ref(false)
@@ -29,7 +31,8 @@ const pages = {
 
 // Функция переключения страницы
 function openPage(pageName) {
-  currentPage.value = pageName
+  // router.push({ path: `vacancies/PremiumPlatforms` })
+  // currentPage.value = pageName
 }
 
 function goBack() {
@@ -77,9 +80,12 @@ const onFallback = () => {
             Используйте работные сайты и&nbsp;доски объявлений с&nbsp;премиум
             публикацией, что&nbsp;бы повысить узнаваемость вашей вакансии
           </p>
-          <UiButton variant="semiaction" size="semiaction" class="w-full" @click="openPage('premiumPlatforms')">
-            Выбрать площадки
-          </UiButton>
+          <router-link to="/vacancies/PremiumPlatforms">
+            <UiButton variant="semiaction" size="semiaction" class="w-full" >
+              Выбрать площадки
+            </UiButton>
+          </router-link>
+          
         </div>
         <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
           <div class="bg-img planet mb-25px"></div>
