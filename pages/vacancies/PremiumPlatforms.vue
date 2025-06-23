@@ -245,6 +245,7 @@
     }
     const config = useRuntimeConfig();
     const tokenCookie = useCookie('auth_user');
+    setCookie('process_auth', 'true', 1);
     window.location.href = 'https://admin.job-ly.ru' 
         + `/code-hh?clientId=${authDataPlatform.value.idClient}` 
         + `&clientSecret=${authDataPlatform.value.idSecret}`
@@ -349,6 +350,11 @@
     window.history.back()
 }
 
+function setCookie(name, value, days) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+}
+
 onBeforeMount(async () => {
     // запрашиваем, есть ли авторизация на hh.ru
     const { data, error } = await profileHh()
@@ -362,17 +368,19 @@ onBeforeMount(async () => {
 onMounted(async () => {
     const query = useRoute().query
     if (query.popup_account === 'true' && query.platform == 'hh' && query.message === 'success') {
-        const { data, error} = useCookie('hh_id')
-        if (hhId != undefined) {
+        const hhId = useCookie('process_auth')
+        if (hhId != undefined && hhId.value) {
             const response = await authHh()
+        console.log(response)
             if (!error) {
+                window.location.href = response.data.url_auth
                 console.log('auth', response)
                 platforms.value[0].isAythenticated = true
                 platforms.value[0].data = response.data
             } else {
                 errorAuthPlatform.value = error
             }
-        } 
+        }
     }
 })
 </script>
