@@ -244,8 +244,7 @@
         return;
     }
     const config = useRuntimeConfig();
-     const tokenCookie = useCookie('auth_user');
-     console.log('token user', tokenCookie.value)
+    const tokenCookie = useCookie('auth_user');
     window.location.href = 'https://admin.job-ly.ru' 
         + `/code-hh?clientId=${authDataPlatform.value.idClient}` 
         + `&clientSecret=${authDataPlatform.value.idSecret}`
@@ -358,6 +357,23 @@ onBeforeMount(async () => {
         platforms.value[0].data = data
     }
     addAuthPopup.value = isAuthOpen ? true : false
+})
+
+onMounted(async () => {
+    const query = useRoute().query
+    if (query.popup_account === 'true' && query.platform == 'hh' && query.message === 'success') {
+        const { data, error} = useCookie('hh_id')
+        if (hhId != undefined) {
+            const response = await authHh()
+            if (!error) {
+                console.log('auth', response)
+                platforms.value[0].isAythenticated = true
+                platforms.value[0].data = response.data
+            } else {
+                errorAuthPlatform.value = error
+            }
+        } 
+    }
 })
 </script>
 
