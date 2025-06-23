@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 
 const isFocused = ref(false)
+const inputRef = ref(null)
 
 const props = defineProps({
   placeholder: {
@@ -44,14 +45,16 @@ const handleBlur = () => {
   emit('blur')
   console.log('Blur triggered')
 }
+
+defineExpose({ focus: () => inputRef.value && inputRef.value.focus() })
 </script>
 
 <template>
   <div class="w-full">
-    <input :type="type"
+    <input :type="type" ref="inputRef"
       class="text-sm font-normal bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
-      :placeholder="isFocused ? '' : placeholder" :value="props.modelValue" @input="updateValue" @focus="isFocused = true"
-      :class="[{ focused: isFocused }, { search: search }]" @blur="handleBlur" />
+      :placeholder="isFocused ? '' : placeholder" :value="props.modelValue" @input="updateValue"
+      @focus="isFocused = true" :class="[{ focused: isFocused }, { search: search }]" @blur="handleBlur" />
   </div>
 </template>
 

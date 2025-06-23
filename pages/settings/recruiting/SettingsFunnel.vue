@@ -61,7 +61,7 @@ const funnelsData = ref([
         </div>
       </div>
       <div v-else class="text-bali min-h-[223px] flex items-center justify-center bg-catskill rounded-fifteen">
-        <p class="text-15px font-medium text-bali">Тут ничего</p>
+        <p class="text-15px font-medium text-bali">Вы еще не создали ни одну воронку</p>
       </div>
     </div>
   </div>

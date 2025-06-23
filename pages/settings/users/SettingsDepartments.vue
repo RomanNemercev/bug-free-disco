@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import BtnTab from '~/components/custom/BtnTab.vue'
 import MyCheckbox from '~/components/custom/MyCheckbox.vue'
 import MyInputSecond from '~/components/custom/MyInputSecond.vue'
@@ -27,6 +27,8 @@ const newCompanyName = ref('')
 const detailedDep = ref(null)
 const removeRoleData = ref(null)
 const removeExternalData = ref(null)
+const editInputs = ref({})
+const externalInputs = ref({})
 
 definePageMeta({
   layout: 'settings',
@@ -466,6 +468,78 @@ function toggleAllSubExternal(ex) {
     subEx.checked = ex.checked
   })
 }
+
+function startEditDep(dep) {
+  data.value.forEach(d => {
+    if (d !== dep) {
+      d.correctMainDep = false
+    }
+  })
+  dep.editName = dep.name
+  dep.correctMainDep = true
+  nextTick(() => {
+    const inputComp = editInputs.value[dep.id]
+    if (inputComp && inputComp.focus) {
+      inputComp.focus()
+    }
+  })
+}
+
+function saveEditDep(dep) {
+  if (dep.editName && dep.editName.trim()) {
+    dep.name = dep.editName.trim()
+  }
+  dep.correctMainDep = false
+}
+
+function cancelEditDep(dep) {
+  dep.editName = dep.name
+  dep.correctMainDep = false
+}
+
+function setEditInputRef(dep, index) {
+  return (el) => {
+    if (el) {
+      editInputs.value[dep.id] = el
+    }
+  }
+}
+
+function saveEditEx(ex) {
+  if (ex.editName && ex.editName.trim()) {
+    ex.name = ex.editName.trim()
+  }
+  ex.correctMainEx = false
+}
+
+function cancelEditEx(ex) {
+  ex.editName = ex.name
+  ex.correctMainEx = false
+}
+
+function setEditExInputRef(ex, index) {
+  return (el) => {
+    if (el) {
+      externalInputs.value[ex.id] = el
+    }
+  }
+}
+
+function startEditEx(ex) {
+  external.value.forEach(e => {
+    if (e !== ex) {
+      e.correctMainEx = false
+    }
+  })
+  ex.editName = ex.name
+  ex.correctMainEx = true
+  nextTick(() => {
+    const inputComp = externalInputs.value[ex.id]
+    if (inputComp && inputComp.focus) {
+      inputComp.focus()
+    }
+  })
+}
 </script>
 
 <template>
@@ -528,17 +602,23 @@ function toggleAllSubExternal(ex) {
                 @change="toggleAllSubDepartments(dep)" />
               <div class="flex justify-between w-full">
                 <div>
-                  <div class="cursor-pointer flex items-center" @click="dep.viewSubs = !dep.viewSubs">
-                    <p class="text-sm font-medium mr-5px select-none"
-                      :class="[dep.viewSubs ? 'text-dodger' : 'text-space']">{{ dep.name }}</p>
-                    <div :class="[dep.viewSubs ? 'text-dodger rotate-180' : 'text-space']"><svg-icon
-                        name="dropdown-arrow" width="16" height="16" /></div>
-
+                  <div v-if="dep.correctMainDep">
+                    <MyInput v-model="dep.editName" :placeholder="'Введите новое название'"
+                      :ref="setEditInputRef(dep, index)" @keyup.enter="saveEditDep(dep)" @blur="cancelEditDep(dep)" />
                   </div>
-                  <span class="text-xs text-bali font-normal leading-130">ID {{ dep.customId }}</span>
+                  <div v-else>
+                    <div class="cursor-pointer flex items-center" @click="dep.viewSubs = !dep.viewSubs">
+                      <p class="text-sm font-medium mr-5px select-none"
+                        :class="[dep.viewSubs ? 'text-dodger' : 'text-space']">{{ dep.name }}</p>
+                      <div :class="[dep.viewSubs ? 'text-dodger rotate-180' : 'text-space']"><svg-icon
+                          name="dropdown-arrow" width="16" height="16" /></div>
+
+                    </div>
+                    <span class="text-xs text-bali font-normal leading-130">ID {{ dep.customId }}</span>
+                  </div>
                 </div>
                 <div class="gap-x-2.5 flex" v-show="dep.hover">
-                  <button
+                  <button @click="dep.correctMainDep ? cancelEditDep(dep) : startEditDep(dep)"
                     class="border border-ahtens bg-athens-gray rounded-ten p-9px text-slate-custom hover:text-dodger hover:bg-zumthor hover:border-zumthor h-fit"><svg-icon
                       name="pencil" width="20" height="20" /></button>
                   <button @click="removeDepartmentPopup(dep)"
@@ -633,19 +713,25 @@ function toggleAllSubExternal(ex) {
               <div class="flex items-center py-17px px-15px" :class="{ 'border-b border-athens': ex.viewSubs }">
                 <MyCheckbox v-model="ex.checked" :twenty-gap="true" :id="ex.name" @change="toggleAllSubExternal(ex)" />
                 <div>
-                  <div class="cursor-pointer flex items-center" @click="ex.viewSubs = !ex.viewSubs">
-                    <p class="text-sm font-medium mr-5px select-none"
-                      :class="[ex.viewSubs ? 'text-dodger' : 'text-space']">
-                      {{ ex.name }}</p>
-                    <div :class="[ex.viewSubs ? 'text-dodger rotate-180' : 'text-space']"><svg-icon
-                        name="dropdown-arrow" width="16" height="16" /></div>
-
+                  <div v-if="ex.correctMainEx">
+                    <MyInput v-model="ex.editName" :placeholder="'Введите новое значение'"
+                      :ref="setEditExInputRef(ex, index)" @keyup.enter="saveEditEx(ex)" @blur="cancelEditEx(ex)" />
                   </div>
-                  <span class="text-xs text-bali font-normal leading-130">ID {{ ex.customId }}</span>
+                  <div v-else>
+                    <div class="cursor-pointer flex items-center" @click="ex.viewSubs = !ex.viewSubs">
+                      <p class="text-sm font-medium mr-5px select-none"
+                        :class="[ex.viewSubs ? 'text-dodger' : 'text-space']">
+                        {{ ex.name }}</p>
+                      <div :class="[ex.viewSubs ? 'text-dodger rotate-180' : 'text-space']"><svg-icon
+                          name="dropdown-arrow" width="16" height="16" /></div>
+
+                    </div>
+                    <span class="text-xs text-bali font-normal leading-130">ID {{ ex.customId }}</span>
+                  </div>
                 </div>
               </div>
               <div class="gap-x-2.5 flex" v-show="ex.hover">
-                <button
+                <button @click="ex.correctMainEx ? cancelEditEx(ex) : startEditEx(ex)"
                   class="border border-ahtens bg-athens-gray rounded-ten p-9px text-slate-custom hover:text-dodger hover:bg-zumthor hover:border-zumthor h-fit"><svg-icon
                     name="pencil" width="20" height="20" /></button>
                 <button @click="removeExternalPopup(ex)"
