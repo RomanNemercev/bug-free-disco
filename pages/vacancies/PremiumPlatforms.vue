@@ -62,43 +62,43 @@
     {
         'platform': 'hh',
         'svg': 'hh-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'rabota',
         'svg': 'rabota-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'rabota',
         'svg': 'zarplata-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'superjob',
         'svg': 'superjob-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'careerist',
         'svg': 'careerist-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'youla',
         'svg': 'popup-youla',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'avito',
         'svg': 'avito-50',
-        'isAythenticated': false,
+        'isAuthenticated': false,
         'data' : null
     },
 ])
@@ -215,7 +215,7 @@
   })
 
   function addProfile() {
-    // platforms[index].isAythenticated = true
+    // platforms[index].isAuthenticated = true
     addProfilePopup.value = true
     disableBodyScroll()
   }
@@ -237,19 +237,17 @@
   }
 
   async function authPlatform() {
-    btnAuthDisabled.value = true
-    errorAuthPlatform.value = null
-    if (!authDataPlatform.value.idClient || !authDataPlatform.value.idSecret) {
-        errorAuthPlatform.value = 'Пожалуйста, введите данные авторизации';
-        return;
-    }
+    // btnAuthDisabled.value = true
+    // errorAuthPlatform.value = null
+    // if (!authDataPlatform.value.idClient || !authDataPlatform.value.idSecret) {
+    //     errorAuthPlatform.value = 'Пожалуйста, введите данные авторизации';
+    //     return;
+    // }
     const config = useRuntimeConfig();
     const tokenCookie = useCookie('auth_user');
     setCookie('process_auth', 'true', 1);
-    window.location.href = 'https://admin.job-ly.ru' 
-        + `/code-hh?clientId=${authDataPlatform.value.idClient}` 
-        + `&clientSecret=${authDataPlatform.value.idSecret}`
-        + `&customerToken=${tokenCookie.value}`
+    window.location.href = config.public.apiBase
+        + `/code-hh?customerToken=${tokenCookie.value}`
   }
 
   function updateAuthDataPlatform(data) {
@@ -358,9 +356,11 @@ function setCookie(name, value, days) {
 onBeforeMount(async () => {
     // запрашиваем, есть ли авторизация на hh.ru
     const { data, error } = await profileHh()
+    
     if (!error) {
-        platforms.value[0].isAythenticated = true
-        platforms.value[0].data = data
+        platforms.value[0].isAuthenticated = true
+        platforms.value[0].data = {email: data.data.email}
+        console.log('data profile', platforms.value[0].data.email);
     }
     addAuthPopup.value = isAuthOpen ? true : false
 })
@@ -375,7 +375,7 @@ onMounted(async () => {
             if (!error) {
                 window.location.href = response.data.url_auth
                 console.log('auth', response)
-                platforms.value[0].isAythenticated = true
+                platforms.value[0].isAuthenticated = true
                 platforms.value[0].data = response.data
             } else {
                 errorAuthPlatform.value = error
@@ -1130,8 +1130,8 @@ onMounted(async () => {
           </div>
           <div class="w-full mb-25px mt-25px h-[1px] bg-athens"></div>
           <ConnectedPlatform 
-            v-if="platforms[activePlatform].isAythenticated" 
-            :model-value="platforms[activePlatform]?.data?.email | ''"
+            v-if="platforms[activePlatform].isAuthenticated" 
+            :email="platforms[activePlatform].data?.email"
           ></ConnectedPlatform>
           <FormAuthPlatform v-else @update:modelValue="updateAuthDataPlatform"></FormAuthPlatform>
           <div v-if="errorAuthPlatform" class="text-red-500 text-xs mt-1">
@@ -1143,6 +1143,7 @@ onMounted(async () => {
           class="mt-auto w-full"
           :class="{ 'opacity-30': btnAuthDisabled , 'disabled:cursor-not-allowed' : btnAuthDisabled }"
           @click="authPlatform"
+          v-if="!platforms[activePlatform].isAuthenticated"
         >
           Авторизовать
         </UiButton>
