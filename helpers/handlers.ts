@@ -8,3 +8,7 @@ export const clickOutside = (event: MouseEvent, ref: any, callback: () => void) 
     }
     document.addEventListener('mousedown', handleClick)
 }
+
+export function capitalize( str: String) {
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+}
