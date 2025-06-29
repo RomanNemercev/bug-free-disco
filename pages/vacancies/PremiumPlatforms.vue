@@ -25,7 +25,9 @@
   import MyCheckbox from '~/components/custom/MyCheckbox.vue'
   import FormAuthPlatform from '~/components/custom/page-parts/FormAuthPlatform.vue'
   import ConnectedPlatform from '~/components/custom/page-parts/ConnectedPlatform.vue'
+  import CardPlatform from '@/components/custom/page-parts/CardPlatform.vue'
   import { getProfile as profileHh, auth as authHh, getCode as getCodeHh } from '@/utils/hhAccount'
+  import { capitalize } from '@/helpers/handlers'
 
   import { useCartStore } from '@/stores/cart'
   import { onMounted, ref, onBeforeUnmount } from 'vue'
@@ -61,42 +63,49 @@
   const platforms = ref([
     {
         'platform': 'hh',
+        'domain': 'hh.ru',
         'svg': 'hh-50',
         'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'rabota',
+        'domain': 'rabota.ru',
         'svg': 'rabota-50',
         'isAuthenticated': false,
         'data' : null
     },
     {
-        'platform': 'rabota',
+        'platform': 'zarplata',
+        'domain': 'zarplata.ru',
         'svg': 'zarplata-50',
         'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'superjob',
+        'domain': 'superjob.ru',
         'svg': 'superjob-50',
         'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'careerist',
+        'domain': 'careerist.ru',
         'svg': 'careerist-50',
         'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'youla',
+        'domain': 'youla.ru',
         'svg': 'popup-youla',
         'isAuthenticated': false,
         'data' : null
     },
     {
         'platform': 'avito',
+        'domain': 'avito.ru',
         'svg': 'avito-50',
         'isAuthenticated': false,
         'data' : null
@@ -236,18 +245,23 @@
     enableBodyScroll()
   }
 
-  async function authPlatform() {
+  async function authPlatform(platform) {
+    errorAuthPlatform.value = null
     // btnAuthDisabled.value = true
     // errorAuthPlatform.value = null
     // if (!authDataPlatform.value.idClient || !authDataPlatform.value.idSecret) {
     //     errorAuthPlatform.value = 'Пожалуйста, введите данные авторизации';
     //     return;
     // }
-    const config = useRuntimeConfig();
-    const tokenCookie = useCookie('auth_user');
-    setCookie('process_auth', 'true', 1);
-    window.location.href = config.public.apiBase
+    if (platform == 'hh') {
+      const config = useRuntimeConfig();
+      const tokenCookie = useCookie('auth_user');
+      setCookie('process_auth', 'true', 1);
+      window.location.href = config.public.apiBase
         + `/code-hh?customerToken=${tokenCookie.value}`
+    } else {
+      errorAuthPlatform.value = `Платформа ${capitalize(platform)} пока неподдерживается :(`
+    }
   }
 
   function updateAuthDataPlatform(data) {
@@ -371,10 +385,8 @@ onMounted(async () => {
         const hhId = useCookie('process_auth')
         if (hhId != undefined && hhId.value) {
             const response = await authHh()
-        console.log(response)
             if (!error) {
                 window.location.href = response.data.url_auth
-                console.log('auth', response)
                 platforms.value[0].isAuthenticated = true
                 platforms.value[0].data = response.data
             } else {
@@ -402,8 +414,11 @@ onMounted(async () => {
     <div
       class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]"
     >
+      <div v-for="(item, index) in platforms.filter((el) => el.isAuthenticated)" class="p-25px bg-white rounded-fifteen flex flex-col">
+        <CardPlatform :platform="item" :index="index" />
+      </div>
       <!-- Первая карточка -->
-      <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+      <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]"  style="display: none">
         <div class="flex justify-between mb-3.5">
           <div class="flex items-center gap-2.5">
             <svg-icon name="hh" width="41" height="40" />
@@ -435,7 +450,7 @@ onMounted(async () => {
         </UiButton>
       </div>
       <!-- Вторая карточка -->
-      <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]">
+      <div class="p-25px bg-white rounded-fifteen flex flex-col min-h-[404px]"  style="display: none">
         <div class="flex justify-between mb-3.5">
           <div class="flex items-center gap-2.5">
             <svg-icon name="zarplata" width="41" height="40" />
@@ -487,8 +502,7 @@ onMounted(async () => {
       Авторизуйте ваши аккаунты на&nbsp;работных сайтах один раз
       и&nbsp;управляйте вакансиями удаленно
     </p>
-    <div
-      class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]"
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]"
     >
       <!-- Первая карточка -->
       <div class="p-25px bg-white rounded-fifteen flex flex-col">
@@ -1122,7 +1136,7 @@ onMounted(async () => {
                v-for="(item, index)  in platforms" 
                :key="index" 
                :class="{ 'opacity-10': activePlatform !== index }"
-               @click="activePlatform = index"
+               @click="() => {activePlatform = index; errorAuthPlatform = null}"
             >
               <svg-icon v-if="item.svg !== 'popup-youla'"  :name="item.svg" width="50" height="50" />
               <div v-else :class="item.svg" @click="openPopupAuth"></div>
@@ -1133,7 +1147,6 @@ onMounted(async () => {
             v-if="platforms[activePlatform].isAuthenticated" 
             :email="platforms[activePlatform].data?.email"
           ></ConnectedPlatform>
-          <FormAuthPlatform v-else @update:modelValue="updateAuthDataPlatform"></FormAuthPlatform>
           <div v-if="errorAuthPlatform" class="text-red-500 text-xs mt-1">
                 {{ errorAuthPlatform }}
           </div>
@@ -1142,7 +1155,7 @@ onMounted(async () => {
           size="action"
           class="mt-auto w-full"
           :class="{ 'opacity-30': btnAuthDisabled , 'disabled:cursor-not-allowed' : btnAuthDisabled }"
-          @click="authPlatform"
+          @click="authPlatform(platforms[activePlatform].platform)"
           v-if="!platforms[activePlatform].isAuthenticated"
         >
           Авторизовать
