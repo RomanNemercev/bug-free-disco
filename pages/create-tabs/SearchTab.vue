@@ -32,7 +32,7 @@ const pages = {
 // Функция переключения страницы
 function openPage(pageName) {
   // router.push({ path: `vacancies/PremiumPlatforms` })
-  // currentPage.value = pageName
+  currentPage.value = pageName
 }
 
 function goBack() {
@@ -81,11 +81,11 @@ const onFallback = () => {
             публикацией, что&nbsp;бы повысить узнаваемость вашей вакансии
           </p>
           <router-link to="/vacancies/PremiumPlatforms">
-            <UiButton variant="semiaction" size="semiaction" class="w-full" >
+            <UiButton variant="semiaction" size="semiaction" class="w-full">
               Выбрать площадки
             </UiButton>
           </router-link>
-          
+
         </div>
         <div class="max-w-275px w-full p-25px bg-white rounded-fifteen flex flex-col items-center min-h-330px">
           <div class="bg-img planet mb-25px"></div>

@@ -124,6 +124,10 @@ function handleCloseAddQuestionPopup() {
           <ConfigResponse />
         </div>
         <div class="p-25px bg-white rounded-fifteen mb-25px">
+          <h2 class="text-xl font-semibold text-space mb-1">Дополнительные вопросы</h2>
+          <p class="text-sm font-normal text-slate-custom mb-8">
+            Добавляйте и редактируйте свои вопросы
+          </p>
           <MoreQuestions @open-settings="handleOpenSettings" @open-delete="handleOpenDelete"
             @open-add-question="handleOpenAddQuestion" />
         </div>
@@ -382,7 +386,7 @@ function handleCloseAddQuestionPopup() {
     </div>
     <transition name="fade" @after-leave="enableBodyScroll">
       <Popup :isOpen="openSettingsPopup" @close="handleCloseSettingsPopup" :showCloseButton="false" :width="'490px'"
-        :disableOverflowHidden="true" :topActive="true">
+        :disableOverflowHidden="true" :lgSize="true">
         <p class="text-xl font-semibold text-space mb-6">Редактор поля</p>
         <p class="text-sm font-medium text-space mb-15px">Тип вопроса</p>
         <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="SettingsArrayValue" />
@@ -418,7 +422,7 @@ function handleCloseAddQuestionPopup() {
     </transition>
     <transition name="fade" @after-leave="enableBodyScroll">
       <Popup :isOpen="openAddQuestionPopup" @close="handleCloseAddQuestionPopup" :width="'490px'"
-        :showCloseButton="false" :disableOverflowHidden="true" :topActive="true">
+        :showCloseButton="false" :disableOverflowHidden="true" :lgSize="true">
         <p class="text-xl font-semibold text-space mb-6">Новое поле</p>
         <p class="text-sm font-medium text-space mb-15px">Тип поля</p>
         <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="NewArrayValue" />
