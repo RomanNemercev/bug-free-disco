@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import DotsDropdown from '~/components/custom/DotsDropdown.vue'
 import Popup from '~/components/custom/Popup.vue'
 import MyInput from '~/components/custom/MyInput.vue'
@@ -7,8 +7,11 @@ import MoreQuestions from '~/components/custom/MoreQuestions.vue'
 import MyDropdown from '~/components/custom/MyDropdown.vue'
 import GenerateDraggable from '~/components/custom/GenerateDraggable.vue'
 import MyCheckbox from '~/components/custom/MyCheckbox.vue'
+import BtnTab from '~/components/custom/BtnTab.vue'
 
 import SettingsArray from '~/src/data/change-settings.json'
+
+import { useForms } from '~/stores/forms'
 
 definePageMeta({
   layout: 'settings',
@@ -50,6 +53,9 @@ const InputExampleHeader = ref('Есть ли у вас гарнитура?')
 const makeRequired = ref(false)
 const NewArrayValue = ref('')
 const makeRequiredNewField = ref(false)
+const newFormTabs = ref('questions')
+const formsStore = useForms()
+const questions = ref([])
 
 // Обработчики событий
 function disableBodyScroll() {
@@ -72,6 +78,8 @@ function handleOpenDelete() {
 
 function handleOpenAddQuestion() {
   openAddQuestionPopup.value = true
+  createNewForm.value = false
+  console.log('createNewForm.value:', createNewForm.value)
   disableBodyScroll()
 }
 
@@ -90,6 +98,11 @@ function handleCloseAddQuestionPopup() {
   openAddQuestionPopup.value = false
   enableBodyScroll()
 }
+
+watch(questions, (val) => {
+  console.log('new question', JSON.parse(JSON.stringify(val)))
+  formsStore.setQuestions(val)
+})
 </script>
 
 <template>
@@ -120,31 +133,55 @@ function handleCloseAddQuestionPopup() {
       <p class="text-15px font-medium text-bali">Вы еще не создавали анкеты</p>
     </div>
     <transition name="fade">
-      <Popup :isOpen="createNewForm" @close="createNewForm = false" :width="'490px'">
+      <Popup :isOpen="createNewForm" @close="createNewForm = false" :width="'690px'" :overflowContainer="true"
+        :maxHeight="true">
         <div>
-          <p class="text-xl font-semibold text-space mb-2.5">Новая анкета</p>
-          <p class="text-sm font-normal text-bali mb-[24px]">Короткое описание того что такое анкета</p>
           <div>
-            <div class="mb-[14px]">
-              <p class="text-sm text-space font-medium mb-[12px]">Системное название анкеты</p>
-              <MyInput class="mb-2.5" :placeholder="'Например: Анкета на вакансию повара'" v-model="newFormName" />
-              <p class="text-xs text-bali font-normal">Будет отображаться в системе</p>
-            </div>
-            <div class="mb-[14px]">
-              <p class="text-sm text-space font-medium mb-[13px]">Оглавление анкеты</p>
-              <MyInput class="mb-2.5" :placeholder="'Например: Пожалуйста, ответьте на следующие вопросы'"
-                v-model="headerFormName" />
-              <p class="text-xs text-bali font-normal">Видно кандидату</p>
-            </div>
+            <p class="text-xl font-semibold text-space mb-25px">Информация об анкете</p>
+            <BtnTab :tabs="[
+              { label: 'Вопросы', value: 'questions' },
+              { label: 'Предосмотр', value: 'preview' }
+            ]" v-model="newFormTabs" class="pb-15px" />
+            <div class="h-1px w-full bg-athens-gray"></div>
+          </div>
+          <div v-if="newFormTabs === 'questions'" class="pt-25px">
+            <!-- <p class="text-xl font-semibold text-space mb-2.5">Новая анкета</p>
+            <p class="text-sm font-normal text-bali mb-[24px]">Короткое описание того что такое анкета</p> -->
             <div>
-              <p class="text-sm font-medium text-space mb-[13px]">Вопросы:</p>
-              <MoreQuestions @open-settings="handleOpenSettings" @open-delete="handleOpenDelete"
-                @open-add-question="handleOpenAddQuestion" :mode="'publish'" />
+              <div class="mb-[14px]">
+                <p class="text-sm text-space font-medium mb-[12px]">Системное название анкеты</p>
+                <MyInput class="mb-2.5" :placeholder="'Например: Анкета на вакансию повара'" v-model="newFormName" />
+                <p class="text-xs text-bali font-normal">Будет отображаться в системе</p>
+              </div>
+              <div class="mb-[14px]">
+                <p class="text-sm text-space font-medium mb-[13px]">Оглавление анкеты</p>
+                <MyInput class="mb-2.5" :placeholder="'Например: Пожалуйста, ответьте на следующие вопросы'"
+                  v-model="headerFormName" />
+                <p class="text-xs text-bali font-normal">Видно кандидату</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-space mb-[13px]">Вопросы:</p>
+                <MoreQuestions v-model:modelValue="questions" />
+              </div>
+            </div>
+            <div class="mt-25px flex justify-between">
+              <UiButton variant="semiaction" size="semiaction">Создать</UiButton>
+              <UiButton variant="back" size="second-back" @click="createNewForm = false">Отмена</UiButton>
             </div>
           </div>
-          <div class="mt-25px">
-            <UiButton variant="action" size="semiaction" class="mr-15px font-semibold">Создать</UiButton>
-            <UiButton variant="back" size="second-back" @click="createNewForm = false">Отмена</UiButton>
+          <div v-else class="pt-25px">
+            <p class="text-xl font-semibold text-space mb-25px">Предпросмотр</p>
+            <div v-for="q in questions" :key="q.id" class="mb-4 p-2 border rounded">
+              <div>Тип: {{ q.type }}</div>
+              <div>Вопрос: {{ q.title }}</div>
+              <div>Обязательный: {{ q.required ? 'Да' : 'Нет' }}</div>
+              <div v-if="q.options && q.options.length">
+                Опции:
+                <ul>
+                  <li v-for="(opt, idx) in q.options" :key="idx">{{ opt }}</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </Popup>

@@ -58,7 +58,7 @@ const props = defineProps({
     default: 'create',
   }
 })
-console.log('type', props.type)
+// console.log('type', props.type)
 
 // const vacancyStore = useVacancyStore()
 const options = ref([
@@ -90,9 +90,9 @@ const handleCheck = id => {
 }
 
 onBeforeMount(async () => {
-    // получаем динамический список исполнителей
-    const {executors: executorData} = await executorsList();
-    executors.value = executorData
+  // получаем динамический список исполнителей
+  const { executors: executorData } = await executorsList();
+  executors.value = executorData
   // if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
   //   loadVacancyData(vacancyStore.editingVacancyId).then(() => {
   //     selectedCard.value = workSpace.value
@@ -138,7 +138,7 @@ const showContacts = ref(true)
 const salaryType = ref('')
 
 // зависимости для отправки на сервер
-const newVacancy = ref({place: 1, currency: 'RUB (рубль)'})
+const newVacancy = ref({ place: 1, currency: 'RUB (рубль)' })
 if (props.id) {
   const currectVacancy = await getVacancy(props.id)
   if (currectVacancy) {
@@ -149,7 +149,7 @@ if (props.id) {
   }
   console.log('vacancy', newVacancy.value)
 }
-const editVacancyData = ref({}) 
+const editVacancyData = ref({})
 const newCode = ref('')
 const jobDescription = ref('')
 // Автоматически форматируем перед отправкой
@@ -166,9 +166,9 @@ const tags = ref([])
 const selectedAdditional = ref([])
 const selectedCarId = ref([])
 const selectedOptions = ref([])
-const salary = ref({ 
-  from: newVacancy.value.salary_from ? newVacancy.value.salary_from : null, 
-  to: newVacancy.value.salary_to ? newVacancy.value.salary_to : null 
+const salary = ref({
+  from: newVacancy.value.salary_from ? newVacancy.value.salary_from : null,
+  to: newVacancy.value.salary_to ? newVacancy.value.salary_to : null
 })
 const currencyType = ref('RUB (рубль)')
 const workSpace = ref('1')
@@ -177,7 +177,7 @@ const response = ref('')
 const phone = ref(null)
 const email = ref('')
 const errors = ref({})
-const { data, error} = await getPhrases()
+const { data, error } = await getPhrases()
 tags.value = data;
 
 
@@ -274,10 +274,10 @@ const updateVacancyHandler = async id => {
 
 async function saveVacancy() {
   if (validateVacancy()) {
-     console.log('data', newVacancy.value)
+    console.log('data', newVacancy.value)
     console.log('edit data', editVacancyData.value)
-    const { data: response, error} = props.type === 'edit' 
-      ? await updateVacancy(props.id, editVacancyData.value) 
+    const { data: response, error } = props.type === 'edit'
+      ? await updateVacancy(props.id, editVacancyData.value)
       : await createVacancy(newVacancy.value)
     console.log('ответ создания вакансии', response)
     console.log('ошибка создания вакансии', error)
@@ -319,14 +319,14 @@ const updateTags = (data) => {
     } else {
       newVacancy.value.phrases = phrases
     }
-    
+
   } else {
     if (props.type === 'edit') {
       if (editVacancyData.value.phrases)
-      delete editVacancyData.value.phrases
+        delete editVacancyData.value.phrases
     } else {
-      if (newVacancy.value.phrases) 
-    delete newVacancy.value.phrases
+      if (newVacancy.value.phrases)
+        delete newVacancy.value.phrases
     }
   }
 }
@@ -338,7 +338,7 @@ const updateDataSalary = (objSalary, type, value) => {
     } else {
       delete objSalary.salary_from
     }
-    
+
   } else {
     if (value) {
       objSalary.salary_to = value
@@ -382,14 +382,12 @@ const updateExecutor = (value, id) => {
               <span class="text-red-custom">*</span>
               Название должности
             </p>
-            <Autocomplete 
-              :source="ArrayMajors" 
-              :model-value="newVacancy.name ? newVacancy.name : ''" 
-              @update:model-value="$event => updateEvent($event, 'name')"
-              placeholder="Например, Менеджер по продажам" class="mb-11px" />
-              <div v-if="errors.name" class="text-red-500 text-xs mt-1">
-                  {{ errors.name }}
-              </div>
+            <Autocomplete :source="ArrayMajors" :model-value="newVacancy.name ? newVacancy.name : ''"
+              @update:model-value="$event => updateEvent($event, 'name')" placeholder="Например, Менеджер по продажам"
+              class="mb-11px" />
+            <div v-if="errors.name" class="text-red-500 text-xs mt-1">
+              {{ errors.name }}
+            </div>
             <p class="text-xs text-bali">
               Осталось 80 символов. Специальных символов нет.
             </p>
@@ -406,12 +404,8 @@ const updateExecutor = (value, id) => {
               </span>
             </div>
             <div class="max-w-400px">
-              <MyInput 
-                :placeholder="'Код вакансии'" 
-                type="string" 
-                :model-value="newVacancy.code ? newVacancy.code : ''" 
-                @update:model-value="$event => updateEvent($event, 'code')"
-              />
+              <MyInput :placeholder="'Код вакансии'" type="string" :model-value="newVacancy.code ? newVacancy.code : ''"
+                @update:model-value="$event => updateEvent($event, 'code')" />
             </div>
           </div>
         </div>
@@ -425,13 +419,11 @@ const updateExecutor = (value, id) => {
           </div>
         </div>
         <div class="mt-15px mb-3.5">
-          <TiptapEditor 
-              :model-value="newVacancy.description ? newVacancy.description : ''" 
-              @update:model-value="(value) => updateEvent(value, 'description')"
-            />
+          <TiptapEditor :model-value="newVacancy.description ? newVacancy.description : ''"
+            @update:model-value="(value) => updateEvent(value, 'description')" />
         </div>
         <div id v-if="errors.description" class="text-red-500 text-xs mt-1">
-                  {{ errors.description }}
+          {{ errors.description }}
         </div>
         <p class="text-xs text-bali font-normal">
           Максимум 700 символов. Использовано 0 символов.
@@ -458,12 +450,9 @@ const updateExecutor = (value, id) => {
               Отрасль компании
             </p>
             <div class="w-full relative">
-              <CustomDropdown 
-                :options="ArrayIndustry" 
-                placeholder="Выберите отрасль" 
-                :model-value="newVacancy.industry ? newVacancy.industry : ''" 
-                @update:model-value="$event => updateEvent($event, 'industry')"
-              />
+              <CustomDropdown :options="ArrayIndustry" placeholder="Выберите отрасль"
+                :model-value="newVacancy.industry ? newVacancy.industry : ''"
+                @update:model-value="$event => updateEvent($event, 'industry')" />
             </div>
           </div>
           <div class="w-full">
@@ -471,12 +460,9 @@ const updateExecutor = (value, id) => {
               Выберите специализацию
             </p>
             <div>
-              <CustomDropdown 
-                :options="ArraySpecialization" 
-                placeholder="Выберите специализацию"
-                :model-value="newVacancy.specializations? newVacancy.specializations : ''" 
-                @update:model-value="$event => updateEvent($event, 'specializations')"
-              />
+              <CustomDropdown :options="ArraySpecialization" placeholder="Выберите специализацию"
+                :model-value="newVacancy.specializations ? newVacancy.specializations : ''"
+                @update:model-value="$event => updateEvent($event, 'specializations')" />
             </div>
           </div>
         </div>
@@ -499,78 +485,53 @@ const updateExecutor = (value, id) => {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-            <my-dropdown 
-              :defaultValue="'Тип занятости'" 
-              :options="options" 
+            <my-dropdown :defaultValue="'Тип занятости'" :options="options"
               :model-value="newVacancy.employment ? newVacancy.employment : ''"
-              @update:model-value="$event => updateEvent($event, 'employment')"
-            />
+              @update:model-value="$event => updateEvent($event, 'employment')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
-            <my-dropdown 
-              :defaultValue="'График работы'" 
-              :options="ArraySchedule" 
+            <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule"
               :model-value="newVacancy.schedule ? newVacancy.schedule : ''"
-              @update:model-value="$event => updateEvent($event, 'schedule')" 
-            />
+              @update:model-value="$event => updateEvent($event, 'schedule')" />
           </div>
         </div>
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
-            <my-dropdown 
-              :defaultValue="'Опыт работы'" 
-              :options="ArrayExperience" 
+            <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience"
               :model-value="newVacancy.experience ? newVacancy.experience : ''"
-              @update:model-value="(value) => updateEvent(value, 'experience')" 
-            />
+              @update:model-value="(value) => updateEvent(value, 'experience')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Образование</p>
-            <my-dropdown 
-              :defaultValue="'Образование'" 
-              :options="ArrayEducation" 
+            <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation"
               :model-value="newVacancy.education ? newVacancy.education : ''"
-              @update:model-value="(value) => updateEvent(value, 'education')"
-            />
+              @update:model-value="(value) => updateEvent(value, 'education')" />
           </div>
         </div>
         <div class="w-full mb-9 max-w-input">
           <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
-          <tag-select 
-            :options="tags"
-            :model-value="newVacancy.phrases ? newVacancy.phrases : []"
-            @update:model-value="$event => updateTags($event)" 
-            @delete="$event => updateTags($event)"
-          />
+          <tag-select :options="tags" :model-value="newVacancy.phrases ? newVacancy.phrases : []"
+            @update:model-value="$event => updateTags($event)" @delete="$event => updateTags($event)" />
         </div>
         <div class="w-fit">
           <MyAccordion title="дополнительные условия" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
-              <CheckboxGroup 
-                :model-value="newVacancy.conditions"
-                :options="ArrayAdditional" 
-                @update:model-value="(value) => updateEvent(value, 'conditions')"
-              />
+              <CheckboxGroup :model-value="newVacancy.conditions" :options="ArrayAdditional"
+                @update:model-value="(value) => updateEvent(value, 'conditions')" />
             </div>
           </MyAccordion>
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup 
-                v-model="newVacancy.drivers" 
-                :options="ArrayCarId" 
-                @update:model-value="(value) => updateEvent(value, 'drivers')"
-              />
+              <CheckboxGroup v-model="newVacancy.drivers" :options="ArrayCarId"
+                @update:model-value="(value) => updateEvent(value, 'drivers')" />
             </div>
           </MyAccordion>
           <MyAccordion title="дополнительные пожелания">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup 
-                v-model="newVacancy.additions" 
-                :options="ArrayOptions" 
-                @update:model-value="(value) => updateEvent(value, 'additions')"
-              />
+              <CheckboxGroup v-model="newVacancy.additions" :options="ArrayOptions"
+                @update:model-value="(value) => updateEvent(value, 'additions')" />
             </div>
           </MyAccordion>
         </div>
@@ -595,22 +556,13 @@ const updateExecutor = (value, id) => {
             <p class="text-sm font-medium text-space mb-3.5">
               Заработная плата / мес
             </p>
-            <SalaryRange 
-              class="mb-4" 
-              :model-value="salary" 
-              :from="salary.from"
-              :to="salary.to"
-              @update:model-value="updateSalary"
-            />
+            <SalaryRange class="mb-4" :model-value="salary" :from="salary.from" :to="salary.to"
+              @update:model-value="updateSalary" />
             <div v-if="errors.salary" class="text-red-500 text-xs mt-1">
-                  {{ errors.salary }}
+              {{ errors.salary }}
             </div>
             <div>
-              <RadioGroup 
-                default-value="past-cash" 
-                class="flex gap-[18px]" 
-                v-model="salaryType"
-              >
+              <RadioGroup default-value="past-cash" class="flex gap-[18px]" v-model="salaryType">
                 <div class="my-checkbox">
                   <Label for="past-cash" class="cursor-pointer flex items-center">
                     <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
@@ -628,13 +580,8 @@ const updateExecutor = (value, id) => {
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
-            <my-dropdown 
-              :defaultValue="'Валюта'" 
-              :options="ArrayCurrency" 
-              :selected="0" 
-              :model-value="newVacancy.currency"
-              @update:model-value="(value) => updateEvent(value, 'currency')"
-            />
+            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0"
+              :model-value="newVacancy.currency" @update:model-value="(value) => updateEvent(value, 'currency')" />
           </div>
         </div>
       </div>
@@ -654,25 +601,14 @@ const updateExecutor = (value, id) => {
         <div class="mb-[23px]">
           <RadioGroup default-value="1" class="flex gap-x-15px w-full" v-model="selectedCard"
             @update:model-value="$event => updateEvent($event, 'place')">
-            <CardOption v-for="card in cards" 
-              :key="card.id" 
-              :id="card.id" 
-              :title="card.title"
-              :description="card.description" 
-              :selectedCard="selectedCard" 
-              :hoveredCard="hoveredCard"
-              @update:selected="handleCheck" 
-              @hover="handleHover" 
-              @leave="clearHover" 
-            />
+            <CardOption v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
+              :description="card.description" :selectedCard="selectedCard" :hoveredCard="hoveredCard"
+              @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" />
           </RadioGroup>
         </div>
         <p class="text-sm font-medium text-space mb-15px">Локация офиса</p>
-        <geo-input 
-          class="mb-2.5" 
-          :model-value="newVacancy.location"
-          @update:model-value="$event => updateEvent($event, 'location')"
-        />
+        <geo-input class="mb-2.5" :model-value="newVacancy.location"
+          @update:model-value="$event => updateEvent($event, 'location')" />
         <p class="leading-normal text-xs text-bali font-normal">
           Укажите расположение офиса для нового сотрудника.
         </p>
@@ -693,33 +629,24 @@ const updateExecutor = (value, id) => {
           Контактная информация
         </p>
         <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-        <response-input 
-          class="mb-6 w-full max-w-input" 
-          :responses="executors" 
-          :model-value="newVacancy.executor_name" 
+        <response-input class="mb-6 w-full max-w-input" :responses="executors" :model-value="newVacancy.executor_name"
           @input:modelValue="$event => updateEvent($event, 'executor_name')"
-          @update:modelValue="$event => updateEvent($event, 'executor_name')"
-        />
+          @update:modelValue="$event => updateEvent($event, 'executor_name')" />
         <div class="w-full flex justify-between gap-x-[25px]">
           <div class="w-full max-w-[400px]">
             <p class="text-sm font-medium text-space leading-normal mb-4">
               Номер телефона
             </p>
-            <phone-input 
-              :model-value="newVacancy.executor_phone" 
-              @update:model-value="$event => updateEvent($event, 'executor_phone')" 
-              class="mb-25px" 
-            />
+            <phone-input :model-value="newVacancy.executor_phone"
+              @update:model-value="$event => updateEvent($event, 'executor_phone')" class="mb-25px" />
             <MyCheckbox :id="'show-contacts'" :label="'Отображать контакты в вакансии'" v-model="showContacts" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space leading-normal mb-4">
               Email
             </p>
-            <email-input 
-              :model-value="newVacancy.executor_email" 
-              @update:model-value="$event => updateEvent($event, 'executor_email')" 
-            />
+            <email-input :model-value="newVacancy.executor_email"
+              @update:model-value="$event => updateEvent($event, 'executor_email')" />
           </div>
         </div>
       </div>
