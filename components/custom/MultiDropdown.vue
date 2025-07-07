@@ -35,10 +35,8 @@
 
 <script setup>
 import {
-    defineProps,
     ref,
     computed,
-    defineEmits,
     onMounted,
     onBeforeUnmount,
 } from 'vue';

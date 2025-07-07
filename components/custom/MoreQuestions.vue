@@ -9,6 +9,10 @@ import MyCheckbox from '~/components/custom/MyCheckbox.vue'
 
 import SettingsArray from '~/src/data/change-settings.json'
 
+const props = defineProps({
+    modelValue: { type: Array, default: () => [] },
+})
+
 const openSettingsPopup = ref(false)
 const openDeletePopup = ref(false)
 const openAddQuestionPopup = ref(false)
@@ -168,11 +172,7 @@ const itemsForCheckbox = ref([
     { id: 1, title: '' }
 ]);
 
-const props = defineProps({
-    modelValue: { type: Array, default: () => [] }
-})
-
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 </script>
 
 <template>

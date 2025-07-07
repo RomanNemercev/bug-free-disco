@@ -8,6 +8,11 @@ import MyDropdown from '~/components/custom/MyDropdown.vue'
 import GenerateDraggable from '~/components/custom/GenerateDraggable.vue'
 import MyCheckbox from '~/components/custom/MyCheckbox.vue'
 import BtnTab from '~/components/custom/BtnTab.vue'
+import MyTextarea from '~/components/custom/MyTextarea.vue'
+import MultiSelect from '~/components/custom/MultiSelect.vue'
+import ChooseTime from '~/components/custom/ChooseTime.vue'
+import DropdownCalendarStatic from '~/components/custom/DropdownCalendarStatic.vue'
+import GeoInput from '~/components/custom/GeoInput.vue'
 
 import SettingsArray from '~/src/data/change-settings.json'
 
@@ -47,40 +52,31 @@ const newFormName = ref('');
 const headerFormName = ref('');
 const openSettingsPopup = ref(false)
 const openDeletePopup = ref(false)
-const openAddQuestionPopup = ref(false)
 const SettingsArrayValue = ref('')
 const InputExampleHeader = ref('Есть ли у вас гарнитура?')
 const makeRequired = ref(false)
-const NewArrayValue = ref('')
-const makeRequiredNewField = ref(false)
 const newFormTabs = ref('questions')
 const formsStore = useForms()
 const questions = ref([])
-
-// Обработчики событий
-function disableBodyScroll() {
-  document.body.style.overflow = 'hidden' // Отключаем прокрутку
-}
+const isOpenDate = ref(false)
+const isOpenDateFrom = ref(false)
+const isOpenDateTo = ref(false)
 
 function enableBodyScroll() {
   document.body.style.overflow = '' // Включаем прокрутку
 }
 
-function handleOpenSettings() {
-  openSettingsPopup.value = true
-  disableBodyScroll()
+const isOpenCalendar = (value) => {
+  console.log('value', value)
+  isOpenDate.value = value
 }
 
-function handleOpenDelete() {
-  openDeletePopup.value = true
-  disableBodyScroll()
+const isOpenCalendarFrom = (value) => {
+  isOpenDateFrom.value = value
 }
 
-function handleOpenAddQuestion() {
-  openAddQuestionPopup.value = true
-  createNewForm.value = false
-  console.log('createNewForm.value:', createNewForm.value)
-  disableBodyScroll()
+const isOpenCalendarTo = (value) => {
+  isOpenDateTo.value = value
 }
 
 // Обработчики событий закрытия попапов
@@ -94,15 +90,18 @@ function handleCloseDeletePopup() {
   enableBodyScroll()
 }
 
-function handleCloseAddQuestionPopup() {
-  openAddQuestionPopup.value = false
-  enableBodyScroll()
-}
-
 watch(questions, (val) => {
   console.log('new question', JSON.parse(JSON.stringify(val)))
   formsStore.setQuestions(val)
 })
+
+function handleOpenCreateForm() {
+  createNewForm.value = true
+}
+
+function hanldeCloseCreateForm() {
+  createNewForm.value = false
+}
 </script>
 
 <template>
@@ -112,7 +111,7 @@ watch(questions, (val) => {
         <p class="text-xl font-semibold text-space mb-2.5">Анкеты</p>
         <p class="text-sm text-bali font-normal leading-150">Узнавайте опыт кандидатов и&nbsp;многое другое</p>
       </div>
-      <UiButton variant="action" size="semiaction" class="font-semibold" @click="createNewForm = true">Создать анкету
+      <UiButton variant="action" size="semiaction" class="font-semibold" @click="handleOpenCreateForm">Создать анкету
       </UiButton>
     </div>
     <div class="[&>*:not(:last-child)]:mb-7px" v-if="forms.length > 0">
@@ -133,14 +132,14 @@ watch(questions, (val) => {
       <p class="text-15px font-medium text-bali">Вы еще не создавали анкеты</p>
     </div>
     <transition name="fade">
-      <Popup :isOpen="createNewForm" @close="createNewForm = false" :width="'690px'" :overflowContainer="true"
+      <Popup :isOpen="createNewForm" @close="hanldeCloseCreateForm" :width="'690px'" :overflowContainer="true"
         :maxHeight="true">
         <div>
           <div>
             <p class="text-xl font-semibold text-space mb-25px">Информация об анкете</p>
             <BtnTab :tabs="[
               { label: 'Вопросы', value: 'questions' },
-              { label: 'Предосмотр', value: 'preview' }
+              { label: 'Предпросмотр', value: 'preview' }
             ]" v-model="newFormTabs" class="pb-15px" />
             <div class="h-1px w-full bg-athens-gray"></div>
           </div>
@@ -161,7 +160,8 @@ watch(questions, (val) => {
               </div>
               <div>
                 <p class="text-sm font-medium text-space mb-[13px]">Вопросы:</p>
-                <MoreQuestions v-model:modelValue="questions" />
+                <MoreQuestions v-model:modelValue="questions" @open-add-question-popup="createNewForm = false"
+                  @close-add-question-popup="createNewForm = true" />
               </div>
             </div>
             <div class="mt-25px flex justify-between">
@@ -172,6 +172,47 @@ watch(questions, (val) => {
           <div v-else class="pt-25px">
             <p class="text-xl font-semibold text-space mb-25px">Предпросмотр</p>
             <div v-for="q in questions" :key="q.id" class="mb-4 p-2 border rounded">
+              <div v-if="q.type === 'Поле для ввода в одну строку'">
+                <p>{{ q.title }}</p>
+                <MyInput :placeholder="'Введите ваш ответ'" />
+              </div>
+              <div v-if="q.type === 'Поле для ввода в несколько строк'">
+                <p>{{ q.title }}</p>
+                <MyTextarea :maxHeight="100" :placeholder="'Введите ваш ответ'" />
+              </div>
+              <div v-if="q.type === 'Выпадающий список (один выбор)'">
+                <p>{{ q.title }}</p>
+                <MyDropdown :defaultValue="'Выберите вариант ответа'" :options="q.options" />
+              </div>
+              <div v-if="q.type === 'Мультисписок (вопрос с вариантами ответа)'">
+                <p>{{ q.title }}</p>
+                <MultiSelect :options="q.options" />
+              </div>
+              <div v-if="q.type === 'Время (выбор времени)'">
+                <p>{{ q.title }}</p>
+                <ChooseTime />
+              </div>
+              <div v-if="q.type === 'Дата (выбор даты)'">
+                <p>{{ q.title }}</p>
+                <!-- <DropdownCalendarStatic @update:model-value="newApplication.dateStart = $event"
+                  :is-open="isOpenDateFrom" @isOpen="isOpenFrom" /> -->
+                <DropdownCalendarStatic :is-open="isOpenDate" @isOpen="isOpenCalendar" />
+              </div>
+              <div v-if="q.type === 'Дата (срок)'">
+                <p>{{ q.title }}</p>
+                <div class="flex gap-x-15px">
+                  <DropdownCalendarStatic :is-open="isOpenDateFrom" @isOpen="isOpenCalendarFrom" />
+                  <DropdownCalendarStatic :is-open="isOpenDateTo" @isOpen="isOpenCalendarTo" />
+                </div>
+              </div>
+              <div v-if="q.type === 'Ссылка'">
+                <p>{{ q.title }}</p>
+                <MyInput :placeholder="'https://'" />
+              </div>
+              <div v-if="q.type === 'Адрес'">
+                <p>{{ q.title }}</p>
+                <geo-input />
+              </div>
               <div>Тип: {{ q.type }}</div>
               <div>Вопрос: {{ q.title }}</div>
               <div>Обязательный: {{ q.required ? 'Да' : 'Нет' }}</div>
@@ -219,26 +260,6 @@ watch(questions, (val) => {
             Отмена
           </UiButton>
           <UiButton variant="delete" size="delete">Удалить поле</UiButton>
-        </div>
-      </Popup>
-    </transition>
-    <transition name="fade" @after-leave="enableBodyScroll">
-      <Popup :isOpen="openAddQuestionPopup" @close="handleCloseAddQuestionPopup" :width="'490px'"
-        :showCloseButton="false" :disableOverflowHidden="true" :lgSize="true">
-        <p class="text-xl font-semibold text-space mb-6">Новое поле</p>
-        <p class="text-sm font-medium text-space mb-15px">Тип поля</p>
-        <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="NewArrayValue" />
-        <div v-if="NewArrayValue === 'Поле для ввода в одну строку'">
-          <p class="text-sm font-medium text-space my-15px">Заголовок</p>
-          <MyInput :placeholder="'Введите текст'" v-model="InputNewField" class="mb-5" />
-          <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequiredNewField"
-            class="mb-25px" />
-          <div class="flex gap-15px justify-between max-w-fit">
-            <UiButton variant="action" size="semiaction">Сохранить</UiButton>
-            <UiButton variant="back" size="second-back" @click="handleCloseAddQuestionPopup">
-              Отмена
-            </UiButton>
-          </div>
         </div>
       </Popup>
     </transition>
