@@ -5,12 +5,14 @@
         </p>
         <MyInput
           v-model="props.email"
-          :type="'Number'"
+          :class="'bg-feta'"
         />
     </div>
 </template>
 
 <script setup lang="ts">
+import MyInput from "~/components/custom/MyInput.vue";
+
 const props = defineProps(
     {
         email: {

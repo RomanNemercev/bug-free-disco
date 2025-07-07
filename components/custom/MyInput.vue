@@ -21,6 +21,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  class: {
+    type: String,
+    default: '',
+  }
 })
 
 const emit = defineEmits(['update:modelValue', 'blur'])
@@ -54,7 +58,7 @@ defineExpose({ focus: () => inputRef.value && inputRef.value.focus() })
     <input :type="type" ref="inputRef"
       class="text-sm font-normal bg-athens-gray border border-athens rounded-ten min-h-10 w-full pl-15px"
       :placeholder="isFocused ? '' : placeholder" :value="props.modelValue" @input="updateValue"
-      @focus="isFocused = true" :class="[{ focused: isFocused }, { search: search }]" @blur="handleBlur" />
+      @focus="isFocused = true" :class="[{ focused: isFocused }, { search: search }, props.class]" @blur="handleBlur" />
   </div>
 </template>
 
