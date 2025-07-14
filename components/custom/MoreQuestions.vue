@@ -164,6 +164,7 @@ function addCheckboxQuestion() {
 
     emit('update:modelValue', items.value)
     newCheckboxField.value = { title: '', required: false, options: [] }
+    newField.value = { type: '', title: '', required: false, options: [] };
     itemsForCheckbox.value = [{ id: 1, title: '' }]
     openAddQuestionPopup.value = false
 }
@@ -245,7 +246,8 @@ const emit = defineEmits(['update:modelValue']);
         </transition>
         <transition name="fade" @after-leave="enableBodyScroll">
             <Popup :isOpen="openAddQuestionPopup" @close="handleCloseAddQuestionPopup" :width="'490px'"
-              :showCloseButton="false" :disableOverflowHidden="true" :lgSize="true">
+              :showCloseButton="false" :disableOverflowHidden="true" :lgSize="true" :overflowVisible="true"
+              :parentRounded="true">
                 <p class="text-xl font-semibold text-space mb-6">Новое поле</p>
                 <p class="text-sm font-medium text-space mb-15px">Тип поля</p>
                 <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="newField.type" />
@@ -267,7 +269,7 @@ const emit = defineEmits(['update:modelValue']);
                     <p class="text-sm font-medium text-space my-15px">Заголовок</p>
                     <MyInput :placeholder="'Введите текст'" v-model="newCheckboxField.title" />
                     <GenerateDraggable v-model:items="itemsForCheckbox"
-                      :placeholder="newField.type === ['Мультисписок (вопрос с вариантами ответа)', 'Выпадающий список (один выбор)'].includes(newField.type) ? 'Вариант ответа' : 'Введите утверждение'" />
+                      :placeholder="['Мультисписок (вопрос с вариантами ответа)', 'Выпадающий список (один выбор)'].includes(newField.type) ? 'Вариант ответа' : 'Введите утверждение'" />
                     <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="newCheckboxField.required"
                       class="mb-25px" />
                     <div class="flex gap-15px justify-between max-w-fit">

@@ -13,6 +13,8 @@ import MultiSelect from '~/components/custom/MultiSelect.vue'
 import ChooseTime from '~/components/custom/ChooseTime.vue'
 import DropdownCalendarStatic from '~/components/custom/DropdownCalendarStatic.vue'
 import GeoInput from '~/components/custom/GeoInput.vue'
+import InputUpload from '~/components/custom/InputUpload.vue'
+import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
 
 import SettingsArray from '~/src/data/change-settings.json'
 
@@ -61,6 +63,7 @@ const questions = ref([])
 const isOpenDate = ref(false)
 const isOpenDateFrom = ref(false)
 const isOpenDateTo = ref(false)
+const answers = ref([])
 
 function enableBodyScroll() {
   document.body.style.overflow = '' // Включаем прокрутку
@@ -102,6 +105,15 @@ function handleOpenCreateForm() {
 function hanldeCloseCreateForm() {
   createNewForm.value = false
 }
+
+// Ensure answers[idx] is an array for checkbox questions
+watch(questions, (val) => {
+  val.forEach((q, idx) => {
+    if (q.type === 'Чекбокс' && !Array.isArray(answers.value[idx])) {
+      answers.value[idx] = [];
+    }
+  });
+});
 </script>
 
 <template>
@@ -133,7 +145,7 @@ function hanldeCloseCreateForm() {
     </div>
     <transition name="fade">
       <Popup :isOpen="createNewForm" @close="hanldeCloseCreateForm" :width="'690px'" :overflowContainer="true"
-        :maxHeight="true">
+        :maxHeight="true" :disableOverflowHidden="true" :lgSize="true">
         <div>
           <div>
             <p class="text-xl font-semibold text-space mb-25px">Информация об анкете</p>
@@ -160,8 +172,7 @@ function hanldeCloseCreateForm() {
               </div>
               <div>
                 <p class="text-sm font-medium text-space mb-[13px]">Вопросы:</p>
-                <MoreQuestions v-model:modelValue="questions" @open-add-question-popup="createNewForm = false"
-                  @close-add-question-popup="createNewForm = true" />
+                <MoreQuestions v-model:modelValue="questions" />
               </div>
             </div>
             <div class="mt-25px flex justify-between">
@@ -171,47 +182,67 @@ function hanldeCloseCreateForm() {
           </div>
           <div v-else class="pt-25px">
             <p class="text-xl font-semibold text-space mb-25px">Предпросмотр</p>
-            <div v-for="q in questions" :key="q.id" class="mb-4 p-2 border rounded">
+            <div v-for="(q, idx) in questions" :key="q.id" class="mb-4 p-2 border rounded">
               <div v-if="q.type === 'Поле для ввода в одну строку'">
                 <p>{{ q.title }}</p>
-                <MyInput :placeholder="'Введите ваш ответ'" />
+                <MyInput :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Ответ: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Поле для ввода в несколько строк'">
                 <p>{{ q.title }}</p>
-                <MyTextarea :maxHeight="100" :placeholder="'Введите ваш ответ'" />
+                <MyTextarea :maxHeight="100" :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Ответ: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Выпадающий список (один выбор)'">
                 <p>{{ q.title }}</p>
-                <MyDropdown :defaultValue="'Выберите вариант ответа'" :options="q.options" />
+                <MyDropdown :defaultValue="'Выберите вариант ответа'" :options="q.options" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Выбрано: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Мультисписок (вопрос с вариантами ответа)'">
                 <p>{{ q.title }}</p>
-                <MultiSelect :options="q.options" />
+                <MultiSelect :options="q.options" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Выбрано: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Время (выбор времени)'">
                 <p>{{ q.title }}</p>
-                <ChooseTime />
+                <ChooseTime v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Время: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Дата (выбор даты)'">
                 <p>{{ q.title }}</p>
-                <!-- <DropdownCalendarStatic @update:model-value="newApplication.dateStart = $event"
-                  :is-open="isOpenDateFrom" @isOpen="isOpenFrom" /> -->
-                <DropdownCalendarStatic :is-open="isOpenDate" @isOpen="isOpenCalendar" />
+                <DropdownCalendarStatic :is-open="isOpenDate" @isOpen="isOpenCalendar" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Дата: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Дата (срок)'">
                 <p>{{ q.title }}</p>
                 <div class="flex gap-x-15px">
-                  <DropdownCalendarStatic :is-open="isOpenDateFrom" @isOpen="isOpenCalendarFrom" />
-                  <DropdownCalendarStatic :is-open="isOpenDateTo" @isOpen="isOpenCalendarTo" />
+                  <DropdownCalendarStatic :is-open="isOpenDateFrom" @isOpen="isOpenCalendarFrom"
+                    v-model="answers[idx + '_from']" />
+                  <DropdownCalendarStatic :is-open="isOpenDateTo" @isOpen="isOpenCalendarTo"
+                    v-model="answers[idx + '_to']" />
                 </div>
+                <p class="text-xs text-bali mt-1">Срок: {{ answers[idx + '_from'] }} — {{ answers[idx + '_to'] }}</p>
               </div>
               <div v-if="q.type === 'Ссылка'">
                 <p>{{ q.title }}</p>
-                <MyInput :placeholder="'https://'" />
+                <MyInput :placeholder="'https://'" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Ссылка: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Адрес'">
                 <p>{{ q.title }}</p>
-                <geo-input />
+                <geo-input v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Адрес: {{ answers[idx] }}</p>
+              </div>
+              <div v-if="q.type === 'Файл'">
+                <p>{{ q.title }}</p>
+                <InputUpload v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Файл: {{ answers[idx] }}</p>
+              </div>
+              <div v-if="q.type === 'Чекбокс'">
+                <p>{{ q.title }}</p>
+                <CheckboxGroup :options="q.options.map(opt => ({ label: opt, value: opt }))" v-model="answers[idx]" />
+                <p class="text-xs text-bali mt-1">Выбрано: {{ Array.isArray(answers[idx]) ? answers[idx].join(', ') : ''
+                }}</p>
               </div>
               <div>Тип: {{ q.type }}</div>
               <div>Вопрос: {{ q.title }}</div>
@@ -219,7 +250,7 @@ function hanldeCloseCreateForm() {
               <div v-if="q.options && q.options.length">
                 Опции:
                 <ul>
-                  <li v-for="(opt, idx) in q.options" :key="idx">{{ opt }}</li>
+                  <li v-for="(opt, idx2) in q.options" :key="idx2">{{ opt }}</li>
                 </ul>
               </div>
             </div>
