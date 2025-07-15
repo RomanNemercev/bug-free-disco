@@ -2,7 +2,8 @@
   <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
     @click.self="closePopup"
     :class="[isOpen ? 'opacity-100' : 'opacity-0', overflowContainer ? 'overflow-y-auto' : (overflowVisible ? 'overflow-visible' : 'overflow-hidden'), parentRounded ? 'rounded-fifteen' : 'rounded-none']">
-    <div @click.self="closePopup" class="w-full absolute" :style="{ maxWidth: width, top: lgSize ? '10%' : 'auto' }">
+    <div @click.self="closePopup" class="w-full absolute"
+      :style="{ maxWidth: width, top: lgSize ? '10%' : 'auto', paddingBottom: lgSize ? '7.86%' : '0' }">
       <div class="bg-white w-full h-full rounded-fifteen p-25px relative transform" :style="{
         maxWidth: width,
         height: height === 'auto' ? 'auto' : (lgSize ? 'auto' : height),

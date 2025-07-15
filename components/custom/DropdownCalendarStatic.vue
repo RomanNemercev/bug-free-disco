@@ -1,13 +1,19 @@
 <template>
   <div class="cursor-pointer w-full relative" ref="dataPicker">
-    <div class="dropdown-selected-option relative border border-athens rounded-ten py-9px px-15px bg-athens-gray"
+    <div class="dropdown-selected-option relative border border-athens rounded-ten py-7px px-15px bg-athens-gray"
       @click="toggleDropdown" @focus="isFocused = true" @blur="handleBlur" :class="[
         { 'bg-athens-gray': !isError },
         { 'border-red-custom': isError },
         { focused: isFocused },
       ]">
       {{ currectDate }}
-      <span v-if="!currectDate" class="color-gray text-sm font-normal">Выберите дату</span>
+      <span v-if="!currectDate" class="color-gray text-sm font-normal">
+        {{
+          props.dateFrom ? 'Начало периода' :
+            props.dateTo ? 'Конец периода' :
+              'Выберите дату'
+        }}
+      </span>
       <div class="absolute right-[15px] top-[11.5px]">
         <transition name="fade-icon" mode="out-in">
           <span :key="isDropDownVisible">
@@ -32,6 +38,14 @@ import { dateStringToDots } from '../../helpers/date'
 
 const props = defineProps({
   isOpen: {
+    type: Boolean,
+    default: false
+  },
+  dateFrom: {
+    type: Boolean,
+    default: false
+  },
+  dateTo: {
     type: Boolean,
     default: false
   }

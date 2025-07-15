@@ -64,6 +64,7 @@ const isOpenDate = ref(false)
 const isOpenDateFrom = ref(false)
 const isOpenDateTo = ref(false)
 const answers = ref([])
+const companyName = ref('OOO ЗЕЛЕНОГЛАЗОЕ ТАКСИ')
 
 function enableBodyScroll() {
   document.body.style.overflow = '' // Включаем прокрутку
@@ -106,14 +107,24 @@ function hanldeCloseCreateForm() {
   createNewForm.value = false
 }
 
-// Ensure answers[idx] is an array for checkbox questions
-watch(questions, (val) => {
-  val.forEach((q, idx) => {
-    if (q.type === 'Чекбокс' && !Array.isArray(answers.value[idx])) {
-      answers.value[idx] = [];
+// Инициализация answers при изменении questions
+watch(questions, (newQuestions) => {
+  // Обновляем answers, сохраняя существующие ответы, если они есть
+  answers.value = newQuestions.map((q, idx) => {
+    if (q.type === 'Чекбокс') {
+      return Array.isArray(answers.value[idx]) ? answers.value[idx] : []
+    } else {
+      return answers.value[idx] || ''
     }
-  });
-});
+  })
+  // Сохраняем вопросы в Pinia
+  formsStore.setQuestions(newQuestions)
+}, { immediate: true })
+
+// Сохраняем answers в Pinia при изменении
+// watch(answers, (newAnswers) => {
+//   formsStore.setAnswers(newAnswers)
+// }, { deep: true })
 </script>
 
 <template>
@@ -181,77 +192,69 @@ watch(questions, (val) => {
             </div>
           </div>
           <div v-else class="pt-25px">
-            <p class="text-xl font-semibold text-space mb-25px">Предпросмотр</p>
-            <div v-for="(q, idx) in questions" :key="q.id" class="mb-4 p-2 border rounded">
+            <p class="text-25px font-bold text-space mb-15px leading-normal">Скрин-анкета для дизайнера</p>
+            <div class="mb-2.5">
+              <div class="flex gap-x-[3px] mb-5px">
+                <p class="text-space text-13px font-normal leading-130">Компания:</p>
+                <span class="text-bali text-13px font-normal leading-130">{{ companyName }}</span>
+              </div>
+              <div class="flex gap-x-[3px]">
+                <p class="text-space text-13px font-normal leading-130">Вакансия:</p>
+                <span class="text-bali text-13px font-normal leading-130">Дизайнер интерфейсов</span>
+              </div>
+            </div>
+            <div class="h-1px w-full bg-athens-gray mb-9px"></div>
+            <div v-for="(q, idx) in questions" :key="q.id" class="mb-25px last:mb-0">
               <div v-if="q.type === 'Поле для ввода в одну строку'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <MyInput :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Ответ: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Поле для ввода в несколько строк'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <MyTextarea :maxHeight="100" :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Ответ: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Выпадающий список (один выбор)'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <MyDropdown :defaultValue="'Выберите вариант ответа'" :options="q.options" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Выбрано: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Мультисписок (вопрос с вариантами ответа)'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <MultiSelect :options="q.options" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Выбрано: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Время (выбор времени)'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <ChooseTime v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Время: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Дата (выбор даты)'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <DropdownCalendarStatic :is-open="isOpenDate" @isOpen="isOpenCalendar" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Дата: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Дата (срок)'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <div class="flex gap-x-15px">
                   <DropdownCalendarStatic :is-open="isOpenDateFrom" @isOpen="isOpenCalendarFrom"
-                    v-model="answers[idx + '_from']" />
+                    v-model="answers[idx + '_from']" :dateFrom="true" />
                   <DropdownCalendarStatic :is-open="isOpenDateTo" @isOpen="isOpenCalendarTo"
-                    v-model="answers[idx + '_to']" />
+                    v-model="answers[idx + '_to']" :dateTo="true" />
                 </div>
-                <p class="text-xs text-bali mt-1">Срок: {{ answers[idx + '_from'] }} — {{ answers[idx + '_to'] }}</p>
               </div>
               <div v-if="q.type === 'Ссылка'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <MyInput :placeholder="'https://'" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Ссылка: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Адрес'">
-                <p>{{ q.title }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
                 <geo-input v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Адрес: {{ answers[idx] }}</p>
               </div>
               <div v-if="q.type === 'Файл'">
-                <p>{{ q.title }}</p>
-                <InputUpload v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Файл: {{ answers[idx] }}</p>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <InputUpload v-model="answers[idx]" :minStyle="true" />
               </div>
               <div v-if="q.type === 'Чекбокс'">
-                <p>{{ q.title }}</p>
-                <CheckboxGroup :options="q.options.map(opt => ({ label: opt, value: opt }))" v-model="answers[idx]" />
-                <p class="text-xs text-bali mt-1">Выбрано: {{ Array.isArray(answers[idx]) ? answers[idx].join(', ') : ''
-                }}</p>
-              </div>
-              <div>Тип: {{ q.type }}</div>
-              <div>Вопрос: {{ q.title }}</div>
-              <div>Обязательный: {{ q.required ? 'Да' : 'Нет' }}</div>
-              <div v-if="q.options && q.options.length">
-                Опции:
-                <ul>
-                  <li v-for="(opt, idx2) in q.options" :key="idx2">{{ opt }}</li>
-                </ul>
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <div class="[&>*:not(:last-child)]:mb-2.5">
+                  <CheckboxGroup :options="q.options.map(opt => ({ label: opt, value: opt }))" v-model="answers[idx]" />
+                </div>
               </div>
             </div>
           </div>

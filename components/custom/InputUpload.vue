@@ -10,6 +10,10 @@ const props = defineProps({
     modelValue: {
         type: [File, String],
         default: null
+    },
+    minStyle: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -138,12 +142,16 @@ watch(() => props.modelValue, (newValue) => {
         </div>
         <input ref="fileInput" type="file" class="hidden" id="file-upload" @change="handleFileChange">
         <label for="file-upload" class="cursor-pointer flex flex-col items-center gap-y-[24px]"
-          @click="handleButtonClick">
-            <div class="file-icon w-[100px] h-[100px] bg-white rounded-full flex items-center justify-center"
-              v-if="!previewUrl">
-                <svg-icon v-if="!previewUrl && !props.modelValue" name="upload" width="30" height="30" />
-                <svg-icon v-if="!previewUrl && props.modelValue && props.fileType === 'file'" name="check-success"
-                  width="30" height="30" />
+          @click="handleButtonClick" :class="minStyle ? 'gap-y-[17px]' : 'gap-y-[24px]'">
+            <div class="file-icon w-[100px] rounded-full flex items-center justify-center" :class="[
+                minStyle ? 'bg-transparent' : 'bg-white',
+                minStyle ? 'h-[36px]' : 'h-[100px]'
+            ]" v-if="!previewUrl">
+                <svg-icon v-if="!previewUrl && !props.modelValue && !minStyle" name="upload" width="30" height="30" />
+                <svg-icon v-if="!previewUrl && props.modelValue && props.fileType === 'file' && !minStyle"
+                  name="check-success" width="30" height="30" />
+                <svg-icon v-if="!previewUrl && !props.modelValue && minStyle" name="download-fill" width="25"
+                  height="25" />
             </div>
             <div v-if="!previewUrl && props.modelValue && props.fileType === 'file'" class="text-sm text-center">
                 Загружен:<br><span class="text-dodger">{{ props.modelValue.name }}</span>

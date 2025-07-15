@@ -159,12 +159,14 @@ function addCheckboxQuestion() {
         required: newCheckboxField.value.required,
         icon: getIconByType(newField.value.type),
         star: newCheckboxField.value.required ? '*' : '',
-        options: itemsForCheckbox.value.map(opt => opt.title) // собираем опции из GenerateDraggable
+        options: itemsForCheckbox.value
+            .filter(opt => opt.title.trim())
+            .map(opt => opt.title),
     })
 
     emit('update:modelValue', items.value)
     newCheckboxField.value = { title: '', required: false, options: [] }
-    newField.value = { type: '', title: '', required: false, options: [] };
+    newField.value = { type: '', title: '', required: false, options: [] }
     itemsForCheckbox.value = [{ id: 1, title: '' }]
     openAddQuestionPopup.value = false
 }
