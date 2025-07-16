@@ -81,10 +81,10 @@ function handleCloseDeletePopup() {
   enableBodyScroll()
 }
 
-watch(questions, (val) => {
-  console.log('new question', JSON.parse(JSON.stringify(val)))
-  formsStore.setQuestions(val)
-})
+// watch(questions, (val) => {
+//   console.log('new question', JSON.parse(JSON.stringify(val)))
+//   formsStore.setQuestions(val)
+// })
 
 function handleOpenCreateForm() {
   createNewForm.value = true
@@ -96,15 +96,16 @@ function hanldeCloseCreateForm() {
 
 // Инициализация answers при изменении questions
 watch(questions, (newQuestions) => {
-  // Обновляем answers, сохраняя существующие ответы, если они есть
   answers.value = newQuestions.map((q, idx) => {
-    if (q.type === 'Чекбокс') {
-      return Array.isArray(answers.value[idx]) ? answers.value[idx] : []
-    } else {
-      return answers.value[idx] || ''
+    const currentAnswer = answers.value[idx]
+    if (q.type === 'Чекбокс' || q.type === 'Мультисписок (вопрос с вариантами ответа)') {
+      return Array.isArray(currentAnswer) ? currentAnswer : []
     }
+    if (q.type === 'Выпадающий список (один выбор)') {
+      return typeof currentAnswer === 'string' ? currentAnswer : ''
+    }
+    return typeof currentAnswer === 'string' ? currentAnswer : ''
   })
-  // Сохраняем вопросы в Pinia
   formsStore.setQuestions(newQuestions)
 }, { immediate: true })
 

@@ -368,7 +368,12 @@ const updateExecutor = (value, id) => {
   }
 }
 
-
+// Валидация employment пример для разрешения данных
+watch(() => newVacancy.employment, (newValue) => {
+  if (newValue && !options.value.includes(newValue)) {
+    updateEvent('', 'employment') // Сбрасываем невалидное значение
+  }
+})
 </script>
 
 <template>
@@ -486,13 +491,13 @@ const updateExecutor = (value, id) => {
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
             <my-dropdown :defaultValue="'Тип занятости'" :options="options"
-              :model-value="newVacancy.employment ? newVacancy.employment : ''"
+              :model-value="newVacancy.employment ? newVacancy.employment : ''" :initialValue="newVacancy.employment"
               @update:model-value="$event => updateEvent($event, 'employment')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
             <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule"
-              :model-value="newVacancy.schedule ? newVacancy.schedule : ''"
+              :model-value="newVacancy.schedule ? newVacancy.schedule : ''" :initialValue="newVacancy.schedule"
               @update:model-value="$event => updateEvent($event, 'schedule')" />
           </div>
         </div>
@@ -500,13 +505,13 @@ const updateExecutor = (value, id) => {
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
             <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience"
-              :model-value="newVacancy.experience ? newVacancy.experience : ''"
+              :model-value="newVacancy.experience ? newVacancy.experience : ''" :initialValue="newVacancy.experience"
               @update:model-value="(value) => updateEvent(value, 'experience')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Образование</p>
             <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation"
-              :model-value="newVacancy.education ? newVacancy.education : ''"
+              :model-value="newVacancy.education ? newVacancy.education : ''" :initialValue="newVacancy.education"
               @update:model-value="(value) => updateEvent(value, 'education')" />
           </div>
         </div>
@@ -581,7 +586,8 @@ const updateExecutor = (value, id) => {
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
             <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0"
-              :model-value="newVacancy.currency" @update:model-value="(value) => updateEvent(value, 'currency')" />
+              :initialValue="newVacancy.currency" :model-value="newVacancy.currency"
+              @update:model-value="(value) => updateEvent(value, 'currency')" />
           </div>
         </div>
       </div>

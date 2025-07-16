@@ -24,11 +24,17 @@ const SettingsArrayValue = ref('')
 const InputExampleHeader = ref('Есть ли у вас гарнитура?')
 const makeRequired = ref(false)
 const itemToDelete = ref(null)
+const itemToEdit = ref({
+    type: '',
+    title: '',
+    required: false,
+    options: [],
+})
 
 const newField = ref({
     type: '',
     title: '',
-    required: false,
+    required: false
 })
 
 const newCheckboxField = ref({
@@ -67,14 +73,26 @@ const onDragEnd = () => {
 const isDragging = ref(false);
 
 // Обработчики событий
-function handleOpenSettings() {
+function handleOpenSettings(item) {
+    let options = item.options
+    if (Array.isArray(options) && options.length > 0 && typeof options[0] === 'string') {
+        options = options.map((opt, idx) => ({
+            id: idx + 1,
+            title: opt
+        }));
+    }
+    itemToEdit.value = {
+        ...item,
+        options
+    }
     openSettingsPopup.value = true
-    disableBodyScroll()
+    console.log('data of element is: ', item)
 }
 
 function handleOpenDelete(item) {
     itemToDelete.value = item
     openDeletePopup.value = true
+    console.log('data of element is: ', item)
 }
 
 function confirmDelete() {
@@ -93,7 +111,12 @@ function handleOpenAddQuestion() {
 // Обработчики событий закрытия попапов
 function handleCloseSettingsPopup() {
     openSettingsPopup.value = false
-    enableBodyScroll()
+    itemToEdit.value = {
+        type: '',
+        title: '',
+        required: false,
+        options: []
+    }
 }
 
 function handleCloseDeletePopup() {
@@ -174,6 +197,30 @@ function addCheckboxQuestion() {
     itemsForCheckbox.value = [{ id: 1, title: '' }]
     openAddQuestionPopup.value = false
 }
+
+function updateQuestion(item) {
+    const index = items.value.findIndex(i => i.id === item.id)
+    let updatedOptions = item.options
+    // Условие для типов с вариантами ответа
+    if (['Выпадающий список (один выбор)', 'Мультисписок (вопрос с вариантами ответа)', 'Чекбокс'].includes(itemToEdit.value.type)) {
+        updatedOptions = itemToEdit.value.options
+            .filter(opt => opt.title.trim())
+            .map(opt => opt.title)
+    }
+    items.value[index] = {
+        ...item,
+        star: item.required ? '*' : '',
+        options: updatedOptions,
+    }
+    emit('update:modelValue', items.value)
+    openSettingsPopup.value = false
+    itemToEdit.value = {
+        type: '',
+        title: '',
+        required: false,
+        options: []
+    }
+}
 </script>
 
 <template>
@@ -193,7 +240,7 @@ function addCheckboxQuestion() {
                             <div class="star text-red-custom mr-1">{{ element.star }}</div>
                             <div class="card-title text-sm font-normal text-space truncate">{{ element.title }}</div>
                         </div>
-                        <button class="settings-button" @click="handleOpenSettings">
+                        <button class="settings-button" @click="handleOpenSettings(element)">
                             <svg-icon name="more-settings" width="18" height="18" />
                         </button>
                         <button class="delete-button" @click="handleOpenDelete(element)">
@@ -212,25 +259,35 @@ function addCheckboxQuestion() {
               :overflowVisible="true">
                 <p class="text-xl font-semibold text-space mb-6">Редактор поля</p>
                 <p class="text-sm font-medium text-space mb-15px">Тип вопроса</p>
-                <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray"
-                  v-model="SettingsArrayValue" />
+                <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="itemToEdit.type" />
                 <div
-                  v-if="['Поле для ввода в одну строку', 'Поле для ввода в несколько строк', 'Время (выбор времени)', 'Дата (выбор даты)', 'Дата (срок)', 'Ссылка', 'Адрес', 'Файл'].includes(SettingsArrayValue)">
+                  v-if="['Поле для ввода в одну строку', 'Поле для ввода в несколько строк', 'Время (выбор времени)', 'Дата (выбор даты)', 'Дата (срок)', 'Ссылка', 'Адрес', 'Файл'].includes(itemToEdit.type)">
                     <p class="text-sm font-medium text-space my-15px">Заголовок</p>
-                    <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" class="mb-5" />
-                    <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequired"
+                    <MyInput :placeholder="'Введите заголовок'" v-model="itemToEdit.title" class="mb-5" />
+                    <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="itemToEdit.required"
                       class="mb-25px" />
                     <div class="flex gap-15px justify-between max-w-fit">
-                        <UiButton variant="action" size="semiaction">Сохранить</UiButton>
+                        <UiButton variant="action" size="semiaction" @click="updateQuestion(itemToEdit)">Сохранить
+                        </UiButton>
                         <UiButton variant="back" size="second-back" @click="handleCloseSettingsPopup">
                             Отмена
                         </UiButton>
                     </div>
                 </div>
                 <div
-                  v-if="['Выпадающий список (один выбор)', 'Мультисписок (вопрос с вариантами ответа)', 'Чекбокс'].includes(SettingsArrayValue)">
-                    <p>test for checkboxes</p>
-                    <!-- <GenerateDraggable class="mb-[23px]" /> -->
+                  v-if="['Выпадающий список (один выбор)', 'Мультисписок (вопрос с вариантами ответа)', 'Чекбокс'].includes(itemToEdit.type)">
+                    <p class="text-sm font-medium text-space my-15px">Заголовок</p>
+                    <MyInput :placeholder="'Введите заголовок'" v-model="itemToEdit.title" class="mb-1" />
+                    <GenerateDraggable class="mb-[23px]" v-model:items="itemToEdit.options" />
+                    <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="itemToEdit.required"
+                      class="mb-25px" />
+                    <div class="flex gap-15px justify-between max-w-fit">
+                        <UiButton variant="action" size="semiaction" @click="updateQuestion(itemToEdit)">Сохранить
+                        </UiButton>
+                        <UiButton variant="back" size="second-back" @click="handleCloseSettingsPopup">
+                            Отмена
+                        </UiButton>
+                    </div>
                 </div>
             </Popup>
         </transition>

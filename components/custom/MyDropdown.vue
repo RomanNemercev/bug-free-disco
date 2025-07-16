@@ -27,8 +27,8 @@
         v-if="isDropDownVisible">
         <div
           class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer first:rounded-t-ten last:rounded-b-ten"
-          v-for="(option, index) in props.options" :key="index" @click="toggleOptionSelect(option)">
-          {{ option.name || option }}
+          v-for="option in props.options" :key="getOptionKey(option)" @click="toggleOptionSelect(option)">
+          {{ getOptionLabel(option) }}
         </div>
       </div>
     </transition>
@@ -36,48 +36,62 @@
 </template>
 
 <script setup>
-import {
-  defineProps,
-  ref,
-  computed,
-  defineEmits,
-  onMounted,
-  onBeforeUnmount,
-  watch,
-} from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   options: {
     type: Array,
     required: true,
+    validator: (options) => options.every(opt => typeof opt === 'string' || ('name' in opt && 'value' in opt))
   },
   modelValue: {
+    type: [String, Number, Object, null],
     default: null,
   },
   defaultValue: {
     type: String,
     default: 'Выбрать значение',
   },
-  selected: {
-    type: Number,
+  initialValue: {
+    type: [String, Number, Object, null],
     default: null,
   },
-  initialValue: {
-    type: [String, Number, Object],
+  selected: {
+    type: [Number, String, null],
     default: null,
   },
 })
+
+const emit = defineEmits(['update:modelValue', 'select'])
 
 const dropDown = ref(null)
 const isDropDownVisible = ref(false)
-const emit = defineEmits(['update:modelValue', 'select'])
-const selectedOption = ref(props.initialValue || props.modelValue || null) // Используем initialValue
+const selectedOption = ref(null)
 
+// Утилиты для обработки options
+const getOptionValue = (option) => option?.value ?? option
+const getOptionLabel = (option) => option?.name ?? option
+const getOptionKey = (option) => getOptionValue(option)
+
+// Вычисляемое свойство для отображаемого значения
 const mappedSelectedOption = computed(() => {
-  return (
-    selectedOption.value?.name || selectedOption.value || props.defaultValue
-  )
+  if (selectedOption.value === null || selectedOption.value === undefined) {
+    return props.defaultValue
+  }
+  // Если selectedOption не в options, показываем его как есть (для данных с сервера)
+  return getOptionLabel(selectedOption.value)
 })
+
+// Инициализация selectedOption
+const initializeSelectedOption = () => {
+  let initial = props.initialValue ?? props.modelValue ?? props.selected
+  if (initial !== null && initial !== undefined) {
+    const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(initial))
+    selectedOption.value = option ?? initial // Сохраняем initial, даже если его нет в options
+  } else {
+    selectedOption.value = null
+  }
+}
 
 // Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
@@ -85,9 +99,9 @@ const toggleDropDown = () => {
 }
 
 // Выбор значения
-const toggleOptionSelect = option => {
-  selectedOption.value = option || null
-  emit('update:modelValue', option?.name || option)
+const toggleOptionSelect = (option) => {
+  selectedOption.value = option
+  emit('update:modelValue', getOptionValue(option))
   emit('select', option)
   isDropDownVisible.value = false
 }
@@ -96,38 +110,54 @@ const toggleOptionSelect = option => {
 const resetSelection = () => {
   selectedOption.value = null
   emit('update:modelValue', null)
+  isDropDownVisible.value = false
 }
 
-// Закрытие выпадающего списка при клике вне его
-const closeDropDown = element => {
-  if (!dropDown.value?.contains(element.target)) {
+// Закрытие выпадающего списка при клике вне
+const closeDropDown = (event) => {
+  if (!dropDown.value?.contains(event.target)) {
     isDropDownVisible.value = false
   }
 }
 
-// **Объединенный onMounted**
+// Проверка валидности selectedOption при изменении options
+watch(() => props.options, (newOptions) => {
+  if (selectedOption.value !== null) {
+    const currentValue = getOptionValue(selectedOption.value)
+    const isValid = newOptions.some(opt => getOptionValue(opt) === currentValue)
+    // Сбрасываем только если компонент используется в контексте динамических опций (например, SettingsForms)
+    // Для данных с сервера (InfoTab) сохраняем значение
+    if (!isValid && !props.initialValue) {
+      selectedOption.value = null
+      emit('update:modelValue', null)
+    }
+  }
+}, { deep: true })
+
+// Синхронизация modelValue → selectedOption
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== getOptionValue(selectedOption.value)) {
+    const option = props.options.find(opt => getOptionValue(opt) === newValue)
+    selectedOption.value = option ?? newValue // Сохраняем newValue, если оно с сервера
+    if (!option && newValue !== null && !props.initialValue) {
+      emit('update:modelValue', null) // Сбрасываем, если значение невалидно и не с сервера
+    }
+  }
+}, { immediate: true })
+
+// Обработка selected
+watch(() => props.selected, (newSelected) => {
+  if (newSelected !== null && newSelected !== getOptionValue(selectedOption.value)) {
+    const option = props.options.find(opt => getOptionValue(opt) === newSelected)
+    selectedOption.value = option ?? null
+    emit('update:modelValue', getOptionValue(option) ?? null)
+  }
+}, { immediate: true })
+
 onMounted(() => {
   window.addEventListener('click', closeDropDown)
-
-  // Установка начального значения при монтировании
-  if (props.selected !== null) {
-    const defaultOption = props.options.find(
-      option => option.value === props.selected
-    )
-    selectedOption.value = defaultOption || null
-  }
+  initializeSelectedOption()
 })
-
-// Отслеживание изменений modelValue (если оно приходит извне)
-watch(
-  () => props.modelValue,
-  newValue => {
-    selectedOption.value =
-      props.options.find(option => option.name === newValue) ||
-      newValue ||
-      null
-  }
-)
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', closeDropDown)
