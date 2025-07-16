@@ -5,8 +5,6 @@ import Popup from '~/components/custom/Popup.vue'
 import MyInput from '~/components/custom/MyInput.vue'
 import MoreQuestions from '~/components/custom/MoreQuestions.vue'
 import MyDropdown from '~/components/custom/MyDropdown.vue'
-import GenerateDraggable from '~/components/custom/GenerateDraggable.vue'
-import MyCheckbox from '~/components/custom/MyCheckbox.vue'
 import BtnTab from '~/components/custom/BtnTab.vue'
 import MyTextarea from '~/components/custom/MyTextarea.vue'
 import MultiSelect from '~/components/custom/MultiSelect.vue'
@@ -15,8 +13,6 @@ import DropdownCalendarStatic from '~/components/custom/DropdownCalendarStatic.v
 import GeoInput from '~/components/custom/GeoInput.vue'
 import InputUpload from '~/components/custom/InputUpload.vue'
 import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
-
-import SettingsArray from '~/src/data/change-settings.json'
 
 import { useForms } from '~/stores/forms'
 
@@ -52,11 +48,7 @@ const forms = ref([
 const createNewForm = ref(false);
 const newFormName = ref('');
 const headerFormName = ref('');
-const openSettingsPopup = ref(false)
 const openDeletePopup = ref(false)
-const SettingsArrayValue = ref('')
-const InputExampleHeader = ref('Есть ли у вас гарнитура?')
-const makeRequired = ref(false)
 const newFormTabs = ref('questions')
 const formsStore = useForms()
 const questions = ref([])
@@ -83,11 +75,6 @@ const isOpenCalendarTo = (value) => {
   isOpenDateTo.value = value
 }
 
-// Обработчики событий закрытия попапов
-function handleCloseSettingsPopup() {
-  openSettingsPopup.value = false
-  enableBodyScroll()
-}
 
 function handleCloseDeletePopup() {
   openDeletePopup.value = false
@@ -257,26 +244,6 @@ watch(questions, (newQuestions) => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Popup>
-    </transition>
-    <transition name="fade" @after-leave="enableBodyScroll">
-      <Popup :isOpen="openSettingsPopup" @close="handleCloseSettingsPopup" :showCloseButton="false" :width="'490px'"
-        :disableOverflowHidden="true" :lgSize="true">
-        <p class="text-xl font-semibold text-space mb-6">Редактор поля</p>
-        <p class="text-sm font-medium text-space mb-15px">Тип вопроса</p>
-        <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray" v-model="SettingsArrayValue" />
-        <div v-if="SettingsArrayValue === 'Поле для ввода в одну строку'">
-          <p class="text-sm font-medium text-space my-15px">Заголовок</p>
-          <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" class="mb-5" />
-          <GenerateDraggable class="mb-[23px]" />
-          <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequired" class="mb-25px" />
-          <div class="flex gap-15px justify-between max-w-fit">
-            <UiButton variant="action" size="semiaction">Сохранить</UiButton>
-            <UiButton variant="back" size="second-back" @click="handleCloseSettingsPopup">
-              Отмена
-            </UiButton>
           </div>
         </div>
       </Popup>

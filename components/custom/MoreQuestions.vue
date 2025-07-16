@@ -13,6 +13,10 @@ const props = defineProps({
     modelValue: { type: Array, default: () => [] },
 })
 
+const itemsForCheckbox = ref([
+    { id: 1, title: '' }
+]);
+const emit = defineEmits(['update:modelValue']);
 const openSettingsPopup = ref(false)
 const openDeletePopup = ref(false)
 const openAddQuestionPopup = ref(false)
@@ -170,12 +174,6 @@ function addCheckboxQuestion() {
     itemsForCheckbox.value = [{ id: 1, title: '' }]
     openAddQuestionPopup.value = false
 }
-
-const itemsForCheckbox = ref([
-    { id: 1, title: '' }
-]);
-
-const emit = defineEmits(['update:modelValue']);
 </script>
 
 <template>
@@ -210,15 +208,16 @@ const emit = defineEmits(['update:modelValue']);
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">
             <Popup :isOpen="openSettingsPopup" @close="handleCloseSettingsPopup" :showCloseButton="false"
-              :width="'490px'" :disableOverflowHidden="true" :lgSize="true">
+              :width="'490px'" :disableOverflowHidden="true" :lgSize="true" :parentRounded="true"
+              :overflowVisible="true">
                 <p class="text-xl font-semibold text-space mb-6">Редактор поля</p>
                 <p class="text-sm font-medium text-space mb-15px">Тип вопроса</p>
                 <my-dropdown :defaultValue="'Выберите тип поля'" :options="SettingsArray"
                   v-model="SettingsArrayValue" />
-                <div v-if="SettingsArrayValue === 'Поле для ввода в одну строку'">
+                <div
+                  v-if="['Поле для ввода в одну строку', 'Поле для ввода в несколько строк', 'Время (выбор времени)', 'Дата (выбор даты)', 'Дата (срок)', 'Ссылка', 'Адрес', 'Файл'].includes(SettingsArrayValue)">
                     <p class="text-sm font-medium text-space my-15px">Заголовок</p>
                     <MyInput :placeholder="'Введите заголовок'" v-model="InputExampleHeader" class="mb-5" />
-                    <GenerateDraggable class="mb-[23px]" />
                     <MyCheckbox id="make-required" label="Сделать поле обязательным" v-model="makeRequired"
                       class="mb-25px" />
                     <div class="flex gap-15px justify-between max-w-fit">
@@ -228,10 +227,16 @@ const emit = defineEmits(['update:modelValue']);
                         </UiButton>
                     </div>
                 </div>
+                <div
+                  v-if="['Выпадающий список (один выбор)', 'Мультисписок (вопрос с вариантами ответа)', 'Чекбокс'].includes(SettingsArrayValue)">
+                    <p>test for checkboxes</p>
+                    <!-- <GenerateDraggable class="mb-[23px]" /> -->
+                </div>
             </Popup>
         </transition>
         <transition name="fade" @after-leave="enableBodyScroll">
-            <Popup :isOpen="openDeletePopup" @close="handleCloseDeletePopup" :width="'490px'" :showCloseButton="false">
+            <Popup :isOpen="openDeletePopup" @close="handleCloseDeletePopup" :width="'490px'" :showCloseButton="false"
+              :parentRounded="true">
                 <p class="leading-normal text-xl font-semibold text-space mb-2">
                     Удаление поля
                 </p>
