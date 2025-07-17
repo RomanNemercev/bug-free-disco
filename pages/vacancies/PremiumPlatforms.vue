@@ -377,6 +377,7 @@ onBeforeMount(async () => {
         console.log('data profile', platforms.value[0].data.email);
     }
     addAuthPopup.value = isAuthOpen ? true : false
+    alert(addAuthPopup.value);
 })
 
 onMounted(async () => {

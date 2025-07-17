@@ -50,13 +50,21 @@ const handleBlur = () => {
   }
 const toggleDropdown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
-  emit('isOpen', isDropDownVisible.value)
+  // emit('isOpen', isDropDownVisible.value)
 }
 
 const updateDate = (newDate) => {
   currectDate.value = dateStringToDots(newDate.toString())
   emit('update:modelValue', currectDate.value)
 };
+
+
+watch(() => props.isOpen, (newStatus) => {
+  alert('dfgdfg');
+  console.log('Новое значение', newStatus)
+  isDropDownVisible.value = newStatus
+});
+
 
 // onBeforeUnmount(() => {
 //   document.removeEventListener('click', (event) => clickOutside(event, calendareBar, () => isDropDownVisible.value = false))

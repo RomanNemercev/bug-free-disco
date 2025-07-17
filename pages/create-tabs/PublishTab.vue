@@ -9,7 +9,21 @@
                     из&nbsp;подключенных профилей
                 </p>
             </div>
-            <UiButton variant="action" size="action" class="font-bold">Добавить публикации</UiButton>
+            <UiButton variant="action" size="action" class="font-bold" @click="openPopupNewPublication">
+                Добавить публикацию
+            </UiButton>
+            <Popup
+                  :isOpen="isOpenPopup"
+                  @close="() => (isOpenPopup = false)"
+                  :width="'740px'"
+                  :showCloseButton="false"
+                  :disableOverflowHidden="true"
+                  :overflowContainer="true"
+                  maxHeight
+                  :lgSize="true"
+            >
+            <AddPublication @closePopup="closePopup"/>
+            </Popup>
         </div>
 
         <!-- Таблица на Grid -->
@@ -79,6 +93,8 @@ import { ref, computed } from "vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
+import Popup from '~/components/custom/Popup.vue';
+import AddPublication from "@/components/platforms/AddPublication.vue";
 
 const data = ref([
     { id: 1, vacancy: "Менеджер по продажам не детских игрушек", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", icon: "sj20", isPng: false, imagePath: "", views: 3250, responses: 492, expires: "18.12" },
@@ -97,6 +113,7 @@ const allSelected = ref(false);
 const sortKey = ref(""); // Поле для сортировки
 const sortOrder = ref("asc"); // Порядок сортировки
 const sortDirection = ref("asc");
+const isOpenPopup = ref(false);
 
 const sortedData = computed(() => {
     if (!sortKey.value) return data.value;
@@ -148,6 +165,10 @@ watch(selected, (newSelected) => {
 }, { deep: true }); // Обязательно deep, так как мы следим за вложенными объектами
 
 const dropdownOptions = ["Редактировать текст", "Посмотреть публикацию", "Снять с публикации", "Дублировать публикацию", "Показать отчет по публикации"];
+
+const openPopupNewPublication = () => {
+    isOpenPopup.value = true;
+}
 </script>
 
 <style scoped>

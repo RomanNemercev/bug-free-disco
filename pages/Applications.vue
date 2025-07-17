@@ -513,7 +513,7 @@
                  <DropdownCalendarStatic 
                    @update:model-value="newApplication.dateStart = $event" 
                    :is-open="isOpenDateFrom"
-                   @isOpen="isOpenFrom "
+                   @update:isOpen="isOpenFrom"
                 />
                 
                 <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
@@ -526,6 +526,7 @@
                 </p>
                 <DropdownCalendarStatic 
                   @update:model-value="newApplication.dateWork = $event" 
+                  :is-open="isOpenDateTo"
                 />
                 <div v-if="errors.dateWork" class="text-red-500 text-xs mt-1">
                   {{ errors.dateWork }}
@@ -1259,8 +1260,8 @@
   const loading = ref(true)
   const loadingItem = ref(false)
   const errorItem = ref(null)
-  const isOpenDateFrom = ref(true)
-  const isOpenDateTo = ref(true)
+  const isOpenDateFrom = ref(false)
+  const isOpenDateTo = ref(false)
 
   const headers = computed(() => {
     const baseHeaders = [
@@ -1420,27 +1421,45 @@
   }
 
   const handleClickOutside = event => {
-    isOpenDateFrom.value = true
-    // обработчик события клика вне календаря
-    if (!event.target.classList.contains('dropdown-selected-option')) {
-      if (event.target.closest('.shadow-shadow-droplist')) {
-        console.log('date from', isOpenDateFrom.value)
-        console.log('date to', isOpenDateTo.value)
-        if (isOpenDateFrom.value)
+    const elTarget = event.target
+    //console.log('event', event.target);
+    //обработчик события клика вне календаря
+    if ((!elTarget || !elTarget.classList.contains('.shadow-shadow-droplist')) || !elTarget.closest('.calendar-wrapper')) {
+      // console.log('от', isOpenDateFrom.value)
+      // console.log('до', isOpenDateTo.value)
+      if (isOpenDateFrom.value)
           isOpenDateFrom.value = false
-        
-        // if (isOpenDateTo.value)
-        //   isOpenDateTo.value = false
-      } else {
-        
-        if (isOpenDateFrom.value)
-          isOpenDateFrom.value = false
-        console.log('Клик вне', isOpenDateFrom.value)
-      }
-    } else {
-      console.log('Клик вне', isOpenDateFrom.value)
-      
+      if (isOpenDateTo.value)
+          isOpenDateTo.value = false
+    console.log('after от', isOpenDateFrom.value)
+      console.log('artes до', isOpenDateTo.value)
     }
+    
+    // if (!event.target.classList.contains('.dropdown-selected-option')) {
+    //   if (event.target.closest('.shadow-shadow-droplist')) {
+    //     console.log('date from', isOpenDateFrom.value)
+    //     console.log('date to', isOpenDateTo.value)
+    //     if (isOpenDateFrom.value)
+    //       isOpenDateFrom.value = false
+        
+    //     // if (isOpenDateTo.value)
+    //     //   isOpenDateTo.value = false
+    //   } else {
+        
+    //     if (isOpenDateFrom.value)
+    //       isOpenDateFrom.value = false
+    //     if (isOpenDateTo.value)
+    //       isOpenDateTo.value = false
+    //     console.log('Клик вне', isOpenDateFrom.value)
+    //   }
+    // } else {
+    //   if (isOpenDateFrom.value)
+    //       isOpenDateFrom.value = false
+    //     if (isOpenDateTo.value)
+    //       isOpenDateTo.value = false
+    //   console.log('Клик вне', isOpenDateFrom.value)
+      
+    // }
     
     
     if (!isNewAppPopupAdmin.value && newApplication.value) {
