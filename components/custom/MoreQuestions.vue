@@ -20,9 +20,6 @@ const emit = defineEmits(['update:modelValue']);
 const openSettingsPopup = ref(false)
 const openDeletePopup = ref(false)
 const openAddQuestionPopup = ref(false)
-const SettingsArrayValue = ref('')
-const InputExampleHeader = ref('Есть ли у вас гарнитура?')
-const makeRequired = ref(false)
 const itemToDelete = ref(null)
 const itemToEdit = ref({
     type: '',
@@ -229,16 +226,17 @@ function updateQuestion(item) {
             <draggable v-model="items" item-key="id" handle=".drag-handle" animation="200" ghost-class="ghost"
               chosen-class="chosen" @start="onDragStart" @end="onDragEnd" v-if="items.length > 0">
                 <template #item="{ element }">
-                    <div class="card mb-15px last-of-child:mb-0" :class="{ 'dragging-card': isDragging }">
+                    <div class="card last-of-child:mb-0" :class="{ 'dragging-card': isDragging }">
                         <div class="drag-handle w-10 h-10 p-2.5 mr-15px cursor-grab">
                             <svg-icon name="drag-burger" width="20" height="20" />
                         </div>
                         <div
-                          class="card-content flex items-center py-[9px] px-15px border border-athens rounded-ten bg-athens-gray w-full overflow-hidden">
+                          class="card-content flex items-center py-[9px] px-15px pl-13px border border-athens rounded-ten bg-athens-gray w-full overflow-hidden">
                             <svg-icon v-if="element.icon" :name="element.icon" width="18" height="18"
-                              class="mr-2.5 text-slate-custom" />
-                            <div class="star text-red-custom mr-1">{{ element.star }}</div>
-                            <div class="card-title text-sm font-normal text-space truncate">{{ element.title }}</div>
+                              class="text-slate-custom shrink-0"
+                              :class="{ 'mr-5px': element.star, 'mr-[9px]': !element.star }" />
+                            <span v-if="element.star" class="star text-red-custom mr-1">{{ element.star }}</span>
+                            <p class="card-title text-sm font-normal text-space truncate">{{ element.title }}</p>
                         </div>
                         <button class="settings-button" @click="handleOpenSettings(element)">
                             <svg-icon name="more-settings" width="18" height="18" />
@@ -249,8 +247,11 @@ function updateQuestion(item) {
                     </div>
                 </template>
             </draggable>
-            <button class="add-question-button" @click="handleOpenAddQuestion">
-                <svg-icon name="accordion-plus" width="20" height="20" class="mr-5px" /><span>Добавить вопрос</span>
+            <button class="add-question-button" :class="{ 'mt-0': items.length === 0, 'mt-25px': items.length > 0 }"
+              @click="handleOpenAddQuestion">
+                <svg-icon name="accordion-plus" width="20" height="20" class="mr-5px" /><span
+                  class="text-sm font-normal">Добавить
+                    вопрос</span>
             </button>
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">
@@ -361,7 +362,7 @@ function updateQuestion(item) {
 }
 
 .card:not(:last-child) {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .card-title {
@@ -383,7 +384,7 @@ function updateQuestion(item) {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     width: fit-content;
     display: flex;
@@ -403,5 +404,13 @@ function updateQuestion(item) {
 
 .fade-leave-from {
     opacity: 1;
+}
+
+.star {
+    position: relative;
+    top: -8px;
+    height: 5px;
+    right: -4px;
+    margin-right: 7px;
 }
 </style>

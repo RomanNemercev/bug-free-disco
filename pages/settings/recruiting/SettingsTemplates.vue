@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import BtnTab from '~/components/custom/BtnTab.vue'
 import DotsDropdown from '~/components/custom/DotsDropdown.vue'
+import Popup from '~/components/custom/Popup.vue'
+import MyInput from '~/components/custom/MyInput.vue'
+import TiptapEditor from '~/components/TiptapEditor.vue'
 
 const templatesTabs = ref('email')
 
@@ -87,6 +90,18 @@ const smsTemplates = ref([
     name: 'Отказ'
   }
 ])
+const createTemplatePopup = ref(true)
+const templateName = ref('')
+const templateTheme = ref('')
+const templateContent = ref('')
+
+function handleOpenCreateTemplate() {
+  createTemplatePopup.value = true
+}
+
+function handleCloseCreateTemplatePopup() {
+  createTemplatePopup.value = false
+}
 </script>
 
 <template>
@@ -97,7 +112,8 @@ const smsTemplates = ref([
           <p class="text-xl text-space mb-2.5 font-semibold">Шаблоны писем</p>
           <p class="text-sm text-bali font-normal leading-150">Редактируйте и&nbsp;настраивайте автоотправку писем</p>
         </div>
-        <UiButton variant="action" size="semiaction" class="font-semibold">Создать шаблон</UiButton>
+        <UiButton variant="action" size="semiaction" class="font-semibold" @click="handleOpenCreateTemplate">Создать
+          шаблон</UiButton>
       </div>
       <div class="bg-catskill w-full px-25px py-15px rounded-b-fifteen">
         <BtnTab :tabs="[
@@ -204,5 +220,59 @@ const smsTemplates = ref([
         <p class="text-15px font-medium text-bali">Вы еще не создавали шаблоны</p>
       </div>
     </div>
+    <transition name="fade">
+      <Popup :isOpen="createTemplatePopup" @close="handleCloseCreateTemplatePopup" :width="'790px'"
+        :overflowContainer="true" :maxHeight="true" :disableOverflowHidden="true" :lgSize="true">
+        <div>
+          <p class="text-xl font-semibold text-space mb-2.5 leading-130">Новый шаблон</p>
+          <p class="text-sm text-slate-custom leading-150 mb-25px">Короткое описание того что такое шаблон письма</p>
+          <div class="mb-25px">
+            <p class="text-sm font-medium text-space mb-15px">Название шаблона</p>
+            <MyInput :placeholder="'Например: Приглашаем на вакансию'" v-model="templateName" />
+          </div>
+          <div>
+            <div class="flex justify-between w-full">
+              <p class="text-sm font-medium text-space">Тема письма</p>
+              <button class="flex items-center gap-x-5px">
+                <svg-icon name="accordion-plus" width="20" height="20" /><span
+                  class="text-sm font-medium text-dodger">Добавить переменную</span>
+              </button>
+            </div>
+            <MyInput :placeholder="'Например: Приглашаем на вакансию'" v-model="templateTheme" />
+          </div>
+          <div>
+            <div class="flex justify-between w-full">
+              <p class="text-sm font-medium text-space">Содержание письма</p>
+              <button class="flex items-center gap-x-5px">
+                <svg-icon name="accordion-plus" width="20" height="20" /><span
+                  class="text-sm font-medium text-dodger">Добавить переменную</span>
+              </button>
+            </div>
+            <TiptapEditor v-model="templateContent" />
+          </div>
+          <div>
+            <UiButton variant="action" size="action">Создать</UiButton>
+            <UiButton variant="back" size="back">Отмена</UiButton>
+          </div>
+        </div>
+      </Popup>
+    </transition>
   </div>
 </template>
+
+<style scoped>
+/* Анимация появления и скрытия */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-leave-from {
+  opacity: 1;
+}
+</style>

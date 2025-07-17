@@ -425,7 +425,7 @@ watch(() => newVacancy.employment, (newValue) => {
         </div>
         <div class="mt-15px mb-3.5">
           <TiptapEditor :model-value="newVacancy.description ? newVacancy.description : ''"
-            @update:model-value="(value) => updateEvent(value, 'description')" />
+            @update:model-value="(value) => updateEvent(value, 'description')" :newVacancy="true" />
         </div>
         <div id v-if="errors.description" class="text-red-500 text-xs mt-1">
           {{ errors.description }}

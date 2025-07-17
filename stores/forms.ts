@@ -8,7 +8,13 @@ export const useForms = defineStore('forms', {
             title: string
             required: boolean
             options?: string[]
-        }>
+        }>,
+        forms: [] as Array<{
+            id: number
+            name: string
+            questions: any[]
+            created?: string
+        }>,
     }),
     actions: {
         setQuestions(questions: any[]) {
@@ -22,6 +28,12 @@ export const useForms = defineStore('forms', {
         },
         removeQuestion(index: number) {
             this.questions.splice(index, 1)
-        }
+        },
+        addForm(form: { id: number; name: string; questions: any[]; created?: string }) {
+            this.forms.push(form)
+        },
+        resetQuestions() {
+            this.questions = []
+        },
     }
 })

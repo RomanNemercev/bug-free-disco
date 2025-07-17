@@ -57,6 +57,9 @@ const isOpenDateFrom = ref(false)
 const isOpenDateTo = ref(false)
 const answers = ref([])
 const companyName = ref('OOO ЗЕЛЕНОГЛАЗОЕ ТАКСИ')
+const openDeleteFormPopup = ref(false)
+const selectedForm = ref(null)
+const selectedFormIndex = ref(null)
 
 function enableBodyScroll() {
   document.body.style.overflow = '' // Включаем прокрутку
@@ -92,6 +95,9 @@ function handleOpenCreateForm() {
 
 function hanldeCloseCreateForm() {
   createNewForm.value = false
+  newFormName.value = ''
+  headerFormName.value = ''
+  questions.value = []
 }
 
 // Инициализация answers при изменении questions
@@ -113,6 +119,55 @@ watch(questions, (newQuestions) => {
 // watch(answers, (newAnswers) => {
 //   formsStore.setAnswers(newAnswers)
 // }, { deep: true })
+
+function confirmCreateNewForm() {
+  const today = new Date()
+  const formattedDate = today.toLocaleDateString('ru-RU').replace(/\./g, '/')
+  const newForm = {
+    id: Date.now(),
+    name: newFormName.value,
+    reply: questions.value.length,
+    changed: formattedDate,
+  }
+  forms.value.push(newForm) // <-- добавляем в локальный массив для рендера
+
+  formsStore.addForm({
+    id: newForm.id,
+    name: newForm.name,
+    questions: questions.value,
+    created: today.toISOString(),
+  })
+  newFormName.value = ''
+  questions.value = []
+  headerFormName.value = ''
+  createNewForm.value = false
+}
+
+function handleCloseDeleteFormPopup() {
+  openDeleteFormPopup.value = false
+}
+
+const handleDropdownSelect = (item, form, index) => {
+  if (item === 'Удалить') {
+    selectedForm.value = form
+    selectedFormIndex.value = index
+    openDeleteFormPopup.value = true
+  }
+  if (item === 'Настроить') {
+    // Логика для редактирования
+  }
+}
+
+// Когда появится сервер, удаление будет через DELETE-запрос,
+// а локальное удаление — только после успешного ответа от сервера.
+function handleDeleteForm() {
+  if (selectedFormIndex.value !== null) {
+    forms.value.splice(selectedFormIndex.value, 1)
+    openDeleteFormPopup.value = false
+    selectedForm.value = null
+    selectedFormIndex.value = null
+  }
+}
 </script>
 
 <template>
@@ -132,7 +187,8 @@ watch(questions, (newQuestions) => {
             <p class="text-lg text-space leading-130 mb-5px">{{ form.name }}</p>
             <p class="text-sm text-bali font-normal">Ответы: {{ form.reply }}</p>
           </div>
-          <DotsDropdown :width="'fit'" :items="['Настроить', 'Удалить']" />
+          <DotsDropdown :width="'fit'" :items="['Настроить', 'Удалить']"
+            @select-item="item => handleDropdownSelect(item, form, index)" />
         </div>
         <div class="bg-catskill py-15px px-25px rounded-b-fifteen text-sm font-medium text-bali">Изменено: {{
           form.changed
@@ -147,7 +203,7 @@ watch(questions, (newQuestions) => {
         :maxHeight="true" :disableOverflowHidden="true" :lgSize="true">
         <div>
           <div>
-            <p class="text-xl font-semibold text-space mb-25px">Информация об анкете</p>
+            <p class="text-xl font-semibold text-space mb-23px">Информация об анкете</p>
             <BtnTab :tabs="[
               { label: 'Вопросы', value: 'questions' },
               { label: 'Предпросмотр', value: 'preview' }
@@ -174,9 +230,9 @@ watch(questions, (newQuestions) => {
                 <MoreQuestions v-model:modelValue="questions" />
               </div>
             </div>
-            <div class="mt-25px flex justify-between">
-              <UiButton variant="semiaction" size="semiaction">Создать</UiButton>
-              <UiButton variant="back" size="second-back" @click="createNewForm = false">Отмена</UiButton>
+            <div class="mt-35px flex justify-between">
+              <UiButton variant="semiaction" size="semiaction" @click="confirmCreateNewForm">Сохранить</UiButton>
+              <UiButton variant="back" size="second-back" @click="hanldeCloseCreateForm">Отмена</UiButton>
             </div>
           </div>
           <div v-else class="pt-25px">
@@ -262,6 +318,22 @@ watch(questions, (newQuestions) => {
             Отмена
           </UiButton>
           <UiButton variant="delete" size="delete">Удалить поле</UiButton>
+        </div>
+      </Popup>
+    </transition>
+    <transition name="fade" @after-leave="enableBodyScroll">
+      <Popup :isOpen="openDeleteFormPopup" :width="'400px'" @close="handleCloseDeleteFormPopup">
+        <p class="leading-normal text-xl font-semibold text-space mb-2.5">
+          Удаление анкеты
+        </p>
+        <p class="text-sm font-normal text-slate-custom mb-25px">
+          Вы действительно хотите удалить анкету {{ selectedForm?.name }} ?
+        </p>
+        <div class="flex justify-between">
+          <UiButton variant="delete" size="delete" @click="handleDeleteForm">Удалить</UiButton>
+          <UiButton variant="back" size="second-back" @click="handleCloseDeleteFormPopup">
+            Отмена
+          </UiButton>
         </div>
       </Popup>
     </transition>

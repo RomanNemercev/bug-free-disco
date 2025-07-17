@@ -33,6 +33,7 @@
 
 <script setup>
 import { Editor, EditorContent } from '@tiptap/vue-3'
+// import { Placeholder } from '@tiptap/extensions'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 
@@ -40,52 +41,52 @@ const props = defineProps({
   modelValue: {
     type: String,
     default: '',
+  },
+  newVacancy: {
+    type: Boolean,
+    default: false,
   }
 })
 
 const emit = defineEmits(['update:modelValue'])
 
+const defaultContent = props.newVacancy
+  ? `<div>
+      <h4>О компании</h4>
+      <ul><li></li></ul>
+    </div>
+    <div>
+      <h4>Требования</h4>
+      <ul><li></li></ul>
+    </div>
+    <div>
+      <h4>Обязанности</h4>
+      <ul><li></li></ul>
+    </div>
+    <div>
+      <h4>Условия</h4>
+      <ul><li></li></ul>
+    </div>`
+  : '<p><span style="color:#bfc8e3;">Начните вводить...</span></p>';
+
 const editor = ref(null)
 
 onMounted(() => {
   editor.value = new Editor({
-      editorProps: {
-        attributes: {
-          class: 'border border-athens py-15px px-3.5 min-h-[460px] max-h-[460px] overflow-y-auto outline-none prose max-w-none rounded-b-fifteen bg-athens-gray',
-        },
+    editorProps: {
+      attributes: {
+        class: 'border border-athens py-15px px-3.5 min-h-[460px] max-h-[460px] overflow-y-auto outline-none prose max-w-none rounded-b-fifteen bg-athens-gray',
       },
-      content: props.modelValue || `<div>
-      <h4>О компании</h4>
-      <ul>
-        <li></li>
-        </ul>
-    </div>
-    <div>
-      <h4>Требования</h4>
-      <ul>
-        <li></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Обязанности</h4>
-      <ul>
-        <li></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Условия</h4>
-      <ul>
-        <li></li>
-      </ul>
-    </div>`,
-      extensions: [StarterKit, Link.configure({
-        openOnClick: true,
-        defaultProtocol: 'https',
-      }),],
-      onUpdate: () => {
-        emit('update:modelValue', editor.value.getHTML()); // обновляем данные в родительском компоненте
-      }
-    });
+    },
+    content: props.modelValue || defaultContent,
+    extensions: [StarterKit, Link.configure({
+      openOnClick: true,
+      defaultProtocol: 'https',
+    }),],
+    onUpdate: () => {
+      emit('update:modelValue', editor.value.getHTML()); // обновляем данные в родительском компоненте
+    }
+  });
 })
 
 
@@ -193,7 +194,7 @@ onMounted(() => {
 //   // },
 // }
 
- 
+
 </script>
 
 <style lang="scss" scoped>
