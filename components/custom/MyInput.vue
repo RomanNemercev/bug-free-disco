@@ -64,6 +64,7 @@ defineExpose({ focus: () => inputRef.value && inputRef.value.focus() })
 
 <style scoped>
 input::placeholder {
+  color: #79869a;
   font-size: 14px;
   font-weight: 400;
   font-family: 'Inter', sans-serif;

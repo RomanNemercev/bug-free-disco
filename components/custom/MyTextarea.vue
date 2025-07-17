@@ -35,7 +35,7 @@ const updateValue = event => {
 </script>
 
 <template>
-  <div>
+  <div class="flex">
     <textarea rows="5"
       class="bg-athens-gray text-sm w-full p-15px border border-athens-gray rounded-ten focus:border-dodger focus:outline-none resize-none"
       @focus="isFocused = true" :placeholder="isFocused ? '' : placeholder" @blur="isFocused = false"

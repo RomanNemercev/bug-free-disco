@@ -2,17 +2,17 @@
     <draggable v-model="items" item-key="id" handle=".drag-handle" animation="200" ghost-class="ghost"
       chosen-class="chosen" @start="onDragStart" @end="onDragEnd">
         <template #item="{ element, index }">
-            <div class="card" :class="{ 'dragging-card': isDragging }">
+            <div class="card first-of-type:mt-4 last-of-type:mb-4" :class="{ 'dragging-card': isDragging }">
                 <div class="drag-handle w-10 h-10 p-2.5 mr-2.5 cursor-grab">
                     <svg-icon name="drag-burger" width="20" height="20" />
                 </div>
                 <div class="card-content flex items-center w-full overflow-hidden">
-                    <MyInput placeholder="Введите значение" v-model="element.title" />
+                    <MyInput :placeholder="props.placeholder" v-model="element.title" />
                 </div>
                 <button class="delete-button" @click="removeCard(index)">
                     <svg-icon name="more-delete" width="18" height="18" />
                 </button>
-                <button v-if="element.plus" class="add-button" @click="addCard(index)">
+                <button v-if="index === items.length - 1" class="add-button text-slate-custom" @click="addCard(index)">
                     <svg-icon name="more-plus" width="18" height="18" />
                 </button>
             </div>
@@ -21,15 +21,28 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import draggable from "vuedraggable";
 import MyInput from "~/components/custom/MyInput.vue";
 
-const items = ref([
-    { id: 1, title: 'Да', plus: false },
-    { id: 2, title: 'Нет', plus: false },
-    { id: 3, title: 'Нет, но готов приобрести', plus: true },
-]);
+const props = defineProps({
+    items: {
+        type: Array,
+        required: true,
+    },
+    placeholder: {
+        type: String,
+        default: "Введите значение",
+    }
+});
+const emit = defineEmits(['update:items']);
+
+const items = computed({
+    get: () => props.items,
+    set: (val) => emit('update:items', val),
+});
+
+const isDragging = ref(false);
 
 const onDragStart = () => {
     isDragging.value = true;
@@ -37,27 +50,24 @@ const onDragStart = () => {
 
 const onDragEnd = () => {
     isDragging.value = false;
-}
+};
 
-const isDragging = ref(false);
-
-// Удаление карточки
 const removeCard = (index) => {
-    if (items.value.length > 1) { // Проверяем длину массива items
-        items.value.splice(index, 1); // Удаляем карточку
+    if (items.value.length > 1) {
+        items.value.splice(index, 1);
+        emit('update:items', [...items.value]);
     } else {
-        alert("Нельзя удалить последнюю карточку"); // Сообщение об ошибке
+        alert("Нельзя удалить последний вариант");
     }
 };
 
-
-// Добавление новой карточки
 const addCard = (index) => {
     const newCard = {
-        ...items.value[index], // Копируем данные текущей карточки
-        id: Date.now(), // Генерируем уникальный ID
+        id: Date.now(),
+        title: '',
     };
-    items.value.splice(index + 1, 0, newCard); // Вставляем карточку после текущей
+    items.value.splice(index + 1, 0, newCard);
+    emit('update:items', [...items.value]);
 };
 </script>
 

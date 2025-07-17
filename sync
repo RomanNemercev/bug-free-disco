@@ -1,0 +1,21 @@
+#!/bin/bash
+
+CURRENT_BRANCH=$(git branch --show-current)
+
+echo "✅ Пушим изменения в $CURRENT_BRANCH"
+git add .
+git commit -m "Save before merge"
+git push origin $CURRENT_BRANCH
+
+echo "➡️ Переход на master и merge с $CURRENT_BRANCH"
+git checkout master
+git pull origin master
+git merge $CURRENT_BRANCH
+git push origin master
+
+echo "↩️ Возврат в $CURRENT_BRANCH и merge master"
+git checkout $CURRENT_BRANCH
+git pull origin $CURRENT_BRANCH
+git merge master
+
+echo "✅ Всё готово! Продолжай работу в $CURRENT_BRANCH"

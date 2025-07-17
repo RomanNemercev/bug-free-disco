@@ -59,9 +59,14 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 const props = defineProps({
   options: {
     type: Array,
-    required: true
+    required: true,
+    validator: (options) => options.every(opt => typeof opt === 'string' || ('name' in opt && 'value' in opt))
   },
   modelValue: {
+    type: Array,
+    default: () => []
+  },
+  initialValue: {
     type: Array,
     default: () => []
   },
@@ -72,9 +77,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
 const dropDown = ref(null)
 const isDropDownVisible = ref(false)
-const selectedOptions = ref([...props.modelValue])
+const selectedOptions = ref([])
 
 // Хелперы для работы с опциями (строки или объекты)
 const getOptionValue = (option) => {
@@ -85,62 +91,151 @@ const getOptionLabel = (option) => {
   return typeof option === 'object' && option !== null ? option.name : option
 }
 
+// Инициализация selectedOptions
+const initializeSelectedOptions = () => {
+  let initial = props.initialValue.length > 0 ? props.initialValue : props.modelValue
+  console.log('Initializing selectedOptions:', { initial, options: props.options })
+  if (initial.length > 0) {
+    selectedOptions.value = initial
+      .map(val => {
+        const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(val))
+        return option || null
+      })
+      .filter(val => val !== null)
+  } else {
+    selectedOptions.value = []
+  }
+  console.log('Initialized selectedOptions:', selectedOptions.value)
+}
+
+// Отображаемое значение
 const displayValue = computed(() => {
   if (!selectedOptions.value.length) return props.defaultValue
-
   return selectedOptions.value
     .map(option => getOptionLabel(option))
     .join(', ')
 })
 
+// Проверка, выбрана ли опция
 const isSelected = (option) => {
   const optionValue = getOptionValue(option)
-  return selectedOptions.value.some(selected => {
-    const selectedValue = getOptionValue(selected)
-    return selectedValue === optionValue
-  })
+  return selectedOptions.value.some(selected => getOptionValue(selected) === optionValue)
 }
 
+// Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
 }
 
+// Выбор/снятие опции
 const toggleOptionSelect = (option) => {
   const optionValue = getOptionValue(option)
-  const index = selectedOptions.value.findIndex(selected => {
-    const selectedValue = getOptionValue(selected)
-    return selectedValue === optionValue
-  })
-
+  const index = selectedOptions.value.findIndex(selected => getOptionValue(selected) === optionValue)
   if (index === -1) {
     selectedOptions.value.push(option)
   } else {
     selectedOptions.value.splice(index, 1)
   }
-
-  emit('update:modelValue', [...selectedOptions.value])
+  console.log('toggleOptionSelect:', { selectedOptions: selectedOptions.value, emitted: selectedOptions.value.map(getOptionValue) })
+  emit('update:modelValue', selectedOptions.value.map(getOptionValue))
 }
 
+// Сброс выбора
 const resetSelection = () => {
   selectedOptions.value = []
+  console.log('resetSelection: Cleared selectedOptions')
   emit('update:modelValue', [])
 }
 
-const closeDropDown = (element) => {
-  if (!dropDown.value?.contains(element.target)) {
+// Закрытие выпадающего списка при клике вне
+const closeDropDown = (event) => {
+  if (!dropDown.value?.contains(event.target)) {
     isDropDownVisible.value = false
   }
 }
 
+// Проверка валидности selectedOptions при изменении options
+watch(() => props.options, (newOptions) => {
+  console.log('watch: options changed', { oldOptions: props.options, newOptions, selectedOptions: selectedOptions.value })
+  if (selectedOptions.value.length > 0) {
+    const validOptions = selectedOptions.value.filter(selected => {
+      const selectedValue = getOptionValue(selected)
+      const isValid = newOptions.some(opt => getOptionValue(opt) === selectedValue)
+      console.log('Checking option:', { selectedValue, isValid })
+      return isValid
+    })
+    if (validOptions.length !== selectedOptions.value.length) {
+      console.log('watch: updating selectedOptions', { validOptions })
+      selectedOptions.value = validOptions
+      emit('update:modelValue', validOptions.map(getOptionValue))
+    }
+  }
+}, { deep: true, immediate: true })
+
+// Синхронизация modelValue → selectedOptions
+watch(() => props.modelValue, (newValue) => {
+  console.log('watch: modelValue changed', { newValue, selectedOptions: selectedOptions.value })
+  if (JSON.stringify(newValue) !== JSON.stringify(selectedOptions.value.map(getOptionValue))) {
+    selectedOptions.value = newValue
+      .map(val => {
+        const option = props.options.find(opt => getOptionValue(opt) === val)
+        return option || null
+      })
+      .filter(val => val !== null)
+    console.log('watch: updated selectedOptions', { selectedOptions: selectedOptions.value })
+    emit('update:modelValue', selectedOptions.value.map(getOptionValue))
+  }
+}, { deep: true, immediate: true })
+
+// Обработка initialValue
+watch(() => props.initialValue, (newInitial) => {
+  console.log('watch: initialValue changed', { newInitial, selectedOptions: selectedOptions.value })
+  if (newInitial.length > 0 && JSON.stringify(newInitial) !== JSON.stringify(selectedOptions.value.map(getOptionValue))) {
+    selectedOptions.value = newInitial
+      .map(val => {
+        const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(val))
+        return option || null
+      })
+      .filter(val => val !== null)
+    console.log('watch: updated selectedOptions from initialValue', { selectedOptions: selectedOptions.value })
+    emit('update:modelValue', selectedOptions.value.map(getOptionValue))
+  }
+}, { immediate: true })
+
 onMounted(() => {
   window.addEventListener('click', closeDropDown)
-})
-
-watch(() => props.modelValue, (newValue) => {
-  selectedOptions.value = newValue ? [...newValue] : []
+  initializeSelectedOptions()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', closeDropDown)
 })
 </script>
+
+<style scoped>
+.option:not(:last-child) {
+  border-bottom: 1px solid #f4f6f8;
+}
+
+.check-item:hover {
+  border: 1px solid #5898FF;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-4px);
+  opacity: 0;
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s ease-in-out;
+}
+</style>
