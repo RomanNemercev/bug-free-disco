@@ -26,7 +26,7 @@
   import FormAuthPlatform from '~/components/custom/page-parts/FormAuthPlatform.vue'
   import ConnectedPlatform from '~/components/custom/page-parts/ConnectedPlatform.vue'
   import CardPlatform from '@/components/custom/page-parts/CardPlatform.vue'
-  import { getProfile as profileHh, auth as authHh, getCode as getCodeHh } from '@/utils/hhAccount'
+  import { getProfile as profileHh, auth as authHh, getAvailableTypes as typesHh } from '@/utils/hhAccount'
   import { capitalize } from '@/helpers/handlers'
 
   import { useCartStore } from '@/stores/cart'
@@ -49,6 +49,8 @@
   import currency from '~/src/data/currency.json'
   import responses from '~/src/data/responses.json'
 
+  import { inject } from 'vue';
+
   const ArrayMajors = majors
   const ArrayIndustry = industry
   const ArraySpecialization = specialization
@@ -60,57 +62,10 @@
   const ArrayOptions = MoreOptions
   const ArrayCurrency = currency
   const cartStore = useCartStore()
-  const platforms = ref([
-    {
-        'platform': 'hh',
-        'domain': 'hh.ru',
-        'svg': 'hh-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'rabota',
-        'domain': 'rabota.ru',
-        'svg': 'rabota-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'zarplata',
-        'domain': 'zarplata.ru',
-        'svg': 'zarplata-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'superjob',
-        'domain': 'superjob.ru',
-        'svg': 'superjob-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'careerist',
-        'domain': 'careerist.ru',
-        'svg': 'careerist-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'youla',
-        'domain': 'youla.ru',
-        'svg': 'popup-youla',
-        'isAuthenticated': false,
-        'data' : null
-    },
-    {
-        'platform': 'avito',
-        'domain': 'avito.ru',
-        'svg': 'avito-50',
-        'isAuthenticated': false,
-        'data' : null
-    },
-])
+  // const platforms = ref(PLATFORMS_DEFAULT)
+  
+  const platforms = ref(inject('platformsGlobal'))
+
   const activePlatform = ref(platforms.value.findIndex(platform => platform.platform === useRoute().query.platform) || 0)
   const btnAuthDisabled = ref(false)
 
@@ -369,15 +324,26 @@ function setCookie(name, value, days) {
 
 onBeforeMount(async () => {
     // запрашиваем, есть ли авторизация на hh.ru
-    const { data, error } = await profileHh()
-    
-    if (!error) {
+    if (!inject('isPlatforms')) {
+      const { data, error } = await profileHh()
+      if (!error) {
         platforms.value[0].isAuthenticated = true
-        platforms.value[0].data = {email: data.data.email}
-        console.log('data profile', platforms.value[0].data.email);
+        platforms.value[0].data = {
+          email: data.data.email,
+          employer_id: data.data.employer_id,
+          manager_id: data.data.manager_id
+        }
+      }
+      const { types, errorTypesHh } = await typesHh(data.data.employer.id, data.data.manager.id)
+      if (!error && !errorTypesHh) {
+        platforms.value[0].types = types
+        console.log('platrofms with types', types);
+      } else {
+        console.log('errorTypesHh', errorTypesHh);
+      }
     }
+    
     addAuthPopup.value = isAuthOpen ? true : false
-    alert(addAuthPopup.value);
 })
 
 onMounted(async () => {
@@ -388,8 +354,8 @@ onMounted(async () => {
             const response = await authHh()
             if (!error) {
                 window.location.href = response.data.url_auth
-                platforms.value[0].isAuthenticated = true
-                platforms.value[0].data = response.data
+                platforms[0].isAuthenticated = true
+                platforms[0].data = response.data
             } else {
                 errorAuthPlatform.value = error
             }

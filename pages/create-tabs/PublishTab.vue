@@ -22,7 +22,7 @@
                   maxHeight
                   :lgSize="true"
             >
-            <AddPublication @closePopup="closePopup"/>
+            <AddPublication/>
             </Popup>
         </div>
 
@@ -94,7 +94,7 @@ import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
-import AddPublication from "@/components/platforms/AddPublication.vue";
+import AddPublication from "~/components/platforms/AddPublication.vue";
 
 const data = ref([
     { id: 1, vacancy: "Менеджер по продажам не детских игрушек", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", icon: "sj20", isPng: false, imagePath: "", views: 3250, responses: 492, expires: "18.12" },

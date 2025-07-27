@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-between mb-3.5">
           <div class="flex items-center gap-2.5">
-            <svg-icon name="hh" width="41" height="40" />
+            <svg-icon :name="platform.platform" width="41" height="40" />
             <p class="text-sm font-medium text-slate-custom">{{ platform.domain }}</p>
           </div>
           <DotsDropdonw :platform :items="dropItems" @select-item="handleSelectItem" />
