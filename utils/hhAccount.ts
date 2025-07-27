@@ -148,3 +148,53 @@ export const getCode = async () => {
         return result.value;
     }
 };
+
+export const getAvailableTypes = async (employerId: string, managerId: string) => {
+    const config = useRuntimeConfig();
+
+    // Токен сервера из cookie
+    const serverTokenCookie = useCookie('auth_token');
+    const serverToken = serverTokenCookie.value;
+    if (!serverToken) {
+        console.error('Токен сервера не найден в cookie');
+        return null;
+    }
+
+    // Токен пользователя из cookie
+    const userTokenCookie = useCookie('auth_user');
+    const userToken = userTokenCookie.value;
+    const result = ref<{ types: any, errorTypes: string | null}>({ types: null, errorTypes: null });
+    if (!userToken) {
+        console.error('Токен пользователя не найден в cookie');
+        return null;
+    }
+    
+    try {
+        const response = await $fetch<PlatformResponse>('/hh/avalibale-types', {
+            method: 'POST',
+            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${serverToken}`,
+                'X-Auth-User': userToken, // Новый заголовок
+            },
+            body: { employer_id: employerId, manager_id: managerId },
+        });
+
+        result.value.types = response.data.items;
+    } catch (err: any) {
+        console.log('error types available ', err.response._data.message);
+        if (err.response?.status === 404) {
+            result.value.errorTypes = err.response._data.message;
+        }
+        if (err.response?.status === 401) {
+            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
+            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            // Middleware сработает автоматически при следующем роутинге
+            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+            navigateTo('/auth');
+        }
+    } finally {
+        return result.value;
+    }
+}

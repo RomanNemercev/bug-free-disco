@@ -43,7 +43,7 @@ const tabs: Record<string, () => Promise<any>> = {
   funnel: () => import('@/pages/create-tabs/FunnelTab.vue'),
 }
 
-const currentTab = ref<keyof typeof tabs>('info')
+const currentTab = ref<keyof typeof tabs>('search')
 const showLoader = ref(false)
 let loaderTimeout: NodeJS.Timeout | null = null
 
