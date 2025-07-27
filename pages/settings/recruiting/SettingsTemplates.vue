@@ -90,7 +90,7 @@ const smsTemplates = ref([
     name: 'Отказ'
   }
 ])
-const createTemplatePopup = ref(true)
+const createTemplatePopup = ref(false)
 const templateName = ref('')
 const templateTheme = ref('')
 const templateContent = ref('')
@@ -128,7 +128,7 @@ function handleCloseCreateTemplatePopup() {
     <div v-if="templatesTabs === 'email'">
       <div v-if="emailTemplates.length > 0">
         <div class="bg-catskill rounded-t-fifteen py-25px px-35px mb-1px">
-          <p class="text-sm font-medium text-bali leading-150">Название шаблона</p>
+          <p class="text-sm font-medium text-bali leading-normal">Название шаблона</p>
         </div>
         <div
           class="bg-white last:rounded-b-fifteen [&>*:not(:last-child)]:border-b [&>*:not(:last-child)]:border-athens">
@@ -226,14 +226,14 @@ function handleCloseCreateTemplatePopup() {
         <div>
           <p class="text-xl font-semibold text-space mb-2.5 leading-130">Новый шаблон</p>
           <p class="text-sm text-slate-custom leading-150 mb-25px">Короткое описание того что такое шаблон письма</p>
-          <div class="mb-25px">
+          <div class="mb-27px">
             <p class="text-sm font-medium text-space mb-15px">Название шаблона</p>
             <MyInput :placeholder="'Например: Приглашаем на вакансию'" v-model="templateName" />
           </div>
-          <div>
-            <div class="flex justify-between w-full">
+          <div class="mb-17px">
+            <div class="flex justify-between w-full mb-13px">
               <p class="text-sm font-medium text-space">Тема письма</p>
-              <button class="flex items-center gap-x-5px">
+              <button class="flex items-center gap-x-1">
                 <svg-icon name="accordion-plus" width="20" height="20" /><span
                   class="text-sm font-medium text-dodger">Добавить переменную</span>
               </button>
@@ -241,7 +241,7 @@ function handleCloseCreateTemplatePopup() {
             <MyInput :placeholder="'Например: Приглашаем на вакансию'" v-model="templateTheme" />
           </div>
           <div>
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between w-full mb-13px">
               <p class="text-sm font-medium text-space">Содержание письма</p>
               <button class="flex items-center gap-x-5px">
                 <svg-icon name="accordion-plus" width="20" height="20" /><span
@@ -250,9 +250,9 @@ function handleCloseCreateTemplatePopup() {
             </div>
             <TiptapEditor v-model="templateContent" />
           </div>
-          <div>
-            <UiButton variant="action" size="action">Создать</UiButton>
-            <UiButton variant="back" size="back">Отмена</UiButton>
+          <div class="mt-[24px]">
+            <UiButton variant="action" size="semiaction" class="mr-15px">Создать</UiButton>
+            <UiButton variant="back" size="semiaction" @click="handleCloseCreateTemplatePopup">Отмена</UiButton>
           </div>
         </div>
       </Popup>
@@ -274,5 +274,9 @@ function handleCloseCreateTemplatePopup() {
 
 .fade-leave-from {
   opacity: 1;
+}
+
+:deep(.ProseMirror) {
+  min-height: 299px;
 }
 </style>
