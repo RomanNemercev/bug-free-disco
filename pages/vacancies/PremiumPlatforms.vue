@@ -804,7 +804,7 @@ onMounted(async () => {
           </div>
           <div class="mt-15px mb-3.5">
             <client-only>
-              <tiptap-editor />
+              <TiptapEditor></TiptapEditor>
             </client-only>
           </div>
           <p class="text-xs text-bali font-normal mb-25px">

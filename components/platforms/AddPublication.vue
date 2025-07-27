@@ -67,7 +67,7 @@
           </div>
           <GenerateButton></GenerateButton>
           <div class="mt-15px mb-25px">
-          <TiptapEditor v-model="defaultContent" class="mb-15px" />
+          <TiptapEditor class="mb-15px" />
           <p class="text-xs text-bali font-normal">
             Максимум 700 символов. Использовано 0 символов.
           </p>
@@ -171,7 +171,7 @@
 import DropDownList from './DropDownList.vue';
 import DropDownTypes from './DropDownTypes.vue';
 import MyInput from '~/components/custom/MyInput.vue';
-import TiptapEditor from '../TiptapEditor.vue';
+import TiptapEditor from '~/components/TiptapEditor.vue'
 import GenerateButton from '../custom/GenerateButton.vue';
 import MyAccordion from '../custom/MyAccordion.vue';
 import MoreOptions from '~/src/data/more-options.json'
