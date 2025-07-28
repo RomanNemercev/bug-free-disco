@@ -38,22 +38,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { ref, watch } from 'vue';
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: '',
-  },
-  newVacancy: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(['update:modelValue']);
-
-const defaultContent = computed(() => {
-  return props.newVacancy
-    ? `<div>
+const defaultContent = `<div>
         <h4>О компании</h4>
         <ul><li></li></ul>
       </div>
@@ -68,9 +53,20 @@ const defaultContent = computed(() => {
       <div>
         <h4>Условия</h4>
         <ul><li></li></ul>
-      </div>`
-    : '<p></p>';
+      </div>`;
+
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: defaultContent,
+  },
+  newVacancy: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits(['update:modelValue']);
 
 const editor = ref(null)
 
