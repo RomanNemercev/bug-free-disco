@@ -76,7 +76,6 @@ const updateDate = (newDate) => {
 
 
 watch(() => props.isOpen, (newStatus) => {
-  alert('dfgdfg');
   console.log('Новое значение', newStatus)
   isDropDownVisible.value = newStatus
 });

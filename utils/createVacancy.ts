@@ -2,7 +2,10 @@ export const createVacancy = async (vacancyData: any) => {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
-
+    const bodyData = new FormData();
+    Object.entries(vacancyData).forEach(([key, value]) => {
+        bodyData.append(key, value);
+    });
 
     try {
         const response: {data: any, message: string } = await $fetch(`${config.public.apiBase}/vacancies`, {
@@ -12,7 +15,7 @@ export const createVacancy = async (vacancyData: any) => {
                     Authorization: `Bearer ${authToken}`,
                     'X-Auth-User': `${authUser}`
                 },
-            body: vacancyData,
+            body: bodyData,
         })
 
         return { data: response, error: null };
