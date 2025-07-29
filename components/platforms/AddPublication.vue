@@ -56,6 +56,7 @@
             </p>
             <MyInput
                 placeholder="Код вакансии"
+                v-model="data.code"
             />
           </div>
         </div>
@@ -78,17 +79,21 @@
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Отрасль компании
             </p>
-            <DropDownTypes 
-            :options="platforms[0]?.types"
-            ></DropDownTypes>
+            <DropDownRoles 
+            :options="roles"
+            :selected="currectRole"
+            v-model="currectRole"
+            ></DropDownRoles>
           </div>
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Выберите специализацию
             </p>
-            <MyInput
-                placeholder="Введите число дней"
-            />
+            <DropDownRoles 
+            :options="currectRole?.roles"
+            :selected="currectRole?.roles[0]"
+            v-model="data.professional_roles[0]"
+            ></DropDownRoles>
           </div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
@@ -97,7 +102,7 @@
               Тип занятости
             </p>
             <DropDownTypes 
-            :options="platforms[0]?.types"
+            :options="[]"
             ></DropDownTypes>
           </div>
           <div class="w-full">
@@ -273,6 +278,7 @@
 <script setup>
 import DropDownList from './DropDownList.vue';
 import DropDownTypes from './DropDownTypes.vue';
+import DropDownRoles from './DropDownRoles.vue';
 import MyDropdown from '~/components/custom/MyDropdown.vue';
 import MyInput from '~/components/custom/MyInput.vue';
 import MyCheckbox from '~/components/custom/MyCheckbox.vue';
@@ -289,7 +295,12 @@ import CarId from '~/src/data/car-id.json'
 import AccordionAdditional from '~/src/data/accordion-additional.json'
 import currency from '~/src/data/currency.json'
 import { inject } from 'vue'
-import { getProfile as profileHh, getAvailableTypes as typesHh, addDraft as addDraftHh } from '@/utils/hhAccount'
+import { 
+  getProfile as profileHh, 
+  getAvailableTypes as typesHh, 
+  addDraft as addDraftHh,
+  getRoles as getRolesHh
+} from '@/utils/hhAccount'
 
 const platforms = ref(inject('platformsGlobal'))
 const data = ref({})
@@ -298,9 +309,7 @@ data.value.workSpace = '1'
 data.value.area = {
   "id": "1"
 }
-data.value.professional_roles = [{
-    "id": "92" 
-}]
+data.value.professional_roles = []
 data.value.billing_types = {
   "id": "free"
 }
@@ -308,6 +317,8 @@ const ArrayAdditional = ref(AccordionAdditional)
 const ArrayOptions = ref(MoreOptions)
 const ArrayCarId = ref(CarId)
 const ArrayCurrency = ref(currency)
+const roles = ref(data.value.professional_roles[0]);
+const currectRole = ref(null)
 
 const cards = [
   {
@@ -376,6 +387,14 @@ onBeforeMount(async () => {
       if (!error && !errorTypes) {
         platforms.value[0].types = types
       }
+  }
+
+  const { roles, errorRoles } = await getRolesHh()
+  if (!errorRoles) {
+    roles.value = roles.categories
+    currectRole.value = roles.value[0]
+    data.value.professional_roles[0] = currectRole.value
+    console.log('roles', currectRole.value);
   }
 })
 
