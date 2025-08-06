@@ -25,4 +25,5 @@ import { provide } from 'vue';
 
 provide('platformsGlobal',  PLATFORMS_DEFAULT)
 provide('isPlatforms', false)
+provide('vacancyCurrect', ref(null));
 </script>

@@ -11,7 +11,8 @@
             </p>
             <DropDownList 
             :options="platforms" 
-            :v-model="data.platform"
+            v-model="data.platform"
+            :selected="data.platform"
             @update:model-value="$event => changePlatform($event)"
             ></DropDownList>
           </div>
@@ -23,6 +24,7 @@
             </p>
             <DropDownTypes 
             :options="platforms[0]?.types"
+            :selected="data.billing_types"
             @update:model-value="$event => changeBalance($event)"
             ></DropDownTypes>
           </div>
@@ -57,6 +59,7 @@
             <MyInput
                 placeholder="Код вакансии"
                 v-model="data.code"
+                @update:model-value="$event => updateEvent($event, 'code')"
             />
           </div>
         </div>
@@ -69,7 +72,11 @@
           </div>
           <GenerateButton></GenerateButton>
           <div class="mt-15px mb-25px">
-          <TiptapEditor v-model="data.description" class="mb-15px" />
+          <TiptapEditor 
+            v-model="data.description" 
+            class="mb-15px" 
+            @update:model-value="$event => updateEvent($event, 'description')"
+          />
           <p class="text-xs text-bali font-normal">
             Максимум 700 символов. Использовано 0 символов.
           </p>
@@ -80,9 +87,10 @@
               Отрасль компании
             </p>
             <DropDownRoles 
-            :options="roles"
-            :selected="currectRole"
-            v-model="currectRole"
+            :options="currectRole"
+            :selected="data.industry"
+            v-model="data.professional_roles['0']"
+            @update:model-value="$event => updateRoles($event)"
             ></DropDownRoles>
           </div>
           <div class="w-full">
@@ -90,8 +98,8 @@
               Выберите специализацию
             </p>
             <DropDownRoles 
-            :options="currectRole?.roles"
-            :selected="currectRole?.roles[0]"
+            :options="data.industry.roles"
+            :selected="data.professional_roles[0]"
             v-model="data.professional_roles[0]"
             ></DropDownRoles>
           </div>
@@ -129,7 +137,7 @@
               Опыт работы
             </p>
             <MyInput
-                placeholder="Код вакансии"
+                placeholder="Опыт работы"
             />
           </div>
         </div>
@@ -166,18 +174,21 @@
               Заработная плата / мес
             </p>
             <div class="flex items-center gap-[10px]">
-              <div class="w-full">
+              <!-- <div class="w-full">
                 <MyInput
                 placeholder="От"
                 type="Number"
+                v-model="data.salary_range?.from"
+                @update:model-value="$event => updateEvent($event, 'salary_range.from')"
                 />
-              </div>
-              <div class="w-full">
+              </div> -->
+              <!-- <div class="w-full">
                 <MyInput
                 placeholder="До"
                 type="Number"
-                />
-              </div>
+                v-model="data.salary_range?.to"
+                /> 
+              </div>-->
             </div>
           </div>
           <div class="w-full">
@@ -263,6 +274,9 @@
             <UiButton @click="savePublication" variant="action" size="semiaction" class="font-semibold">
               Опубликовать
             </UiButton>
+            <div class="status" v-if="status">
+              {{ status }}
+            </div>
           </div>
           <div class="w-full flex justify-end">
             <UiButton variant="semiaction" size="semiaction" class="text-space">
@@ -294,6 +308,7 @@ import MoreOptions from '~/src/data/more-options.json'
 import CarId from '~/src/data/car-id.json'
 import AccordionAdditional from '~/src/data/accordion-additional.json'
 import currency from '~/src/data/currency.json'
+import { PLATFORM_PROPERTIES } from '@/src/constants'
 import { inject } from 'vue'
 import { 
   getProfile as profileHh, 
@@ -301,8 +316,18 @@ import {
   addDraft as addDraftHh,
   getRoles as getRolesHh
 } from '@/utils/hhAccount'
+import { getVacancy } from '@/utils/getVacancies';
+import { useRoute } from 'vue-router'
 
 const platforms = ref(inject('platformsGlobal'))
+const isPlatforms = ref(inject('isPlatforms'))
+const vacancyData = inject('vacancyCurrect')
+const currectRole = ref(null)
+const roleData = ref(null)
+const status = ref(null)
+
+
+
 const data = ref({})
 data.value.days = "30"
 data.value.workSpace = '1'
@@ -310,15 +335,57 @@ data.value.area = {
   "id": "1"
 }
 data.value.professional_roles = []
-data.value.billing_types = {
-  "id": "free"
+const { roles, errorRoles } = await getRolesHh()
+if (!errorRoles) {
+  roles.value = roles.categories
+  currectRole.value = roles.value
+  console.log('currectRole', currectRole.value)
+  data.value.professional_roles[0] = currectRole.value[0].roles[0]
 }
+// data.value.billing_types = {
+//   "id": "free"
+// }
+data.value.salary_range = {}
+if (vacancyData) {
+  data.value.name = vacancyData.value.name
+  data.value.code = vacancyData.value.code
+  data.value.description = vacancyData.value.description
+  data.value.industry = currectRole.value.filter(function (n) {
+    return n.name == vacancyData.value.industry
+  })[0]
+  if (data.value.industry.length == 0) {
+    data.value.professional_roles[0] = vacancyData.value.industry[0]
+  }
+  data.value.professional_roles[0] = data.value.industry.roles.filter(function (n) {
+    return n.name == vacancyData.value.specializations
+  })
+  if (data.value.professional_roles[0].length == 0) {
+    roleData.value = data.value.industry.roles[0]
+    data.value.professional_roles[0] = data.value.industry.roles[0]
+  }
+} 
+
+for (let key of platforms.value) {
+    if (!isPlatforms.value) {
+        if (key.platform == 'hh') {
+          const profile = await profileHh()      
+          if (!profile.error) {
+            key.isAuthenticated = true
+            key.data = profile.data.data
+            isPlatforms.value = true
+            data.value.billing_types = key['types'] ? key['types']['6'] : null
+          }
+        }
+        data.value.platform = key
+        
+        console.log('vacancyCurrect', vacancyData)
+    }
+  }
+
 const ArrayAdditional = ref(AccordionAdditional)
 const ArrayOptions = ref(MoreOptions)
 const ArrayCarId = ref(CarId)
 const ArrayCurrency = ref(currency)
-const roles = ref(data.value.professional_roles[0]);
-const currectRole = ref(null)
 
 const cards = [
   {
@@ -343,6 +410,8 @@ const hoveredCard = ref(null)
 
 const workSpace = ref('1')
 
+const route = useRoute();
+
 const handleCheck = id => {
   selectedCard.value = id
   workSpace.value = id
@@ -361,19 +430,35 @@ const handleWorkSpaceUpdate = newValue => {
 }
 
 const savePublication = async () => {
-  if (data.value.platform === 'hh') {
+  if (data.value.platform.platform === 'hh') {
     console.log('savePublication', data.value);
     const { draft, errorDraft} = await addDraftHh(data.value);
+    if (!errorDraft) {
+      status.value = 'Вакансия успешно опубликована'
+    }
   }
-  
 }
 
 const changeBalance = (value) => {
   data.value.billing_types = value.vacancy_billing_type
 }
 
+const  updateRoles = (value) => {
+  console.log('value', value)
+  data.value.industry = value
+  data.value.professional_roles[0] = value.roles[0]
+  roleData.value = value
+  console.log('prof role', data.value.professional_roles[0])
+  // roleId.value = value
+}
+
 const changePlatform = (value) => {
   data.value.platform = value.platform
+}
+
+const updateEvent = (event, property) => {
+  console.log('event', event, property)
+  // data.value[property] = event
 }
 
 onBeforeMount(async () => {
@@ -389,12 +474,28 @@ onBeforeMount(async () => {
       }
   }
 
-  const { roles, errorRoles } = await getRolesHh()
-  if (!errorRoles) {
-    roles.value = roles.categories
-    currectRole.value = roles.value[0]
-    data.value.professional_roles[0] = currectRole.value
-    console.log('roles', currectRole.value);
+  const vacancyId = route.query.id
+  const globCurrentVacancy = ref(inject('vacancyCurrect'))
+
+  if (vacancyId && !globCurrentVacancy.value) {
+    const  vacancy = await getVacancy(vacancyId)
+    if (vacancy) {
+      globCurrentVacancy.value = vacancy
+    }
+  }
+  
+  if (globCurrentVacancy.value) {
+    for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
+      data.value[key] = globCurrentVacancy.value[key]
+    }
+    if (globCurrentVacancy.value.salary_from) {
+        data.value.salary_range.from = globCurrentVacancy.value.salary_from
+    }
+    if (globCurrentVacancy.value.salary_to) {
+        data.value.salary_range.to = globCurrentVacancy.value.salary_to
+    }
+    data.value.salary_range.currency = 'RUR'
+    data.value.salary_range.gross = true
   }
 })
 

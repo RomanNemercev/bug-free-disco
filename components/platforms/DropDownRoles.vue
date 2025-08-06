@@ -29,7 +29,7 @@
             <div
               class="options-wrapper absolute w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-10 max-h-400px overflow-y-scroll"
               v-if="isDropDownVisible">
-              <template v-for="(option, index) in props.options" :key="index">
+              <template v-for="(option) in props.options" :key="index">
                 <div
                   class="option font-normal py-13px px-15px hover:bg-athens-gray cursor-pointer first:rounded-t-ten last:rounded-b-ten"
                    @click="toggleOptionSelect(option)">
@@ -72,14 +72,13 @@ const props = defineProps({
         default: 'selected', // default | selected
     },
 });
-
+console.log('options - ', props.options);
 
 const dropDown = ref(null);
 const isDropDownVisible = ref(false);
 const emit = defineEmits(['update:modelValue']);
 const selectedOption = ref(props.selected); // Устанавливаем начальное значение
 const isSelected = computed(() => props.variant === 'selected');
-console.log('roles', props.options);
 // Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
     isDropDownVisible.value = !isDropDownVisible.value;
