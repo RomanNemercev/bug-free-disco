@@ -98,7 +98,7 @@
               Выберите специализацию
             </p>
             <DropDownRoles 
-            :options="data.industry.roles"
+            :options="currectRole[data.industry.key]?.roles"
             :selected="data.professional_roles[0]"
             v-model="data.professional_roles[0]"
             ></DropDownRoles>
@@ -325,7 +325,7 @@ const vacancyData = inject('vacancyCurrect')
 const currectRole = ref(null)
 const roleData = ref(null)
 const status = ref(null)
-
+const route = useRoute();
 
 
 const data = ref({})
@@ -334,32 +334,58 @@ data.value.workSpace = '1'
 data.value.area = {
   "id": "1"
 }
+data.value.salary_range = {}
 data.value.professional_roles = []
 const { roles, errorRoles } = await getRolesHh()
 if (!errorRoles) {
-  roles.value = roles.categories
-  currectRole.value = roles.value
-  console.log('currectRole', currectRole.value)
-  data.value.professional_roles[0] = currectRole.value[0].roles[0]
+  currectRole.value = roles.categories
 }
-// data.value.billing_types = {
-//   "id": "free"
-// }
+
+const vacancyId = route.query.id
+const globCurrentVacancy = ref(inject('vacancyCurrect'))
+if (vacancyId) {
+  if (!globCurrentVacancy.value || vacancyId !== globCurrentVacancy.value.id.toString()) {
+    
+    const  vacancy = await getVacancy(vacancyId)
+    if (vacancy) {
+      globCurrentVacancy.value = vacancy
+    }
+  }
+}
+
+if (globCurrentVacancy.value) {
+  for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
+    data.value[key] = globCurrentVacancy.value[key]
+  }
+
+  if (globCurrentVacancy.value['salary_from']) {
+      data.value.salary_range.from = globCurrentVacancy.value['salary_from']
+  }
+  if (globCurrentVacancy.value.salary_to) {
+      data.value.salary_range.to = globCurrentVacancy?.value?.salary_to
+  }
+  data.value.salary_range.currency = 'RUR'
+  data.value.salary_range.gross = true
+}
+
 data.value.salary_range = {}
-if (vacancyData) {
+if (vacancyData.value) {
   data.value.name = vacancyData.value.name
   data.value.code = vacancyData.value.code
   data.value.description = vacancyData.value.description
-  data.value.industry = currectRole.value.filter(function (n) {
+  data.value.industry = currectRole.value.filter(function (n, index) {
+    n.key = index
     return n.name == vacancyData.value.industry
   })[0]
-  if (data.value.industry.length == 0) {
+  console.log('data.value.industry', data.value.industry)
+  if (data.value.industry !== undefined && data.value.industry.length == 0) {
     data.value.professional_roles[0] = vacancyData.value.industry[0]
+    data.value.professional_roles[0] = data.value.industry.roles.filter(function (n) {
+      return n.name == vacancyData.value.specializations
+    })
   }
-  data.value.professional_roles[0] = data.value.industry.roles.filter(function (n) {
-    return n.name == vacancyData.value.specializations
-  })
-  if (data.value.professional_roles[0].length == 0) {
+  
+  if (data.value.professional_roles[0] && data.value.professional_roles[0].length == 0) {
     roleData.value = data.value.industry.roles[0]
     data.value.professional_roles[0] = data.value.industry.roles[0]
   }
@@ -410,8 +436,6 @@ const hoveredCard = ref(null)
 
 const workSpace = ref('1')
 
-const route = useRoute();
-
 const handleCheck = id => {
   selectedCard.value = id
   workSpace.value = id
@@ -444,12 +468,8 @@ const changeBalance = (value) => {
 }
 
 const  updateRoles = (value) => {
-  console.log('value', value)
   data.value.industry = value
   data.value.professional_roles[0] = value.roles[0]
-  roleData.value = value
-  console.log('prof role', data.value.professional_roles[0])
-  // roleId.value = value
 }
 
 const changePlatform = (value) => {
@@ -472,30 +492,6 @@ onBeforeMount(async () => {
       if (!error && !errorTypes) {
         platforms.value[0].types = types
       }
-  }
-
-  const vacancyId = route.query.id
-  const globCurrentVacancy = ref(inject('vacancyCurrect'))
-
-  if (vacancyId && !globCurrentVacancy.value) {
-    const  vacancy = await getVacancy(vacancyId)
-    if (vacancy) {
-      globCurrentVacancy.value = vacancy
-    }
-  }
-  
-  if (globCurrentVacancy.value) {
-    for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
-      data.value[key] = globCurrentVacancy.value[key]
-    }
-    if (globCurrentVacancy.value.salary_from) {
-        data.value.salary_range.from = globCurrentVacancy.value.salary_from
-    }
-    if (globCurrentVacancy.value.salary_to) {
-        data.value.salary_range.to = globCurrentVacancy.value.salary_to
-    }
-    data.value.salary_range.currency = 'RUR'
-    data.value.salary_range.gross = true
   }
 })
 

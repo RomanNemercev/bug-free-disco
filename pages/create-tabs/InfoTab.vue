@@ -143,7 +143,7 @@ const newVacancy = ref({ place: 1, currency: 'RUB (рубль)' })
 if (props.id) {
   const currectVacancy = await getVacancy(props.id)
   if (currectVacancy) {
-    selectedCard.value = currectVacancy?.place.toString() || '1'
+    selectedCard.value = currectVacancy.place ? currectVacancy.place.toString() : '1'
     for (let key in currectVacancy) {
       newVacancy.value[key] = currectVacancy[key]
     }
