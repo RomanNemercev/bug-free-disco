@@ -76,6 +76,17 @@ watch(() => props.newVacancy, () => {
   }
 });
 
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    // Проверяем, отличается ли новое значение от текущего в редакторе, чтобы избежать цикла
+    if (newValue !== editor.value?.getHTML()) {
+      editor.value?.commands.setContent(newValue);
+    }
+  },
+  { immediate: true } // Немедленно применяем при инициализации
+);
+
 onMounted(() => {
   editor.value = new Editor({
     editorProps: {

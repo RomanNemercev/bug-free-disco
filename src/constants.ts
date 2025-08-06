@@ -50,3 +50,17 @@ export const PLATFORMS_DEFAULT = [
         'data' : null
     },
 ];
+
+export const PLATFORM_PROPERTIES = {
+    'hh': {
+      name: {
+        name: 'name',
+      },
+      description: {
+        name: 'description',
+      },
+      code: {
+        name: 'code',
+      },
+    }
+};

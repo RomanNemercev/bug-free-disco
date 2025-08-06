@@ -19,6 +19,7 @@ import PhoneInput from '~/components/custom/PhoneInput.vue'
 import EmailInput from '~/components/custom/EmailInput.vue'
 import CustomDropdown from '~/components/custom/CustomDropdown.vue'
 import GenerateButton from '~/components/custom/GenerateButton.vue'
+import { inject } from 'vue'
 
 import schedule from '~/src/data/work-schedule.json'
 import experience from '~/src/data/experience.json'
@@ -146,8 +147,9 @@ if (props.id) {
     for (let key in currectVacancy) {
       newVacancy.value[key] = currectVacancy[key]
     }
+    inject('currentVacancy', currectVacancy)
   }
-  console.log('vacancy', newVacancy.value)
+  
 }
 const editVacancyData = ref({})
 const newCode = ref('')
