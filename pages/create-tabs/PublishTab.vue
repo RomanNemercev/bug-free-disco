@@ -69,16 +69,16 @@
                     <div>
                         <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" />
                     </div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.vacancy }}</div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.region }}</div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.tariff }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.name }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.area.name }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ item.billing_type?.name ?? 'Стандарт' }}</div>
                     <div>
-                        <CardIcon :icon="item.icon" :isPng="item.isPng" :imagePath="item.imagePath" :width="21"
+                        <CardIcon icon="hh" :isPng="false" imagePath="" :width="21"
                           :height="21" class="px-2.5" />
                     </div>
                     <div class="text-sm font-medium text-space px-2.5">{{ item.views }}</div>
                     <div class="text-sm font-medium text-space px-2.5">{{ item.responses }}</div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.expires }}</div>
+                    <div class="text-sm font-medium text-space px-2.5">{{ dateStringToDots(item.published_at) }}</div>
                     <div>
                         <DotsDropdown :items="dropdownOptions" />
                     </div>
@@ -95,6 +95,8 @@ import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
 import AddPublication from "~/components/platforms/AddPublication.vue";
+import { getPublications } from "~/utils/hhAccount";
+import { dateStringToDots } from "@/helpers/date";
 
 const data = ref([
     { id: 1, vacancy: "Менеджер по продажам не детских игрушек", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", icon: "sj20", isPng: false, imagePath: "", views: 3250, responses: 492, expires: "18.12" },
@@ -114,10 +116,13 @@ const sortKey = ref(""); // Поле для сортировки
 const sortOrder = ref("asc"); // Порядок сортировки
 const sortDirection = ref("asc");
 const isOpenPopup = ref(false);
-
+const publicationsHh = ref([]);
+const publications = await getPublications()
+publicationsHh.value = publications.roles.items
+console.log('publicationsHh.value', publicationsHh.value)
 const sortedData = computed(() => {
-    if (!sortKey.value) return data.value;
-    return [...data.value].sort((a, b) => {
+    if (!sortKey.value) return publicationsHh.value;
+    return [...publicationsHh.value].sort((a, b) => {
         const multiplier = sortOrder.value === "asc" ? 1 : -1;
         if (a[sortKey.value] > b[sortKey.value]) return 1 * multiplier;
         if (a[sortKey.value] < b[sortKey.value]) return -1 * multiplier;

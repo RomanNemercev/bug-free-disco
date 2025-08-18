@@ -203,8 +203,38 @@ export const addDraft = async (data: any) => {
     const config = useRuntimeConfig();
     const bodyData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
-        bodyData.append(key, value);
+        if (Array.isArray(value)) {
+            if (value.length > 0) {
+                if (value[0] !== null) {
+                    console.log(`${key}[0][id]` + value[0].id)
+                    bodyData.append(`${key}[0][id]`, value[0].id);
+                    // for (let index in value[0]) {
+                    //     alert(`${key}[0][${index}]` + value[0][index])
+                    //     bodyData.append(`${key}[0][${index}]`, value[0][index]);
+                    // }
+                }
+            }
+        } else {
+            if (typeof value === 'object') {
+                if (Object.keys(value).length > 0) {
+                    bodyData.append(`${key}[id]`, `${value.id}`);
+                    for (let index in value) {
+                        // console.log('API: ' + `${key}[${index}]` + `${value[index]}`);
+                        // bodyData.append(`${key}[${index}]`, `${value[index]}`);
+                    }
+                }
+            } else {
+                bodyData.append(key, value);
+            }
+            
+        }
+        // if (key == 'professional_roles' ) {
+        //     bodyData.append('professional_roles[0][id]', data.professional_roles[0].id);
+        // } else {
+        //     bodyData.append(key, value);
+        // }
     })
+    
 
     // Токен сервера из cookie
     const serverTokenCookie = useCookie('auth_token');
@@ -237,11 +267,9 @@ export const addDraft = async (data: any) => {
 
         result.value.draft = response.data;
     } catch (err: any) {
-        console.log('error types available ', err.response._data.message);
-        if (err.response?.status === 404) {
+        if (err.response?.status !== 401) {
             result.value.errorDraft = err.response._data.message;
-        }
-        if (err.response?.status === 401) {
+        } else {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
@@ -286,6 +314,53 @@ export const getRoles = async () => {
         result.value.roles = response.data;
     } catch (err: any) {
         console.log('error types available ', err.response._data.message);
+        if (err.response?.status === 404) {
+            result.value.errorRoles = err.response._data.message;
+        }
+        if (err.response?.status === 401) {
+            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
+            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            // Middleware сработает автоматически при следующем роутинге
+            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+            navigateTo('/auth');
+        }
+    } finally {
+        return result.value;
+    }
+}
+
+export const getPublications = async () => {
+    const config = useRuntimeConfig();
+
+    // Токен сервера из cookie
+    const serverTokenCookie = useCookie('auth_token');
+    const serverToken = serverTokenCookie.value;
+    if (!serverToken) {
+        console.error('Токен сервера не найден в cookie');
+        return null;
+    }
+
+    // Токен пользователя из cookie
+    const userTokenCookie = useCookie('auth_user');
+    const userToken = userTokenCookie.value;
+    const result = ref<{ roles: any, errorRoles: string | null}>({ roles: null, errorRoles: null });
+    if (!userToken) {
+        console.error('Токен пользователя не найден в cookie');
+        return null;
+    }
+    
+    try {
+        const response = await $fetch<PlatformResponse>('/hh/publications', {
+            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${serverToken}`,
+                'X-Auth-User': userToken, 
+            },
+        });
+
+        result.value.roles = response.data;
+    } catch (err: any) {
         if (err.response?.status === 404) {
             result.value.errorRoles = err.response._data.message;
         }
