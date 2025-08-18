@@ -379,7 +379,7 @@ onMounted(async () => {
     </p>
     <!-- Первый блок -->
     <div
-      class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px]"
+      class="grid grid-cols-3 gap-15px mb-35px max-w-[875px]"
     >
       <div v-for="(item, index) in platforms.filter((el) => el.isAuthenticated)" class="p-25px bg-white rounded-fifteen flex flex-col">
         <CardPlatform :platform="item" :index="index" />

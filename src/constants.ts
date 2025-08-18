@@ -64,3 +64,26 @@ export const PLATFORM_PROPERTIES = {
       },
     }
 };
+
+export const HH_EMPLOYMENT_TYPES = [
+    {
+        id: "FULL",
+        name: "Полная занятость",
+        siteName: 'Полная'
+    },
+    {
+        id: "PART",
+        name: "Подработка",
+        siteName: 'Частичная'
+    },
+    {
+        id: "PROJECT",
+        name: "Проект или разовое задание",
+        siteName: 'Временная'
+    },
+    {
+        id: "FLY_IN_FLY_OUT",
+        name: "Вахта",
+        siteName: 'Стажировка'
+    }
+]

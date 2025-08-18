@@ -72,7 +72,6 @@ const props = defineProps({
         default: 'selected', // default | selected
     },
 });
-console.log('options - ', props.options);
 
 const dropDown = ref(null);
 const isDropDownVisible = ref(false);
@@ -86,7 +85,6 @@ const toggleDropDown = () => {
 
 // Выбор значения
 const toggleOptionSelect = (option) => {
-    console.log(option);
     selectedOption.value = option || null;
     emit('update:modelValue', option || null);
     isDropDownVisible.value = false;
@@ -98,6 +96,15 @@ const closeDropDown = (element) => {
         isDropDownVisible.value = false;
     }
 };
+
+// Watch for changes in props.selected and update selectedOption
+watch(
+  () => props.selected,
+  (newSelected) => {
+    selectedOption.value = newSelected || null;
+  },
+  { deep: true } // Watch for deep changes if selected is an object
+);
 
 onMounted(() => {
     window.addEventListener('click', closeDropDown);

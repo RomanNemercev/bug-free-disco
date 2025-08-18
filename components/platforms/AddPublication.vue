@@ -88,19 +88,19 @@
             </p>
             <DropDownRoles 
             :options="currectRole"
-            :selected="data.industry"
-            v-model="data.professional_roles['0']"
-            @update:model-value="$event => updateRoles($event)"
+            :selected="data.industry ?? ''"
+            @update:model-value="$event => updateIndustry($event)"
             ></DropDownRoles>
           </div>
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Выберите специализацию
             </p>
-            <DropDownRoles 
+            <DropDownRoles
             :options="currectRole[data.industry.key]?.roles"
             :selected="data.professional_roles[0]"
             v-model="data.professional_roles[0]"
+            @update:model-value="$event => updateRoles($event)"
             ></DropDownRoles>
           </div>
         </div>
@@ -110,7 +110,9 @@
               Тип занятости
             </p>
             <DropDownTypes 
-            :options="[]"
+            :options=HH_EMPLOYMENT_TYPES
+            :selected="data.employment_form"
+            v-model="data.employment_form"
             ></DropDownTypes>
           </div>
           <div class="w-full">
@@ -308,7 +310,7 @@ import MoreOptions from '~/src/data/more-options.json'
 import CarId from '~/src/data/car-id.json'
 import AccordionAdditional from '~/src/data/accordion-additional.json'
 import currency from '~/src/data/currency.json'
-import { PLATFORM_PROPERTIES } from '@/src/constants'
+import { PLATFORM_PROPERTIES, HH_EMPLOYMENT_TYPES } from '@/src/constants'
 import { inject } from 'vue'
 import { 
   getProfile as profileHh, 
@@ -327,15 +329,13 @@ const roleData = ref(null)
 const status = ref(null)
 const route = useRoute();
 
-
 const data = ref({})
 data.value.days = "30"
 data.value.workSpace = '1'
-data.value.area = {
-  "id": "1"
-}
+data.value.areas = [{"id":"1"}]
 data.value.salary_range = {}
-data.value.professional_roles = []
+data.value.professional_roles = [null]
+data.value.employment_form = null
 const { roles, errorRoles } = await getRolesHh()
 if (!errorRoles) {
   currectRole.value = roles.categories
@@ -352,6 +352,7 @@ if (vacancyId) {
     }
   }
 }
+
 
 if (globCurrentVacancy.value) {
   for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
@@ -377,36 +378,49 @@ if (vacancyData.value) {
     n.key = index
     return n.name == vacancyData.value.industry
   })[0]
-  console.log('data.value.industry', data.value.industry)
   if (data.value.industry !== undefined && data.value.industry.length == 0) {
-    data.value.professional_roles[0] = vacancyData.value.industry[0]
     data.value.professional_roles[0] = data.value.industry.roles.filter(function (n) {
       return n.name == vacancyData.value.specializations
     })
   }
   
-  if (data.value.professional_roles[0] && data.value.professional_roles[0].length == 0) {
+  if (data.value.professional_roles.length == 0) {
     roleData.value = data.value.industry.roles[0]
     data.value.professional_roles[0] = data.value.industry.roles[0]
   }
-} 
+}
+
+data.value.employment_form = HH_EMPLOYMENT_TYPES.filter( (item, i) => {
+      return item.siteName == globCurrentVacancy.value.employment
+})[0]
+
+if (!inject('isPlatforms')) {
+    const { data, error } = await profileHh()
+    if (!error) {
+      platforms.value[0].isAuthenticated = true
+      platforms.value[0].data = {email: data.data.email }
+    }
+    const { types, errorTypes } = await typesHh(data.data.employer.id, data.data.manager.id)
+      if (!error && !errorTypes) {
+        platforms.value[0].types = types
+      }
+}
 
 for (let key of platforms.value) {
     if (!isPlatforms.value) {
         if (key.platform == 'hh') {
-          const profile = await profileHh()      
+          const profile = await profileHh()  
           if (!profile.error) {
             key.isAuthenticated = true
             key.data = profile.data.data
             isPlatforms.value = true
-            data.value.billing_types = key['types'] ? key['types']['6'] : null
+            data.value.billing_types = key.types ? key.types[6] : null
+            console.log('types - ', key['types'])
           }
         }
         data.value.platform = key
-        
-        console.log('vacancyCurrect', vacancyData)
     }
-  }
+}
 
 const ArrayAdditional = ref(AccordionAdditional)
 const ArrayOptions = ref(MoreOptions)
@@ -454,11 +468,14 @@ const handleWorkSpaceUpdate = newValue => {
 }
 
 const savePublication = async () => {
-  if (data.value.platform.platform === 'hh') {
-    console.log('savePublication', data.value);
+  status.value = ''
+  if (data.value.platform.platform === 'hh') { 
     const { draft, errorDraft} = await addDraftHh(data.value);
+    console.log('savePublication', data.value);
     if (!errorDraft) {
       status.value = 'Вакансия успешно опубликована'
+    } else {
+      status.value = errorDraft
     }
   }
 }
@@ -467,9 +484,15 @@ const changeBalance = (value) => {
   data.value.billing_types = value.vacancy_billing_type
 }
 
-const  updateRoles = (value) => {
+const updateIndustry = (value) => {
   data.value.industry = value
-  data.value.professional_roles[0] = value.roles[0]
+  roleData.value = null
+  console.log('role', roleData.value)
+  data.value.professional_roles[0] = value.roles ? value.roles[0] : null
+}
+
+const  updateRoles = (value) => {
+  // data.value.industry = value
 }
 
 const changePlatform = (value) => {
@@ -482,17 +505,6 @@ const updateEvent = (event, property) => {
 }
 
 onBeforeMount(async () => {
-  if (!inject('isPlatforms')) {
-    const { data, error } = await profileHh()
-    if (!error) {
-      platforms.value[0].isAuthenticated = true
-      platforms.value[0].data = {email: data.data.email }
-    }
-    const { types, errorTypes } = await typesHh(data.data.employer.id, data.data.manager.id)
-      if (!error && !errorTypes) {
-        platforms.value[0].types = types
-      }
-  }
 })
 
 </script>
