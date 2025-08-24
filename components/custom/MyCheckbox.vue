@@ -2,16 +2,16 @@
     <div class="flex items-center">
         <label :for="id" class="flex items-center cursor-pointer check-wrapper">
             <!-- Скрытый чекбокс -->
-            <input type="checkbox" :id="id" :checked="modelValue" @change="toggleCheck" class="hidden" />
+            <input type="checkbox" :id="id" :checked="isChecked" @change="$event => toggleChange($event.target.value)" class="hidden" />
             <!-- Визуальный элемент чекбокса -->
             <div class="w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
-                'bg-dodger border-dodger': modelValue,
-                'border-athens bg-athens-gray': !modelValue,
+                'bg-dodger border-dodger': isChecked == 'on',
+                'border-athens bg-athens-gray': isChecked != 'on',
                 'mr-0': emptyLabel,
                 'mr-2.5': !emptyLabel,
                 'mr-5': twentyGap,
             }">
-                <svg v-if="modelValue" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20"
+                <svg v-if="isChecked == 'on'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20"
                   fill="currentColor">
                     <path fill-rule="evenodd"
                       d="M16.704 5.293a1 1 0 00-1.408 0L7.5 12.086 4.704 9.293a1 1 0 00-1.408 1.414l3.5 3.5a1 1 0 001.408 0l8-8a1 1 0 000-1.414z"
@@ -31,10 +31,8 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: "Checkbox",
-    props: {
+<script setup>
+const props = defineProps({
         id: {
             type: [String, Number],
             required: true,
@@ -67,15 +65,16 @@ export default {
         fontSize: {
             type: String,
             default: "sm",
-        },
-    },
-    emits: ["update:modelValue"],
-    methods: {
-        toggleCheck(event) {
-            this.$emit("update:modelValue", event.target.checked); // Передаём только булевое значение
-        },
-    },
-};
+        }
+})
+
+const isChecked = ref(props.modelValue ? 'on' : 'off')
+
+const emit = defineEmits(['update:modelValue'])
+const toggleChange = (event) => {
+    isChecked.value = event == 'on' ? 'off' : 'on'
+    emit('update:modelValue', isChecked.value == 'on')
+}
 </script>
 
 <style scoped>

@@ -217,10 +217,11 @@ export const addDraft = async (data: any) => {
         } else {
             if (typeof value === 'object') {
                 if (Object.keys(value).length > 0) {
-                    bodyData.append(`${key}[id]`, `${value.id}`);
+                    // console.log(`${key}[id]` + value.id)
+                    // bodyData.append(`${key}[id]`, `${value.id}`);
                     for (let index in value) {
-                        // console.log('API: ' + `${key}[${index}]` + `${value[index]}`);
-                        // bodyData.append(`${key}[${index}]`, `${value[index]}`);
+                        console.log('API: ' + `${key}[${index}]` + `${value[index]}`);
+                        bodyData.append(`${key}[${index}]`, `${value[index]}`);
                     }
                 }
             } else {

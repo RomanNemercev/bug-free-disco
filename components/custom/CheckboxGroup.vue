@@ -1,7 +1,14 @@
 <template>
     <label v-for="option in props.options" :key="option.value"
       class="flex items-center cursor-pointer check-wrapper w-fit">
-        <input type="checkbox" :id="option.value" :value="option.value" v-model="selectedOptions" class="hidden" />
+        <input t
+           type="checkbox" 
+           :id="option.value" 
+           :value="option.value" 
+           v-model="selectedOptions" 
+           class="hidden" 
+           @change="$event => toggleChange(selectedOptions, option)" 
+        />
         <div class="mr-2.5 w-5 h-5 flex items-center justify-center border rounded-md check-item" :class="{
             'bg-dodger border-dodger': selectedOptions.includes(option.value),
             'border-athens bg-athens-gray': !selectedOptions.includes(option.value)
@@ -36,6 +43,16 @@ const emit = defineEmits(['update:modelValue'])
 
 const selectedOptions = ref([...props.modelValue])
 
+const objSelected = ref([])
+const toggleChange = (selected, data) => {
+    if (objSelected.value.find(item => item.id === data?.id) !== undefined) {
+        objSelected.value.pop({id: data?.id, value: data?.value});
+    } else {
+        objSelected.value.push({id: data?.id, value: data?.value});
+    }
+    emit('update:modelValue',  selected, objSelected.value)
+}
+
 // Синхронизация modelValue → selectedOptions
 watch(() => props.modelValue, (newValue) => {
     // Проверяем, отличается ли новое значение от текущего, чтобы избежать рекурсии
@@ -46,9 +63,10 @@ watch(() => props.modelValue, (newValue) => {
 
 // Синхронизация selectedOptions → modelValue
 watch(selectedOptions, (newValue) => {
+    
     // Проверяем, отличается ли новое значение от modelValue, чтобы избежать рекурсии
     if (JSON.stringify(newValue) !== JSON.stringify(props.modelValue)) {
-        emit('update:modelValue', newValue)
+        emit('update:modelValue', newValue, objSelected.value)
     }
 }, { deep: true })
 </script>
