@@ -151,6 +151,7 @@ if (props.id) {
   }
   
 }
+console.log('newVacancy', newVacancy.value)
 const editVacancyData = ref({})
 const newCode = ref('')
 const jobDescription = ref('')
@@ -276,17 +277,13 @@ const updateVacancyHandler = async id => {
 
 async function saveVacancy() {
   if (validateVacancy()) {
-    console.log('data', newVacancy.value)
-    console.log('edit data', editVacancyData.value)
     const { data: response, error } = props.type === 'edit'
       ? await updateVacancy(props.id, editVacancyData.value)
       : await createVacancy(newVacancy.value)
-    console.log('ответ создания вакансии', response)
-    console.log('ошибка создания вакансии', error)
     if (response == null) {
       switch (error.status) {
         case 409:
-          errors.value.response = 'Вакансия с таким названием/кодом уже существует'
+          errors.value.response = 'Конфлит полей вакансии'
           break
         case 422:
           errors.value.response = 'Ошибка валидации вакансии'
@@ -306,6 +303,14 @@ const updateEvent = (data, property) => {
     editVacancyData.value[property] = data
   } else {
     newVacancy.value[property] = data
+  }
+}
+
+const updateEventObject = (data, property, obj) => {
+  if (props.type === 'edit') {
+    editVacancyData.value[property] = obj
+  } else {
+    newVacancy.value[property] = obj
   }
 }
 
@@ -532,7 +537,7 @@ watch(() => newVacancy.employment, (newValue) => {
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
               <CheckboxGroup v-model="newVacancy.drivers" :options="ArrayCarId"
-                @update:model-value="(value) => updateEvent(value, 'drivers')" />
+                @update:model-value="(value, data) => updateEventObject(value, 'drivers', data)" />
             </div>
           </MyAccordion>
           <MyAccordion title="дополнительные пожелания">
@@ -587,9 +592,9 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
-            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0"
+            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="ArrayCurrency[0].value"
               :initialValue="newVacancy.currency" :model-value="newVacancy.currency"
-              @update:model-value="(value) => updateEvent(value, 'currency')" />
+              @update:model-value="($event) => {console.log('update currency', ArrayCurrency.find((item) => item.value === $event));updateEvent(ArrayCurrency.find((item) => item.value === $event).name, 'currency')}" />
           </div>
         </div>
       </div>

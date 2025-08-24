@@ -86,4 +86,98 @@ export const HH_EMPLOYMENT_TYPES = [
         name: "Вахта",
         siteName: 'Стажировка'
     }
-]
+];
+
+export const HH_WORKING_HOURS = [
+    {
+            id: "HOURS_2",
+            name: "2 часа"
+        },
+        {
+            id: "HOURS_3",
+            name: "3 часа"
+        },
+        {
+            id: "HOURS_4",
+            name: "4 часа"
+        },
+        {
+            id: "HOURS_5",
+            name: "5 часов"
+        },
+        {
+            id: "HOURS_6",
+            name: "6 часов"
+        },
+        {
+            id: "HOURS_7",
+            name: "7 часов"
+        },
+        {
+            id: "HOURS_8",
+            name: "8 часов"
+        },
+        {
+            id: "HOURS_9",
+            "name": "9 часов"
+        },
+        {
+            id: "HOURS_10",
+            name: "10 часов"
+        },
+        {
+            id: "HOURS_11",
+            name: "11 часов"
+        },
+        {
+            id: "HOURS_12",
+            name: "12 часов"
+        },
+        {
+            id: "HOURS_24",
+            name: "24 часа"
+        },
+        {
+            id: "FLEXIBLE",
+            name: "По договорённости"
+        },
+        {
+            id: "OTHER",
+            name: "Другое"
+        }
+];
+
+export const HH_EDUCATION_LAVEL = [
+    {
+            id: "secondary",
+            name: "Среднее"
+        },
+        {
+            id: "special_secondary",
+            name: "Среднее специальное"
+        },
+        {
+            id: "unfinished_higher",
+            name: "Неоконченное высшее"
+        },
+        {
+            id: "higher",
+            name: "Высшее"
+        },
+        {
+            id: "bachelor",
+            name: "Бакалавр"
+        },
+        {
+            id: "master",
+            name: "Магистр"
+        },
+        {
+            id: "candidate",
+            name: "Кандидат наук"
+        },
+        {
+            id: "doctor",
+            name: "Доктор наук"
+        }
+];

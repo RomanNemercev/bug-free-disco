@@ -119,10 +119,11 @@
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               График работы
             </p>
-            <MyInput
-                placeholder="Введите число дней"
-                :type="'Number'"
-            />
+            <DropDownTypes 
+            :options=HH_WORKING_HOURS
+            :selected="data.work_schedule_by_days"
+            v-model="data.work_schedule_by_days"
+            ></DropDownTypes>
           </div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
@@ -130,17 +131,21 @@
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Образование
             </p>
-            <MyInput
-                placeholder="Например, Менеджер по продажам"
-            />
+            <DropDownTypes 
+            :options=HH_EDUCATION_LAVEL
+            :selected="data.education_level"
+            v-model="data.education_level"
+            ></DropDownTypes>
           </div>
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Опыт работы
             </p>
-            <MyInput
-                placeholder="Опыт работы"
-            />
+            <DropDownTypes 
+            :options=experience
+            :selected="data.experience"
+            v-model="data.experience"
+            ></DropDownTypes>
           </div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
@@ -148,20 +153,23 @@
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Ключевые фразы
             </p>
-            <MyInput
-                placeholder="Например, Менеджер по продажам"
-            />
+            <tag-select :options="phrases" :model-value="data.phrases ? data.phrases : []"
+            @update:model-value="$event => updateTags($event)" @delete="$event => updateTags($event)" />
           </div>
         </div>
         <div class="w-fit mb-25px">
           <MyAccordion title="дополнительные условия" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
-              <CheckboxGroup  :m-value=null :options="ArrayAdditional" />
+              <CheckboxGroup  model-value='' :options="ArrayAdditional" />
             </div>
           </MyAccordion>
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup  :m-value=null :options="ArrayCarId"/>
+              <CheckboxGroup  
+                v-model="data.driver_license_types" 
+                :options="ArrayCarId" 
+                @update:model-value="($event, data) => updateEvent($event, 'driver_license_types', data)"
+              />
             </div>
           </MyAccordion>
           <MyAccordion title="дополнительные пожелания">
@@ -268,7 +276,12 @@
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
           <div class="w-full">
-             <MyCheckbox :id="'show-contacts'" :label="'Сохранить в черновике'" />
+             <MyCheckbox 
+               id="show-contacts" 
+               label="Сохранить в черновике" 
+               v-model="isDraft" 
+               @update:model-value="$event => (isDraft = $event)"
+             />
           </div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
@@ -302,15 +315,23 @@ import TiptapEditor from '~/components/TiptapEditor.vue';
 import GenerateButton from '../custom/GenerateButton.vue';
 import MyAccordion from '~/components/custom/MyAccordion.vue';
 import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
+import TagSelect from '~/components/custom/TagSelect.vue'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import CardOption from '~/components/custom/CardOption.vue';
+import { getPhrases } from '@/utils/getVacancies'
 import PhoneInput from '~/components/custom/PhoneInput.vue';
 import MoreOptions from '~/src/data/more-options.json'
 import CarId from '~/src/data/car-id.json'
 import AccordionAdditional from '~/src/data/accordion-additional.json'
 import currency from '~/src/data/currency.json'
-import { PLATFORM_PROPERTIES, HH_EMPLOYMENT_TYPES } from '@/src/constants'
+import { 
+  PLATFORM_PROPERTIES, 
+  HH_EMPLOYMENT_TYPES, 
+  HH_WORKING_HOURS, 
+  HH_EDUCATION_LAVEL 
+} from '@/src/constants'
+import experience from '~/src/data/experience.json'
 import { inject } from 'vue'
 import { 
   getProfile as profileHh, 
@@ -328,7 +349,9 @@ const currectRole = ref(null)
 const roleData = ref(null)
 const status = ref(null)
 const route = useRoute();
-
+const isDraft = ref(true)
+console.log('current vacancy - ', vacancyData);
+const phrases = ref(null)
 const data = ref({})
 data.value.days = "30"
 data.value.workSpace = '1'
@@ -336,6 +359,11 @@ data.value.areas = [{"id":"1"}]
 data.value.salary_range = {}
 data.value.professional_roles = [null]
 data.value.employment_form = null
+data.value.work_schedule_by_days = ref(null)
+data.value.education_level = ref(null)
+data.value.experience = ref(null)
+data.value.driver_license_types = ref(null)
+
 const { roles, errorRoles } = await getRolesHh()
 if (!errorRoles) {
   currectRole.value = roles.categories
@@ -353,6 +381,12 @@ if (vacancyId) {
   }
 }
 
+const getPhrasesVacancy = async function() {
+  const { data, error } = await getPhrases()
+  return data
+}
+
+phrases.value = await getPhrasesVacancy()
 
 if (globCurrentVacancy.value) {
   for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
@@ -364,6 +398,21 @@ if (globCurrentVacancy.value) {
   }
   if (globCurrentVacancy.value.salary_to) {
       data.value.salary_range.to = globCurrentVacancy?.value?.salary_to
+  }
+  if (globCurrentVacancy.value.schedule) {
+    data.value.work_schedule_by_days = HH_WORKING_HOURS.find((item) => item.name == globCurrentVacancy.value.schedule)
+  }
+  if (globCurrentVacancy.value.education) {
+    data.value.education_level = HH_EDUCATION_LAVEL.find((item) => item.name == globCurrentVacancy.value.education)
+  }
+  if (globCurrentVacancy.value.education) {
+    data.value.experience = experience.find((item) => item.name == globCurrentVacancy.value.experience)
+  }
+  if (globCurrentVacancy.value.phrases) {
+    data.value.phrases = globCurrentVacancy.value.phrases
+  }
+  if (globCurrentVacancy.value.drivers) {
+    data.value.driver_license_types = globCurrentVacancy.value.drivers
   }
   data.value.salary_range.currency = 'RUR'
   data.value.salary_range.gross = true
@@ -391,7 +440,7 @@ if (vacancyData.value) {
 }
 
 data.value.employment_form = HH_EMPLOYMENT_TYPES.filter( (item, i) => {
-      return item.siteName == globCurrentVacancy.value.employment
+      return item.siteName == globCurrentVacancy.value?.employment
 })[0]
 
 if (!inject('isPlatforms')) {
@@ -499,9 +548,23 @@ const changePlatform = (value) => {
   data.value.platform = value.platform
 }
 
-const updateEvent = (event, property) => {
-  console.log('event', event, property)
+const updateEvent = (event, property, data) => {
+  console.log('event', event, property, data)
   // data.value[property] = event
+}
+
+const updateTags = (el) => {
+  if (el.length > 0) {
+    const phrases = []
+    el.forEach((item, key) => {
+      phrases.push(item.id)
+    })
+    data.value.phrases = phrases
+
+  } else {
+    if (data.value.phrases)
+        delete data.value.phrases
+    }
 }
 
 onBeforeMount(async () => {
