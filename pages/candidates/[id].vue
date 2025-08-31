@@ -524,6 +524,8 @@
   import Timeline from '@/components/timeline/index.vue'
   import ChatInput from '@/components/chat/ChatInput.vue'
 
+  import { getResponse } from '@/utils/hhAccount'
+
   // get current route from candidateFull
   const route = useRoute()
   const router = useRouter()
@@ -747,16 +749,16 @@
 
     return {
       id: data.id ?? null,
-      created: data.created_at ?? null,
-      age: data.age ?? null,
-      firstName: data.firstname ?? '',
-      surname: data.surname ?? '',
-      patronymic: data.patronymic ?? '',
-      email: data.email ?? '',
-      phone: data.phone ?? '',
-      location: data.location ?? '',
-      vacancy: data.vacancy ?? '',
-      status: data.status ?? '',
+      created: data.resume.created_at ?? null,
+      age: data.resume.age ?? null,
+      firstName: data.resume.first_name ?? '',
+      surname: data.resume.last_name ?? '',
+      patronymic: data.resume.patronymic ?? '',
+      email: data.resume.email ?? '',
+      phone: data.resume.phone ?? '',
+      location: data.vacancy?.area.name ?? '',
+      vacancy: data.resume.title ?? '',
+      status: data.resume.status ?? '',
       skills: ['Excel', 'Коммуникабельность'],
       experience: data.experience ?? '',
       skype: data.skype ?? '',
@@ -781,7 +783,7 @@
       customer: data.customer ?? null,
       icon: data.icon ?? null,
       photo:
-        'https://avatars.mds.yandex.net/i?id=91c6021eb7bcff5e3d9cbafed2b385a4502d4cf7-5236630-images-thumbs&n=13',
+        data.resume.photo !== null ? data.resume.photo[500] : null,
     }
   }
 
@@ -793,8 +795,10 @@
   const loadCandidate = async id => {
     loading.value = true
     try {
-      const rawData = await fetchCandidateById(id)
-      console.log('candidate data processed:', rawData)
+      // const rawData = await fetchCandidateById(id)
+      const { responses, errorResponses } = await getResponse(id)
+      const rawData = responses
+      console.log('candidate data processed:', responses)
       candidate.value = sanitazeCandidate(rawData)
       console.log('Candidate loaded:', candidate)
     } catch (error) {

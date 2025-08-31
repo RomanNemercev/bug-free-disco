@@ -9,6 +9,8 @@
   import CardIcon from '~/components/custom/CardIcon.vue'
   import Pagination from '@/components/custom/Pagination.vue'
 
+  import { getVacancies, getDrafts, getResponses } from '@/utils/hhAccount'
+
   const isHoveredFunnel = ref(false)
   const isActiveFunnel = ref(false)
   const isHoveredSort = ref(false)
@@ -75,7 +77,21 @@
       const { candidates: data, pagination } = await fetchCandidatesMin(
         currentPage.value
       )
-      paginatedCandidates.value = data
+
+      // const candidates = await getVacancies(); 
+      const { drafts, errorDrafts } = await getDrafts();
+      // if (!errorDrafts) {
+      //   if (drafts.items.length > 0) {
+      //     drafts.items.forEach(async item => {
+      //       const candidate = await getResponses(item.draft_id)
+      //       console.log('candidate', candidate)
+      //     })
+      //   }
+      // }
+      const { responses, errorResponses  } = await getResponses('122562967')
+      console.log('drafts', responses.items[0].resume.last_name);
+      // paginatedCandidates.value = data
+      paginatedCandidates.value = responses.items
       totalPages.value = pagination.lastPage
     } catch (error) {
       console.error('Ошибка при загрузке кандидатов:', error)
@@ -171,49 +187,49 @@
                 :emptyLabel="true"
               />
             </div>
-            <div class="flex gap-2.5 p-2.5">
+            <div class="flex gap-2.5 p-2.5 items-center">
               <UiAvatar size="candidate">
                 <UiAvatarImage
                   src="https://github.com/radix-vue.png"
                   alt="@radix-vue"
                 />
-                <UiAvatarFallback>АА</UiAvatarFallback>
+                <UiAvatarFallback>{{ item.resume?.last_name[0] }}{{ item.resume?.first_name[0] }}</UiAvatarFallback>
               </UiAvatar>
               <div>
                 <p
                   class="text-sm font-medium text-space mb-5px leading-[170%] cursor-pointer"
                   @click="goToCandidate(item.id)"
                 >
-                  {{ item.surname }} {{ item.firstName }}
+                  {{ item.resume.last_name }} {{ item.resume.first_name }}
                 </p>
                 <div class="flex gap-2.5">
-                  <span
+                  <!-- <span
                     v-for="tag in item.tags"
                     :key="tag"
                     class="text-dodger text-13px font-normal"
                   >
                     {{ tag }}
-                  </span>
+                  </span> -->
                 </div>
               </div>
             </div>
             <div class="px-2.5">
               <CardIcon
-                :icon="item.icon"
-                :isPng="item.isPng"
-                :imagePath="item.imagePath"
+                icon="hh"
+                :isPng="false"
+                imagePath='hh'
                 :width="21"
                 :height="21"
               />
             </div>
             <div class="px-2.5 text-sm font-normal text-space">
-              {{ item.resume }}
+              {{ item.resume.title }}
             </div>
             <div class="px-2.5 text-sm font-normal text-space">
-              {{ item.vacancy }}
+              {{ 'Учитель начальных классов' }}
             </div>
             <div class="px-2.5 text-sm font-normal text-space">
-              {{ item.stage }}
+              {{ 'Новый' }}
             </div>
           </div>
         </div>

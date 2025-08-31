@@ -181,3 +181,62 @@ export const HH_EDUCATION_LAVEL = [
             name: "Доктор наук"
         }
 ];
+
+export const HH_WORK_SCHEDULE_BY_DAYS = [
+    {
+            id: "SIX_ON_ONE_OFF",
+            name: "6/1"
+        },
+        {
+            id: "FIVE_ON_TWO_OFF",
+            name: "5/2"
+        },
+        {
+            id: "FOUR_ON_FOUR_OFF",
+            name: "4/4"
+        },
+        {
+            id: "FOUR_ON_THREE_OFF",
+            name: "4/3"
+        },
+        {
+            id: "FOUR_ON_TWO_OFF",
+            name: "4/2"
+        },
+        {
+            id: "THREE_ON_THREE_OFF",
+            name: "3/3"
+        },
+        {
+            id: "THREE_ON_TWO_OFF",
+            name: "3/2"
+        },
+        {
+            id: "TWO_ON_TWO_OFF",
+            name: "2/2"
+        },
+        {
+            id: "TWO_ON_ONE_OFF",
+            name: "2/1"
+        },
+        {
+            id: "ONE_ON_THREE_OFF",
+            name: "1/3"
+        },
+        {
+            id: "ONE_ON_TWO_OFF",
+            name: "1/2"
+        },
+        {
+            id: "WEEKEND",
+            name: "По выходным"
+        },
+        {
+            id: "FLEXIBLE",
+            name: "Свободный"
+        },
+        {
+            id: "OTHER",
+            name: "Другое"
+        }
+]
