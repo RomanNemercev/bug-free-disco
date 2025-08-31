@@ -120,7 +120,7 @@
               График работы
             </p>
             <DropDownTypes 
-            :options=HH_WORKING_HOURS
+            :options=HH_WORK_SCHEDULE_BY_DAYS
             :selected="data.work_schedule_by_days"
             v-model="data.work_schedule_by_days"
             ></DropDownTypes>
@@ -329,6 +329,7 @@ import {
   PLATFORM_PROPERTIES, 
   HH_EMPLOYMENT_TYPES, 
   HH_WORKING_HOURS, 
+  HH_WORK_SCHEDULE_BY_DAYS,
   HH_EDUCATION_LAVEL 
 } from '@/src/constants'
 import experience from '~/src/data/experience.json'
@@ -399,9 +400,9 @@ if (globCurrentVacancy.value) {
   if (globCurrentVacancy.value.salary_to) {
       data.value.salary_range.to = globCurrentVacancy?.value?.salary_to
   }
-  if (globCurrentVacancy.value.schedule) {
-    data.value.work_schedule_by_days = HH_WORKING_HOURS.find((item) => item.name == globCurrentVacancy.value.schedule)
-  }
+  // if (globCurrentVacancy.value.schedule) {
+  //   data.value.working_hours = HH_WORKING_HOURS.find((item) => item.name == globCurrentVacancy.value.schedule)
+  // }
   if (globCurrentVacancy.value.education) {
     data.value.education_level = HH_EDUCATION_LAVEL.find((item) => item.name == globCurrentVacancy.value.education)
   }
@@ -463,7 +464,7 @@ for (let key of platforms.value) {
             key.isAuthenticated = true
             key.data = profile.data.data
             isPlatforms.value = true
-            data.value.billing_types = key.types ? key.types[6] : null
+            // data.value.billing_types = key.types ? key.types[6] : null
             console.log('types - ', key['types'])
           }
         }

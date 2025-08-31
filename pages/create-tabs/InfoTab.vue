@@ -536,7 +536,8 @@ watch(() => newVacancy.employment, (newValue) => {
           </MyAccordion>
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup v-model="newVacancy.drivers" :options="ArrayCarId"
+              <!-- <CheckboxGroup v-model="newVacancy.drivers.map(item => item.id)" :options="ArrayCarId" -->
+                <CheckboxGroup v-model="newVacancy.drivers" :options="ArrayCarId"
                 @update:model-value="(value, data) => updateEventObject(value, 'drivers', data)" />
             </div>
           </MyAccordion>
