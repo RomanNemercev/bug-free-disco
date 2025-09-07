@@ -25,3 +25,9 @@
 .flex-center {
   @apply flex justify-center items-center;
 }
+
+.wrapping {
+  white-space: break-spaces;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

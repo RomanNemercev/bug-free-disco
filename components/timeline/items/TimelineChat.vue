@@ -23,7 +23,7 @@
               <span>{{ message.time }}</span>
               {{ message.author }} пишет для {{ message.company }}
             </p>
-            <p class="text-sm font-normal text-space truncate">
+            <p class="text-sm font-normal text-space wrapping">
               {{ message.content }}
             </p>
           </li>

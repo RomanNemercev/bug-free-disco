@@ -566,3 +566,53 @@ export const getResponse = async (id: string) => {
         return result.value;
     }
 }
+
+export const getData = async (url: any) => {
+    const config = useRuntimeConfig();
+
+    // Токен сервера из cookie
+    const serverTokenCookie = useCookie('auth_token');
+    const serverToken = serverTokenCookie.value;
+    if (!serverToken) {
+        console.error('Токен сервера не найден в cookie');
+        return null;
+    }
+
+    // Токен пользователя из cookie
+    const userTokenCookie = useCookie('auth_user');
+    const userToken = userTokenCookie.value;
+    const result = ref<{ responses: any, errorResponses: string | null}>({ responses: null, errorResponses: null });
+    if (!userToken) {
+        console.error('Токен пользователя не найден в cookie');
+        return null;
+    }
+    
+    try {
+        const response = await $fetch<PlatformResponse>(`/hh/send-url`, {
+            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${serverToken}`,
+                'X-Auth-User': userToken, 
+            },
+            body: url
+        });
+
+        result.value.responses = response.data;
+        console.log(result.value.responses);
+    } catch (err: any) {
+        if (err.response?.status === 404) {
+            result.value.errorResponses = err.response._data.message;
+        }
+        if (err.response?.status === 401) {
+            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
+            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            // Middleware сработает автоматически при следующем роутинге
+            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+            navigateTo('/auth');
+        }
+    } finally {
+        return result.value;
+    }
+}
