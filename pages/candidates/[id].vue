@@ -156,7 +156,7 @@
           <div class="w-[200px] h-[200px]">
             <img
               :src="candidate.photo"
-              alt="photo of candidate"
+              alt="Фото кандидата"
               class="rounded-fifteen h-full w-full object-cover"
             />
           </div>
@@ -178,7 +178,40 @@
             </div>
             <div class="mb-px bg-white p-25px">
               <p class="text-15px text-space font-medium mb-4">Образование</p>
-              <p class="text-sm text-slate-custom">{{ candidate.education }}</p>
+              <p class="text-sm text-slate-custom mb-8">{{ candidate.education.level.name }}</p>
+              <ul v-if="candidate.education.primary.length > 0">
+                <li
+                  v-for="(item, index) in candidate.education.primary"
+                  :key="index"
+                  class="text-sm text-slate-custom mb-4"
+                >
+                  {{ item.name }}
+                  <p class="text-xs">
+                    <span v-if="item.university_acronym">{{ item.university_acronym }}, </span>
+                    <span v-if="item.organization">{{ item.organization }}, </span>
+                    <span v-if="item.result">{{ item.result }}, </span>
+                    <span v-if="item.year">{{ item.year }}</span>
+                  </p>
+                </li>
+              </ul>
+            </div>
+            <div class="mb-px bg-white p-25px">
+              <p class="text-15px text-space font-medium mb-4">Курсы повышения квалификации</p>
+              <p class="text-sm text-slate-custom mb-8">{{ candidate.education.additional.name }}</p>
+              <ul v-if="candidate.education.additional.length > 0">
+                <li
+                  v-for="(item, index) in candidate.education.additional"
+                  :key="index"
+                  class="text-sm text-slate-custom mb-4"
+                >
+                  {{ item.name }}
+                  <p class="text-xs">
+                    <span v-if="item.organization">{{ item.organization }}, </span>
+                    <span v-if="item.result">{{ item.result }}, </span>
+                    <span v-if="item.year">{{ item.year }}</span>
+                  </p>
+                </li>
+              </ul>
             </div>
             <div class="mb-px bg-white p-25px">
               <p class="text-15px text-space font-medium mb-3.5">Навыки</p>
@@ -320,9 +353,30 @@
                 <p class="text-sm font-normal text-space min-w-[250px]">
                   Опыт работы
                 </p>
-                <p class="text-sm font-normal text-space leading-150">
-                  {{ candidate.experience }}
-                </p>
+                <ul v-if="candidate.experience.length > 0" class="text-sm font-normal text-space leading-150">
+                  <li class="mb-5" v-for="(exp, index) in candidate.experience" :key="index">
+                    <div class="text-13px font-normal text-slate-custom leading-normal mb-7px">
+                      <p class="text-13px font-normal text-slate-custom leading-normal mb-7px">
+                        {{ exp?.start ? dateStringToDots(exp?.start) : '' }} - {{ exp?.end ? dateStringToDots(exp?.start) : 'по настоящее время' }}
+                      </p>
+                      <p v-if="exp.employer !== null" class="flex items-center gap-2">
+                        <img v-if="exp.employer?.logo_urls" :src="exp.employer.logo_urls[90]" width="40"> 
+                        <a v-if="exp.employer?.alternate_url" class="text-dodger" :href="exp.employer.alternate_url" target="_blank">
+                          {{ exp?.employer.name }}
+                        </a>
+                      </p>
+                      
+                    </div>
+                    <p class="underline text-sm font-medium text-space leading-normal mb-2">
+                        {{ exp?.position }}
+                      </p>
+                      <template v-if="exp?.description.split('\n').length > 0">
+                        <p v-for="(description, index) in exp?.description.split('\n')" :key="index" class="text-sm font-normal text-space truncate">
+                        {{ description }}
+                      </p>
+                      </template>
+                  </li>
+                </ul>
               </div>
               <div class="flex gap-2.5 mb-5">
                 <p class="text-sm font-normal text-space min-w-[250px]">Фото</p>
@@ -524,7 +578,9 @@
   import Timeline from '@/components/timeline/index.vue'
   import ChatInput from '@/components/chat/ChatInput.vue'
 
-  import { getResponse } from '@/utils/hhAccount'
+  import { dateStringToDots, formatDate } from '@/helpers/date'
+
+  import { getProfile as profileHh, getResponse, getData } from '@/utils/hhAccount'
 
   // get current route from candidateFull
   const route = useRoute()
@@ -606,160 +662,166 @@
   const newCustomFirst = ref('')
   const newCustomSecond = ref('')
   const newCustomThird = ref('')
+  import { inject } from 'vue';
 
-  const timelineGroups = ref([
-    {
-      date: '13/12/2025',
-      events: [
-        {
-          id: 1,
-          type: 'system',
-          time: '18.01.2024 15:04',
-          content: 'создан кандидат Анатольев Дмитрий Корсаров',
-        },
-        {
-          id: 2,
-          type: 'system',
-          time: '18.01.2024 15:04',
-          content:
-            'кандидат Анатольев Дмитрий Корсаров откликнулся на вакансию Консультант продавцов',
-        },
-        {
-          id: 3,
-          type: 'system',
-          time: '18.01.2024 15:04',
-          content:
-            'Перемещение на этап Подумать пользователем Анатолий Семенов',
-        },
-      ],
-    },
-    {
-      date: 'Сегодня',
-      events: [
-        {
-          id: 4,
-          type: 'call',
-          calls: [
-            {
-              time: '18.01.2024 15:04',
-              candidateName: 'Марго Роби',
-            },
-            {
-              time: '18.01.2024 15:04',
-              candidateName: 'Марго Роби',
-            },
-          ],
-        },
-        {
-          id: 5,
-          type: 'note',
-          time: '18.01.2024 15:04',
-          author: 'Анатолий Семенов',
-          content:
-            'Кандидат утверждает что у него есть знакомые которые работали в компании и отзываются не очень хорошо, но самому ему все нравится. Ему нужно время подумать.',
-        },
-        {
-          id: 6,
-          type: 'task',
-          time: '18.01.2024 15:04',
-          user: 'Анатолий Семенов',
-          title: 'Интервью с кандидатом',
-          scheduled: '13/02/2024 в 13:30',
-        },
-        {
-          id: 7,
-          type: 'email',
-          emails: [
-            {
-              time: '18.01.2024 15:04',
-              direction: 'входящее',
-              from: 'Анатолий Семенов',
-              to: 'Марго Роби',
-              subject: 'Реквизиты компании',
-              content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
-            },
-            {
-              time: '18.01.2024 15:04',
-              direction: 'входящее',
-              from: 'Марго Роби',
-              to: 'Анатолий Семенов',
-              status: 'Доставлено',
-              subject: 'Реквизиты компании',
-              content: `Благодарю за обращение. Вот реквизиты нашей компании: Название организации: [Название] ИНН: [Ваш ИНН] КПП: [Ваш КПП] Расчётный счёт: [Ваш счёт] Банк: [Название банка] БИК: [Ваш БИК] Корреспондентский счёт: [Ваш корр. счёт] Если потребуется дополнительная информация, пожалуйста, дайте знать. С уважением, [Имя клиента] [Должность, если есть] [Контактные данные] [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
-            },
-          ],
-        },
-        {
-          id: 8,
-          type: 'email',
-          emails: [
-            {
-              time: '18.01.2024 15:04',
-              direction: 'входящее',
-              from: 'Марго Роби',
-              to: 'Анатолий Семенов',
-              subject: 'Другая тема письма',
-              content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
-            },
-          ],
-        },
-        {
-          id: 9,
-          type: 'hh_chat',
-          time: '18.01.2024 15:04',
-          author: 'Марго Роби',
-          company: 'ООО КОМПАНИЯ',
-          content: 'Здравствуйте! Посмотрите пожалуйста мой отклик',
-          initials: 'СК',
-        },
-        {
-          id: 10,
-          type: 'telegram',
-          time: '18.01.2024 15:04',
-          author: 'Марго Роби',
-          content:
-            'Здравствуйте, как думаете, с моими скиллами какие у меня есть шансы попасть к вам на работу?',
-          initials: 'МР',
-        },
-        {
-          id: 11,
-          type: 'whatsapp',
-          time: '18.01.2024 15:04',
-          author: 'Марго Роби',
-          content:
-            'Здравствуйте, как думаете, с моими скиллами какие у меня есть шансы попасть к вам на работу?',
-          initials: 'МР',
-        },
-        {
-          id: 12,
-          type: 'comment',
-          time: '18.01.2024 15:04',
-          author: 'Марго Роби',
-          content:
-            'Коллеги, кандидат не плохой, давайте рассмотрим его под микроскопом?',
-          initials: 'АС',
-        },
-      ],
-    },
-  ])
+  const timelineGroups = ref([]);
+  // const timelineGroups = ref([
+  //   {
+  //     date: '13/12/2025',
+  //     events: [
+  //       {
+  //         id: 1,
+  //         type: 'system',
+  //         time: '18.01.2024 15:04',
+  //         content: 'создан кандидат Анатольев Дмитрий Корсаров',
+  //       },
+  //       {
+  //         id: 2,
+  //         type: 'system',
+  //         time: '18.01.2024 15:04',
+  //         content:
+  //           'кандидат Анатольев Дмитрий Корсаров откликнулся на вакансию Консультант продавцов',
+  //       },
+  //       {
+  //         id: 3,
+  //         type: 'system',
+  //         time: '18.01.2024 15:04',
+  //         content:
+  //           'Перемещение на этап Подумать пользователем Анатолий Семенов',
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     date: 'Сегодня',
+  //     events: [
+  //       {
+  //         id: 4,
+  //         type: 'call',
+  //         calls: [
+  //           {
+  //             time: '18.01.2024 15:04',
+  //             candidateName: 'Марго Роби',
+  //           },
+  //           {
+  //             time: '18.01.2024 15:04',
+  //             candidateName: 'Марго Роби',
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         id: 5,
+  //         type: 'note',
+  //         time: '18.01.2024 15:04',
+  //         author: 'Анатолий Семенов',
+  //         content:
+  //           'Кандидат утверждает что у него есть знакомые которые работали в компании и отзываются не очень хорошо, но самому ему все нравится. Ему нужно время подумать.',
+  //       },
+  //       {
+  //         id: 6,
+  //         type: 'task',
+  //         time: '18.01.2024 15:04',
+  //         user: 'Анатолий Семенов',
+  //         title: 'Интервью с кандидатом',
+  //         scheduled: '13/02/2024 в 13:30',
+  //       },
+  //       {
+  //         id: 7,
+  //         type: 'email',
+  //         emails: [
+  //           {
+  //             time: '18.01.2024 15:04',
+  //             direction: 'входящее',
+  //             from: 'Анатолий Семенов',
+  //             to: 'Марго Роби',
+  //             subject: 'Реквизиты компании',
+  //             content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+  //           },
+  //           {
+  //             time: '18.01.2024 15:04',
+  //             direction: 'входящее',
+  //             from: 'Марго Роби',
+  //             to: 'Анатолий Семенов',
+  //             status: 'Доставлено',
+  //             subject: 'Реквизиты компании',
+  //             content: `Благодарю за обращение. Вот реквизиты нашей компании: Название организации: [Название] ИНН: [Ваш ИНН] КПП: [Ваш КПП] Расчётный счёт: [Ваш счёт] Банк: [Название банка] БИК: [Ваш БИК] Корреспондентский счёт: [Ваш корр. счёт] Если потребуется дополнительная информация, пожалуйста, дайте знать. С уважением, [Имя клиента] [Должность, если есть] [Контактные данные] [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         id: 8,
+  //         type: 'email',
+  //         emails: [
+  //           {
+  //             time: '18.01.2024 15:04',
+  //             direction: 'входящее',
+  //             from: 'Марго Роби',
+  //             to: 'Анатолий Семенов',
+  //             subject: 'Другая тема письма',
+  //             content: `Здравствуйте, [Имя клиента]! Для завершения оформления документов нам необходимо уточнить ваши реквизиты. Пожалуйста, отправьте следующую информацию: [Запрашиваемые данные, например: название организации, ИНН, расчётный счёт и т.д.] Если у вас возникнут вопросы, буду рад помочь! Спасибо за оперативность. С уважением, [Ваше имя] [Ваша должность] [Контактные данные]`,
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         id: 9,
+  //         type: 'hh_chat',
+  //         time: '18.01.2024 15:04',
+  //         author: 'Марго Роби',
+  //         company: 'ООО КОМПАНИЯ',
+  //         content: 'Здравствуйте! Посмотрите пожалуйста мой отклик',
+  //         initials: 'СК',
+  //       },
+  //       {
+  //         id: 10,
+  //         type: 'telegram',
+  //         time: '18.01.2024 15:04',
+  //         author: 'Марго Роби',
+  //         content:
+  //           'Здравствуйте, как думаете, с моими скиллами какие у меня есть шансы попасть к вам на работу?',
+  //         initials: 'МР',
+  //       },
+  //       {
+  //         id: 11,
+  //         type: 'whatsapp',
+  //         time: '18.01.2024 15:04',
+  //         author: 'Марго Роби',
+  //         content:
+  //           'Здравствуйте, как думаете, с моими скиллами какие у меня есть шансы попасть к вам на работу?',
+  //         initials: 'МР',
+  //       },
+  //       {
+  //         id: 12,
+  //         type: 'comment',
+  //         time: '18.01.2024 15:04',
+  //         author: 'Марго Роби',
+  //         content:
+  //           'Коллеги, кандидат не плохой, давайте рассмотрим его под микроскопом?',
+  //         initials: 'АС',
+  //       },
+  //     ],
+  //   },
+  // ])
 
   // fnc for check load data
   function sanitazeCandidate(data) {
     if (!data) return null
+    
+    let address = data?.area.name ? `г. ${data?.area.name}` :  ''
+    address += data?.metro?.name ? `, м. ${data.metro.name}` : ''
 
     return {
       id: data.id ?? null,
-      created: data.resume.created_at ?? null,
-      age: data.resume.age ?? null,
-      firstName: data.resume.first_name ?? '',
-      surname: data.resume.last_name ?? '',
-      patronymic: data.resume.patronymic ?? '',
-      email: data.resume.email ?? '',
-      phone: data.resume.phone ?? '',
-      location: data.vacancy?.area.name ?? '',
-      vacancy: data.resume.title ?? '',
-      status: data.resume.status ?? '',
-      skills: ['Excel', 'Коммуникабельность'],
+      created: data.created_at ?? null,
+      age: data.age ?? null,
+      firstName: data.first_name ?? '',
+      surname: data.last_name ?? '',
+      patronymic: data.patronymic ?? '',
+      email: data.contact ? data.contact.find(function(value) {return value.kind === 'email';})?.contact_value : '',
+      phone: data.contact ? data.contact.find(function(value) {return value.kind === 'phone';})?.contact_value : '',
+      location: data?.area.name ?? '',
+      vacancy: data.title ?? '',
+      gender: data.gender.name ?? '',
+      status: data.status ?? '',
+      skills: data.skill_set ?? [],
       experience: data.experience ?? '',
       skype: data.skype ?? '',
       telegram: data.telegram ?? '',
@@ -768,13 +830,13 @@
       education: data.education ?? '',
       attachedFiles: data.attachments ?? [],
       links: [
-        'www.testlink-null.com',
-        'www.testlink-one.com',
-        'www.testlink-second.com',
+        // 'www.testlink-null.com',
+        // 'www.testlink-one.com',
+        // 'www.testlink-second.com',
       ],
-      header: data.header ?? '',
-      locationFull: data.locationFull ?? '',
-      educationLevel: data.educationLevel ?? '',
+      header: data.title ?? '',
+      locationFull: address,
+      educationLevel: data.education.level.name ?? '',
       resumeDownloadLink: data.resumeDownloadLink ?? '',
       coverLetter: data.coverPath ?? '',
       comments: data.comments ?? [],
@@ -783,7 +845,7 @@
       customer: data.customer ?? null,
       icon: data.icon ?? null,
       photo:
-        data.resume.photo !== null ? data.resume.photo[500] : null,
+        data.photo?.medium !== null ? data.photo?.medium : null,
     }
   }
 
@@ -798,8 +860,9 @@
       // const rawData = await fetchCandidateById(id)
       const { responses, errorResponses } = await getResponse(id)
       const rawData = responses
-      console.log('candidate data processed:', responses)
-      candidate.value = sanitazeCandidate(rawData)
+      const dataUrl = {url: rawData.resume.url}
+      const resume = await getData(dataUrl);
+      candidate.value = sanitazeCandidate(resume.responses)
       console.log('Candidate loaded:', candidate)
     } catch (error) {
       console.error(error)
@@ -812,11 +875,145 @@
     }
   }
 
+  const getMessageSystem = (data) => {
+    return{
+      id: data.id,
+      type: 'system',
+      time: formatDate(data.time),
+      timestamp: data.timestamp,
+      content: data.text,
+    }
+  }
+
+  const getMessagePlatform = (data) => {
+    return {
+          id: data.id,
+          type: data.platformName,
+          time: formatDate(data.time),
+          timestamp: data.timestamp,
+          author: data.author,
+          company: data.company,
+          content: data.text,
+          initials: data.initials,
+    }
+  }
+
   // load cans on visit page
-  onMounted(() => {
+  onMounted(async() => {
     const id = parseInt(route.params.id)
     if (!isNaN(id)) {
-      loadCandidate(id)
+      await loadCandidate(id)
+      const messagers = await getData({url: `https://api.hh.ru/negotiations/${id}/messages`});
+      const profile = ref(null)
+      if (messagers.responses.items.length > 0) {
+        messagers.responses.items.forEach(async (item) => {
+          const date = dateStringToDots(item.created_at)
+          let isAdd = false;
+          if (item.state.name == 'Отклик') {
+            const actionCandidate = candidate.value.gender == 'Женский' ? 'откликнулась' : 'откликнулся'
+           
+            timelineGroups.value.map(function(value, index) {
+              if (value.date === date.replaceAll('.', '/')) { 
+                timelineGroups.value[index].events.push(getMessageSystem({
+                  id: item.id,
+                  timestamp: item.created_at,
+                  time: item.created_at,
+                  content: `кандидат ${candidate.value.surname} ${candidate.value.firstName} ${candidate.value?.patronymic} ${actionCandidate} на вакансию ${candidate.value.vacancy}`
+                }))
+                isAdd = true
+              }
+            })
+            if (!isAdd) {
+              timelineGroups.value.push({
+                date: date.replaceAll('.', '/'),
+                events: [getMessageSystem({
+                  id: item.id,
+                  timestamp: item.created_at,
+                  time: item.created_at,
+                  text: `кандидат ${candidate.value.surname} ${candidate.value.firstName} ${candidate.value?.patronymic} ${actionCandidate} на вакансию ${candidate.value.vacancy}`
+                })]
+              })
+            }
+          }
+
+          if (item.state.name == 'Текст') {
+            let employer = '';
+            let company = '';
+            let initials = '';
+            if (profile.value == null) {
+              profile.value = await profileHh()
+              if (!profile.error) {
+                if (item.author.participant_type == 'applicant') {
+                  company = profile.value.data.data.employer.name
+                  employer = `${candidate.value.firstName} ${candidate.value.surname}` 
+                  initials = candidate.value.firstName[0] + candidate.value.surname[0]
+                } else {
+                  company = `${candidate.value.firstName} ${candidate.value.surname}` 
+                  employer = `${profile.value.data.data.first_name} ${profile.value.data.data.last_name}` 
+                  initials = profile.value.data.data.first_name[0] + profile.value.data.data.last_name[0]
+                }
+              }
+            }
+
+            const newEvent = getMessagePlatform({
+              id: item.id,
+              platformName: 'hh_chat',
+              author: employer,
+              company: company,
+              time: item.created_at,
+              timestamp: item.created_at,
+              text: item.text,
+              initials: initials
+            });
+          
+            timelineGroups.value.map(function(value, index) {
+              if (value.date === date.replaceAll('.', '/')) {
+                timelineGroups.value[index].events.push(getMessagePlatform({
+                  id: item.id,
+                  platformName: 'hh_chat',
+                  author: employer,
+                  company: company,
+                  time: item.created_at,
+                  timestamp: item.created_at,
+                  text: item.text,
+                  initials: initials
+                }))
+                isAdd = true
+              }
+            })
+            if (!isAdd) {
+              timelineGroups.value.push({
+                date: date.replaceAll('.', '/'),
+                events: [getMessagePlatform({
+                  id: item.id,
+                  platformName: 'hh_chat',
+                  author: item.author.participant_type == 'applicant' ? `${candidate.value.surname} ${candidate.value.firstName} ` : company,
+                  company: item.author.participant_type == 'applicant' ? employer : `${candidate.value.surname} ${candidate.value.firstName} `,
+                  time: item.created_at,
+                  timestamp: item.created_at,
+                  text: item.text,
+                  initials: `${candidate.value.surname[0]}${candidate.value.firstName[0]}`
+                })]
+              })
+            }
+          }
+        })
+
+        timelineGroups.value.forEach((item, index) => {
+          if (Array.isArray(item.events)) {
+            console.log(index, timelineGroups.value[index].events);
+          timelineGroups.value[index].events.sort((a, b) => {
+            const dateA = new Date(a.timestamp);
+            const dateB = new Date(b.timestamp);
+            if (isNaN(dateA) || isNaN(dateB)) {
+              console.warn(`Невалидная дата: ${a.timestamp} или ${b.timestamp}`);
+              return 0;
+            }
+            return dateB - dateA;
+          });
+        }
+      })
+      }
     }
   })
 
