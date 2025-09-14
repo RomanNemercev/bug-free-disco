@@ -97,7 +97,7 @@
               Выберите специализацию
             </p>
             <DropDownRoles
-            :options="currectRole[data.industry.key]?.roles"
+            :options="data.industry !== undefined ?? currectRole[data.industry.key]?.roles"
             :selected="data.professional_roles[0]"
             v-model="data.professional_roles[0]"
             @update:model-value="$event => updateRoles($event)"
@@ -343,6 +343,7 @@ import {
 import { getVacancy } from '@/utils/getVacancies';
 import { useRoute } from 'vue-router'
 
+const isDraft = ref(true)
 const platforms = ref(inject('platformsGlobal'))
 const isPlatforms = ref(inject('isPlatforms'))
 const vacancyData = inject('vacancyCurrect')
@@ -350,10 +351,10 @@ const currectRole = ref(null)
 const roleData = ref(null)
 const status = ref(null)
 const route = useRoute();
-const isDraft = ref(true)
 console.log('current vacancy - ', vacancyData);
 const phrases = ref(null)
 const data = ref({})
+
 data.value.days = "30"
 data.value.workSpace = '1'
 data.value.areas = [{"id":"1"}]
@@ -377,6 +378,7 @@ if (vacancyId) {
     
     const  vacancy = await getVacancy(vacancyId)
     if (vacancy) {
+      
       globCurrentVacancy.value = vacancy
     }
   }
@@ -567,6 +569,7 @@ const updateTags = (el) => {
         delete data.value.phrases
     }
 }
+
 
 onBeforeMount(async () => {
 })

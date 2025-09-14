@@ -302,6 +302,7 @@ const updateEvent = (data, property) => {
   if (props.type === 'edit') {
     editVacancyData.value[property] = data
   } else {
+    console.log('newvacancy', data, property)
     newVacancy.value[property] = data
   }
 }
@@ -497,9 +498,12 @@ watch(() => newVacancy.employment, (newValue) => {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-            <my-dropdown :defaultValue="'Тип занятости'" :options="options"
+            <CustomDropdown :options="options" placeholder="Выберите специализацию"
+                :model-value="newVacancy.employment ? newVacancy.employment : ''"
+                @update:model-value="$event => updateEvent($event, 'employment')" />
+            <!-- <my-dropdown :defaultValue="'Тип занятости'" :options="options"
               :model-value="newVacancy.employment ? newVacancy.employment : ''" :initialValue="newVacancy.employment"
-              @update:model-value="$event => updateEvent($event, 'employment')" />
+              @update:model-value="$event => updateEvent($event, 'employment')" /> -->
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
