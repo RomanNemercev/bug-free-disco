@@ -443,7 +443,7 @@
               Вы ещё не добавили вакансии которые можно редактировать
             </p>
           </div>
-          <div v-if="vacanciesDraft.length > 0">
+          <div v-if="vacanciesDraft.length > 0" class="flex flex-col gap-15px">
             <VacancyCard
               v-for="(vacancy, index) in paginatedDraftVacancies"
               :key="vacancy.id"
@@ -470,7 +470,7 @@
               Вы еще не добавляли вакансии в архив
             </p>
           </div>
-          <div v-if="vacanciesArchive.length > 0">
+          <div v-if="vacanciesArchive.length > 0" class="flex flex-col gap-15px">
             <VacancyCard
               v-for="(vacancy, index) in paginatedArchiveVacancies"
               :key="vacancy.id"

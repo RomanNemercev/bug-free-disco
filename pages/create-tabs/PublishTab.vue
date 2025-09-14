@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
@@ -110,6 +110,7 @@ const data = ref([
     // Добавь остальные данные
 ]);
 
+
 const selected = ref({}); // Выбранные чекбоксы
 const allSelected = ref(false);
 const sortKey = ref(""); // Поле для сортировки
@@ -129,6 +130,11 @@ const sortedData = computed(() => {
         return 0;
     });
 });
+
+// const AddPublication = defineAsyncComponent(() => {
+//     import('~/components/platforms/AddPublication.vue')
+//     isOpenPopup.value = false
+// });
 
 const sortBy = (key) => {
     if (sortKey.value === key) {

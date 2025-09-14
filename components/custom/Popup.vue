@@ -20,7 +20,12 @@
             class="absolute top-25px right-25px text-gray-500 hover:text-black">
             ✖
           </button>
-          <slot></slot>
+          <Suspense>
+            <template #fallback>
+                <UiDotsLoader/>
+            </template>
+            <slot></slot>
+          </Suspense>
         </div>
       </div>
     </div>
@@ -29,6 +34,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
 
 const props = defineProps({
   isOpen: { type: Boolean, required: true },

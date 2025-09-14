@@ -11,6 +11,7 @@ import SettingsArray from '~/src/data/change-settings.json'
 
 const props = defineProps({
     modelValue: { type: Array, default: () => [] },
+    texButton: { type: String, default: 'Добавить вопрос' },
 })
 
 const itemsForCheckbox = ref([
@@ -249,9 +250,10 @@ function updateQuestion(item) {
             </draggable>
             <button class="add-question-button" :class="{ 'mt-0': items.length === 0, 'mt-25px': items.length > 0 }"
               @click="handleOpenAddQuestion">
-                <svg-icon name="accordion-plus" width="20" height="20" class="mr-5px" /><span
-                  class="text-sm font-normal">Добавить
-                    вопрос</span>
+                <svg-icon name="accordion-plus" width="20" height="20" class="mr-5px" />
+                <span class="text-sm font-normal">
+                    {{ props.texButton }}
+                </span>
             </button>
         </div>
         <transition name="fade" @after-leave="enableBodyScroll">

@@ -22,6 +22,7 @@ const { $loader } = useNuxtApp()
 const route = useRoute()
 const vacancyId = ref(route.query.id)
 const currectVacancy = inject('vacancyCurrect')
+console.log('currectVacancy', currectVacancy.value);
 const typeSave = ref(route.query.type ? route.query.type : 'create')
 
 if (vacancyId.value && !currectVacancy.value) {

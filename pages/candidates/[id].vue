@@ -63,7 +63,7 @@
         <div class="flex justify-between">
           <div>
             <p class="text-25px font-bold text-space leading-normal mb-2">
-              {{ candidate.surname }} {{ candidate.firstName }}
+              {{ candidate.surname }} {{ candidate.firstName }} {{ candidate?.middle_name }}
             </p>
             <p class="text-15px font-medium text-space leading-normal mb-6px">
               {{ candidate.vacancy }}
@@ -306,7 +306,15 @@
                 </p>
                 <p class="text-sm font-normal text-space leading-150">
                   {{ candidate.surname }} {{ candidate.firstName }}
-                  {{ candidate.patronymic || '' }}
+                  {{ candidate.middle_name || '' }}
+                </p>
+              </div>
+              <div v-if="candidate.age" class="flex gap-2.5 mb-5">
+                <p class="text-sm font-normal text-space min-w-[250px]">
+                  Возраст
+                </p>
+                <p class="text-sm font-normal text-space leading-150">
+                  {{ candidate.age }} {{ [0, 5, 6, 7, 8, 9].includes(candidate.age % 10) ? 'лет' : 'года' }}
                 </p>
               </div>
               <div class="flex gap-2.5 mb-5">
@@ -371,22 +379,12 @@
                         {{ exp?.position }}
                       </p>
                       <template v-if="exp?.description.split('\n').length > 0">
-                        <p v-for="(description, index) in exp?.description.split('\n')" :key="index" class="text-sm font-normal text-space truncate">
+                        <p v-for="(description, index) in exp?.description.split('\n')" :key="index" class="text-sm font-normal text-space">
                         {{ description }}
                       </p>
                       </template>
                   </li>
                 </ul>
-              </div>
-              <div class="flex gap-2.5 mb-5">
-                <p class="text-sm font-normal text-space min-w-[250px]">Фото</p>
-                <a
-                  :href="candidate.photo"
-                  target="_blank"
-                  class="text-dodger text-sm font-normal"
-                >
-                  {{ candidate.photo?.split('/').pop() ?? 'Фото не загружено' }}
-                </a>
               </div>
               <div class="flex gap-2.5 mb-5">
                 <p class="text-sm font-normal text-space min-w-[250px]">
@@ -523,9 +521,61 @@
                 <p class="text-sm font-normal text-space min-w-[240px]">Три</p>
                 <MyInputSecond v-model="newCustomThird" />
               </div>
+              <div v-for="(q, idx) in questions" :key="q.id" class="flex gap-2.5 items-center">
+              <div v-if="q.type === 'Поле для ввода в одну строку'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <MyInput :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Поле для ввода в несколько строк'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <MyTextarea :maxHeight="100" :placeholder="'Введите ваш ответ'" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Выпадающий список (один выбор)'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <MyDropdown :defaultValue="'Выберите вариант ответа'" :options="q.options" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Мультисписок (вопрос с вариантами ответа)'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <MultiSelect :options="q.options" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Время (выбор времени)'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <ChooseTime v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Дата (выбор даты)'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <DropdownCalendarStatic :is-open="isOpenDate" @isOpen="isOpenCalendar" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Дата (срок)'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <div class="flex gap-x-15px">
+                  <DropdownCalendarStatic :is-open="isOpenDateFrom" @isOpen="isOpenCalendarFrom"
+                    v-model="answers[idx + '_from']" :dateFrom="true" />
+                  <DropdownCalendarStatic :is-open="isOpenDateTo" @isOpen="isOpenCalendarTo"
+                    v-model="answers[idx + '_to']" :dateTo="true" />
+                </div>
+              </div>
+              <div v-if="q.type === 'Ссылка'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <MyInput :placeholder="'https://'" v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Адрес'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <geo-input v-model="answers[idx]" />
+              </div>
+              <div v-if="q.type === 'Файл'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <InputUpload v-model="answers[idx]" :minStyle="true" />
+              </div>
+              <div v-if="q.type === 'Чекбокс'">
+                <p class="text-space text-sm font-medium mb-15px leading-150">{{ q.title }}</p>
+                <div class="[&>*:not(:last-child)]:mb-2.5">
+                  <CheckboxGroup :options="q.options.map(opt => ({ label: opt, value: opt }))" v-model="answers[idx]" />
+                </div>
+              </div>
+            </div>
               <button class="flex items-center gap-x-5px mt-25px">
-                <svg-icon name="plus-blue20" width="20" height="20" />
-                <span class="text-dodger text-sm font-medium">Добавить</span>
+                <MoreQuestions v-model:modelValue="questions" texButton="Добавить" />
               </button>
             </div>
             <div class="bg-white pb-25px rounded-b-fifteen px-15px">
@@ -554,7 +604,9 @@
         </div>
       </div>
     </div>
-    <div v-else>Загрузка...</div>
+    <div v-else class="absolute top-1/2 left-1/2">
+        <UiDotsLoader />
+    </div>
   </div>
 </template>
 
@@ -577,6 +629,9 @@
   import MinDropdownSecond from '~/components/custom/MinDropdownSecond.vue'
   import Timeline from '@/components/timeline/index.vue'
   import ChatInput from '@/components/chat/ChatInput.vue'
+  import UiDotsLoader from '@/components/custom/UiDotsLoader.vue'
+  import MoreQuestions from '@/components/custom/MoreQuestions.vue'
+  import { useForms } from '~/stores/forms'
 
   import { dateStringToDots, formatDate } from '@/helpers/date'
 
@@ -662,7 +717,9 @@
   const newCustomFirst = ref('')
   const newCustomSecond = ref('')
   const newCustomThird = ref('')
-  import { inject } from 'vue';
+  const questions = ref([])
+  const answers = ref([])
+  const formsStore = useForms()
 
   const timelineGroups = ref([]);
   // const timelineGroups = ref([
@@ -863,7 +920,7 @@
       const dataUrl = {url: rawData.resume.url}
       const resume = await getData(dataUrl);
       candidate.value = sanitazeCandidate(resume.responses)
-      console.log('Candidate loaded:', candidate)
+      console.log('Candidate loaded:', candidate) 
     } catch (error) {
       console.error(error)
       throw createError({
@@ -1027,6 +1084,21 @@
       }
     }
   )
+
+  // Инициализация answers при изменении questions
+watch(questions, (newQuestions) => {
+  answers.value = newQuestions.map((q, idx) => {
+    const currentAnswer = answers.value[idx]
+    if (q.type === 'Чекбокс' || q.type === 'Мультисписок (вопрос с вариантами ответа)') {
+      return Array.isArray(currentAnswer) ? currentAnswer : []
+    }
+    if (q.type === 'Выпадающий список (один выбор)') {
+      return typeof currentAnswer === 'string' ? currentAnswer : ''
+    }
+    return typeof currentAnswer === 'string' ? currentAnswer : ''
+  })
+  formsStore.setQuestions(newQuestions)
+}, { immediate: true })
 
   // next or prev candidate moving
   const goToPrevious = () => {
