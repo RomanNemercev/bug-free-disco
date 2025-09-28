@@ -131,13 +131,14 @@ const sortedData = computed(() => {
     });
 });
 
-// const AddPublication = defineAsyncComponent(() => {
-//     import('~/components/platforms/AddPublication.vue')
-//     isOpenPopup.value = false
-// });
-
 const sortBy = (key) => {
     if (sortKey.value === key) {
+/**
+ * Changes the sort order of the list of publications.
+ * If the sort key is the same as the current sort key, the sort order is reversed.
+ * If the sort key is different, the sort order is set to ascending.
+ * @param {string} key - The key to sort by.
+ */
         sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
         sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
     } else {

@@ -23,6 +23,10 @@
       type: Boolean,
       default: false,
     },
+    notFound: {
+      type: String,
+      default: 'Ответственный не найден',
+    }
   })
 
   const currentResponse = ref('')
@@ -116,7 +120,7 @@
           class="no-reponse absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10"
         >
           <div class="text-slate-custom text-sm font-normal py-10px px-15px">
-            Ответственный не найден
+            {{ props.notFound }}
           </div>
         </div>
       </transition>

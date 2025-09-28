@@ -96,16 +96,7 @@
               {{ vacancy.title }}
             </button>
           </div>
-          <div class="text-sm font-medium text-space py-5 pl-2.5">
-            {{ vacancy.region }}
-          </div>
-          <div class="text-sm font-medium text-space py-5 pl-2.5">
-            {{ vacancy.createdAt }}
-          </div>
-          <div class="text-sm font-medium text-space py-5 pl-2.5">
-            {{ vacancy.closeDate }}
-          </div>
-          <!-- status vacancy -->
+           <!-- status vacancy -->
           <div class="text-sm font-medium text-space py-5 pl-2.5">
             {{ vacancy.status }}
           </div>
@@ -115,6 +106,9 @@
             v-if="['admin', 'responsible'].includes(userRole)"
           >
             {{ vacancy.customer }}
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.createdAt }}
           </div>
           <div
             v-if="userRole === 'customer'"
@@ -128,9 +122,9 @@
             <div v-if="userRole === 'admin'">
               <div
                 class="text-sm font-medium text-space py-5 pl-2.5"
-                v-if="vacancy.executor"
+                v-if="vacancy.responsible"
               >
-                {{ vacancy.executor }}
+                {{ vacancy.responsible }}
               </div>
               <div v-else>
                 <!-- Если выбрано значение, показываем его -->
@@ -154,16 +148,16 @@
                     value => updateResponseChoose(vacancy, value)
                   "
                   class="mb-0 w-full max-w-input py-5"
-                  :responses="executors"
+                  :responses="vacancy.responsible"
                 />
               </div>
             </div>
             <div v-if="userRole === 'responsible'">
               <div
-                v-if="vacancy.executor"
+                v-if="vacancy.responsible"
                 class="text-sm font-medium text-space py-5 pl-2.5"
               >
-                {{ vacancy.executor }}
+                {{ vacancy.responsible }}
               </div>
               <div v-else>
                 <button
@@ -176,7 +170,7 @@
             </div>
             <div div v-if="userRole === 'customer'">
               <div
-                v-if="vacancy.executor"
+                v-if="vacancy.responsible"
                 class="text-sm font-medium text-space py-5 pl-2.5"
               >
                 {{ vacancy.responsible }}
@@ -187,6 +181,12 @@
                 </p>
               </div>
             </div>
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.region }}
+          </div>
+          <div class="text-sm font-medium text-space py-5 pl-2.5">
+            {{ vacancy.closeDate }}
           </div>
           <!-- dropdown item -->
           <div class="py-2.5">
@@ -360,7 +360,7 @@
           <div class="mb-22">
             <div class="mb-15px">
               <p class="text-sm font-medium text-space mb-7px">
-                Утверждение
+                Согласующий<span class="text-red-500">*</span>
               </p>
               <response-input
                 class="w-full"
@@ -374,8 +374,8 @@
                 {{ errors.response }}
               </div>
             </div>
-            <div class="w-full flex justify-between gap-x-15px mb-15px">
-              <!-- <div class="w-full max-w-[400px]">
+            <!--<div class="w-full flex justify-between gap-x-15px mb-15px">
+               <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-4">
                   Заказчик
                 </p>
@@ -405,11 +405,11 @@
                 <div v-if="errors.executor" class="text-red-500 text-xs mt-1">
                   {{ errors.executor }}
                 </div>
-              </div> -->
-            </div>
+              </div> 
+            </div>-->
             <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
+                <p class="text-sm font-medium text-space leading-normal mb-15px">
                   Название должности<span class="text-red-500">*</span>
                 </p>
                 <MyInput
@@ -421,21 +421,30 @@
                 </div>
               </div>
               <div class="w-full">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
-                  Подразделение
+                <p class="text-sm font-medium text-space leading-normal mb-15px">
+                  Отдел
                 </p>
-                <MyInput
+                <response-input
+                class="w-full"
+                :responses="departments"
+                :model-value="newApplication.division ? newApplication.division.name : null"
+                :showRoles="true"
+                notFound="Отдел не найден"
+                placeholder="Введите название отдела"
+                @update:modelValue="newApplication.division = $event"
+              />
+                <!-- <MyInput
                   placeholder="Введите название подразделения"
                   v-model="newApplication.division"
-                />
-                <div v-if="errors.department" class="text-red-500 text-xs mt-1">
+                /> -->
+                <!-- <div v-if="errors.department" class="text-red-500 text-xs mt-1">
                   {{ errors.department }}
-                </div>
+                </div> -->
               </div>
             </div>
-            <div class="w-full mb-2.5">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
-                Регион поиска<span class="text-red-500">*</span>
+            <div class="w-full mb-15px">
+              <p class="text-sm font-medium text-space leading-normal mb-15px">
+                Город поиска<span class="text-red-500">*</span>
               </p>
               <geo-input
                 v-model="newApplication.city"
@@ -445,8 +454,8 @@
                 {{ errors.location }}
               </div>
             </div>
-            <div class="w-full mb-2.5">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
+            <div class="w-full mb-15px">
+              <p class="text-sm font-medium text-space leading-normal mb-15px">
                 Сколько человек нужно нанять<span class="text-red-500">*</span>
               </p>
               <MyInput
@@ -458,9 +467,9 @@
                 {{ errors.positions }}
               </div>
             </div>
-            <div class="w-full mb-2.5 flex gap-x-15px">
+            <div class="w-full mb-15px flex gap-x-15px">
               <div class="w-full">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
+                <p class="text-sm font-medium text-space leading-normal mb-15px">
                   Зарплата
                 </p>
                 <SalaryRange  
@@ -477,7 +486,7 @@
                 </div>
               </div>
               <div class="w-full">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
+                <p class="text-sm font-medium text-space leading-normal mb-15px">
                   Валюта
                 </p>
                 <my-dropdown
@@ -492,7 +501,7 @@
               </div>
             </div>
             <div class="w-full mb-15px">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
+              <p class="text-sm font-medium text-space leading-normal mb-15px">
                 Причина открытия вакансии<span class="text-red-500">*</span>
               </p>
               <my-dropdown
@@ -506,7 +515,7 @@
             </div>
             <div class="w-full gap-x-15px flex mb-15px">
               <div class="w-full">
-                <p class="text-sm font-medium text-space mb-1">
+                <p class="text-sm font-medium text-space mb-15px">
                   Начать подбор не позднее
                 </p>
                 <!-- <InputCalendar :fullStyles="true" /> -->
@@ -521,7 +530,7 @@
                 </div>
               </div>
               <div class="w-full">
-                <p class="text-sm font-medium text-space mb-1">
+                <p class="text-sm font-medium text-space mb-15px">
                   Желаемая дата выхода кандидата
                 </p>
                 <DropdownCalendarStatic 
@@ -533,8 +542,8 @@
                 </div>
               </div>
             </div>
-            <div class="w-full">
-              <p class="text-sm font-medium text-space leading-normal mb-4">
+            <div class="w-full mb-15px">
+              <p class="text-sm font-medium text-space leading-normal mb-15px">
                 Требования к кандидату
               </p>
               <MyTextarea
@@ -545,7 +554,7 @@
                 {{ errors.requirements }}
               </div>
             </div>
-            <div class="w-full mb-25px">
+            <div class="w-full mb-15px">
               <p class="text-sm font-medium text-space leading-normal mb-4">
                 Обязанности кандидата
               </p>
@@ -559,6 +568,24 @@
               >
                 {{ errors.responsibilities }}
               </div>
+            </div>
+            <div class="w-full mb-15px">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Условия работы
+              </p>
+              <MyTextarea
+                v-model="newApplication.conditions"
+                :placeholder="'Опишите условия работы для кандидата'"
+              />
+            </div>
+            <div class="w-full mb-25px">
+              <p class="text-sm font-medium text-space leading-normal mb-4">
+                Комментарий или заметки
+              </p>
+              <MyTextarea
+                v-model="newApplication.comments"
+                :placeholder="'Опишите комментарий или заметки для кандидата'"
+              />
             </div>
             <div></div>
             <div class="flex gap-15px justify-between w-fit">
@@ -708,7 +735,7 @@
             <div class="grid gap-x-5 grid-flow-col mb-6">
               <div>
                 <p class="text-sm font-medium text-space pl-15px mb-1">
-                  Регион поиска
+                  Город поиска
                 </p>
                 <SimpleInput v-model="newRegionResponsible" />
               </div>
@@ -831,7 +858,7 @@
             <div class="grid gap-x-5 grid-flow-col mb-6">
               <div>
                 <p class="text-sm font-medium text-space pl-15px mb-1">
-                  Регион поиска
+                  Город поиска
                 </p>
                 <SimpleInput v-model="newRegionCustomer" />
               </div>
@@ -1176,6 +1203,32 @@
         </template>
       </Popup>
     </transition>
+   <transition
+        name="fade"
+        @after-leave="enableBodyScroll"
+        @enter="disableBodyScroll"
+      >
+      <Popup
+          :isOpen="isSaveVacancy"
+          @close="() => (isSaveVacancy = false)"
+          :width="'740px'"
+          :showCloseButton="false"
+          :disableOverflowHidden="true"
+          :overflowContainer="true"
+          maxHeight
+          :lgSize="true"
+      >
+         <p class="leading-normal text-xl font-semibold text-space mb-[10px]">
+          Заявка отправлена
+         </p>
+         <p class="text-base text-slate-custom font-normal mb-35px">
+          Вы получите уведомление о ходе работы на почту
+         </p>
+         <UiButton variant="action" size="semiaction" class="font-bold" @click="() => (isSaveVacancy = false)">
+              Закрыть
+         </UiButton>
+      </Popup>
+   </transition>
     <div
       v-if="loadingItem"
       class="absolute bg-black bg-opacity-50 inset-0 flex items-center justify-center"
@@ -1235,7 +1288,7 @@
   import { createApplication } from '~/utils/applicationCreate'
   import { deleteApplication } from '~/utils/applicationRemove'
   import { clientsList } from '~/utils/clientsList'
-  import { executorsList } from '~/utils/executorsList'
+  import { executorsList, getDepartments } from '~/utils/executorsList'
   import { fetchApplicationUpdate } from '~/utils/applicationUpdate'
   import { getVacancies, getVacanciesNames } from '~/utils/getVacancies'
 
@@ -1266,17 +1319,18 @@
   const headers = computed(() => {
     const baseHeaders = [
       { key: 'title', label: 'Вакансия' },
-      { key: 'region', label: 'Регион' },
-      { key: 'dateStart', label: 'Создана от' },
-      { key: 'dateWork', label: 'Закрыть до' },
       { key: 'status', label: 'Статус' },
-      { key: 'executor', label: 'Исполнитель' },
+      { key: 'dateStart', label: 'Дата создания' },
+      { key: 'executor', label: 'Согласующий' },
+      { key: 'region', label: 'Город' },
+      { key: 'dateWork', label: 'Закрыть до' }, 
+      
     ]
 
     if (['admin', 'responsible'].includes(userRole.value)) {
-      baseHeaders.splice(5, 0, { key: 'customer', label: 'Заказчик' })
+      baseHeaders.splice(2, 0, { key: 'customer', label: 'Автор' })
     } else if (userRole.value === 'customer') {
-      baseHeaders.splice(5, 0, { key: 'responsible', label: 'Ответственный' })
+      baseHeaders.splice(2, 0, { key: 'responsible', label: 'Ответственный' })
     }
 
     return baseHeaders
@@ -1329,12 +1383,14 @@
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
   const popupResponse = ref(null)
+  const isSaveVacancy = ref(false)
 
   const ArrayCurrency = currency
   const addNewCustomer = ref('')
   const addNewResponsible = ref('')
   const clients = ref([])
   const executors = ref([])
+  const departments = ref([])
   const vacancies = ref([])
   let resizeObserver = null
   const errors = ref({})
@@ -1565,7 +1621,11 @@
     // получаем динамический список исполнителей
     const {executors: executorData} = await executorsList();
     executors.value = executorData
+    console.log('executprs', executors.value);
   }
+
+  // Получаем динамический список отделов
+  departments.value = await getDepartments();
 
   const handlePageChange = async page => {
     pagination.value.current_page = page
@@ -1680,6 +1740,8 @@
   }
 
   function updateNewResponsible(value, id) {
+    console.log('value edit', value)
+    console.log('id edit', id)
     if (value) {
       newExecutor.value.name = value
       newExecutor.value.id = id
@@ -1690,6 +1752,7 @@
       newApplication.value.responsible.id = id
       newApplication.value.responsible.name = value
     }
+    console.log('data', newApplication.value);
   }
 
   const updateNewCustomer = (value, id) => {
@@ -1893,8 +1956,9 @@
   const validateForm = () => {
     const newErrors = {}
 
+    if (!newApplication.value.responsible) newErrors.response = 'Укажите согласующего'
     if (!newApplication.value.position) newErrors.post = 'Укажите должность'
-    if (!newApplication.value.city) newErrors.location = 'Укажите регион поиска'
+    if (!newApplication.value.city) newErrors.location = 'Укажите город поиска'
     if (!newApplication.value.count || newApplication.value.count <= 0) {
       newErrors.positions = 'Укажите корректное количество позиций'
     }
@@ -1907,8 +1971,10 @@
       }
     }
     if (!newApplication.value.currency) newApplication.value.currency = currency[0]['name']
-    if (!newApplication.value.reason)
+    if (!newApplication.value.reason) {
       newErrors.reason = 'Укажите причину открытия вакансии'
+    }
+      
 
     errors.value = newErrors
 
@@ -1916,6 +1982,7 @@
   }
 
   const applicationData = computed(() => {
+    console.log('newApplication.value', newApplication.value)
     return {
       position: newApplication.value.position,
       division: newApplication.value.division,
@@ -1926,7 +1993,7 @@
       require: newApplication.value.require,
       duty: newApplication.value.duty,
       city: newApplication.value.city,
-      reason: newApplication.value.reason,
+      reason: newApplication.value.reason.name,
       dateStart: newApplication.value.dateStart,
       dateWork: newApplication.value.dateWork,
       vacancy: newApplication.value.vacancy?.id,
@@ -1949,6 +2016,7 @@
           console.log('Success:', data.message)
           isNewAppPopupAdmin.value = false // Закрываем попап
           loadApplications()
+          isSaveVacancy.value = true
         } else if (error) {
           const status = error.status
           const message = error.data?.message || error.message
