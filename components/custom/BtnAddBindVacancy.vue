@@ -60,7 +60,7 @@
     </div>
 
     <!-- Отображение выбранной вакансии -->
-    <div v-if="currentVacancy && !showInput" class="pl-15px">
+    <div v-if="currentVacancy && !showInput">
       <p class="py-2.5 text-sm font-medium text-dodger leading-normal">
         {{ currentVacancy.name }}
       </p>

@@ -1,6 +1,6 @@
 <template>
   <div ref="responseContainer">
-    <div v-if="modelValue" class="text-sm font-medium text-dodger pl-15px">
+    <div v-if="modelValue" class="text-sm font-medium text-dodger">
       {{ modelValue }}
     </div>
     <button
