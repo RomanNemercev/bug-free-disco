@@ -5,6 +5,7 @@
   import GeoInput from '~/components/custom/GeoInput.vue'
   import ResponseInput from '~/components/custom/ResponseInput.vue'
   import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
+  import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
 
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { getVacancies } from '~/utils/getVacancies'
@@ -297,10 +298,11 @@
             <svg-icon name="funnel" width="20" height="20" />
           </button>
         </div>
+        </div>
         <transition name="fade">
           <div
             v-if="isActiveFunnel"
-            class="absolute bg-white w-full top-[71px] left-0 p-25px pt-15px rounded-b-ten z-10"
+            class="relative bg-white w-full top-[10px] left-0 p-25px pt-15px rounded-b-ten z-10"
           >
             <p class="text-18px font-medium text-space leading-normal mb-35px">
               Фильтры
@@ -352,7 +354,7 @@
         <transition name="fade">
           <div
             v-if="isActiveSort"
-            class="absolute bg-white w-full top-[71px] left-0 p-25px pt-15px rounded-b-ten z-10"
+            class="relative bg-white w-full top-[10px] left-0 p-25px pt-15px rounded-b-ten z-10"
           >
             <p class="text-18px font-medium text-space leading-normal mb-25px">
               Фильтры
@@ -381,7 +383,7 @@
             </div>
           </div>
         </transition>
-      </div>
+      <!-- </div> -->
     </div>
     <div
       ref="containerRef"
@@ -397,19 +399,8 @@
         "
       >
         <div v-if="activeVacancies" class="absolute w-full active-view">
-          <div
-            v-if="loading"
-            class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center"
-          >
-            <p class="text-15px font-medium text-slate-custom">Загрузка...</p>
-          </div>
-          <div
-            v-else-if="vacancies.length === 0"
-            class="bg-catskill w-full rounded-fifteen min-h-56 flex items-center justify-center"
-          >
-            <p class="text-15px font-medium text-slate-custom">
-              Вы еще не добавляли вакансий которыми можно управлять
-            </p>
+          <div v-if="vacancies.length === 0" class="absolute top-1/2 left-1/2">
+            <UiDotsLoader />
           </div>
           <div
             class="[&>*:not(:last-child)]:mb-15px"
@@ -486,6 +477,9 @@
               :totalPages="totalArchivePages"
               @page-changed="handleArchivePageChange"
             />
+          </div>
+          <div v-if="loadingCandidates" class="absolute top-1/2 left-1/2">
+            <UiDotsLoader />
           </div>
         </div>
       </transition>

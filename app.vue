@@ -23,6 +23,7 @@
 import { PLATFORMS_DEFAULT } from '@/src/constants'
 import { provide } from 'vue';
 
+
 provide('platformsGlobal',  PLATFORMS_DEFAULT)
 provide('isPlatforms', false)
 provide('vacancyCurrect', ref(null));

@@ -9,6 +9,10 @@
         }" class="text-sm">
           {{ mappedSelectedOption }}
         </div>
+        <div v-show="!selectedOption"
+          class="right-3.5 top-2 transition-transform duration-300 text-bali">
+          {{ valueData }}
+        </div>
         <!-- Стрелка -->
         <div v-show="!selectedOption"
           class="dropdown-arrow absolute right-3.5 top-2 transition-transform duration-300 text-bali"
@@ -36,6 +40,7 @@
 </template>
 
 <script setup>
+import Placeholder from '@tiptap/extension-placeholder'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
@@ -60,6 +65,10 @@ const props = defineProps({
     type: [Number, String, null],
     default: null,
   },
+  placeholder: {
+    type: String,
+    default: 'Выберите значение',
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'select'])
@@ -72,6 +81,7 @@ const selectedOption = ref(null)
 const getOptionValue = (option) => option?.value ?? option
 const getOptionLabel = (option) => option?.name ?? option
 const getOptionKey = (option) => getOptionValue(option)
+const valueData = ref(props.defaultValue)
 
 // Вычисляемое свойство для отображаемого значения
 const mappedSelectedOption = computed(() => {

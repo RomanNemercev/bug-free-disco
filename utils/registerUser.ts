@@ -14,7 +14,7 @@ export const registerUser = async (userData: any) => {
 
         const response = await $fetch('/register', {
             method: 'POST',
-            baseURL: config.public.apiBase,
+            baseURL: config.public.apiBase as string,
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
@@ -33,3 +33,31 @@ export const registerUser = async (userData: any) => {
         return null;
     }
 };
+
+export const registerClient = async (path: string, userData: any) => {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+    let error: boolean = false;
+
+    try {
+        let response = await $fetch(`/customer-with-roles/${path}`, {
+            method: 'POST',
+            baseURL: config.public.apiBase as string,
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`,
+                'X-Auth-User': `${authUser}`
+            },
+            body: userData,
+        });
+
+        console.log('Ответ сервера при регистрации:', response);
+        response = await response.json();
+    
+        return {data: response, error: error};
+    } catch (err: any) {
+        return {data: null, error: true, message: err.response._data.message};
+    }
+};
+
