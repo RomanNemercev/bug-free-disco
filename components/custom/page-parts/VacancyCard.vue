@@ -44,7 +44,7 @@
                   class="text-sm font-normal mb-1 transition-colors cursor-default"
                   :class="hovered[index] ? 'text-dodger' : 'text-space'"
                 >
-                  {{ column.count }}
+                  {{ column.count ? column.count : "-" }}
                 </div>
                 <div
                   class="text-13px text-slate-custom font-normal truncate cursor-default"

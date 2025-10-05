@@ -19,6 +19,7 @@ import PhoneInput from '~/components/custom/PhoneInput.vue'
 import EmailInput from '~/components/custom/EmailInput.vue'
 import CustomDropdown from '~/components/custom/CustomDropdown.vue'
 import GenerateButton from '~/components/custom/GenerateButton.vue'
+import MyTextarea from '@/components/custom/MyTextarea.vue'
 import { inject } from 'vue'
 
 import schedule from '~/src/data/work-schedule.json'
@@ -413,7 +414,7 @@ watch(() => newVacancy.employment, (newValue) => {
               <span>
                 <svg-icon name="question" width="20" height="20" />
                 <MyTooltip
-                  text="Каждая вакансия получает свой уникальный код, что позволяет точно идентифицировать её в системе и избежать путаницы, особенно при работе с большим количеством вакансий." />
+                  text="Укажите номер или идентификатор вакансии из ваших систем (например, из 1С), чтобы не путать вакансии с одинаковыми названиями между собой" />
               </span>
             </div>
             <div class="max-w-400px">
@@ -498,16 +499,13 @@ watch(() => newVacancy.employment, (newValue) => {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-            <CustomDropdown :options="options" placeholder="Выберите специализацию"
-                :model-value="newVacancy.employment ? newVacancy.employment : ''"
-                @update:model-value="$event => updateEvent($event, 'employment')" />
-            <!-- <my-dropdown :defaultValue="'Тип занятости'" :options="options"
+            <my-dropdown :defaultValue="'Выберите значение'" :options="options"
               :model-value="newVacancy.employment ? newVacancy.employment : ''" :initialValue="newVacancy.employment"
-              @update:model-value="$event => updateEvent($event, 'employment')" /> -->
+              @update:model-value="$event => updateEvent($event, 'employment')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
-            <my-dropdown :defaultValue="'График работы'" :options="ArraySchedule"
+            <my-dropdown :defaultValue="'Выберите значение'" :options="ArraySchedule" placeholder="График работы"
               :model-value="newVacancy.schedule ? newVacancy.schedule : ''" :initialValue="newVacancy.schedule"
               @update:model-value="$event => updateEvent($event, 'schedule')" />
           </div>
@@ -515,21 +513,32 @@ watch(() => newVacancy.employment, (newValue) => {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Опыт работы</p>
-            <my-dropdown :defaultValue="'Опыт работы'" :options="ArrayExperience"
+            <my-dropdown :defaultValue="'Выберите значение'" :options="ArrayExperience"
               :model-value="newVacancy.experience ? newVacancy.experience : ''" :initialValue="newVacancy.experience"
               @update:model-value="(value) => updateEvent(value, 'experience')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Образование</p>
-            <my-dropdown :defaultValue="'Образование'" :options="ArrayEducation"
+            <my-dropdown :defaultValue="'Выберите значение'" :options="ArrayEducation"
               :model-value="newVacancy.education ? newVacancy.education : ''" :initialValue="newVacancy.education"
               @update:model-value="(value) => updateEvent(value, 'education')" />
           </div>
         </div>
-        <div class="w-full mb-9 max-w-input">
-          <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
-          <tag-select :options="tags" :model-value="newVacancy.phrases ? newVacancy.phrases : []"
-            @update:model-value="$event => updateTags($event)" @delete="$event => updateTags($event)" />
+        <div class="flex justify-between gap-25px mb-3.5">
+          <div class="w-full max-w-input">
+            <p class="text-sm font-medium text-space mb-13px">Ключевые фразы</p>
+            <tag-select :options="tags" :model-value="newVacancy.phrases ? newVacancy.phrases : []"
+              @update:model-value="$event => updateTags($event)" @delete="$event => updateTags($event)" />
+          </div>
+          <div class="w-full max-w-input">
+            <p class="text-sm font-medium text-space mb-13px">Количество человек</p>
+            <MyInput :placeholder="'Введите количество'" type="number" :model-value="newVacancy.peoples ? newVacancy.peoples : ''"
+                  @update:model-value="$event => updateEvent($event, 'peoples')" />
+          </div>
+        </div>
+        <div class="mb-9">
+          <p class="text-sm font-medium text-space mb-13px">Комментарий или заметки</p>
+          <MyTextarea :placeholder="'Введите текст'" :model-value="newVacancy.comment ? newVacancy.comment : ''" />
         </div>
         <div class="w-fit">
           <MyAccordion title="дополнительные условия" class="mb-15px">

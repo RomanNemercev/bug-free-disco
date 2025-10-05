@@ -38,7 +38,7 @@
 
   // Дебаунс-функция для фильтрации списка
   const filterResponses = debounce(() => {
-    const input = currentResponse.value.toLowerCase()
+    const input = currentResponse.value?.toLowerCase()
     filteredResponses.value = props.responses.filter(response => {
       const name = response.name.toLowerCase()
       const role = response.role ? response.role.toLowerCase() : ''
