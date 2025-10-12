@@ -507,7 +507,6 @@
               <my-dropdown
                 :options="reasonseForOpenVacancy"
                 v-model="newApplication.reason"
-                :defaultValue="'Укажите вариант ответа'"
               />
               <div v-if="errors.reason" class="text-red-500 text-xs mt-1">
                 {{ errors.reason }}
@@ -1006,6 +1005,7 @@
                   <div
                     class="flex gap-x-5 p-25px bg-white rounded-fifteen mb-2.5"
                   >
+                  
                     <div class="w-full">
                       <p class="text-sm font-medium mb-5px">Исполнитель</p>
                       <BtnResponseInput
@@ -1044,6 +1044,7 @@
                     </div>
                   </div>
                   <div class="p-25px bg-white rounded-fifteen">
+                    
                     <div class="flex gap-x-15px mb-5">
                       <div class="w-full">
                         <p class="text-sm font-medium mb-15px">Заказчик</p>
@@ -1188,7 +1189,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex gap-x-15px">
+            <div v-if="!isAddApprove" class="flex gap-x-15px">
               <UiButton variant="action" size="semiaction" @click="() => handlerUpdateApplication([], selectedVacancy)">Готово</UiButton>
               <UiButton
                 variant="back"
@@ -1197,6 +1198,19 @@
                 @click="closePopup"
               >
                 Отмена
+              </UiButton>
+            </div>
+            <div v-else class="flex gap-x-15px">
+              <UiButton variant="action" size="semiaction" @click="() => isAddApprove = true">
+                Создать вакансию
+              </UiButton>
+              <UiButton
+                variant="back"
+                size="second-back"
+                class="font-medium"
+                @click="() => isNotApprove = true"
+              >
+                Отклонить
               </UiButton>
             </div>
           </div>
@@ -1242,6 +1256,39 @@
       @page-changed="handlePageChange"
     />
   </div>
+  <Popup 
+          :isOpen="isApprove"
+          @close="() => (isApprove = false)"
+          :width="'740px'"
+          :showCloseButton="false"
+          :disableOverflowHidden="true"
+          :overflowContainer="true"
+          maxHeight
+          :lgSize="true"
+    >
+    <p class="leading-normal text-xl font-semibold text-space mb-[10px]">
+          Вакансия успешно создана
+    </p>
+  </Popup>
+  <Popup 
+          :isOpen="isNotApprove"
+          @close="() => (isApprove = false)"
+          :width="'740px'"
+          :showCloseButton="false"
+          :disableOverflowHidden="true"
+          :overflowContainer="true"
+          maxHeight
+          :lgSize="true"
+    >
+    <p class="leading-normal text-xl font-semibold text-space mb-[10px]">
+          Отклонение заявки
+    </p>
+    <p class="text-base text-slate-custom font-normal mb-35px">
+          Заявка будет отклонена, заказчику придет уведомление об этом. Информация будет отражена в Заявке.
+    </p>
+    <p class="text-sm font-medium text-space mb-13px">Причина</p>
+          <MyTextarea :placeholder="'Заполните это поле'"  />
+  </Popup>
 </template>
 
 <script setup>
@@ -1251,18 +1298,10 @@
     onMounted,
     onUnmounted,
     onBeforeUnmount,
-    watchEffect,
     nextTick,
     watch,
   } from 'vue'
   import dayjs from 'dayjs'
-  // import { useUserStore } from '@/stores/user'
-
-  // import { getMovieList } from "@/src/api";
-  // const apiTest = getMovieList('movie');
-  // const initTop = await useAsyncData('top10', async () => await getMovieList('movie'));
-  // console.log(apiTest);
-
   import ResponseInput from '~/components/custom/ResponseInput.vue'
   import DotsDropdown from '~/components/custom/DotsDropdown.vue'
   import Popup from '~/components/custom/Popup.vue'
@@ -1290,17 +1329,14 @@
   import { clientsList } from '~/utils/clientsList'
   import { executorsList, getDepartments } from '~/utils/executorsList'
   import { fetchApplicationUpdate } from '~/utils/applicationUpdate'
-  import { getVacancies, getVacanciesNames } from '~/utils/getVacancies'
+  import { getVacanciesNames } from '~/utils/getVacancies'
+  import { loadScript } from '@/plugins/loader'
+  import { profile } from '@/utils/loginUser'
+
+  import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/api'
 
 
   const applications = ref([])
-  // const data = ref(
-  //   dataList.map(vacancy => ({
-  //     ...vacancy,
-  //     showResponseInput: false, // Добавляем состояние для каждого элемента
-  //     responseChoose: '', // Выбранный ответственный
-  //   }))
-  // )
   const data = ref([])
   const pagination = ref({
     current_page: 1,
@@ -1386,8 +1422,6 @@
   const isSaveVacancy = ref(false)
 
   const ArrayCurrency = currency
-  const addNewCustomer = ref('')
-  const addNewResponsible = ref('')
   const clients = ref([])
   const executors = ref([])
   const departments = ref([])
@@ -1395,7 +1429,14 @@
   let resizeObserver = null
   const errors = ref({})
   const updateData = ref({});
+  const isAddApprove = ref(false);
+  
 
+  const {data: profileCustomer, error: errorProfile } = await profile();
+  if (!errorProfile) {
+
+  }
+  console.log('user', profileCustomer, errorProfile);
   // Функция обновления высоты контента
   const updateTabHeight = () => {
     nextTick(() => {
@@ -1412,13 +1453,6 @@
     console.log('value', value)
     isOpenDateFrom.value = value
   }
-
-  // const statusLabels = {
-  //   new: 'Новая заявка',
-  //   in_review: 'На рассмотрении',
-  //   in_work: 'В работе',
-  //   paused: 'Приостановлена',
-  // }
 
   const statusWeights = {
     new: 1,
@@ -1481,8 +1515,6 @@
     //console.log('event', event.target);
     //обработчик события клика вне календаря
     if ((!elTarget || !elTarget.classList.contains('.shadow-shadow-droplist')) || !elTarget.closest('.calendar-wrapper')) {
-      // console.log('от', isOpenDateFrom.value)
-      // console.log('до', isOpenDateTo.value)
       if (isOpenDateFrom.value)
           isOpenDateFrom.value = false
       if (isOpenDateTo.value)
@@ -1644,7 +1676,8 @@
     return executors;
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}`);
     document.addEventListener('click', handleClickOutside)
     document.addEventListener('click', handleClickOutsideNewAppPopup)
     document.addEventListener('click', handleClickOutsideNewAppPopupResponsible)
@@ -1740,8 +1773,6 @@
   }
 
   function updateNewResponsible(value, id) {
-    console.log('value edit', value)
-    console.log('id edit', id)
     if (value) {
       newExecutor.value.name = value
       newExecutor.value.id = id
@@ -1825,6 +1856,11 @@
     try {
       const fullData = await fetchApplicationDetail(vacancy.id)
       detailedVacancy.value = fullData.data // save full response.data
+      if (detailedVacancy.value.status.name == 'На рассмотрении') {
+        if (profileCustomer.data.role.name == 'Рекрутер') {
+          isAddApprove.value = true
+        }
+      }
     
       selectedVacancy.value = vacancy // open popup
     } catch (error) {

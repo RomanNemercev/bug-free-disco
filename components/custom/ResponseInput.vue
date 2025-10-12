@@ -31,9 +31,9 @@
 
   const currentResponse = ref('')
   currentResponse.value = props.modelValue
-  const filteredResponses = ref([])
+  const filteredResponses = ref(props.responses)
   const isFocused = ref(false)
-  
+  console.log('filteredResponses', filteredResponses.value)
   const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null]})
 
   // Дебаунс-функция для фильтрации списка
@@ -93,7 +93,7 @@
 
       <transition name="slide-fade">
         <ul
-          v-if="filteredResponses.length && currentResponse"
+          v-if="filteredResponses.length && isFocused"
           class="responses-list absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10"
         >
           <li

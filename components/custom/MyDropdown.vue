@@ -11,7 +11,7 @@
         </div>
         <div v-show="!selectedOption"
           class="right-3.5 top-2 transition-transform duration-300 text-bali">
-          {{ valueData }}
+          {{ props.placeholder }}
         </div>
         <!-- Стрелка -->
         <div v-show="!selectedOption"
@@ -40,7 +40,6 @@
 </template>
 
 <script setup>
-import Placeholder from '@tiptap/extension-placeholder'
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
@@ -55,7 +54,7 @@ const props = defineProps({
   },
   defaultValue: {
     type: String,
-    default: 'Выбрать значение',
+    default: null,
   },
   initialValue: {
     type: [String, Number, Object, null],

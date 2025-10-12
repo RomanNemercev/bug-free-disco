@@ -136,7 +136,7 @@ export const getPhrases = async () => {
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${serverToken}`,
-                'X-Auth-User': userToken, 
+                'X-Auth-User': userToken,
             },
         });
 
@@ -147,8 +147,8 @@ export const getPhrases = async () => {
             const userStore = useUserStore();
             userStore.clearUserData();
 
-            serverTokenCookie.value = null; // Удаляем просроченный токен сервера
-            userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
+            serverTokenCookie.value = null; 
+            userTokenCookie.value = null;
             // Middleware сработает автоматически при следующем роутинге
             alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');

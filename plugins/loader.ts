@@ -47,3 +47,19 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
     }
 })
+
+export const loadScript = (url: string) => {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${url}"]`)) {
+          resolve(); // Скрипт уже загружен, не дублируем
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = url;
+        // script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+     
+};

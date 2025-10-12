@@ -149,6 +149,11 @@ if (props.id) {
       newVacancy.value[key] = currectVacancy[key]
     }
     inject('currentVacancy', currectVacancy)
+  } else {
+    throw createError({
+            statusCode: 404,
+            statusMessage: 'Вакансия не найдена'
+        });
   }
   
 }
@@ -387,7 +392,7 @@ watch(() => newVacancy.employment, (newValue) => {
 
 <template>
   <div class="container pb-10">
-    <div class="flex gap-x-[24px] pt-48">
+    <div class="flex gap-x-[24px] block">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
         <p class="text-space text-xl font-semibold mb-8">Основная информация</p>
         <div class="w-full justify-between flex gap-25px mb-6">
@@ -699,5 +704,8 @@ watch(() => newVacancy.employment, (newValue) => {
 <style scoped>
 .max-w-input {
   max-width: calc(50% - 12.5px);
+}
+.block {
+  padding-top: 12rem;
 }
 </style>

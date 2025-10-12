@@ -17,6 +17,9 @@ import { ref, defineAsyncComponent, computed } from 'vue'
 import { useNuxtApp } from '#app'
 import UiLoader from '~/components/UiLoader.vue'
 import { useRoute } from 'vue-router'
+import { loadScript } from '@/plugins/loader'
+import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/api'
+
 const { $loader } = useNuxtApp()
 
 const route = useRoute()
@@ -49,7 +52,7 @@ const tabs: Record<string, () => Promise<any>> = {
   funnel: () => import('@/pages/create-tabs/FunnelTab.vue'),
 }
 
-const currentTab = ref<keyof typeof tabs>('search')
+const currentTab = ref<keyof typeof tabs>('info')
 const showLoader = ref(false)
 let loaderTimeout: NodeJS.Timeout | null = null
 
@@ -85,4 +88,8 @@ const onResolve = () => {
 const onFallback = () => {
   console.log('Suspense: Showing fallback')
 }
+
+onMounted(async () => {
+  await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}`);
+})
 </script>

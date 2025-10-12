@@ -69,3 +69,24 @@ export const loginUser = async (email: string, password: string) => {
         return { data: null, error: errorMessage };
     }
 };
+
+export const profile = async () => {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+    
+
+    try {
+        const response: {data: any, message: string } = await $fetch(`${config.public.apiBase}/profile`, {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${authToken}`,
+                'X-Auth-User': `${authUser}`
+            },
+        })
+
+        return { data: response, error: null };
+    } catch (error) {
+        return { data: null, error: error };
+    }
+}
