@@ -61,9 +61,9 @@
 
     <!-- Отображение выбранной вакансии -->
     <div v-if="currentVacancy && !showInput">
-      <p class="py-2.5 text-sm font-medium text-dodger leading-normal">
+      <a class="py-2.5 text-sm font-medium text-dodger leading-normal" href="/">
         {{ currentVacancy.name }}
-      </p>
+      </a>
       <p class="text-slate-custom text-13px font-normal leading-normal">
         ID {{ currentVacancy.id }}
       </p>

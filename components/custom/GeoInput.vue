@@ -1,6 +1,8 @@
 <script setup>
   import { ref, watch } from 'vue'
   import debounce from 'lodash/debounce'
+  import { loadScript } from '@/plugins/loader'
+  import { useScriptTag } from '@vueuse/core'
 
   const props = defineProps({
     placeholder: {
@@ -27,11 +29,14 @@
 
   const filteredCities = ref([])
 
-  const filterCities = debounce(() => {
+  const filterCities = debounce(async () => {
     const input = currentCity.value.toLowerCase()
-    filteredCities.value = cities.value.filter(city =>
-      city.toLowerCase().includes(input)
-    ) 
+    const adresses = await ymaps.suggest(input);
+    filteredCities.value = adresses.map(address => address.value);
+
+    // filteredCities.value = cities.value.filter(city =>
+    //   city.toLowerCase().includes(input)
+    // ) 
     if (!filteredCities.value.length) {
       emit('update:modelValue', currentCity.value)
     } 
@@ -51,6 +56,8 @@
   }
 
   const emit = defineEmits(['update:modelValue'])
+  console.log('Отрисовка гео-компоненты');
+
 </script>
 
 <template>
@@ -112,8 +119,12 @@
 
   .geo-input {
     padding-right: 15px;
+    padding-left: 42px;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background-image: url('../../assets/sprite/svg/search.svg');
+    background-repeat: no-repeat;
+    background-position: 15px center;
   }
 
   .clear-city {
