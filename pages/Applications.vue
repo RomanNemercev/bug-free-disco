@@ -788,7 +788,7 @@
                 Причина отклонения заявки
               </p>
               <div class="relative z-10">
-                {{ detailedVacancy.approvals[0].description }}
+                {{ detailedVacancy.approvals[0]?.description }}
               </div>
               <p class="text-xs text-slate-custom font-normal mb-25px">
                 *Чтобы внести изменения после отклонения заявки, скопируйте заявку на вакансию, нажав на кнопку "Копировать" внизу окна созданной вами заявки. Заявка будет скопирована и создана заново.
