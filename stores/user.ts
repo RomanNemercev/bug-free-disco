@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 interface UserState {
     name: string;
     email: string;
+    role: string
     // add other user properties as needed
 }
 
@@ -12,6 +13,7 @@ export const useUserStore = defineStore('user', {
     state: (): UserState => ({
         name: '',
         email: '',
+        role: ''
         // add other user properties as needed
     }),
 
@@ -40,11 +42,13 @@ export const useUserStore = defineStore('user', {
         setUserData(userData: Partial<UserState>) {
             if (userData.name) this.name = userData.name;
             if (userData.email) this.email = userData.email;
+            if (userData.role) this.role = userData.role;
         },
 
         clearUserData() {
             this.name = '';
             this.email = '';
+            this.role = '';
         }
     },
 

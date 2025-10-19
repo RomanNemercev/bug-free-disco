@@ -83,7 +83,7 @@
 
       <transition name="slide-fade">
         <ul
-          v-if="filteredVacancies.length && currentVacancy"
+          v-if="filteredVacancies.length && isFocused"
           class="absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10 overflow-y-auto max-h-40"
         >
           <li
@@ -100,7 +100,9 @@
           v-else-if="currentVacancy && isFocused"
           class="no-vacancy absolute w-full bg-white border rounded shadow top-12 z-10"
         >
-          <div class="text-gray-500 py-2 px-4">Вакансия не найдена</div>
+          <div class="text-gray-500 py-2 px-4">
+            Вакансия не найдена
+          </div>
         </div>
       </transition>
     </div>

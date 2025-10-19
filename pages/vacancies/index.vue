@@ -10,15 +10,8 @@
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { getVacancies } from '~/utils/getVacancies'
 
-  import vacanciesData from '@/src/data/vacancies.json'
-  // import vacanciesData from "@/src/data/vacancies-empty.json";
-  // import vacanciesData from "@/src/data/vacancies-one-page.json";
   import vacanciesDraftData from '@/src/data/vacancies-draft.json'
-  // import vacanciesDraftData from "@/src/data/vacancies-draft-empty.json";
-  // import vacanciesDraftData from "@/src/data/vacancies-draft-one-page.json"
   import vacanciesArchiveData from '@/src/data/vacancies-archive.json'
-  // import vacanciesArchiveData from "@/src/data/vacancies-archive-empty.json";
-  // import vacanciesArchiveData from "@/src/data/vacancies-archive-one-page.json"
   import responses from '~/src/data/response-roles.json'
   import singleResponses from '~/src/data/responses.json'
   import checkboxOptions from '~/src/data/checkbox-more.json'

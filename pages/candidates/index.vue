@@ -89,9 +89,9 @@
       //   }
       // }
       const { responses, errorResponses  } = await getResponses('122562967')
-      console.log('drafts', responses.items[0].resume.last_name);
+    
       // paginatedCandidates.value = data
-      paginatedCandidates.value = responses.items
+      paginatedCandidates.value = responses?.items ?? null
       totalPages.value = pagination.lastPage
     } catch (error) {
       console.error('Ошибка при загрузке кандидатов:', error)

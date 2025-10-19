@@ -76,7 +76,7 @@ export const auth = async () => {
     try {
         const response = await $fetch<PlatformResponse>('/hh/auth', {
             method: 'GET',
-            baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
+            baseURL: config.public.apiBase as string, 
             headers: {
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${serverToken}`,
@@ -228,7 +228,7 @@ export const getAvailableTypes = async (employerId: string, managerId: string) =
             body: { employer_id: employerId, manager_id: managerId },
         });
 
-        result.value.types = response.data.items;
+        result.value.types = response.data?.items;
     } catch (err: any) {
         console.log('error types available ', err.response._data.message);
         if (err.response?.status === 404) {
