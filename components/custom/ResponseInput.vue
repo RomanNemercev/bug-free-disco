@@ -57,7 +57,7 @@
 
   const selectResponse = response => {
     console.log('value executors', response)
-    currentResponse.value = response.name// Записываем только имя в поле ввода
+    currentResponse.value = response.name
     filteredResponses.value = []
     isFocused.value = false
     emit('update:modelValue', response.name, response.id)

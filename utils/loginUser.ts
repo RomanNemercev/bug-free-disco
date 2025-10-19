@@ -6,6 +6,7 @@ interface LoginResponse {
         auth_token: string;
         name: string;
         email: string;
+        role: string;
     }
 }
 
@@ -48,6 +49,7 @@ export const loginUser = async (email: string, password: string) => {
             userStore.setUserData({
                 name: response.user.name,
                 email: response.user.email,
+                role: response.user.role
             });
             console.log('User data is save in store', userStore.name, userStore.email);
         } else {

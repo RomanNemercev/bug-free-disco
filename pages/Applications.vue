@@ -201,143 +201,6 @@
       </div>
     </div>
     <div v-if="userRole === 'admin' && isNewAppPopupAdmin">
-      <!-- <transition
-        name="fade"
-        @after-leave="enableBodyScroll"
-        @enter="disableBodyScroll"
-      >
-        <Popup
-          :isOpen="isNewAppPopup"
-          @close="() => (isNewAppPopup = false)"
-          :width="'740px'"
-          :showCloseButton="false"
-          :disableOverflowHidden="true"
-          :overflowContainer="true"
-          maxHeight
-          :lgSize="true"
-        >
-          <p class="leading-normal text-xl font-semibold text-space mb-[39px]">
-            Новая заявка
-          </p>
-          <div class="mb-22px">
-            <p class="text-sm font-medium text-space mb-7px pl-15px">
-              Ответственный
-            </p>
-            <div ref="responseContainer">
-              <div
-                v-if="newResponse"
-                class="text-sm font-medium text-dodger pl-15px"
-              >
-                {{ newResponse }}
-              </div>
-              <button
-                v-else-if="!showNewResponse"
-                @click="openNewResponse"
-                class="text-sm font-medium text-dodger py-2.5 px-15px"
-              >
-                Добавить
-              </button>
-              <response-input
-                class="w-full"
-                :responses="responses"
-                v-model="newResponse"
-                v-show="showNewResponse"
-                @update:modelValue="value => updateNewResponse(value)"
-              />
-            </div>
-          </div>
-          <div class="grid gap-x-5 grid-flow-col mb-6">
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Должность
-              </p>
-              <SimpleInput
-                placeholder="Введите название должности"
-                v-model="newPosition"
-              />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Департамент
-              </p>
-              <SimpleInput v-model="newDepartment" />
-            </div>
-          </div>
-          <div class="grid gap-x-5 grid-flow-col mb-6">
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Регион поиска
-              </p>
-              <SimpleInput v-model="newRegion" />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Причина открытия вакансии
-              </p>
-              <SimpleInput v-model="newReason" />
-            </div>
-          </div>
-          <div class="grid gap-x-5 grid-flow-col mb-6">
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Зарплата от
-              </p>
-              <SimpleInput v-model="salaryMin" type="number" />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Зарплата до
-              </p>
-              <SimpleInput v-model="salaryMax" type="number" />
-            </div>
-          </div>
-          <div class="mb-6">
-            <p class="text-sm font-medium text-space pl-15px mb-1">
-              Количество позиций
-            </p>
-            <SimpleInput v-model="vacancyCount" type="number" />
-          </div>
-          <div class="mb-6">
-            <p class="text-sm font-medium text-space pl-15px mb-1">
-              Требования кандидата
-            </p>
-            <SimpleInput v-model="requirements" />
-          </div>
-          <div class="mb-6">
-            <p class="text-sm font-medium text-space pl-15px mb-1">
-              Обязанности кандидата
-            </p>
-            <SimpleInput v-model="responsibilities" />
-          </div>
-          <div class="grid gap-x-5 grid-flow-col grid-cols-2 mb-9">
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Начать подбор не позднее
-              </p>
-              <InputCalendar />
-            </div>
-            <div>
-              <p class="text-sm font-medium text-space pl-15px mb-1">
-                Желаемая дата выхода кандидата
-              </p>
-              <InputCalendar />
-            </div>
-          </div>
-          <div class="flex gap-15px justify-between w-fit">
-            <UiButton variant="action" size="semiaction" class="font-bold">
-              Создать
-            </UiButton>
-            <UiButton
-              variant="back"
-              size="second-back"
-              class="font-medium"
-              @click="isNewAppPopup = false"
-            >
-              Отмена
-            </UiButton>
-          </div>
-        </Popup>
-      </transition> -->
       <transition
         name="fade"
         @after-leave="enableBodyScroll"
@@ -374,39 +237,6 @@
                 {{ errors.response }}
               </div>
             </div>
-            <!--<div class="w-full flex justify-between gap-x-15px mb-15px">
-               <div class="w-full max-w-[400px]">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
-                  Заказчик
-                </p>
-                <response-input
-                  class="w-full"
-                  :responses="clients"
-                  :model-value="newApplication.client ?newApplication.client.name : ''"
-                  :client="newApplication"
-                  :showRoles="true"
-                  @update:modelValue="updateNewClient"
-                />
-                <div v-if="errors.customer" class="text-red-500 text-xs mt-1">
-                  {{ errors.customer }}
-                </div>
-              </div> -->
-              <!-- <div class="w-full">
-                <p class="text-sm font-medium text-space leading-normal mb-4">
-                  Исполнитель
-                </p>
-                <response-input
-                  class="w-full"
-                  :responses="executors"
-                  :model-value="newApplication.executor ? newApplication.executor.name : ''"
-                  :showRoles="true"
-                  @update:modelValue="updateNewExecutor"
-                />
-                <div v-if="errors.executor" class="text-red-500 text-xs mt-1">
-                  {{ errors.executor }}
-                </div>
-              </div> 
-            </div>-->
             <div class="w-full flex justify-between gap-x-15px mb-15px">
               <div class="w-full max-w-[400px]">
                 <p class="text-sm font-medium text-space leading-normal mb-15px">
@@ -953,6 +783,17 @@
             <h3 class="text-xl font-semibold text-space mb-5">
               {{ detailedVacancy.position }}
             </h3>
+            <div v-if="reasonReject">
+              <p class="text-sm text-slate-custom font-normal mb-10px text-red-500">
+                Причина отклонения заявки
+              </p>
+              <div class="relative z-10">
+                {{ detailedVacancy.approvals[0].description }}
+              </div>
+              <p class="text-xs text-slate-custom font-normal mb-25px">
+                *Чтобы внести изменения после отклонения заявки, скопируйте заявку на вакансию, нажав на кнопку "Копировать" внизу окна созданной вами заявки. Заявка будет скопирована и создана заново.
+              </p>
+            </div>
             <p class="text-sm text-slate-custom font-normal mb-25px">
               {{ detailedVacancy.city }}
             </p>
@@ -1190,7 +1031,7 @@
               </div>
             </div>
             <div v-if="!isAddApprove" class="flex gap-x-15px">
-              <UiButton variant="action" size="semiaction" @click="() => handlerUpdateApplication([], selectedVacancy)">Готово</UiButton>
+              <UiButton variant="action" size="semiaction" @click="() => handlerUpdateApplication( selectedVacancy)">Готово</UiButton>
               <UiButton
                 variant="back"
                 size="second-back"
@@ -1201,14 +1042,17 @@
               </UiButton>
             </div>
             <div v-else class="flex gap-x-15px">
-              <UiButton variant="action" size="semiaction" @click="() => isAddApprove = true">
-                Создать вакансию
+              <UiButton 
+              variant="action" 
+              size="semiaction" 
+              @click="addApprove">
+                {{ !vacancy ? 'Создать вакансию' : 'Согласовать' }}
               </UiButton>
               <UiButton
                 variant="back"
                 size="second-back"
                 class="font-medium"
-                @click="() => isNotApprove = true"
+                @click="rejectApplication"
               >
                 Отклонить
               </UiButton>
@@ -1255,12 +1099,12 @@
       :totalPages="pagination.last_page"
       @page-changed="handlePageChange"
     />
-  </div>
-  <Popup 
+    
+    <Popup 
           :isOpen="isApprove"
           @close="() => (isApprove = false)"
           :width="'740px'"
-          :showCloseButton="false"
+          :showCloseButton="true"
           :disableOverflowHidden="true"
           :overflowContainer="true"
           maxHeight
@@ -1272,9 +1116,9 @@
   </Popup>
   <Popup 
           :isOpen="isNotApprove"
-          @close="() => (isApprove = false)"
+          @close="() => (isNotApprove = false)"
           :width="'740px'"
-          :showCloseButton="false"
+          :showCloseButton="true"
           :disableOverflowHidden="true"
           :overflowContainer="true"
           maxHeight
@@ -1287,8 +1131,21 @@
           Заявка будет отклонена, заказчику придет уведомление об этом. Информация будет отражена в Заявке.
     </p>
     <p class="text-sm font-medium text-space mb-13px">Причина</p>
-          <MyTextarea :placeholder="'Заполните это поле'"  />
+    <p class="text-sm font-medium text-space mb-25px">
+       <MyTextarea v-model="rejectReason"  :placeholder="'Заполните это поле'"  />
+    </p>
+    <UiButton 
+              class="mt-20px"
+              variant="action" 
+              size="semiaction" 
+              @click="sendReject(rejectReason)">
+                Отправить
+    </UiButton>
+    <span v-if="errorReject" class="text-red-500 text-xs mt-1 pl-3">
+      {{ errorReject }}
+    </span>
   </Popup>
+  </div>
 </template>
 
 <script setup>
@@ -1323,7 +1180,7 @@
   import currency from '~/src/data/currency.json'
 
   import { fetchApplications } from '~/utils/applicationsList'
-  import { fetchApplicationDetail } from '~/utils/applicationItem'
+  import { fetchApplicationDetail, approve } from '~/utils/applicationItem'
   import { createApplication } from '~/utils/applicationCreate'
   import { deleteApplication } from '~/utils/applicationRemove'
   import { clientsList } from '~/utils/clientsList'
@@ -1332,8 +1189,14 @@
   import { getVacanciesNames } from '~/utils/getVacancies'
   import { loadScript } from '@/plugins/loader'
   import { profile } from '@/utils/loginUser'
+  import { reject } from '@/utils/applicationItem'
+  const isCreateVacancy = ref(false)
 
   import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/api'
+
+  import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 
   const applications = ref([])
@@ -1351,6 +1214,7 @@
   const errorItem = ref(null)
   const isOpenDateFrom = ref(false)
   const isOpenDateTo = ref(false)
+  const errorReject = ref(null)
 
   const headers = computed(() => {
     const baseHeaders = [
@@ -1414,12 +1278,13 @@
   const requirementsCustomer = ref('')
   const responsibilitiesCustomer = ref('')
   const selectedVacancy = ref(null)
-  const detailedVacancy = ref(null) // Для хранения полной информации о заявке
+  const detailedVacancy = ref(null) 
   const popupSelectedTab = ref('popupMainInfo')
   const tabContentInner = ref(null)
   const tabContentHeight = ref(0)
   const popupResponse = ref(null)
   const isSaveVacancy = ref(false)
+  const rejectReason = ref('')
 
   const ArrayCurrency = currency
   const clients = ref([])
@@ -1430,19 +1295,20 @@
   const errors = ref({})
   const updateData = ref({});
   const isAddApprove = ref(false);
+  const isApprove = ref(false);
+  const isNotApprove = ref(false);
+  const reasonReject = ref(false);
   
 
   const {data: profileCustomer, error: errorProfile } = await profile();
   if (!errorProfile) {
 
   }
-  console.log('user', profileCustomer, errorProfile);
   // Функция обновления высоты контента
   const updateTabHeight = () => {
     nextTick(() => {
       if (tabContentInner.value) {
         tabContentHeight.value = tabContentInner.value.offsetHeight
-        console.log('Correct height in popup - enabled.')
       } else {
         console.warn('tabContent is null when updating height')
       }
@@ -1450,7 +1316,6 @@
   }
 
   const isOpenFrom = (value) => {
-    console.log('value', value)
     isOpenDateFrom.value = value
   }
 
@@ -1487,8 +1352,6 @@
     }
     let asc = sortOrder.value === 'asc' ? '' : '&asc=0'
      loadApplications(1, `sort=${sortKey.value}${asc}`)
-    console.log('key sort', sortKey.value)
-    console.log('type sort', sortOrder.value)
   }
 
   const sortArrowStyle = key => {
@@ -1519,8 +1382,6 @@
           isOpenDateFrom.value = false
       if (isOpenDateTo.value)
           isOpenDateTo.value = false
-    console.log('after от', isOpenDateFrom.value)
-      console.log('artes до', isOpenDateTo.value)
     }
     
     // if (!event.target.classList.contains('.dropdown-selected-option')) {
@@ -1572,6 +1433,7 @@
   }
 
   const handleClickOutsideNewAppPopup = event => {
+
     if (
       responseContainer.value &&
       !responseContainer.value.contains(event.target)
@@ -1624,17 +1486,15 @@
         pagination: fetchedPagination,
       } = await fetchApplications(page, params)
       applications.value = fetchedApplications
-      console.log('Loaded applications: ', applications.value)
       data.value = applications.value.map(vacancy => ({
         ...vacancy,
         responsible: vacancy.responsible, // TODO: Заменить на данные из API
         candidates: 0, // TODO: Заменить на данные из API
         showResponseInput: false,
         responseChoose: '',
+        approvals: vacancy.approvals
       }))
       pagination.value = fetchedPagination
-      console.log('Loaded data: ', applications.value)
-      console.log('Pagination: ', pagination.value)
 
       // получаем динамический список клиентов
       const {clients: clientData} = await clientsList();
@@ -1648,12 +1508,10 @@
 
     // получаем динамический список вакансий
       vacancies.value = await getVacanciesNames();
-      console.log('vacancies', vacancies.value)
 
     // получаем динамический список исполнителей
     const {executors: executorData} = await executorsList();
     executors.value = executorData
-    console.log('executprs', executors.value);
   }
 
   // Получаем динамический список отделов
@@ -1684,7 +1542,6 @@
     document.addEventListener('click', handleClickOutsideNewAppPopupExecutor)
     document.addEventListener('click', handleClickOutsideNewAppPopupCustomer)
     loadApplications()
-    console.log('Applications data for check: ', applications)
   })
 
   onBeforeUnmount(() => {
@@ -1702,7 +1559,6 @@
     if (resizeObserver) {
       resizeObserver.disconnect()
       resizeObserver = null
-      console.log('correct height in popup is - disabled.')
     }
   })
 
@@ -1783,7 +1639,6 @@
       newApplication.value.responsible.id = id
       newApplication.value.responsible.name = value
     }
-    console.log('data', newApplication.value);
   }
 
   const updateNewCustomer = (value, id) => {
@@ -1826,12 +1681,10 @@
               isInitialUpdate = false
             } else {
               updateTabHeight()
-              console.log('call fnc second time')
             }
           })
           resizeObserver.observe(tabContentInner.value)
           updateTabHeight()
-          console.log('call fnc first time')
         } else {
           console.warn('tabContentInner is null after popup open')
         }
@@ -1841,7 +1694,6 @@
       if (resizeObserver) {
         resizeObserver.disconnect()
         resizeObserver = null
-        console.log('correct height container in popup is disabled')
       }
     }
   })
@@ -1857,9 +1709,17 @@
       const fullData = await fetchApplicationDetail(vacancy.id)
       detailedVacancy.value = fullData.data // save full response.data
       if (detailedVacancy.value.status.name == 'На рассмотрении') {
-        if (profileCustomer.data.role.name == 'Рекрутер') {
+        if (profileCustomer.data.role.name == 'Рекрутер' || profileCustomer.data.role.name == 'Администратор') {
           isAddApprove.value = true
         }
+      } else {
+        console.log('detailedVacancy', detailedVacancy.value)
+        if (detailedVacancy.value.status.name == 'Отклонена' && detailedVacancy.value.approvals.length > 0) {
+          reasonReject.value = true
+        } else {
+          reasonReject.value = false
+        }
+        isAddApprove.value = false
       }
     
       selectedVacancy.value = vacancy // open popup
@@ -1872,7 +1732,6 @@
   }
 
   const closePopup = () => {
-    console.log('Close popup. Clear fullData.')
     selectedVacancy.value = null
     detailedVacancy.value = null
   }
@@ -1998,9 +1857,7 @@
     if (!newApplication.value.count || newApplication.value.count <= 0) {
       newErrors.positions = 'Укажите корректное количество позиций'
     }
-    console.log('from', newApplication.value.salaryFrom, 'to', newApplication.value.salaryTo)
     if (newApplication.value.salaryFrom && newApplication.value.salaryTo) {
-      console.log('from', newApplication.value.salaryFrom, 'to', newApplication.value.salaryTo)
        if (newApplication.value.salaryFrom > newApplication.value.salaryTo) {
         newErrors.salaryTo =
           'Максимальная зарплата должна быть больше минимальной'
@@ -2018,7 +1875,6 @@
   }
 
   const applicationData = computed(() => {
-    console.log('newApplication.value', newApplication.value)
     return {
       position: newApplication.value.position,
       division: newApplication.value.division,
@@ -2041,15 +1897,12 @@
   })
 
   const createApplicationHandler = async () => {
-    console.log('data' , newApplication.value)
     if (validateForm()) {
       try {
         const { data, error } = await createApplication(
           applicationData.value
         )
-        console.log('error', error)
         if (!error) {
-          console.log('Success:', data.message)
           isNewAppPopupAdmin.value = false // Закрываем попап
           loadApplications()
           isSaveVacancy.value = true
@@ -2113,16 +1966,16 @@
       // Обновляем detailedVacancy.responsible, если это необходимо
       
       if (detailedVacancy.value.name) {
+        isCreateVacancy.value = false
         detailedVacancy.value.vacancy.name = newValue
       } else {
-        // Если responsible === null, создаем объект responsible
+        isCreateVacancy.value = true
         detailedVacancy.value.vacancy = { id: 0, name: newValue } // Или другой id
       }
     },
   })
 
   const updateResponse = (value, id, key = null) => {
-    console.log('key', key)
     if (key) {
       updateData.value[key] = id
     }
@@ -2135,14 +1988,12 @@
 
   const handleRemoveApplication = async (item, vacancy) => {
     if (item === 'Удалить') {
-      console.log('Application for removing, ID:', vacancy.id)
       try {
         const { data, error } = await deleteApplication(vacancy.id)
         if (error) {
           console.error('Failed to delete application:', error)
           return
         }
-        console.log('Application deleted successfully:', data)
         // Опционально: обнови список заявок после удаления
         loadApplications() // Если нужно перезагрузить список
       } catch (err) {
@@ -2152,7 +2003,6 @@
     if (item === 'Копировать заявку') {
       const { data, error} = await fetchApplicationDetail(vacancy.id)
       newApplication.value = data
-      console.log('dat ' , newApplication.value)
       isNewAppPopupAdmin.value = true
     }
     if (item === 'Управлять') {
@@ -2160,7 +2010,7 @@
     }
   }
 
-  const handlerUpdateApplication = async (dataForm, vacancy) => {
+  const handlerUpdateApplication = async (vacancy) => {
     if (Object.keys(updateData.value).length > 0) {
       const { data, error } = await fetchApplicationUpdate(updateData.value, vacancy.id)
       updateData.value = {}
@@ -2168,6 +2018,36 @@
     } 
     
     closePopup()
+  }
+
+  const rejectApplication = () => {
+    selectedVacancy.value = false
+    isNotApprove.value = true
+  }
+
+  const sendReject = async (reason) => {
+    const {data: message, error: errorResponse} = await reject(detailedVacancy.value.id, reason)
+    if (!errorResponse) {
+      if (errorReject.value) {
+        errorReject.value = null
+      }
+      isNotApprove.value = false
+      await handlePageChange(pagination.value.current_page)
+    } else {
+      errorReject.value = errorResponse
+    }
+  }
+
+  const addApprove = async () => {
+    selectedVacancy.value = false; 
+    if (!vacancy.value) {
+      router.push(`/vacancies/newvacancy/?application=${detailedVacancy.value.id}`)
+    } else {
+      const idApplication = detailedVacancy.value.id
+      handlerUpdateApplication( detailedVacancy.value)
+      await approve(idApplication)
+      loadApplications()
+    }  
   }
 </script>
 
@@ -2194,4 +2074,8 @@
   .fade-leave-from {
     opacity: 1;
   }
+  .text-red-500 {
+    --tw-text-opacity: 1;
+    color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+}
 </style>

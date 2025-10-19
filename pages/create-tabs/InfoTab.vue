@@ -55,6 +55,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  application: {
+    type: Object,
+    default: null,
+  },
   type: {
     type: String,
     default: 'create',
@@ -154,8 +158,19 @@ if (props.id) {
             statusCode: 404,
             statusMessage: 'Вакансия не найдена'
         });
+  } 
+}
+
+if (props.application) {
+  const applicationResponse = await fetchApplicationDetail(props.application)
+  if (applicationResponse.data) {
+    console.log('app', applicationResponse.data)
+    newVacancy.value.name = applicationResponse.data.position
+    newVacancy.value.currency = applicationResponse.data.currency
+    newVacancy.value.salary_from = applicationResponse.data.salaryFrom
+    newVacancy.value.salary_to = applicationResponse.data.salaryTo
+    newVacancy.value.location = applicationResponse.data.city
   }
-  
 }
 console.log('newVacancy', newVacancy.value)
 const editVacancyData = ref({})

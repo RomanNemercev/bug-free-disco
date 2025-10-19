@@ -16,9 +16,10 @@
           </NuxtLink>
         </li>
         <li>
-          <NuxtLink to="/vacancies" :class="{ 'active-link': isVacanciesActive }">
+          <NuxtLink to="/vacancies"  :class="{ 'active-link': isVacanciesActive }">
             <p
-              class="page-name leading-normal text-white opacity-50 px-3 py-2 hover:opacity-100 transition-all rounded-lg hover:bg-hoverbtn text-15px font-semibold">
+              class="page-name leading-normal text-white opacity-50 px-3 py-2 hover:opacity-100 transition-all 
+              rounded-lg hover:bg-hoverbtn text-15px font-semibold">
               Вакансии
             </p>
           </NuxtLink>
@@ -95,7 +96,7 @@
                     {{ userName }}
                   </p>
                   <span class="text-13px text-slate-custom leading-130">
-                    Администратор
+                    {{ userStore.role }}
                   </span>
                 </div>
               </div>
@@ -134,6 +135,7 @@ const userStore = useUserStore()
 const showNotification = ref(false)
 const toggleButtonRef = ref(null)
 const userName = computed(() => userStore.name || 'Гость')
+const userRole = computed(() => userStore.role)
 
 const toggleNotification = () => {
   showNotification.value = !showNotification.value

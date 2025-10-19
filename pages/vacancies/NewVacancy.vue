@@ -3,7 +3,7 @@
     <status-vacancy @update:currentTab="switchTab" />
     <Suspense @pending="onPending" @resolve="onResolve" @fallback="onFallback">
       <template #default>
-        <component :is="currentTabComponent" :id="vacancyId":type="typeSave" />
+        <component :is="currentTabComponent" :id="vacancyId" :application="application" :type="typeSave" />
       </template>
       <template #fallback>
         <UiLoader v-if="showLoader" />
@@ -25,7 +25,8 @@ const { $loader } = useNuxtApp()
 const route = useRoute()
 const vacancyId = ref(route.query.id)
 const currectVacancy = inject('vacancyCurrect')
-console.log('currectVacancy', currectVacancy.value);
+const application = ref(route.query.application)
+
 const typeSave = ref(route.query.type ? route.query.type : 'create')
 
 if (vacancyId.value && !currectVacancy.value) {
@@ -67,7 +68,6 @@ function switchTab(tabName: keyof typeof tabs) {
 
 // Обработчики событий Suspense
 const onPending = () => {
-  console.log('Suspense: Loading started')
   // Добавляем минимальную задержку, чтобы избежать мигания
   loaderTimeout = setTimeout(() => {
     showLoader.value = true
