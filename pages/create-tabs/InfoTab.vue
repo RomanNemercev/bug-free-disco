@@ -21,6 +21,7 @@ import CustomDropdown from '~/components/custom/CustomDropdown.vue'
 import GenerateButton from '~/components/custom/GenerateButton.vue'
 import MyTextarea from '@/components/custom/MyTextarea.vue'
 import { inject } from 'vue'
+import { useRoute } from 'vue-router'
 
 import schedule from '~/src/data/work-schedule.json'
 import experience from '~/src/data/experience.json'
@@ -99,15 +100,6 @@ onBeforeMount(async () => {
   // получаем динамический список исполнителей
   const { executors: executorData } = await executorsList();
   executors.value = executorData
-  // if (vacancyStore.isEditing && vacancyStore.editingVacancyId) {
-  //   loadVacancyData(vacancyStore.editingVacancyId).then(() => {
-  //     selectedCard.value = workSpace.value
-  //     console.log(
-  //       'Значение selectedCard после загрузки: ',
-  //       selectedCard.value
-  //     )
-  //   })
-  // }
 })
 
 const handleHover = id => {
@@ -217,6 +209,8 @@ const tagsString = computed(() => {
   return tags.value.join(' ') || ''
 })
 
+const route = useRoute();
+
 const vacancyData = computed(() => {
   return {
     name: newVacancy.value,
@@ -241,7 +235,7 @@ const vacancyData = computed(() => {
     customer_phone: phone.value,
     customer_email: email.value,
   }
-})
+});
 
 const validateVacancy = () => {
   let errorsValid = true;
@@ -300,7 +294,7 @@ async function saveVacancy() {
   if (validateVacancy()) {
     const { data: response, error } = props.type === 'edit'
       ? await updateVacancy(props.id, editVacancyData.value)
-      : await createVacancy(newVacancy.value)
+      : (newVacancy.value.application = route.query.application ? route.query.application : null) && await createVacancy(newVacancy.value)
     if (response == null) {
       switch (error.status) {
         case 409:

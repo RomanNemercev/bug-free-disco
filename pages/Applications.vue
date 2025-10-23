@@ -343,7 +343,7 @@
               </div>
             </div>
             <div class="w-full gap-x-15px flex mb-15px">
-              <div class="w-full">
+              <div class="w-full" @click="closeCalendare">
                 <p class="text-sm font-medium text-space mb-15px">
                   Начать подбор не позднее
                 </p>
@@ -351,7 +351,7 @@
                  <DropdownCalendarStatic 
                    @update:model-value="newApplication.dateStart = $event" 
                    :is-open="isOpenDateFrom"
-                   @update:isOpen="isOpenFrom"
+                   @update:isOpen="isOpenDateFrom"
                 />
                 
                 <div v-if="errors.dateStart" class="text-red-500 text-xs mt-1">
@@ -1315,6 +1315,10 @@ const router = useRouter()
     })
   }
 
+  const closeCalendare = () => {
+    isOpenFrom(false);
+  }
+
   const isOpenFrom = (value) => {
     isOpenDateFrom.value = value
   }
@@ -1377,38 +1381,15 @@ const router = useRouter()
     const elTarget = event.target
     //console.log('event', event.target);
     //обработчик события клика вне календаря
-    if ((!elTarget || !elTarget.classList.contains('.shadow-shadow-droplist')) || !elTarget.closest('.calendar-wrapper')) {
-      if (isOpenDateFrom.value)
-          isOpenDateFrom.value = false
-      if (isOpenDateTo.value)
-          isOpenDateTo.value = false
-    }
-    
-    // if (!event.target.classList.contains('.dropdown-selected-option')) {
-    //   if (event.target.closest('.shadow-shadow-droplist')) {
-    //     console.log('date from', isOpenDateFrom.value)
-    //     console.log('date to', isOpenDateTo.value)
-    //     if (isOpenDateFrom.value)
-    //       isOpenDateFrom.value = false
-        
-    //     // if (isOpenDateTo.value)
-    //     //   isOpenDateTo.value = false
-    //   } else {
-        
-    //     if (isOpenDateFrom.value)
-    //       isOpenDateFrom.value = false
-    //     if (isOpenDateTo.value)
-    //       isOpenDateTo.value = false
-    //     console.log('Клик вне', isOpenDateFrom.value)
-    //   }
-    // } else {
-    //   if (isOpenDateFrom.value)
-    //       isOpenDateFrom.value = false
-    //     if (isOpenDateTo.value)
-    //       isOpenDateTo.value = false
-    //   console.log('Клик вне', isOpenDateFrom.value)
-      
+    // if ((!elTarget || !elTarget.classList.contains('.shadow-shadow-droplist')) || !elTarget.closest('.calendar-wrapper')) {
+    console.log('close');
+      // if (isOpenDateFrom.value)
+      //     isOpenDateFrom.value = false
+      // if (isOpenDateTo.value)
+      //     isOpenDateTo.value = false
+      //   console.log('isOpen', isOpenDateFrom.value);
     // }
+
     
     
     if (!isNewAppPopupAdmin.value && newApplication.value) {
@@ -1712,6 +1693,7 @@ const router = useRouter()
         if (profileCustomer.data.role.name == 'Рекрутер' || profileCustomer.data.role.name == 'Администратор') {
           isAddApprove.value = true
         }
+        reasonReject.value ? reasonReject.value = false : ''
       } else {
         console.log('detailedVacancy', detailedVacancy.value)
         if (detailedVacancy.value.status.name == 'Отклонена' && detailedVacancy.value.approvals.length > 0) {
@@ -2077,5 +2059,9 @@ const router = useRouter()
   .text-red-500 {
     --tw-text-opacity: 1;
     color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+}
+.text-green-500 {
+    --tw-text-opacity: 1;
+    color: rgb(73 145 73 / var(--tw-text-opacity, 1));
 }
 </style>

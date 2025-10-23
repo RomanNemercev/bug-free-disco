@@ -90,6 +90,7 @@ const onFallback = () => {
 }
 
 onMounted(async () => {
-  await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}`);
+  await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}&results=10`);
+  // await loadScript(`https://suggest-maps.yandex.ru/v1/suggest?text=%D0%B1%D1%83%D1%80%D0%B4%D0%B6&highlight=0&apikey=${API_YANDEX_SUGGEST}`)
 })
 </script>
