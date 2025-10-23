@@ -118,10 +118,14 @@ async function createClient(event) {
   const { data: response, error, message}  = await registerClient('register-recruiter', data.value)
   if (error) {
     errors.value.response = message
+    success.value.status = false
+    success.value.message = ''
   } else {
+    data.value = {};
+    errors.value.response = ''
     errors.value.response = false
     success.value.status = true
-    success.value.message = response.message
+    success.value.message = message
   }
 }
 </script>

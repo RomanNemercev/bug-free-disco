@@ -102,7 +102,7 @@
                 {{ errors.response }}
         </div>
     </div>
-     <div v-if="success.status" class="text-red-500 text-xs mt-1">
+     <div v-if="success.status" class="text-green-500 text-xs mt-1">
                 {{ success.message }}
         </div>
     </form>
@@ -158,14 +158,19 @@ async function createClient(event) {
   if (data.value.pathronomic) {
     data.value.name += ` ${data.value.pathronomic}`
   }
-  console.log('data', data.value.department);
+
   const { data: response, error, message}  = await registerClient('register-client', data.value)
   if (error) {
     errors.value.response = message
+    success.value.status = false
+    success.value.message = ''
   } else {
+    data.value = {};
+    errors.value.response = ''
     errors.value.response = false
     success.value.status = true
-    success.value.message = response.message
+    success.value.message = message
+
   }
 }
 </script>

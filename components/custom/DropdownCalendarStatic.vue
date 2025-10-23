@@ -16,7 +16,7 @@
       </span>
       <div class="absolute right-[15px] top-[11.5px]">
         <transition name="fade-icon" mode="out-in">
-          <span :key="isDropDownVisible">
+          <span :key="props.isOpen">
             <svg-icon :name="isDropDownVisible ? 'calendar-end' : 'calendar-start'"
               :class="isDropDownVisible ? 'text-dodger' : 'text-bali'" width="20" height="20" />
           </span>
@@ -74,11 +74,39 @@ const updateDate = (newDate) => {
   emit('update:modelValue', currectDate.value)
 };
 
-
 watch(() => props.isOpen, (newStatus) => {
   console.log('Новое значение', newStatus)
   isDropDownVisible.value = newStatus
 });
+
+// Обработка клика вне компонента
+const handleClickOutside = (event) => {
+  if (
+    isDropDownVisible.value &&
+    dataPicker.value &&
+    !dataPicker.value.contains(event.target) &&
+    calendarBar.value?.$el &&
+    !calendarBar.value.$el.contains(event.target)
+  ) {
+    isDropDownVisible.value = false;
+    emit('isOpen', isDropDownVisible.value);
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+watch(
+  () => props.isOpen,
+  (newStatus) => {
+    isDropDownVisible.value = newStatus;
+  },
+);
 
 
 // onBeforeUnmount(() => {

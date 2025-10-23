@@ -52,10 +52,8 @@ export const registerClient = async (path: string, userData: any) => {
             body: userData,
         });
 
-        console.log('Ответ сервера при регистрации:', response);
-        response = await response.json();
-    
-        return {data: response, error: error};
+    console.log('response', response.user);
+        return {data: response.user, error: error, message: response.message};
     } catch (err: any) {
         return {data: null, error: true, message: err.response._data.message};
     }
