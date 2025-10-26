@@ -4,17 +4,17 @@
   import Pagination from '@/components/custom/Pagination.vue'
   import GeoInput from '~/components/custom/GeoInput.vue'
   import ResponseInput from '~/components/custom/ResponseInput.vue'
-  import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
+  // import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
+  import MyDropdown from '@/components/custom/MyDropdown.vue'
+  import DropdownCalendarStatic from '@/components/custom/DropdownCalendarStatic.vue'
 
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { getVacancies } from '~/utils/getVacancies'
+  import { clientsList } from '@/utils/clientsList'
 
   import vacanciesDraftData from '@/src/data/vacancies-draft.json'
   import vacanciesArchiveData from '@/src/data/vacancies-archive.json'
-  import responses from '~/src/data/response-roles.json'
-  import singleResponses from '~/src/data/responses.json'
-  import checkboxOptions from '~/src/data/checkbox-more.json'
   import VacancyCardDropdown from '@/src/data/vacancy-card-dropdown.json'
   import VacancyCardDraftDropdown from '@/src/data/vacancy-card-draft-dropdown.json'
   import VacancyCardArchiveDropdown from '@/src/data/vacancy-card-archive-dropdown.json'
@@ -50,6 +50,20 @@
   const containerHeight = ref(0) // отслеживаю высоту контейнера
   const containerRef = ref(null) // ссылка на контейнер
   const loading = ref(false)
+  const clients = ref([])
+  const recruiters = ref([])
+  const filters = ref({
+    status: null,
+    client: null,
+    city: null,
+    executor: null,
+    responsible: null,
+    create: {
+      from: null,
+      to: null
+    }
+  })
+  const filterStatuses = {'В работе': 'active', 'Черновик': 'draft', 'Архив': 'archive'}
 
   const totalPages = computed(() =>
     Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage))
@@ -150,13 +164,22 @@
     console.log(`Вакансия с id ${vacancyId} удалена из списка`)
   }
 
+  const { clients:  responseClients, error: clientsError } = await clientsList('clients')
+  if (!clientsError) {
+    clients.value = responseClients
+  }
+
+  const { clients:  responseRecruiters, error: recruitersError } = await clientsList('recruiters')
+  if (!recruitersError) {
+    recruiters.value = responseRecruiters
+  }
+
   // Инициализация высоты при монтировании
   // onMounted(updateContainerHeight, fetchVacancies);
   onMounted(async () => {
     updateContainerHeight()
     loading.value = true
     const result = await getVacancies()
-    console.log('vacancies', result)
     if (result) {
       vacancies.value = result
       loading.value = false
@@ -165,6 +188,36 @@
       console.log('Cannot fetch vacancies')
     }
   })
+
+  const filteredVacancies = async() => {
+    loading.value = true
+    let params = ''
+    for (let key in filters.value) {
+      if (filters.value[key]) {
+        if (key === 'status') {
+          params += `&filters[${key}]=${filterStatuses[filters.value[key]]}`
+        }else {
+          if (key === 'create') {
+            console.log('create', filters)
+            if (filters.value.create.from || filters.value.create.to) {
+              const from = filters.value.create.from ? filters.value.create.from : '01.01.1970'
+              const to = filters.value.create.to ? filters.value.create.to : '01.01.3000'
+              params += `&filters[${key}]=${from};${to}`
+            }
+          } else {
+            params += `&filters[${key}]=${filters.value[key]}`
+          }
+        }
+      } 
+    }
+    if (params !== '') {
+      params = params.slice(1)
+    }
+    const response = await getVacancies(params)
+  
+    vacancies.value = response
+    loading.value = false
+  }
 
   // Следим за изменением активных блоков
   watch(
@@ -303,36 +356,60 @@
             <div class="grid grid-cols-4 gap-15px mb-6">
               <div>
                 <p class="text-sm font-medium text-space mb-3.5">
-                  Регион поиска
+                  Статус
                 </p>
-                <geo-input placeholder="Введите город" />
+                <MyDropdown 
+                  :defaultValue="''" 
+                  placeholder="Выберите статус"
+                  :options="['В работе', 'Черновик', 'Архив']"
+                  :model-value="filters.status ? filters.status : ''"
+                  @update:model-value="$event => filters.status = $event" 
+                />
               </div>
               <div>
                 <p class="text-sm font-medium text-space mb-3.5">
-                  Ответственный вакансии
+                  Рекрутер
                 </p>
-                <response-input :responses="singleResponses" />
+                <response-input 
+                  placeholder="Выберите рекрутера"
+                  :responses="recruiters"
+                  @update:modelValue="($event, index) => filters.executor = index"
+                 />
               </div>
               <div>
                 <p class="text-sm font-medium text-space mb-3.5">Заказчик</p>
                 <response-input
-                  placeholder="Участники"
-                  :showRoles="true"
-                  :responses="responses"
+                  placeholder="Выберите заказчика"
+                  :showRoles="false"
+                  :responses="clients"
+                  @update:modelValue="($event, index) => filters.client = index"
                 />
               </div>
               <div>
                 <p class="text-sm font-medium text-space mb-3.5">
-                  Искать по ID
+                  Город
                 </p>
-                <response-input
-                  placeholder="Введите ID вакансии"
-                  :showRoles="false"
-                  :responses="responses"
+                <geo-input 
+                  placeholder="Введите город" 
+                  :model-value="filters.city ? filters.city : ''"
+                  @update:modelValue="$event => filters.city = $event"
                 />
               </div>
+              <div class="col-span-2">
+                <p class="text-sm font-medium text-space mb-3.5">
+                  Дата создания
+                </p>
+                <p class="flex gap-15px">
+                   <DropdownCalendarStatic 
+                  @update:model-value="filters.create.from = $event" 
+                />
+                <DropdownCalendarStatic 
+                  @update:model-value="filters.create.from = $event" 
+                />
+                </p>  
+              </div>
             </div>
-            <div class="mb-35px">
+            <!-- <div class="mb-35px">
               <p class="text-sm font-medium text-space mb-3">Дополнительно</p>
               <div class="flex flex-col gap-y-2.5">
                 <CheckboxGroup
@@ -340,8 +417,8 @@
                   v-model="selectedMore"
                 />
               </div>
-            </div>
-            <UiButton variant="action" size="semiaction">Применить</UiButton>
+            </div> -->
+            <UiButton variant="action" size="semiaction" @click="filteredVacancies">Применить</UiButton>
           </div>
         </transition>
         <transition name="fade">
@@ -392,7 +469,7 @@
         "
       >
         <div v-if="activeVacancies" class="absolute w-full active-view">
-          <div v-if="vacancies.length === 0" class="absolute top-1/2 left-1/2">
+          <div v-if="loading" class="absolute top-1/2 left-1/2">
             <UiDotsLoader />
           </div>
           <div
@@ -415,6 +492,9 @@
               @page-changed="handlePageChange"
             />
           </div>
+          <div v-if="vacancies.length === 0 && loading === false" class="bg-catskill p-20 px-25px  mb-35px transition-all relative text-center">
+            Вакансий не найдено
+          </div> 
         </div>
       </transition>
       <transition name="fade" @after-enter="updateContainerHeight">

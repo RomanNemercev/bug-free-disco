@@ -92,7 +92,7 @@
           class="text-sm font-medium text-slate-custom leading-normal"
           v-if="vacancy.footerData.responsible"
         >
-          Ответственный: {{ vacancy.footerData.responsible }}
+          Ответственный: {{ vacancy.footerData.responsible.name }}
         </p>
         <p
           class="text-sm font-medium text-slate-custom leading-normal"
