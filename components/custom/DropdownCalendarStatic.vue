@@ -25,7 +25,7 @@
     </div>
     <transition name="slide-fade">
       <div class="absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
-        <CalendarBarStatic ref="calendarBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" />
+        <CalendarBarStatic ref="calendarBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" class="calendar-wrapper" />
       </div>
     </transition>
   </div>
@@ -66,7 +66,7 @@ const handleBlur = () => {
 }
 const toggleDropdown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
-  // emit('isOpen', isDropDownVisible.value)
+  emit('isOpen', isDropDownVisible.value)
 }
 
 const updateDate = (newDate) => {
@@ -81,12 +81,15 @@ watch(() => props.isOpen, (newStatus) => {
 
 // Обработка клика вне компонента
 const handleClickOutside = (event) => {
+  const selectContent = document.querySelector('.calendar-wrapper');
+  console.log('target', event.target.contains(selectContent))
   if (
     isDropDownVisible.value &&
     dataPicker.value &&
     !dataPicker.value.contains(event.target) &&
     calendarBar.value?.$el &&
-    !calendarBar.value.$el.contains(event.target)
+    !calendarBar.value.$el.contains(event.target) &&
+    (!event.target.contains(selectContent) || !selectContent)
   ) {
     isDropDownVisible.value = false;
     emit('isOpen', isDropDownVisible.value);
@@ -101,104 +104,12 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-watch(
-  () => props.isOpen,
-  (newStatus) => {
-    isDropDownVisible.value = newStatus;
-  },
-);
-
-
-// onBeforeUnmount(() => {
-//   document.removeEventListener('click', (event) => clickOutside(event, calendareBar, () => isDropDownVisible.value = false))
-// })
-
-//  onMounted(() => {
-//     document.addEventListener('click', (event) => clickOutside(event, calendareBar, () => {
-//       const parentModal = event.target.closest('.shadow-shadow-droplist')
-//       if (parentModal == null) {
-//         isDropDownVisible.value = false
-//       }
-//       console.log('event', parentModal)
-//     }))
-//   })
-
-// const closeCalendar = (event) => {
-//   const target = event.target;
-//   const isVisible = isDropDownVisible.value;
-//   if (!isVisible) {
-//     console.log('Дропдаун не виден на момент события, обработка прервана');
-//     return;
-//   }
-
-//   // Блокируем изменения isDropDownVisible до завершения проверки
-//   const originalValue = isDropDownVisible.value;
-//   setTimeout(() => {
-//     if (originalValue !== isDropDownVisible.value) {
-//       console.log('Состояние isDropDownVisible изменилось во время проверки, игнорируем');
-//       return;
-//     }
-//   }, 0);
-
-//   setTimeout(() => {
-//     if (!document.contains(target)) {
-//       console.log('Элемент клика удалён из DOM после задержки');
-//       return;
-//     }
-
-//     console.log('Начальный элемент клика:', target.tagName.toLowerCase(), 'Классы:', Array.from(target.classList).join(' '));
-
-//     if (dataPicker.value?.contains(target)) {
-//       console.log('Элемент внутри dataPicker, игнорируем:', target.tagName.toLowerCase(), 'Классы:', Array.from(target.classList).join(' '));
-//       return;
-//     }
-
-//     if (calendarBar.value?.$el?.contains(target)) {
-//       console.log('Элемент внутри calendarBar, игнорируем:', target.tagName.toLowerCase(), 'Классы:', Array.from(target.classList).join(' '));
-//       return;
-//     }
-
-//     const ignoreClasses = ['header-handler', 'calendar-wrapper', 'select-month-custom'];
-//     let el = target;
-//     let isIgnoredByClass = false;
-//     let level = 0;
-
-//     while (el && level < 10) {
-//       if (el.classList) {
-//         const tagName = el.tagName.toLowerCase();
-//         const classes = Array.from(el.classList).join(' ');
-//         console.log(`Уровень ${level}: Проверяем элемент: <${tagName} class="${classes}">`);
-//         const matchingClasses = ignoreClasses.filter(cls => el.classList.contains(cls));
-//         if (matchingClasses.length > 0) {
-//           console.log(`Уровень ${level}: Найден игнорируемый класс(ы): ${matchingClasses.join(', ')} на элементе <${tagName} class="${classes}">`);
-//           isIgnoredByClass = true;
-//           break;
-//         }
-//       }
-//       el = el.parentElement;
-//       level++;
-//     }
-
-//     if (isIgnoredByClass) {
-//       console.log('Элемент проигнорирован по классу, закрытие отменено');
-//       return;
-//     }
-
-//     console.log('Ни один из условий исключения не выполнен, закрываем дропдаун');
-//     isDropDownVisible.value = false;
-//     emit('isOpen', isDropDownVisible.value);
-//   }, 0);
-// };
-
-// onMounted(() => {
-//   console.log('dataPicker:', dataPicker.value, 'calendarBar:', calendarBar.value?.$el);
-//   window.addEventListener('click', closeCalendar);
-// });
-
-// onBeforeUnmount(() => {
-//   console.log('Удалён слушатель кликов');
-//   window.removeEventListener('click', closeCalendar);
-// });
+// watch(
+//   () => props.isOpen,
+//   (newStatus) => {
+//     isDropDownVisible.value = newStatus;
+//   },
+// );
 </script>
 
 <style scoped>

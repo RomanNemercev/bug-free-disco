@@ -6,7 +6,7 @@ interface VacancyResponse {
     }
 }
 
-export const getVacancies = async () => {
+export const getVacancies = async (params: any = '') => {
     const config = useRuntimeConfig();
 
     // Токен сервера из cookie
@@ -26,7 +26,7 @@ export const getVacancies = async () => {
     }
 
     try {
-        const response = await $fetch<VacancyResponse>('/vacancies', {
+        const response = await $fetch<VacancyResponse>('/vacancies' + `?${params}`, {
             method: 'GET',
             baseURL: config.public.apiBase as string, // https://admin.job-ly.ru/api
             headers: {
