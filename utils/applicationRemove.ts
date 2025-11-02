@@ -1,7 +1,10 @@
+import { data } from "autoprefixer";
+
 export const deleteApplication = async (id) => {
     const config = useRuntimeConfig();
 
-    const { data, error } = await useFetch(`/applications/${id}`, {
+    try {
+        const data = await $fetch(`/applications/${id}`, {
         method: 'DELETE',
         baseURL: config.public.apiBase,
         headers: {
@@ -11,13 +14,16 @@ export const deleteApplication = async (id) => {
         },
     });
 
-    console.log('Server response:', data.value);
-    console.log('Server error:', error.value);
-
-    if (error.value) {
-        console.error('Application deletion error:', error.value);
-        return { data: null, error: error.value };
+    console.log('Server response:', data);
+    } catch (error) {
+        if (error.response.status === 401) {
+            useRouter().replace('/auth');
+        } else {
+            console.error('Application deletion error:', error);
+            return { data: null, error: error.response._data.message };
+        }
     }
 
-    return { data: data.value, error: null };
+
+    return { data: data, error: null };
 };

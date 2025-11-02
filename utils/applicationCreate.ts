@@ -20,8 +20,13 @@ export const createApplication = async (applicationData: any) => {
         
         return { data: response, error: null };
     } catch (error) {
-        console.error('Ошибка создания заявки:', error);
+        if (error.response.status === 401) {
+            alert('Ваша сессия истекла! Пожалуйста, авторизуйтесь снова.');
+            useRouter().replace('/auth');
+        } else {
+            console.error('Ошибка создания заявки:', error);
         throw error;
+        }
     }
 
 

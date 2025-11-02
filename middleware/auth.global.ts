@@ -7,7 +7,11 @@ export default defineNuxtRouteMiddleware((to: RouteLocationNormalized, from: Rou
   if (to.path === '/auth') {
     return;
   }
-  if (!tokenCookie.value) {
-    return navigateTo('/auth');
+  if (to.path.startsWith('/public')) {
+    return;
+  } else {
+    if (!tokenCookie.value) {
+      return navigateTo('/auth');
+    }
   }
 });

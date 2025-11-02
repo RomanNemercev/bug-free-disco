@@ -93,7 +93,7 @@ export async function  getDepartments() {
     // });
 
     console.log(response.data);
-    const departments = [];
+    const departments: Array<any> = [];
      if (response.data.length > 0) {
         response.data.map((item: any) => {
             if (item.divisions.length > 0) {
@@ -109,4 +109,56 @@ export async function  getDepartments() {
      }
 
     return departments;
+};
+
+export async function  responsiblesList() {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+
+    const response: ApiResponseExecutors = await $fetch(`${config.public.apiBase}/customer-with-roles/responsibles`, {
+        headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${authToken}`,
+             'X-Auth-User': `${authUser}`
+        }
+    });
+
+    if (!response.data || !response.data || !Array.isArray(response.data)) {
+        throw new Error('Данные исполнителей не найдены или имеют неверный формат');
+    }
+
+    const responsibles: Executor[] = response.data.map((executor: ApiExecutor) => ({
+            id: executor.id,
+            name: executor.name,
+            role: executor.role.name 
+        }));
+
+        return responsibles;
+};
+
+export async function  employeesList() {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+
+    const response: ApiResponseExecutors = await $fetch(`${config.public.apiBase}/customer-with-roles/employees`, {
+        headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${authToken}`,
+             'X-Auth-User': `${authUser}`
+        }
+    });
+
+    if (!response.data || !response.data || !Array.isArray(response.data)) {
+        throw new Error('Данные исполнителей не найдены или имеют неверный формат');
+    }
+
+    const employees: Executor[] = response.data.map((executor: ApiExecutor) => ({
+            id: executor.id,
+            name: executor.name,
+            role: executor.role.name 
+        }));
+
+        return employees;
 };

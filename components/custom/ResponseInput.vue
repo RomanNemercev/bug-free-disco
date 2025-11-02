@@ -51,7 +51,7 @@
 
   const clearResponse = () => {
     currentResponse.value = ''
-    filteredResponses.value = []
+    filteredResponses.value = props.responses
     emit('update:modelValue', '', null)
   }
 

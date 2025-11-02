@@ -27,8 +27,12 @@ export async function fetchApplicationDetail(id: number) {
         
         return response;
     } catch (error) {
-        console.error('Missed data. Error occured:', error);
-        throw error;
+        if (error.response.status === 401) {
+            useRouter().replace('/auth');
+        } else {
+            console.error('Missed data. Error occured:', error);
+            return { data: null, error: error.response._data.message };
+        }
     }
 }
 
@@ -54,8 +58,12 @@ export async function reject(id: string, descr: string) {
 
         arr.value = response;
     } catch (err: any) {
-        console.error('Missed data. Error occured:', err);
-        error.value = err.response._data.message
+        if (error.response.status === 401) {
+            useRouter().replace('/auth');
+        } else {
+            console.error('Missed data. Error occured:', err);
+            error.value = err.response._data.message
+        }
     }
 
     return { data: null, error: error.value};
@@ -80,8 +88,12 @@ export async function approve(id: string) {
 
         arr.value = response;
     } catch (err: any) {
-        console.error('Missed data. Error occured:', err);
-        error.value = err.response._data.message
+        if (error.response.status === 401) {
+            useRouter().replace('/auth');
+        } else {
+            console.error('Missed data. Error occured:', err);
+            error.value = err.response._data.message
+        }
     }
 
     return { data: null, error: error.value};

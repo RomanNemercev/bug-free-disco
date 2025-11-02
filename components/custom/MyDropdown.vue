@@ -74,7 +74,7 @@ const emit = defineEmits(['update:modelValue', 'select'])
 
 const dropDown = ref(null)
 const isDropDownVisible = ref(false)
-const selectedOption = ref(null)
+const selectedOption = ref(props.defaultValue ? props.defaultValue : null)
 
 // Утилиты для обработки options
 const getOptionValue = (option) => option?.value ?? option
