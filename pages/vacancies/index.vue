@@ -12,6 +12,7 @@
   import { ref, computed, nextTick, watch, onMounted } from 'vue'
   import { getVacancies } from '~/utils/getVacancies'
   import { clientsList } from '@/utils/clientsList'
+  import { getDepartments, responsiblesList } from "@/utils/executorsList";
 
   import vacanciesDraftData from '@/src/data/vacancies-draft.json'
   import vacanciesArchiveData from '@/src/data/vacancies-archive.json'
@@ -52,6 +53,8 @@
   const loading = ref(false)
   const clients = ref([])
   const recruiters = ref([])
+  const departments = ref([])
+  const responsibles = ref([])
   const filters = ref({
     status: null,
     client: null,
@@ -64,6 +67,8 @@
     }
   })
   const filterStatuses = {'В работе': 'active', 'Черновик': 'draft', 'Архив': 'archive'}
+  departments.value = await getDepartments();
+  responsibles.value = await responsiblesList();
 
   const totalPages = computed(() =>
     Math.max(1, Math.ceil(vacancies.value.length / itemsPerPage))
@@ -353,7 +358,7 @@
             <p class="text-18px font-medium text-space leading-normal mb-35px">
               Фильтры
             </p>
-            <div class="grid grid-cols-4 gap-15px mb-6">
+            <div class="filters grid grid-cols-4 gap-15px mb-6">
               <div>
                 <p class="text-sm font-medium text-space mb-3.5">
                   Статус
@@ -393,6 +398,29 @@
                   placeholder="Введите город" 
                   :model-value="filters.city ? filters.city : ''"
                   @update:modelValue="$event => filters.city = $event"
+                />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-space mb-3.5">
+                  Отдел
+                </p>
+                <response-input
+                class="w-full"
+                :responses="departments"
+                :model-value="filters.division ? filters.division.name : null"
+                :showRoles="true"
+                notFound="Отдел не найден"
+                placeholder="Введите название отдела"
+                @update:modelValue="(name, index) => console.log(name, index)"
+              />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-space mb-3.5">Согласующий</p>
+                <response-input
+                  placeholder="Выберите согласующего"
+                  :showRoles="false"
+                  :responses="responsibles"
+                  @update:modelValue="($event, index) => filters.responsible = index"
                 />
               </div>
               <div class="col-span-2">
@@ -594,5 +622,21 @@
   .slide-fade-leave-to {
     transform: translateX(20px);
     opacity: 0;
+  }
+
+  @media (max-width: 992px) {
+    .filters {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 768px) {
+    .filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .filters {
+      grid-template-columns:  1fr;
+    }
   }
 </style>

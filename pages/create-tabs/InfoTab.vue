@@ -20,6 +20,8 @@ import EmailInput from '~/components/custom/EmailInput.vue'
 import CustomDropdown from '~/components/custom/CustomDropdown.vue'
 import GenerateButton from '~/components/custom/GenerateButton.vue'
 import MyTextarea from '@/components/custom/MyTextarea.vue'
+import DropdownCalendarStatic from '@/components/custom/DropdownCalendarStatic.vue'
+import { getDepartments } from '~/utils/executorsList'
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -136,7 +138,7 @@ const showContacts = ref(true)
 const salaryType = ref('')
 
 // зависимости для отправки на сервер
-const newVacancy = ref({ place: 1, currency: 'RUB (рубль)' })
+const newVacancy = ref({ place: 1, currency: 'RUB (рубль)', status: 1 })
 if (props.id) {
   const currectVacancy = await getVacancy(props.id)
   if (currectVacancy) {
@@ -193,10 +195,12 @@ const response = ref('')
 const phone = ref(null)
 const email = ref('')
 const errors = ref({})
+const isOpenDateTo = ref(false)
+const departments = ref([])
 const { data, error } = await getPhrases()
 tags.value = data;
 
-
+departments.value = await getDepartments();
 const descriptionText = computed(() => {
   return formattedJobDescription.value
     .reduce((acc, section) => {
@@ -292,9 +296,20 @@ const updateVacancyHandler = async id => {
 
 async function saveVacancy() {
   if (validateVacancy()) {
-    const { data: response, error } = props.type === 'edit'
-      ? await updateVacancy(props.id, editVacancyData.value)
-      : (newVacancy.value.application = route.query.application ? route.query.application : null) && await createVacancy(newVacancy.value)
+    // const { data: response, error } = props.type === 'edit'
+    //   ? await updateVacancy(props.id, editVacancyData.value)
+    //   : (newVacancy.value.application = route.query.application ? route.query.application : null) && await createVacancy(newVacancy.value)
+    let response, error;
+    
+    if (props.type === 'edit') {
+      ({ data: response, error } = await updateVacancy(props.id, editVacancyData.value));
+    } else {
+      // Присваиваем application, если есть query-параметр
+      newVacancy.value.application = route.query.application ?? null;
+      
+      ({ data: response, error } = await createVacancy(newVacancy.value));
+    }
+    
     if (response == null) {
       switch (error.status) {
         case 409:
@@ -437,6 +452,43 @@ watch(() => newVacancy.employment, (newValue) => {
             </div>
           </div>
         </div>
+        <div class="flex justify-between gap-25px mb-3.5">
+          <div class="w-full">
+            <p class="text-sm font-medium text-space mb-3.5">
+                  Статус
+            </p>
+            <MyDropdown 
+                  :defaultValue="''" 
+                  placeholder="Выберите статус"
+                  :options="['В работе', 'Черновик', 'Архив']"
+                  :model-value="newVacancy.status"
+                  @update:model-value="$event => newVacancy.status = $event" 
+            />
+          </div>
+           <div class="w-full">
+              <p class="text-sm font-medium text-space mb-3.5">
+                  Желаемая дата закрытия
+              </p>
+              <DropdownCalendarStatic 
+                  @update:model-value="newVacancy.dateEnd = $event" 
+                  :is-open="isOpenDateTo"
+                />
+           </div>
+           <div class="w-full">
+                <p class="text-sm font-medium text-space leading-normal mb-15px">
+                  Отдел
+                </p>
+                <response-input
+                class="w-full"
+                :responses="departments"
+                :model-value="newVacancy.department"
+                :showRoles="true"
+                notFound="Отдел не найден"
+                placeholder="Введите название отдела"
+                @update:modelValue="newVacancy.department = $event"
+              />
+              </div>
+        </div>
         <div class="w-full">
           <div class="w-full flex justify-between">
             <p class="text-sm font-medium text-space">
@@ -551,7 +603,14 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
         </div>
         <div class="mb-9">
-          <p class="text-sm font-medium text-space mb-13px">Комментарий или заметки</p>
+          <div class="flex">
+            <p class="text-sm font-medium text-space mb-13px mr-[3px]">Комментарий или заметки</p>
+            <span>
+                  <svg-icon name="question" width="20" height="20" />
+                  <MyTooltip
+                    text="Это необязательное поле, в нем вы можете указать ссылку на вакансию или любые заметки, которые могут быть полезны другим рекрутерам и заказчикам" />
+            </span>
+          </div>
           <MyTextarea :placeholder="'Введите текст'" :model-value="newVacancy.comment ? newVacancy.comment : ''" />
         </div>
         <div class="w-fit">

@@ -11,10 +11,10 @@
         </div>
         <div class="table-container">
             <div class="table-header">
-                <div>
+                <!-- <div>
                     <MyCheckbox id="select-all" :label="''" v-model="allSelected" @update:modelValue="toggleAll"
                       :emptyLabel="true" />
-                </div>
+                </div> -->
                 <div class="px-2.5">Профиль</div>
                 <div class="px-2.5">Email</div>
                 <div class="px-2.5">Роль</div>
@@ -22,7 +22,7 @@
             </div>
             <div class="table-body">
                 <div v-for="item in users" :key="item.id" class="table-row">
-                    <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" />
+                    <!-- <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" /> -->
                     <div class="text-sm font-medium text-dodger px-2.5 flex items-center gap-x-2.5">
                         <div class="rounded-full user-outline">
                             <CardIcon :icon="item.icon" :isPng="item.isPng" :imagePath="item.imagePath" :width="45"
@@ -53,14 +53,20 @@
                 </p>
                 <div class="flex gap-x-1 mb-15px items-center">
                     <span class="text-red">*</span>
-                    <p class="text-sm font-medium text-space leading-normal">Email</p>
-                </div>
-                <EmailInput v-model="emailInvoice" class="mb-15px" />
-                <div class="flex gap-x-1 mb-15px items-center">
-                    <span class="text-red">*</span>
                     <p class="text-sm font-medium text-space leading-normal">Доступ</p>
                 </div>
                 <MultiDropdown :options="optionsData" class="mb-25px" />
+                <div class="flex gap-x-1 mb-15px items-center">
+                    <span class="text-red">*</span>
+                    <p class="text-sm font-medium text-space leading-normal">Пользователь</p>
+                </div>
+                <response-input 
+                  class="mb-15px"
+                  placeholder="Выберите рекрутера"
+                  :responses="employees"
+                  @update:modelValue="($event, index) => emailInvoice = index"
+                 />
+                <!-- <EmailInput v-model="emailInvoice" class="mb-15px" /> -->
                 <div class="flex gap-x-15px">
                     <UiButton variant="action" size="action" @click="switchToConfirmation">Пригласить</UiButton>
                     <UiButton variant="back" size="back" @click="closePopup">Отмена</UiButton>
@@ -93,6 +99,8 @@ import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
 import EmailInput from '~/components/custom/EmailInput.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
+import { employeesList } from "@/utils/executorsList";
+import ResponseInput from "~/components/custom/ResponseInput.vue";
 
 const selected = ref({}); // Выбранные чекбоксы
 const allSelected = ref(false);
@@ -100,7 +108,9 @@ const hoveredIndex = ref(null);
 const isPopupOpen = ref(false); // control visibility popup
 const emailInvoice = ref('');
 const activePopup = ref('invite'); // Текущее активное окно ('invite' or 'confirmation')
+const employees = ref([]);
 
+employees.value = await employeesList();
 // Функции для управления прокруткой
 function disableBodyScroll() {
     document.body.style.overflow = 'hidden'; // Отключаем прокрутку
@@ -147,8 +157,8 @@ const users = ref([
 const optionsData = [
     {
         "id": 1,
-        "title": "Администратор",
-        "description": "Может добавлять, редактировать, активировать вакансии. Имеет доступ к отчетам и многому другому."
+        "title": "Согласующий",
+        "description": "Могут участвовать в подборе, но не должны видеть зарплатные ожидания кандидатов"
     },
     {
         "id": 2,
@@ -162,7 +172,7 @@ const optionsData = [
     }
 ]
 
-const dropdownOptions = ["Редактировать текст", "Посмотреть публикацию", "Снять с публикации", "Дублировать публикацию", "Показать отчет по публикации"];
+const dropdownOptions = ["Удалить"];
 
 const toggleAll = (isChecked) => {
     users.value.forEach((item) => {
@@ -203,7 +213,7 @@ watch(selected, (newSelected) => {
 .table-header,
 .table-row {
     display: grid;
-    grid-template-columns: 1.778% 26.667% 44.89% 17.778% 3.556%;
+    grid-template-columns: 26.667% 44.89% 17.778% 3.556%;
     gap: 15px;
     /* Горизонтальный отступ */
     padding: 20px 25px;
