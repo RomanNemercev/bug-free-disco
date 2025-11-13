@@ -509,7 +509,7 @@ watch(() => newVacancy.employment, (newValue) => {
           Максимум 700 символов. Использовано 0 символов.
         </p>
       </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+      <!-- <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
         <p class="text-space leading-[17px] text-13px font-normal">
           Ваша заявка на&nbsp;размещение вакансии
           на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
@@ -517,7 +517,7 @@ watch(() => newVacancy.employment, (newValue) => {
           на&nbsp;вашей странице вакансий. Процесс утверждения займет
           до&nbsp;4&nbsp;часов.
         </p>
-      </div>
+      </div> -->
     </div>
     <div class="flex gap-x-[24px] pt-3.5">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
@@ -547,7 +547,7 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
         </div>
       </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+      <!-- <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
         <p class="text-space leading-[17px] text-13px font-normal">
           Ваша заявка на&nbsp;размещение вакансии
           на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
@@ -555,7 +555,7 @@ watch(() => newVacancy.employment, (newValue) => {
           на&nbsp;вашей странице вакансий. Процесс утверждения займет
           до&nbsp;4&nbsp;часов.
         </p>
-      </div>
+      </div> -->
     </div>
     <div class="flex gap-x-[24px] pt-3.5">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
@@ -603,7 +603,7 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
         </div>
         <div class="mb-9">
-          <div class="flex">
+            <div class="flex">
             <p class="text-sm font-medium text-space mb-13px mr-[3px]">Комментарий или заметки</p>
             <span>
                   <svg-icon name="question" width="20" height="20" />
@@ -611,7 +611,15 @@ watch(() => newVacancy.employment, (newValue) => {
                     text="Это необязательное поле, в нем вы можете указать ссылку на вакансию или любые заметки, которые могут быть полезны другим рекрутерам и заказчикам" />
             </span>
           </div>
-          <MyTextarea :placeholder="'Введите текст'" :model-value="newVacancy.comment ? newVacancy.comment : ''" />
+          <div class="flex w-[calc(100% + 275px)] gap-50px" style="width: calc(100% + 325px)">
+            <MyTextarea :placeholder="'Введите текст'" :model-value="newVacancy.comment ? newVacancy.comment : ''" style="width: 100%" "/>
+            <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+             <p class="text-space leading-[17px] text-13px font-normal">
+                Это необязательное поле, в нем вы можете указать ссылку на вакансию или любые заметки, которые могут быть полезны другим рекрутерам и заказчикам 
+             </p>
+            </div>
+          </div>
+           
         </div>
         <div class="w-fit">
           <MyAccordion title="дополнительные условия" class="mb-15px">
@@ -634,15 +642,6 @@ watch(() => newVacancy.employment, (newValue) => {
             </div>
           </MyAccordion>
         </div>
-      </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
-        <p class="text-space leading-[17px] text-13px font-normal">
-          Ваша заявка на&nbsp;размещение вакансии
-          на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
-          в&nbsp;стадии рассмотрения. Эта вакансия уже опубликована
-          на&nbsp;вашей странице вакансий. Процесс утверждения займет
-          до&nbsp;4&nbsp;часов.
-        </p>
       </div>
     </div>
     <div class="flex gap-x-[24px] pt-3.5">
@@ -685,7 +684,7 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
         </div>
       </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+      <!-- <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
         <p class="text-space leading-[17px] text-13px font-normal">
           Ваша заявка на&nbsp;размещение вакансии
           на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
@@ -693,7 +692,7 @@ watch(() => newVacancy.employment, (newValue) => {
           на&nbsp;вашей странице вакансий. Процесс утверждения займет
           до&nbsp;4&nbsp;часов.
         </p>
-      </div>
+      </div> -->
     </div>
     <div class="flex gap-x-[24px] pt-3.5">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
@@ -713,7 +712,7 @@ watch(() => newVacancy.employment, (newValue) => {
           Укажите расположение офиса для нового сотрудника.
         </p>
       </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+      <!-- <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
         <p class="text-space leading-[17px] text-13px font-normal">
           Ваша заявка на&nbsp;размещение вакансии
           на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
@@ -721,7 +720,7 @@ watch(() => newVacancy.employment, (newValue) => {
           на&nbsp;вашей странице вакансий. Процесс утверждения займет
           до&nbsp;4&nbsp;часов.
         </p>
-      </div>
+      </div> -->
     </div>
     <div class="flex gap-x-[24px] pt-3.5 mb-25px">
       <div class="max-w-[875px] flex-grow p-25px bg-white rounded-fifteen">
@@ -750,7 +749,7 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
         </div>
       </div>
-      <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
+      <!-- <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
         <p class="text-space leading-[17px] text-13px font-normal">
           Ваша заявка на&nbsp;размещение вакансии
           на&nbsp;14&nbsp;из&nbsp;18&nbsp;бесплатных площадках находиться
@@ -758,7 +757,7 @@ watch(() => newVacancy.employment, (newValue) => {
           на&nbsp;вашей странице вакансий. Процесс утверждения займет
           до&nbsp;4&nbsp;часов.
         </p>
-      </div>
+      </div> -->
     </div>
     <UiButton @click="saveVacancy" variant="action" size="semiaction" class="font-semibold">
       Сохранить и продолжить

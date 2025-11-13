@@ -15,7 +15,7 @@
         </div>
         <!-- Стрелка -->
         <div v-show="!selectedOption"
-          class="dropdown-arrow absolute right-3.5 top-2 transition-transform duration-300 text-bali"
+          class="dropdown-arrow absolute right-3.5 top-[calc(50%-10px)] transition-transform duration-300 text-bali"
           :class="{ 'rotate-180 text-dodger': isDropDownVisible }">
           <svg-icon name="dropdown-arrow" width="20" height="20" />
         </div>

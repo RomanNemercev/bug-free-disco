@@ -232,7 +232,7 @@
 </script>
 
 <template>
-  <div class="container pt-35px pb-28">
+  <div class="container pt-35px pb-28px">
     <!-- header block -->
     <div
       class="w-full p-25px rounded-t-fifteen bg-white flex justify-between mb-px items-center"
@@ -255,10 +255,10 @@
     </div>
     <!-- cards block -->
     <div
-      class="bg-catskill rounded-b-fifteen py-13px px-25px mb-15px pb-15px transition-all relative"
+      class="filters-wrapper bg-catskill  rounded-b-[10px] px-25px mb-15px pb-35px transition-all relative"
       ref="cardsBlock"
     >
-      <div class="flex justify-between">
+      <div class="flex justify-between pt-[15px]">
         <div class="flex">
           <div class="flex justify-between gap-x-2.5 mr-2.5">
             <button
@@ -423,16 +423,23 @@
                   @update:modelValue="($event, index) => filters.responsible = index"
                 />
               </div>
-              <div class="col-span-2">
+              <div>
                 <p class="text-sm font-medium text-space mb-3.5">
-                  Дата создания
+                  Дата создания от
                 </p>
                 <p class="flex gap-15px">
                    <DropdownCalendarStatic 
                   @update:model-value="filters.create.from = $event" 
                 />
+                </p>  
+              </div>
+              <div>
+                <p class="text-sm font-medium text-space mb-3.5">
+                  Дата создания до
+                </p>
+                <p class="flex gap-15px">
                 <DropdownCalendarStatic 
-                  @update:model-value="filters.create.from = $event" 
+                  @update:model-value="filters.create.to = $event" 
                 />
                 </p>  
               </div>
@@ -623,6 +630,10 @@
     transform: translateX(20px);
     opacity: 0;
   }
+
+  .filters-wrapper {
+      border-radius: 0 0 15px 15px!important;
+    }
 
   @media (max-width: 992px) {
     .filters {
