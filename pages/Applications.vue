@@ -1030,8 +1030,22 @@
                 </div>
               </div>
             </div>
-            <div v-if="!isAddApprove" class="flex gap-x-15px">
-              <UiButton variant="action" size="semiaction" @click="() => handlerUpdateApplication( selectedVacancy)">Готово</UiButton>
+            <div v-if="!isDelete" class="flex gap-x-15px">
+              <UiButton 
+                v-if="isDeleteApplication"
+                variant="action" 
+                size="semiaction" 
+                @click="deleteApplicationSelect(selectedVacancy.id)"
+              >
+                Удалить
+              </UiButton>
+              <UiButton 
+                variant="action" 
+                size="semiaction" 
+                @click="() => handlerUpdateApplication( selectedVacancy)"
+              >
+                Готово
+              </UiButton>
               <UiButton
                 variant="back"
                 size="second-back"
@@ -1294,6 +1308,7 @@ const router = useRouter()
   let resizeObserver = null
   const errors = ref({})
   const updateData = ref({});
+  const isDeleteApplication = ref(false);
   const isAddApprove = ref(false);
   const isApprove = ref(false);
   const isNotApprove = ref(false);
@@ -1321,6 +1336,13 @@ const router = useRouter()
 
   const isOpenFrom = (value) => {
     isOpenDateFrom.value = value
+  }
+
+  const deleteApplicationSelect = async (id) => {
+    await deleteApplication(id);
+    isDeleteApplication.value = false;
+    selectedVacancy.value = false;
+    loadApplications();
   }
 
   const statusWeights = {
@@ -1693,9 +1715,20 @@ const router = useRouter()
         if (profileCustomer.data.role.name == 'Рекрутер' || profileCustomer.data.role.name == 'Администратор') {
           isAddApprove.value = true
         }
+        if (profileCustomer.data.role.name == 'Клиент' || profileCustomer.data.role.name == 'Администратор') {
+          if (!isDeleteApplication.value) {
+            isDeleteApplication.value = true
+          }
+        } else {
+          if (isDeleteApplication.value) {
+            isDeleteApplication.value = false
+          }
+        }
         reasonReject.value ? reasonReject.value = false : ''
       } else {
-        console.log('detailedVacancy', detailedVacancy.value)
+        if (isDeleteApplication.value) {
+            isDeleteApplication.value = false
+          }
         if (detailedVacancy.value.status.name == 'Отклонена' && detailedVacancy.value.approvals.length > 0) {
           reasonReject.value = true
         } else {

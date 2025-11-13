@@ -13,14 +13,12 @@ interface LoginResponse {
 export const loginUser = async (email: string, password: string) => {
     const serverToken = await getServerToken();
     if (!serverToken) {
-        console.error('Token server not found');
         return { data: null, error: 'Не удалось получить серверный токен' };
     }
 
     const config = useRuntimeConfig();
 
     try {
-        console.log('Отправляемые данные для входа:', { email, password });
 
         const response = await $fetch<LoginResponse>('/login', {
             method: 'POST',
@@ -35,14 +33,9 @@ export const loginUser = async (email: string, password: string) => {
             },
         });
 
-        console.log('Server response:', response);
-        console.log('User:', response.user.name);
-        console.log('Email:', response.user.email);
-
         if (response?.user?.auth_token) {
             const userTokenCookie = useCookie('auth_user');
             userTokenCookie.value = response.user.auth_token;
-            console.log('User token is save in cookie', userTokenCookie.value);
         }
         if (response.user.name && response.user.email) {
             const userStore = useUserStore();
@@ -87,8 +80,8 @@ export const profile = async () => {
             },
         })
 
-        return { data: response, error: null };
-    } catch (error) {
-        return { data: null, error: error };
+        return { data: response, error: null, status: 200 };
+    } catch (error: any) {
+        return { data: null, error: error.response._data.message, status: error.response.status };
     }
 }
