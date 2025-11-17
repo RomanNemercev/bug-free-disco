@@ -45,7 +45,6 @@ export const getProfile = async () => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -131,15 +130,12 @@ export const getCode = async () => {
             },
         });
 
-        console.log('response', response);
-
         result.value.data = response;
     } catch (err: any) {
         if (err.response?.status === 401) {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         } else {
             result.value.error = err.response._data.message;
@@ -188,7 +184,6 @@ export const getPublications = async () => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -230,7 +225,6 @@ export const getAvailableTypes = async (employerId: string, managerId: string) =
 
         result.value.types = response.data?.items;
     } catch (err: any) {
-        console.log('error types available ', err.response._data.message);
         if (err.response?.status === 404) {
             result.value.errorTypes = err.response._data.message;
         }
@@ -321,7 +315,6 @@ export const addDraft = async (data: any) => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -361,7 +354,6 @@ export const getRoles = async () => {
 
         result.value.roles = response.data;
     } catch (err: any) {
-        console.log('error types available ', err.response._data.message);
         if (err.response?.status === 404) {
             result.value.errorRoles = err.response._data.message;
         }
@@ -369,7 +361,6 @@ export const getRoles = async () => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -416,7 +407,6 @@ export const getVacancies = async () => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -463,7 +453,6 @@ export const getDrafts = async () => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -511,7 +500,6 @@ export const getResponses = async (id: string) => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -559,7 +547,6 @@ export const getResponse = async (id: string) => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {
@@ -609,7 +596,6 @@ export const getData = async (url: any) => {
             serverTokenCookie.value = null; // Удаляем просроченный токен сервера
             userTokenCookie.value = null;   // Удаляем просроченный токен пользователя
             // Middleware сработает автоматически при следующем роутинге
-            alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
             navigateTo('/auth');
         }
     } finally {

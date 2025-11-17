@@ -82,18 +82,36 @@ watch(() => props.isOpen, (newStatus) => {
 // Обработка клика вне компонента
 const handleClickOutside = (event) => {
   const selectContent = document.querySelector('.calendar-wrapper');
-  console.log('target', event.target.contains(selectContent))
+  // console.log('isDropDownVisible.value', isDropDownVisible.value)
+  // console.log('dataPicker.value', dataPicker.value)
+  // console.log('dataPicker.value.contains(event.target)', !dataPicker.value.contains(event.target))
+  // console.log('calendarBar.value?.$el', calendarBar.value?.$el)
+  // console.log('calendarBar.value.$el.contains(event.target)', calendarBar.value.$el.contains(event.target))
+  // console.log('event.target.contains(selectContent)', !event.target.contains(selectContent))
+  console.log('event', event.target)
   if (
     isDropDownVisible.value &&
-    dataPicker.value &&
+    // dataPicker.value &&
     !dataPicker.value.contains(event.target) &&
-    calendarBar.value?.$el &&
+    (calendarBar.value?.$el !== undefined) &&
     !calendarBar.value.$el.contains(event.target) &&
+    // (calendarBar.value?.$el !== undefined || !calendarBar.value.$el.contains(event.target))  &&
+    // !calendarBar.value.$el.contains(event.target) &&
     (!event.target.contains(selectContent) || !selectContent)
+    // !selectContent
   ) {
+
     isDropDownVisible.value = false;
     emit('isOpen', isDropDownVisible.value);
   }
+  // if (
+  //   calendarBar.value?.$el !== undefined && 
+  //   dataPicker.value &&
+  //   !calendarBar.value.$el.contains(event.target) && 
+  //   isDropDownVisible.value) {
+  //   isDropDownVisible.value = false;
+  //   emit('isOpen', isDropDownVisible.value);
+  // }
 };
 
 onMounted(() => {

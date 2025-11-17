@@ -25,12 +25,12 @@
                     <!-- <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" /> -->
                     <div class="text-sm font-medium text-dodger px-2.5 flex items-center gap-x-2.5">
                         <div class="rounded-full user-outline">
-                            <CardIcon :icon="item.icon" :isPng="item.isPng" :imagePath="item.imagePath" :width="45"
+                            <CardIcon :icon="true" :isPng="true" imagePath="/img/user.png" :width="45"
                               :height="45" />
                         </div>
                         <div @mouseenter="hoveredIndex = item.id" @mouseleave="hoveredIndex = null"
                           :class="{ 'user-hovered': hoveredIndex === item.id }" class="cursor-pointer select-none">{{
-                            item.profile
+                            item.name
                             }}</div>
                     </div>
                     <div class="text-sm font-medium text-space px-2.5">{{ item.email }}</div>
@@ -99,7 +99,7 @@ import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
 import EmailInput from '~/components/custom/EmailInput.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
-import { employeesList } from "@/utils/executorsList";
+import { employeesList, teamList } from "@/utils/executorsList";
 import ResponseInput from "~/components/custom/ResponseInput.vue";
 
 const selected = ref({}); // Выбранные чекбоксы
@@ -109,6 +109,7 @@ const isPopupOpen = ref(false); // control visibility popup
 const emailInvoice = ref('');
 const activePopup = ref('invite'); // Текущее активное окно ('invite' or 'confirmation')
 const employees = ref([]);
+const users = ref([]);
 
 employees.value = await employeesList();
 // Функции для управления прокруткой
@@ -147,12 +148,14 @@ onBeforeUnmount(() => {
     enableBodyScroll();
 });
 
-const users = ref([
-    { id: 1, isPng: true, imagePath: "/img/user.png", profile: "Туманов Анатолий Семенович", email: "tumanovanatolya@gmail.com", role: "Рекрутер" },
-    { id: 2, isPng: true, imagePath: "/img/user.png", profile: "Антонов Александр", email: "anton10203gmail.com", role: "Рекрутер" },
-    { id: 3, isPng: true, imagePath: "/img/user.png", profile: "Лидия Семенова", email: "lidiasemenova@gmail.com", role: "Рекрутер" },
-    { id: 4, isPng: true, imagePath: "/img/user.png", profile: "Алексей Самсонов", email: "samsonov1204871824@gmail.com", role: "Рекрутер" },
-])
+users.value = await teamList();
+console.log('users', users.value);
+// const users = ref([
+//     { id: 1, isPng: true, imagePath: "/img/user.png", profile: "Туманов Анатолий Семенович", email: "tumanovanatolya@gmail.com", role: "Рекрутер" },
+//     { id: 2, isPng: true, imagePath: "/img/user.png", profile: "Антонов Александр", email: "anton10203gmail.com", role: "Рекрутер" },
+//     { id: 3, isPng: true, imagePath: "/img/user.png", profile: "Лидия Семенова", email: "lidiasemenova@gmail.com", role: "Рекрутер" },
+//     { id: 4, isPng: true, imagePath: "/img/user.png", profile: "Алексей Самсонов", email: "samsonov1204871824@gmail.com", role: "Рекрутер" },
+// ])
 
 const optionsData = [
     {
@@ -161,12 +164,12 @@ const optionsData = [
         "description": "Могут участвовать в подборе, но не должны видеть зарплатные ожидания кандидатов"
     },
     {
-        "id": 2,
+        "id": 3,
         "title": "Рекрутер",
-        "description": "Имеет доступ к кандидатам, комментариям и электронной почте. Может создать вакансию добавить и команду."
+        "description": "Имеет доступ к кандидатам, комментариям и электронной почте. Может добавить вакансию  и команду."
     },
     {
-        "id": 3,
+        "id": 5,
         "title": "Заказчик",
         "description": "Имеет доступ к статистики, может оставлять комментарии и оценивать кандидатов."
     }

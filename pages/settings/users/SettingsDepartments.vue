@@ -8,6 +8,7 @@ import Popup from '~/components/custom/Popup.vue'
 import MyInput from '~/components/custom/MyInput.vue'
 import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
 import draggable from 'vuedraggable'
+import { getDepartments } from '@/utils/executorsList'
 
 
 const settingsTabs = ref('departments')
@@ -29,6 +30,8 @@ const removeRoleData = ref(null)
 const removeExternalData = ref(null)
 const editInputs = ref({})
 const externalInputs = ref({})
+const dataApi = ref([])
+const data = ref([])
 
 definePageMeta({
   layout: 'settings',
@@ -38,91 +41,22 @@ useHead({
   title: 'Настройки — Отделы и роли',
 })
 
-// const data = ref(null)
-
-const data = ref([
-  {
-    id: 1,
-    name: 'Разработка',
-    customId: '29139123812',
-    checked: false,
-    subDepartments: [
-      {
-        id: 1,
-        name: 'Аналитика',
+dataApi.value = await getDepartments(true)
+dataApi.value.forEach((element, index, array) => {
+    const subs = element.divisions.map((sub) => ({
+        id: sub.id,
+        name: sub.division,
         checked: false,
-        hover: false,
-      },
-      {
-        id: 2,
-        name: 'Програмированние',
-        checked: false,
-        hover: false,
-      },
-      {
-        id: 3,
-        name: 'Управление проектами',
-        checked: false,
-        hover: false,
-      },
-    ],
-    newSubDep: '',
-  },
-  {
-    id: 2,
-    name: 'Маркетинг',
-    customId: '29139123812',
-    checked: false,
-    subDepartments: [
-      {
-        id: 1,
-        name: 'SEO',
-        checked: false,
-        hover: false,
-      },
-      {
-        id: 2,
-        name: 'SMM',
-        checked: false,
-        hover: false,
-      },
-      {
-        id: 3,
-        name: 'Контент-маркетинг',
-        checked: false,
-        hover: false,
-      },
-    ],
-    newSubDep: '',
-  },
-  {
-    id: 3,
-    name: 'Финансы',
-    customId: '29139123812',
-    checked: false,
-    subDepartments: [
-      {
-        id: 1,
-        name: 'Бухгалтерия',
-        checked: false,
-        hover: false,
-      },
-      {
-        id: 2,
-        name: 'Анализ данных',
-        checked: false,
-        hover: false,
-      },
-      {
-        id: 3,
-        name: 'Управление рисками',
-        checked: false,
-        hover: false,
-      },
-    ],
-    newSubDep: '',
-  },
-])
+        hover: false
+    }))
+    data.value.push({
+      id: index,
+      name: element.name,
+      customId: element.id,
+      checked: false,
+      subDepartments: subs
+    })
+});
 
 function addSubDepartment(dep) {
   if (!dep.newSubDep || !dep.newSubDep.trim()) return
