@@ -15,6 +15,7 @@ export default defineNuxtRouteMiddleware(async (to: RouteLocationNormalized, fro
     return navigateTo('/auth');
   } else {
       const { data: profileUser, error: profileError, status } = await getProfile();
+      console.log('route path', to.path);
       if (status == 401) {
         await getServerToken();
         const { data: profileUser, error: profileError, status: statusUpdate } = await getProfile();
@@ -22,8 +23,7 @@ export default defineNuxtRouteMiddleware(async (to: RouteLocationNormalized, fro
           if (profileError == 'Unauthorized')
           return navigateTo('/auth');
         }
-        navigateTo({ path: to.path });
-        return;
+        return navigateTo({ path: to.path });
       } else {
         return;
       }

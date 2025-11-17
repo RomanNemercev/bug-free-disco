@@ -4,6 +4,13 @@ interface Executor {
     'role': string;
 }
 
+interface Team {
+    'id': number;
+    'name': string;
+    'email': string;
+    'role': string;
+}
+
 interface Division {
     'id': number;
     'department_id': number;
@@ -13,6 +20,16 @@ interface Division {
 interface ApiExecutor {
     'id': number;
     'name': string;
+    'role': {
+        'id': number,
+        'name': string
+    };
+}
+
+interface ApiTeam {
+    'id': number;
+    'name': string;
+    'email': string;
     'role': {
         'id': number,
         'name': string
@@ -29,6 +46,11 @@ interface ApiDepartment {
 interface ApiResponseExecutors {
     'message': string;
     'data': [ApiExecutor];
+}
+
+interface ApiResponseTeam {
+    'message': string;
+    'data': [ApiTeam];
 }
 
 interface ApiResponseDepartments {
@@ -63,7 +85,7 @@ export async function  executorsList() {
         return { executors };
 };
 
-export async function  getDepartments() {
+export async function  getDepartments(divisions: boolean = false) {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
@@ -81,18 +103,9 @@ export async function  getDepartments() {
         throw new Error('Данные исполнителей не найдены или имеют неверный формат');
     }
 
-    // response.data.map((department: any) => {
-    //     // console.log('dep', department);
-    //     if (department.divisions.length > 0) {
-    //         return {
-    //             id: department.divisions.id,
-    //             name: department.divisions.name,
-    //             role: department.name
-    //         }
-    //     }
-    // });
-
-    console.log(response.data);
+    if (divisions) {
+        return response.data;
+    }
     const departments: Array<any> = [];
      if (response.data.length > 0) {
         response.data.map((item: any) => {
@@ -162,3 +175,31 @@ export async function  employeesList() {
 
         return employees;
 };
+
+export async function  teamList() {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+
+    const response: ApiResponseTeam = await $fetch(`${config.public.apiBase}/team`, {
+        headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${authToken}`,
+             'X-Auth-User': `${authUser}`
+        }
+    });
+
+    if (!response.data || !response.data || !Array.isArray(response.data)) {
+        throw new Error('Данные команды не найдены или имеют неверный формат');
+    }
+
+    const employees: Team[] = response.data.map((executor: ApiTeam) => ({
+            id: executor.id,
+            name: executor.name,
+            email: executor.email,
+            role: executor.role.name 
+        }));
+
+        return employees;
+}
+    

@@ -8,21 +8,21 @@ import TagSelect from '~/components/custom/TagSelect.vue'
 import MyAccordion from '~/components/custom/MyAccordion.vue'
 import MyCheckbox from '~/components/custom/MyCheckbox.vue'
 import SalaryRange from '~/components/custom/SalaryRange.vue'
-import { Label } from '@/components/ui/label'
+import { Label } from '~/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { parseHtmlToJson } from '~/utils/htmlParser'
-import CardOption from '@/components/custom/CardOption.vue'
-import GeoInput from '@/components/custom/GeoInput.vue'
-import ResponseInput from '@/components/custom/ResponseInput.vue'
+import CardOption from '~/components/custom/CardOption.vue'
+import GeoInput from '~/components/custom/GeoInput.vue'
+import ResponseInput from '~/components/custom/ResponseInput.vue'
 import CheckboxGroup from '~/components/custom/CheckboxGroup.vue'
 import PhoneInput from '~/components/custom/PhoneInput.vue'
 import EmailInput from '~/components/custom/EmailInput.vue'
 import CustomDropdown from '~/components/custom/CustomDropdown.vue'
 import GenerateButton from '~/components/custom/GenerateButton.vue'
-import MyTextarea from '@/components/custom/MyTextarea.vue'
-import DropdownCalendarStatic from '@/components/custom/DropdownCalendarStatic.vue'
-import { getDepartments } from '~/utils/executorsList'
-import { inject } from 'vue'
+import MyTextarea from '~/components/custom/MyTextarea.vue'
+import DropdownCalendarStatic from '~/components/custom/DropdownCalendarStatic.vue'
+import { getDepartments, executorsList } from '~/utils/executorsList'
+import { inject, ReactiveEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 import schedule from '~/src/data/work-schedule.json'
@@ -35,10 +35,9 @@ import MoreOptions from '~/src/data/more-options.json'
 import industry from '~/src/data/industry.json'
 import specialization from '~/src/data/specialization.json'
 
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { createVacancy } from '~/utils/createVacancy'
 import { getPhrases, getVacancy } from '@/utils/getVacancies'
-import { executorsList } from '~/utils/executorsList'
 import { updateVacancy } from '~/utils/updateVacancy'
 import majors from '~/src/data/majors.json'
 
@@ -67,9 +66,8 @@ const props = defineProps({
     default: 'create',
   }
 })
-// console.log('type', props.type)
 
-// const vacancyStore = useVacancyStore()
+
 const options = ref([
   {
     name: 'Полная',
@@ -98,8 +96,8 @@ const handleCheck = id => {
   workSpace.value = id
 }
 
+
 onBeforeMount(async () => {
-  // получаем динамический список исполнителей
   const { executors: executorData } = await executorsList();
   executors.value = executorData
 })
@@ -113,7 +111,7 @@ const clearHover = () => {
 }
 
 const handleWorkSpaceUpdate = newValue => {
-  selectedCard.value = newValue // Синхронизируем selectedCard с workSpace
+  selectedCard.value = newValue
 }
 
 const cards = [
@@ -137,7 +135,6 @@ const cards = [
 const showContacts = ref(true)
 const salaryType = ref('')
 
-// зависимости для отправки на сервер
 const newVacancy = ref({ place: 1, currency: 'RUB (рубль)', status: 1 })
 if (props.id) {
   const currectVacancy = await getVacancy(props.id)
@@ -170,7 +167,7 @@ console.log('newVacancy', newVacancy.value)
 const editVacancyData = ref({})
 const newCode = ref('')
 const jobDescription = ref('')
-// Автоматически форматируем перед отправкой
+
 const formattedJobDescription = computed(() =>
   parseHtmlToJson(jobDescription.value)
 )
@@ -206,7 +203,7 @@ const descriptionText = computed(() => {
     .reduce((acc, section) => {
       return acc + `${section.title} ${section.items.join(' ')} `
     }, '')
-    .trim() // Убираем лишний пробел в конце
+    .trim()
 })
 
 const tagsString = computed(() => {
@@ -277,7 +274,7 @@ const updateVacancyHandler = async id => {
 
     if (data) {
       console.log('Успех обновления:', data.message)
-      // vacancyStore.resetEditing()
+
     } else if (error) {
       const status = error.status
       const message = error.data?.message || error.message
@@ -304,7 +301,7 @@ async function saveVacancy() {
     if (props.type === 'edit') {
       ({ data: response, error } = await updateVacancy(props.id, editVacancyData.value));
     } else {
-      // Присваиваем application, если есть query-параметр
+      
       newVacancy.value.application = route.query.application ?? null;
       
       ({ data: response, error } = await createVacancy(newVacancy.value));
@@ -457,36 +454,36 @@ watch(() => newVacancy.employment, (newValue) => {
             <p class="text-sm font-medium text-space mb-3.5">
                   Статус
             </p>
-            <MyDropdown 
+            <!-- <MyDropdown 
                   :defaultValue="''" 
                   placeholder="Выберите статус"
                   :options="['В работе', 'Черновик', 'Архив']"
-                  :model-value="newVacancy.status"
+                  :model-value="newVacancy.status ? newVacancy.status : null"
                   @update:model-value="$event => newVacancy.status = $event" 
-            />
+            /> -->
           </div>
            <div class="w-full">
               <p class="text-sm font-medium text-space mb-3.5">
                   Желаемая дата закрытия
               </p>
-              <DropdownCalendarStatic 
+              <!-- <DropdownCalendarStatic 
                   @update:model-value="newVacancy.dateEnd = $event" 
                   :is-open="isOpenDateTo"
-                />
+                /> -->
            </div>
            <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-15px">
                   Отдел
                 </p>
-                <response-input
+                <!-- <ResponseInput
                 class="w-full"
                 :responses="departments"
-                :model-value="newVacancy.department"
+                :model-value="newVacancy.department ? newVacancy.department : ''"
                 :showRoles="true"
                 notFound="Отдел не найден"
                 placeholder="Введите название отдела"
                 @update:modelValue="newVacancy.department = $event"
-              />
+              /> -->
               </div>
         </div>
         <div class="w-full">
@@ -565,13 +562,13 @@ watch(() => newVacancy.employment, (newValue) => {
         <div class="flex justify-between gap-25px mb-3.5">
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Тип занятости</p>
-            <my-dropdown :defaultValue="'Выберите значение'" :options="options"
+            <MyDropdown :defaultValue="'Выберите значение'" :options="options"
               :model-value="newVacancy.employment ? newVacancy.employment : ''" :initialValue="newVacancy.employment"
               @update:model-value="$event => updateEvent($event, 'employment')" />
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">График работы</p>
-            <my-dropdown :defaultValue="'Выберите значение'" :options="ArraySchedule" placeholder="График работы"
+            <MyDropdown :defaultValue="'Выберите значение'" :options="ArraySchedule" placeholder="График работы"
               :model-value="newVacancy.schedule ? newVacancy.schedule : ''" :initialValue="newVacancy.schedule"
               @update:model-value="$event => updateEvent($event, 'schedule')" />
           </div>
@@ -585,7 +582,7 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Образование</p>
-            <my-dropdown :defaultValue="'Выберите значение'" :options="ArrayEducation"
+            <MyDropdown :defaultValue="'Выберите значение'" :options="ArrayEducation"
               :model-value="newVacancy.education ? newVacancy.education : ''" :initialValue="newVacancy.education"
               @update:model-value="(value) => updateEvent(value, 'education')" />
           </div>
@@ -612,7 +609,11 @@ watch(() => newVacancy.employment, (newValue) => {
             </span>
           </div>
           <div class="flex w-[calc(100% + 275px)] gap-50px" style="width: calc(100% + 325px)">
-            <MyTextarea :placeholder="'Введите текст'" :model-value="newVacancy.comment ? newVacancy.comment : ''" style="width: 100%" "/>
+            <MyTextarea 
+              :placeholder="'Введите текст'" 
+              :model-value="newVacancy.comment ? newVacancy.comment : ''" 
+              style="width: 100%"
+            />
             <div class="max-w-[275px] sticky top-4 rounded-fifteen bg-white p-15px h-fit">
              <p class="text-space leading-[17px] text-13px font-normal">
                 Это необязательное поле, в нем вы можете указать ссылку на вакансию или любые заметки, которые могут быть полезны другим рекрутерам и заказчикам 
@@ -630,7 +631,6 @@ watch(() => newVacancy.employment, (newValue) => {
           </MyAccordion>
           <MyAccordion title="водительские права" class="mb-15px">
             <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <!-- <CheckboxGroup v-model="newVacancy.drivers.map(item => item.id)" :options="ArrayCarId" -->
                 <CheckboxGroup v-model="newVacancy.drivers" :options="ArrayCarId"
                 @update:model-value="(value, data) => updateEventObject(value, 'drivers', data)" />
             </div>
@@ -654,8 +654,13 @@ watch(() => newVacancy.employment, (newValue) => {
             <p class="text-sm font-medium text-space mb-3.5">
               Заработная плата / мес
             </p>
-            <SalaryRange class="mb-4" :model-value="salary" :from="salary.from" :to="salary.to"
-              @update:model-value="updateSalary" />
+            <SalaryRange 
+              class="mb-4" 
+              :model-value="salary" 
+              :from="salary.from" 
+              :to="salary.to"
+              @update:model-value="updateSalary" 
+            />
             <div v-if="errors.salary" class="text-red-500 text-xs mt-1">
               {{ errors.salary }}
             </div>
@@ -678,9 +683,16 @@ watch(() => newVacancy.employment, (newValue) => {
           </div>
           <div class="w-full">
             <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
-            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="ArrayCurrency[0].value"
-              :initialValue="newVacancy.currency" :model-value="newVacancy.currency"
-              @update:model-value="($event) => {console.log('update currency', ArrayCurrency.find((item) => item.value === $event));updateEvent(ArrayCurrency.find((item) => item.value === $event).name, 'currency')}" />
+            <MyDropdown 
+              :defaultValue="'Валюта'" 
+              :options="ArrayCurrency" 
+              :selected="ArrayCurrency[0].value"
+              :initialValue="newVacancy.currency" 
+              :model-value="newVacancy.currency"
+              @update:model-value="($event) => {
+                   console.log('update currency', ArrayCurrency.find((item) => item.value === $event));updateEvent(ArrayCurrency.find((item) => item.value === $event).name, 'currency')
+             }"
+            />
           </div>
         </div>
       </div>
@@ -728,9 +740,13 @@ watch(() => newVacancy.employment, (newValue) => {
           Контактная информация
         </p>
         <p class="text-sm font-medium text-space mb-16px">Контактное лицо</p>
-        <response-input class="mb-6 w-full max-w-input" :responses="executors" :model-value="newVacancy.executor_name"
+        <ResponseInput 
+          class="mb-6 w-full max-w-input" 
+          :responses="executors" 
+          :model-value="newVacancy.executor_name ? newVacancy.executor_name : ''"
           @input:modelValue="$event => updateEvent($event, 'executor_name')"
-          @update:modelValue="$event => updateEvent($event, 'executor_name')" />
+          @update:modelValue="$event => updateEvent($event, 'executor_name')" 
+        />
         <div class="w-full flex justify-between gap-x-[25px]">
           <div class="w-full max-w-[400px]">
             <p class="text-sm font-medium text-space leading-normal mb-4">

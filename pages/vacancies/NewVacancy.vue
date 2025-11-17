@@ -23,15 +23,15 @@ import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/api'
 const { $loader } = useNuxtApp()
 
 const route = useRoute()
-const vacancyId = ref(route.query.id)
-const currectVacancy = inject('vacancyCurrect')
-const application = ref(route.query.application)
+const vacancyId = ref(route.query.id ? route.query.id : null)
+const currectVacancy: any = inject('vacancyCurrect')
+const application = ref(route.query.application ? route.query.application : null)
 
 const typeSave = ref(route.query.type ? route.query.type : 'create')
 
-if (vacancyId.value && !currectVacancy.value) {
-  currectVacancy.value = await getVacancy(String(vacancyId.value))
-}
+// if (vacancyId.value && !currectVacancy.value) {
+//   currectVacancy.value = await getVacancy(String(vacancyId.value))
+// }
 
 useSeoMeta({
   title: 'Создание вакансии — Jobly',
@@ -76,7 +76,6 @@ const onPending = () => {
 }
 
 const onResolve = () => {
-  console.log('Suspense: Loading finished')
   if (loaderTimeout) {
     clearTimeout(loaderTimeout)
     loaderTimeout = null
@@ -89,8 +88,19 @@ const onFallback = () => {
   console.log('Suspense: Showing fallback')
 }
 
+// onMounted(async () => {
+//   await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}&results=10`);
+//   // await loadScript(`https://suggest-maps.yandex.ru/v1/suggest?text=%D0%B1%D1%83%D1%80%D0%B4%D0%B6&highlight=0&apikey=${API_YANDEX_SUGGEST}`)
+// })
+
+
 onMounted(async () => {
-  await loadScript(`https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}&results=10`);
-  // await loadScript(`https://suggest-maps.yandex.ru/v1/suggest?text=%D0%B1%D1%83%D1%80%D0%B4%D0%B6&highlight=0&apikey=${API_YANDEX_SUGGEST}`)
+  try {
+    await loadScript(
+      `https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=${API_YANDEX_KEY}&suggest_apikey=${API_YANDEX_SUGGEST}&results=10`
+    )
+  } catch (error) {
+    console.error('Ошибка загрузки Yandex Maps:', error)
+  }
 })
 </script>

@@ -49,9 +49,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 })
 
 export const loadScript = (url: string) => {
+    console.log('Загрузка яндекс-скрипта для городов', document.querySelector(`script[src="${url}"]`));
       return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${url}"]`)) {
-          resolve(); // Скрипт уже загружен, не дублируем
+         resolve(); // Скрипт уже загружен, не дублируем
           return;
         }
         const script = document.createElement('script');

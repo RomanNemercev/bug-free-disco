@@ -14,6 +14,7 @@
     responses: {
       type: Array,
       required: true,
+      default: [],
     },
     modelValue: {
       type: String,
@@ -37,17 +38,17 @@
   const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null]})
 
   // Дебаунс-функция для фильтрации списка
-  const filterResponses = debounce(() => {
-    const input = currentResponse.value?.toLowerCase()
-    filteredResponses.value = props.responses.filter(response => {
-      const name = response.name.toLowerCase()
-      const role = response.role ? response.role.toLowerCase() : ''
-      return name.includes(input) || (props.showRoles && role.includes(input))
-    })
-    if (!filteredResponses.value.length) {
-      emit('input:modelValue', currentResponse.value, null)
-    } 
-  }, 300)
+  // const filterResponses = debounce(() => {
+  //   const input = currentResponse.value?.toLowerCase()
+  //   filteredResponses.value = props.responses.filter(response => {
+  //     const name = response.name.toLowerCase()
+  //     const role = response.role ? response.role.toLowerCase() : ''
+  //     return name.includes(input) || (props.showRoles && role.includes(input))
+  //   })
+  //   if (!filteredResponses.value.length) {
+  //     emit('input:modelValue', currentResponse.value, null)
+  //   } 
+  // }, 300)
 
   const clearResponse = () => {
     currentResponse.value = ''
