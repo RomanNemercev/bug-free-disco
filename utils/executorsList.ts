@@ -176,12 +176,12 @@ export async function  employeesList() {
         return employees;
 };
 
-export async function  teamList() {
+export async function  teamList(id = 0) {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
 
-    const response: ApiResponseTeam = await $fetch(`${config.public.apiBase}/team`, {
+    const response: ApiResponseTeam = await $fetch(`${config.public.apiBase}/team/${id}`, {
         headers: {
             Accept: 'application/json',
             Authorization: `Bearer ${authToken}`,

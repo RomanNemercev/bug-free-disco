@@ -1316,6 +1316,7 @@ const router = useRouter()
   
 
   const {data: profileCustomer, error: errorProfile } = await profile();
+  console.log( 'profileCustomer',  profileCustomer);
   if (!errorProfile) {
 
   }
@@ -1710,6 +1711,7 @@ const router = useRouter()
     loadingItem.value = true
     try {
       const fullData = await fetchApplicationDetail(vacancy.id)
+      console.log('profiler', profileCustomer);
       detailedVacancy.value = fullData.data // save full response.data
       if (detailedVacancy.value.status.name == 'На рассмотрении') {
         if (profileCustomer.data.role.name == 'Рекрутер' || profileCustomer.data.role.name == 'Администратор') {
