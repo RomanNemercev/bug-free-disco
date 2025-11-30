@@ -24,7 +24,7 @@
       </div>
     </div>
     <transition name="slide-fade">
-      <div class="absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
+      <div class="calendare-wrapper absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
         <CalendarBarStatic ref="calendarBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" class="calendar-wrapper" />
       </div>
     </transition>
@@ -74,21 +74,10 @@ const updateDate = (newDate) => {
   emit('update:modelValue', currectDate.value)
 };
 
-watch(() => props.isOpen, (newStatus) => {
-  console.log('Новое значение', newStatus)
-  isDropDownVisible.value = newStatus
-});
-
 // Обработка клика вне компонента
 const handleClickOutside = (event) => {
-  const selectContent = document.querySelector('.calendar-wrapper');
-  // console.log('isDropDownVisible.value', isDropDownVisible.value)
-  // console.log('dataPicker.value', dataPicker.value)
-  // console.log('dataPicker.value.contains(event.target)', !dataPicker.value.contains(event.target))
-  // console.log('calendarBar.value?.$el', calendarBar.value?.$el)
-  // console.log('calendarBar.value.$el.contains(event.target)', calendarBar.value.$el.contains(event.target))
-  // console.log('event.target.contains(selectContent)', !event.target.contains(selectContent))
-  console.log('event', event.target)
+  const selectContent = document.querySelector('.calendare-wrapper');
+  console.log('click calendare', event.target);
   if (
     isDropDownVisible.value &&
     // dataPicker.value &&
@@ -97,21 +86,12 @@ const handleClickOutside = (event) => {
     !calendarBar.value.$el.contains(event.target) &&
     // (calendarBar.value?.$el !== undefined || !calendarBar.value.$el.contains(event.target))  &&
     // !calendarBar.value.$el.contains(event.target) &&
-    (!event.target.contains(selectContent) || !selectContent)
-    // !selectContent
+    (!event.target.contains(selectContent) || !selectContent) ||
+    (event.target.classList.contains('filters-wrapper'))
   ) {
-
     isDropDownVisible.value = false;
     emit('isOpen', isDropDownVisible.value);
   }
-  // if (
-  //   calendarBar.value?.$el !== undefined && 
-  //   dataPicker.value &&
-  //   !calendarBar.value.$el.contains(event.target) && 
-  //   isDropDownVisible.value) {
-  //   isDropDownVisible.value = false;
-  //   emit('isOpen', isDropDownVisible.value);
-  // }
 };
 
 onMounted(() => {

@@ -9,38 +9,7 @@
             </div>
             <UiButton variant="black" size="black" class="font-bold" @click="openPopup">Добавить участников</UiButton>
         </div>
-        <div class="table-container">
-            <div class="table-header">
-                <!-- <div>
-                    <MyCheckbox id="select-all" :label="''" v-model="allSelected" @update:modelValue="toggleAll"
-                      :emptyLabel="true" />
-                </div> -->
-                <div class="px-2.5">Профиль</div>
-                <div class="px-2.5">Email</div>
-                <div class="px-2.5">Роль</div>
-                <div></div>
-            </div>
-            <div class="table-body">
-                <div v-for="item in users" :key="item.id" class="table-row">
-                    <!-- <MyCheckbox :id="item.id" :label="''" v-model="selected[item.id]" :emptyLabel="true" /> -->
-                    <div class="text-sm font-medium text-dodger px-2.5 flex items-center gap-x-2.5">
-                        <div class="rounded-full user-outline">
-                            <CardIcon :icon="true" :isPng="true" imagePath="/img/user.png" :width="45"
-                              :height="45" />
-                        </div>
-                        <div @mouseenter="hoveredIndex = item.id" @mouseleave="hoveredIndex = null"
-                          :class="{ 'user-hovered': hoveredIndex === item.id }" class="cursor-pointer select-none">{{
-                            item.name
-                            }}</div>
-                    </div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.email }}</div>
-                    <div class="text-sm font-medium text-space px-2.5">{{ item.role }} </div>
-                    <div>
-                        <DotsDropdonw :items="dropdownOptions" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <TableUsers :users="users" :dropdownOptions="dropdownOptions" />
     </div>
     <transition name="fade" @after-leave="enableBodyScroll">
         <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false" :width="'490px'"
@@ -101,6 +70,8 @@ import EmailInput from '~/components/custom/EmailInput.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
 import { employeesList, teamList } from "@/utils/executorsList";
 import ResponseInput from "~/components/custom/ResponseInput.vue";
+import TableUsers from "@/components/custom/TableUsers.vue";
+import { useRoute } from 'vue-router'
 
 const selected = ref({}); // Выбранные чекбоксы
 const allSelected = ref(false);
@@ -110,6 +81,9 @@ const emailInvoice = ref('');
 const activePopup = ref('invite'); // Текущее активное окно ('invite' or 'confirmation')
 const employees = ref([]);
 const users = ref([]);
+
+const route = useRoute();
+const currectVacancyId = route.query.id;
 
 employees.value = await employeesList();
 // Функции для управления прокруткой
@@ -148,7 +122,10 @@ onBeforeUnmount(() => {
     enableBodyScroll();
 });
 
-users.value = await teamList();
+if (currectVacancyId) {
+    users.value = await teamList(currectVacancyId);
+}
+
 console.log('users', users.value);
 // const users = ref([
 //     { id: 1, isPng: true, imagePath: "/img/user.png", profile: "Туманов Анатолий Семенович", email: "tumanovanatolya@gmail.com", role: "Рекрутер" },
@@ -199,57 +176,6 @@ watch(selected, (newSelected) => {
 </script>
 
 <style scoped>
-.table-container {
-    display: grid;
-    grid-template-rows: auto;
-    /* Автоматическая высота строк */
-    gap: 1px;
-    /* Отступы между строками */
-}
-
-.table-body {
-    display: grid;
-    gap: 1px;
-    /* Отступы между строками */
-}
-
-.table-header,
-.table-row {
-    display: grid;
-    grid-template-columns: 26.667% 44.89% 17.778% 3.556%;
-    gap: 15px;
-    /* Горизонтальный отступ */
-    padding: 20px 25px;
-    align-items: center;
-    /* Центрирование содержимого */
-}
-
-.table-header {
-    background-color: #f5f7fa;
-    border-radius: 15px 15px 0 0;
-    font-weight: 500;
-    font-size: 14px;
-    color: #79869a;
-    text-align: left;
-}
-
-.table-row {
-    background-color: #ffffff;
-}
-
-.user-outline {
-    outline: 2px solid rgba(0, 82, 208, 0.2);
-    outline-offset: -2px;
-}
-
-.table-row:last-child {
-    border-radius: 0 0 15px 15px;
-}
-
-.user-hovered {
-    text-decoration: underline;
-}
-
 /* Анимация появления и скрытия */
 .fade-enter-active,
 .fade-leave-active {

@@ -7,7 +7,7 @@
       @childClick="updateActiveTab" />
     </div>
     <div class="default-template">
-      <TableClients v-if="activeTab === 'list'" :list="listActive.list"/>
+      <TableClients v-if="activeTab === 'list'" :list="listActive.list" emptyText="У вас пока нет заказчиков"/>
       <TableClients v-if="activeTab === 'invites'" typeList="invites" :list="listInvites.list" emptyText="Активных приглашений нет" />
     </div>
   </div>
@@ -27,13 +27,20 @@ useHead({
 })
 
 const activeTab = ref('list');
-const updateActiveTab = async (tab) => {
+const updateActiveTab = async (tab, update = false) => {
   activeTab.value = tab;
-  if (activeTab.value === 'invites' && !listInvites.value.isGet) {
-    const {clients: clients, error: error} = await clientsList('clients', 'status=invites');
+  if (activeTab.value === 'invites' && (!listInvites.value.isGet || update)) {
+    const {clients: clients, error: error} = await clientsList('clients', 'status=new');
     if (!error) {
       listInvites.value.list = clients
       listInvites.value.isGet = true
+    }
+  }
+  if (activeTab.value === 'list' && (!listActive.value.isGet || update)) {
+    const {clients: clients, error: error} = await clientsList('clients', 'status=active');
+    if (!error) {
+      listActive.value.list = clients
+      listActive.value.isGet = true
     }
   }
 }
@@ -50,9 +57,15 @@ const listInvites = ref({
 const {clients: clients, error: error} = await clientsList('clients', 'status=active');
 if (!error) {
   listActive.value.list = clients
-  console.log('list active clients', listActive.value.list);
 } else {
   console.error(error)
+}
+
+const {clients: inviteClients, error: inviteError} = await clientsList('clients', 'status=new');
+if (!inviteError) {
+  listInvites.value.list = inviteClients
+} else {
+  console.error(inviteError)
 }
 
 </script>

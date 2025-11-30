@@ -50,8 +50,8 @@
               :disableOverflowHidden="true" 
               :lgSize="true" :parentRounded="true"
               :overflowVisible="true">
-      <FormAddClient v-if="props.typeUser === 'client'" />
-      <FormAddRecruiter v-if="props.typeUser === 'recruiter'" />
+      <FormAddClient v-if="props.typeUser === 'client'" @update="update('invites')"/>
+      <FormAddRecruiter v-if="props.typeUser === 'recruiter'" @update="update('invites')"/>
     </Popup>
   </transition>
 </template>
@@ -83,6 +83,10 @@ const activeTab = ref(props.activeTab);
 const updateActiveTab = (tab) => {
     activeTab.value = tab;
     emit('childClick', tab);
+}
+
+const update = (tab) => {
+    emit('childClick', tab, true);
 }
 
 const isOpenPopupAddClient = ref(false)

@@ -119,7 +119,7 @@ const sortDirection = ref("asc");
 const isOpenPopup = ref(false);
 const publicationsHh = ref([]);
 const publications = await getPublications()
-publicationsHh.value = publications.roles.items
+publicationsHh.value = publications.roles?.items
 console.log('publicationsHh.value', publicationsHh.value)
 const sortedData = computed(() => {
     if (!sortKey.value) return publicationsHh.value;
