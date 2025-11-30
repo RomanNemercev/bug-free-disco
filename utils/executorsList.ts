@@ -176,7 +176,7 @@ export async function  employeesList() {
         return employees;
 };
 
-export async function  teamList(id = 0) {
+export async function  teamList(id: string) {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;

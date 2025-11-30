@@ -55,6 +55,8 @@
   const recruiters = ref([])
   const departments = ref([])
   const responsibles = ref([])
+  const isOpenDateFrom = ref(false)
+  const isOpenDateTo = ref(false)
   const filters = ref({
     status: null,
     client: null,
@@ -100,6 +102,13 @@
       startIndex + itemsArchivePerPage
     )
   })
+
+  const updateFilters = (event) => {
+    if (event.target.classList.contains('filters-wrapper')) {
+      if (isOpenDateFrom.value) isOpenDateFrom.value = false
+      if (isOpenDateTo.value) isOpenDateTo.value = false
+    }
+  }
 
   function handlePageChange(page) {
     currentPage.value = page
@@ -334,7 +343,8 @@
           <DotsDropdown :items="vacancyItems" />
         </div>
         <div class="flex gap-x-15px">
-          <button
+          <div class="relative">
+            <button
             class="p-2.5 rounded-ten border transition-colors"
             @mouseover="isHoveredSort = true"
             @mouseleave="isHoveredSort = false"
@@ -347,6 +357,53 @@
           >
             <svg-icon name="sort-list" width="20" height="20" />
           </button>
+            <transition name="fade">
+              <div
+                v-if="isActiveSort"
+                class="absolute bg-white size-max top-[50px] left-0 p-25px pt-15px rounded-b-ten z-10 right-0 left-[unset] shadow-xl"
+              >
+                <p class="text-18px font-medium text-space leading-normal mb-25px">
+                  Сортировка
+                </p>
+                <div class="flex gap-x-2.5 mb-[20px]">
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    Новые
+                  </button>
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    Старые
+                  </button>
+                </div>
+                <div class="flex gap-x-2.5 mb-[20px]">
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    Срочные
+                  </button>
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    Не срочные
+                  </button>
+                </div>
+                <div class="flex gap-x-2.5 ">
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    От А до Я
+                  </button>
+                  <button
+                    class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                  >
+                    От Я до А
+                  </button>
+                </div>
+              </div>
+            </transition>
+          </div>
           <button
             class="p-2.5 rounded-ten border transition-colors"
             @mouseover="isHoveredFunnel = true"
@@ -365,7 +422,8 @@
         <transition name="fade">
           <div
             v-if="isActiveFunnel"
-            class="relative bg-white w-full top-[10px] left-0 p-25px pt-15px rounded-b-ten z-10"
+            class="filters-wrapper relative bg-white w-full top-[10px] left-0 p-25px pt-15px rounded-b-ten z-10"
+            @click="(event) => updateFilters(event)"
           >
             <p class="text-18px font-medium text-space leading-normal mb-35px">
               Фильтры
@@ -441,6 +499,7 @@
                 </p>
                 <p class="flex gap-15px">
                    <DropdownCalendarStatic 
+                   :isOpen="isOpenDateFrom"
                   @update:model-value="filters.create.from = $event" 
                 />
                 </p>  
@@ -451,6 +510,7 @@
                 </p>
                 <p class="flex gap-15px">
                 <DropdownCalendarStatic 
+                :isOpen="isOpenDateTo"
                   @update:model-value="filters.create.to = $event" 
                 />
                 </p>  
@@ -468,7 +528,7 @@
             <UiButton variant="action" size="semiaction" @click="filteredVacancies">Применить</UiButton>
           </div>
         </transition>
-        <transition name="fade">
+        <!-- <transition name="fade">
           <div
             v-if="isActiveSort"
             class="relative bg-white w-full top-[10px] left-0 p-25px pt-15px rounded-b-ten z-10"
@@ -515,7 +575,7 @@
               </button>
             </div>
           </div>
-        </transition>
+        </transition> -->
       <!-- </div> -->
     </div>
     <div
