@@ -66,9 +66,8 @@ import MyCheckbox from "~/components/custom/MyCheckbox.vue";
 import DotsDropdonw from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
-import EmailInput from '~/components/custom/EmailInput.vue';
 import MultiDropdown from '~/components/custom/MultiDropdown.vue';
-import { employeesList, teamList } from "@/utils/executorsList";
+import { teamList } from "@/utils/executorsList";
 import ResponseInput from "~/components/custom/ResponseInput.vue";
 import TableUsers from "@/components/custom/TableUsers.vue";
 import { useRoute } from 'vue-router'
@@ -81,6 +80,7 @@ const emailInvoice = ref('');
 const activePopup = ref('invite'); // Текущее активное окно ('invite' or 'confirmation')
 const employees = ref([]);
 const users = ref([]);
+const filterEmployees = ref('');
 
 const route = useRoute();
 const currectVacancyId = route.query.id;
@@ -126,13 +126,6 @@ if (currectVacancyId) {
     users.value = await teamList(currectVacancyId);
 }
 
-console.log('users', users.value);
-// const users = ref([
-//     { id: 1, isPng: true, imagePath: "/img/user.png", profile: "Туманов Анатолий Семенович", email: "tumanovanatolya@gmail.com", role: "Рекрутер" },
-//     { id: 2, isPng: true, imagePath: "/img/user.png", profile: "Антонов Александр", email: "anton10203gmail.com", role: "Рекрутер" },
-//     { id: 3, isPng: true, imagePath: "/img/user.png", profile: "Лидия Семенова", email: "lidiasemenova@gmail.com", role: "Рекрутер" },
-//     { id: 4, isPng: true, imagePath: "/img/user.png", profile: "Алексей Самсонов", email: "samsonov1204871824@gmail.com", role: "Рекрутер" },
-// ])
 
 const optionsData = [
     {

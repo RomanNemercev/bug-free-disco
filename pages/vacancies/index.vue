@@ -134,6 +134,7 @@
 
   function sortToggleActive() {
     isActiveSort.value = !isActiveSort.value
+    console.log('isActiveSort.value', isActiveSort.value);
     cardsBlock.value.style.borderBottomLeftRadius = isActiveSort.value
       ? '0px'
       : '15px'
@@ -166,6 +167,17 @@
     if (containerRef.value) {
       const activeBlock = containerRef.value.querySelector('.active-view')
       containerHeight.value = activeBlock?.offsetHeight || 0
+    }
+  }
+
+  const sort = async (type) => {
+    loading.value = true
+    const result = await getVacancies('sort=' + type)
+    if (result) {
+      vacancies.value = result
+      loading.value = false
+    } else {
+      console.log('Cannot fetch vacancies')
     }
   }
 
@@ -527,23 +539,39 @@
             <div class="flex gap-x-2.5">
               <button
                 class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('new')"
               >
                 Новые
               </button>
               <button
                 class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('old')"
               >
                 Старые
               </button>
               <button
                 class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('urgent')"
               >
-                По региону
+                Срочные
               </button>
               <button
                 class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('non-urgent')"
               >
-                По заказчику
+                Несрочные
+              </button>
+              <button
+                class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('asc')"
+              >
+                От А до Я
+              </button>
+              <button
+                class="rounded-ten px-2.5 py-5px bg-athens-gray text-sm font-normal text-slate-custom"
+                @click="sort('desc')"
+              >
+                От Я до А
               </button>
             </div>
           </div>
