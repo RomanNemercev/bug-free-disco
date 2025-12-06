@@ -1,0 +1,34 @@
+# Dependencies
+node_modules
+package-lock.json
+
+# Build outputs
+.nuxt
+.output
+dist
+.nitro
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Generated files
+assets/css/*.css.map
+assets/sprite/gen
+
+# Temporary files
+temp
+sync
+*.bak
+*.tmp
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
