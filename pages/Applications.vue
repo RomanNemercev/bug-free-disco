@@ -1057,7 +1057,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="!isDelete" class="flex gap-x-15px">
+            <div v-if="isDelete" class="flex gap-x-15px">
               <UiButton
                 v-if="isDeleteApplication"
                 variant="action"
@@ -1340,6 +1340,7 @@
   let resizeObserver = null;
   const errors = ref({});
   const updateData = ref({});
+  const isDelete = ref(false);
   const isDeleteApplication = ref(false);
   const isAddApprove = ref(false);
   const isApprove = ref(false);
@@ -1748,8 +1749,9 @@
     loadingItem.value = true;
     try {
       const fullData = await fetchApplicationDetail(vacancy.id);
-      console.log('profiler', profileCustomer);
-      detailedVacancy.value = fullData.data; // save full response.data
+      
+      detailedVacancy.value = fullData.data;
+      vacancy.value = detailedVacancy.value;
       if (detailedVacancy.value.status.name == 'На рассмотрении') {
         if (
           profileCustomer.data.role.name == 'Рекрутер' ||
@@ -1761,8 +1763,13 @@
           profileCustomer.data.role.name == 'Клиент' ||
           profileCustomer.data.role.name == 'Администратор'
         ) {
-          if (!isDeleteApplication.value) {
-            isDeleteApplication.value = true;
+          if (profileCustomer.data.role.name == 'Клиент') {
+            isDelete.value = true;
+          } else {
+            isDelete.value = false;
+          }
+          if (isDeleteApplication.value) {
+            isDeleteApplication.value = false;
           }
         } else {
           if (isDeleteApplication.value) {
@@ -1786,6 +1793,7 @@
       }
 
       selectedVacancy.value = vacancy; // open popup
+      
     } catch (error) {
       error.value = 'Ошибка загрузки деталей заявки.';
       console.error(error);

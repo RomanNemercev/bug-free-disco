@@ -141,7 +141,7 @@
 
     if (data) {
       // Успешная авторизация, перенаправляем на главную страницу
-      await navigateTo('/')
+      await navigateTo('/vacancies')
     }
   }
 </script>

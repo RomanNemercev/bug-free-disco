@@ -11,11 +11,11 @@
         </div>
         <TableUsers :users="users" :dropdownOptions="dropdownOptions" />
     </div>
-    <transition name="fade" @after-leave="enableBodyScroll">
+    <transition v-if="activePopup === 'invite'" name="fade" @after-leave="enableBodyScroll">
         <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false" :width="'490px'"
           :height="'fit-content'" :disableOverflowHidden="true">
             <!-- Первое окно -->
-            <div v-if="activePopup === 'invite'">
+            <div>
                 <p class="text-xl font-semibold text-space mb-2.5">Новый участник</p>
                 <p class="text-sm font-normal text-slate-custom mb-25px">
                     Приглашенному участнику придет письмо с&nbsp;доступом, которое нужно подтвердить.
@@ -24,7 +24,7 @@
                     <span class="text-red">*</span>
                     <p class="text-sm font-medium text-space leading-normal">Доступ</p>
                 </div>
-                <MultiDropdown :options="optionsData" class="mb-25px" />
+                <MultiDropdown v-model="selectedRole" :options="optionsData" class="mb-25px" />
                 <div class="flex gap-x-1 mb-15px items-center">
                     <span class="text-red">*</span>
                     <p class="text-sm font-medium text-space leading-normal">Пользователь</p>
@@ -32,16 +32,27 @@
                 <response-input 
                   class="mb-15px"
                   placeholder="Выберите рекрутера"
+                  v-model="selectedEmployee"
                   :responses="employees"
-                  @update:modelValue="($event, index) => emailInvoice = index"
+                  @update:modelValue="(name, id, email) => {
+                    emailInvoice = email;
+                    selectedEmployee = employees.find(emp => emp.id === id) || null;
+                  }"
                  />
                 <!-- <EmailInput v-model="emailInvoice" class="mb-15px" /> -->
                 <div class="flex gap-x-15px">
                     <UiButton variant="action" size="action" @click="switchToConfirmation">Пригласить</UiButton>
                     <UiButton variant="back" size="back" @click="closePopup">Отмена</UiButton>
                 </div>
+                <p class="text-red-500 text-xs mt-1" v-if="errorMessage">
+                    {{ errorMessage }}
+                </p>
             </div>
-
+        </Popup>
+    </transition>
+    <transition v-if="activePopup === 'confirmation'" name="fade" @after-leave="enableBodyScroll">
+        <Popup :isOpen="isPopupOpen" @close="closePopup" :showCloseButton="false" :width="'490px'"
+          :height="'fit-content'" :disableOverflowHidden="true">
             <!-- Второе окно -->
             <div v-if="activePopup === 'confirmation'">
                 <p class="text-xl font-semibold text-space mb-2.5">Приглашение отправлено</p>
@@ -81,7 +92,9 @@ const activePopup = ref('invite'); // Текущее активное окно (
 const employees = ref([]);
 const users = ref([]);
 const filterEmployees = ref('');
-
+const selectedRole = ref(null);
+const selectedEmployee = ref(null);
+const errorMessage = ref(null);
 const route = useRoute();
 const currectVacancyId = route.query.id;
 
@@ -97,20 +110,33 @@ function enableBodyScroll() {
 
 function openPopup() {
     isPopupOpen.value = true;
-    activePopup.value = 'invite'; // Открываем начальное окно
+    activePopup.value = 'invite';
     disableBodyScroll();
 }
 
+function resetForm() {
+    errorMessage.value = null;
+    selectedRole.value = null;
+    selectedEmployee.value = null;
+}
+
 function closePopup() {
-    console.log('Закрываем попап');
     isPopupOpen.value = false;
-    activePopup.value = 'invite'; // Сбрасываем на начальное окно
+    activePopup.value = 'invite';
+    resetForm();
+    emailInvoice.value = '';
     enableBodyScroll();
 }
 
 function switchToConfirmation() {
+    if (selectedRole.value === null || selectedEmployee.value === null) {
+        errorMessage.value = 'Пожалуйста, выберите роль и пользователя';
+        return;
+    } else {
+        resetForm();
+    }
     console.log('Переключаемся на окно confirmation');
-    activePopup.value = 'confirmation'; // Переключаемся на окно подтверждения
+    activePopup.value = 'confirmation';  
 }
 
 function cancelInvitation() {

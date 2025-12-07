@@ -10,7 +10,7 @@
           {{ mappedSelectedOption }}
         </div>
         <div v-show="!selectedOption"
-          class="right-3.5 top-2 transition-transform duration-300 text-bali">
+          class="right-3.5 top-2 transition-transform duration-300 text-bali text-sm">
           {{ props.placeholder }}
         </div>
         <!-- Стрелка -->

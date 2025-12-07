@@ -20,6 +20,7 @@ interface Division {
 interface ApiExecutor {
     'id': number;
     'name': string;
+    'email': string;
     'role': {
         'id': number,
         'name': string
@@ -170,6 +171,7 @@ export async function  employeesList() {
     const employees: Executor[] = response.data.map((executor: ApiExecutor) => ({
             id: executor.id,
             name: executor.name,
+            email: executor.email,
             role: executor.role.name 
         }));
 
