@@ -1,6 +1,7 @@
 interface Client {
     'id': number;
     'name': string;
+    'email': string;
     'role': string;
 }
 
@@ -26,6 +27,7 @@ export async function  clientsList(nameList: string = 'clients', getParams?: str
     const clients: Client[] = response.data.map((client: Client) => ({
             id: client.id,
             name: client.name,
+            email: client.email,
             role: 'Менеджер'
         }));
 

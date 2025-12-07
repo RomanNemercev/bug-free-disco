@@ -117,6 +117,7 @@ import ResponseInput from "../custom/ResponseInput.vue";
 import { getVacancies } from "@/utils/getVacancies";
 import { registerClient } from "@/utils/registerUser";
 
+const emit = defineEmits(['update']);
 
 const errors = ref({})
 const data = ref({})
@@ -170,7 +171,7 @@ async function createClient(event) {
     errors.value.response = false
     success.value.status = true
     success.value.message = message
-
+    emit('update')
   }
 }
 </script>

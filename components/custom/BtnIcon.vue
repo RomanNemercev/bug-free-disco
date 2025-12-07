@@ -8,6 +8,10 @@
       type: String,
       required: true,
     },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
     iconWidth: {
       type: [String, Number],
       default: '17',
@@ -41,6 +45,10 @@
       type: String,
       default: 'border-athens bg-athens-gray text-slate-custom',
     },
+    isActiveClasses: {
+      type: String,
+      default: 'border-zumthor bg-zumthor text-dodger',
+    },
   });
 
   const isHovered = ref<boolean>(false);
@@ -60,7 +68,14 @@
     @mouseover="isHovered = true"
     @mouseleave="isHovered = false"
     @click="handleButtonClick"
-    :class="[classes, isHovered ? isHoveredClasses : isNotHoveredClasses]"
+    :class="[
+      classes,
+      isActive
+        ? isActiveClasses
+        : isHovered
+          ? isHoveredClasses
+          : isNotHoveredClasses,
+    ]"
     :style="{ width: `${buttonWidth}px`, height: `${buttonHeight}px` }"
   >
     <MyTooltip :text="tooltipText" />

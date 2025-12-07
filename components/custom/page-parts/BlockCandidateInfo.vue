@@ -4,12 +4,20 @@
   import DotsDropdown from '~/components/custom/DotsDropdown.vue';
   import MyTooltip from '~/components/custom/MyTooltip.vue';
   import BtnIcon from '~/components/custom/BtnIcon.vue';
+  import { getVacancyName } from '@/src/api/vacancies';
 
   import type { Candidate } from '@/types/candidates';
+  import type { ApiResponseVacancy, Vacancy } from '@/types/vacancy';
 
   const props = defineProps<{
     candidate: Candidate;
   }>();
+
+  const vacancyName = ref<string>('');
+
+  vacancyName.value = await getVacancyName(
+    props.candidate?.vacancy?.toString() || '0'
+  );
 
   const options = [
     'Все',
@@ -104,30 +112,40 @@
     <div class="absolute left-0 top-[70px] h-[1px] w-full bg-athens-gray"></div>
     <div class="flex justify-between">
       <div>
-        <p class="mb-2 text-25px font-bold leading-normal text-space">
+        <div class="mb-2 text-25px font-bold leading-normal text-space">
           {{ candidate.surname }} {{ candidate.firstname }}
           {{ candidate?.patronymic }}
-        </p>
-        <p class="mb-6px text-15px font-medium leading-normal text-space">
-          {{ candidate.vacancy }}
-        </p>
-        <p class="mb-6 text-13px text-slate-custom">
-          г. {{ candidate.location }}
-        </p>
-        <div class="flex">
-          <p
+        </div>
+        <div class="mb-6px text-15px font-medium leading-normal text-space">
+          {{ vacancyName }}
+        </div>
+        <div class="mb-6 text-13px text-slate-custom">
+          {{
+            candidate.location ? 'г. ' + candidate.location : 'Город не указан'
+          }}
+        </div>
+        <div v-if="candidate.phone" class="flex">
+          <div
             class="mb-5px mr-[45px] min-w-[70px] text-sm font-normal leading-150 text-space"
           >
             Телефон:
-          </p>
+          </div>
           <div class="mr-2.5 flex">
             <span class="mr-4 text-sm font-medium text-space">
               <a :href="`tel:${candidate.phone}`">
                 <!-- <svg-icon name="phone20" width="21" height="21" /> -->
-                {{ candidate.phone }}
+                {{
+                  candidate.phone.slice(0, 2) +
+                  '-' +
+                  candidate.phone.slice(2, 5) +
+                  '-' +
+                  candidate.phone.slice(5, 8) +
+                  '-' +
+                  candidate.phone.slice(8, 12)
+                }}
               </a>
             </span>
-            <div>
+            <div v-if="candidate.telegram">
               <button class="mr-1" @click="handleClickTelegram">
                 <svg-icon
                   class="pointer-events-none [&_use]:pointer-events-none"
@@ -156,41 +174,41 @@
           </div>
         </div>
         <div class="flex">
-          <p
+          <span
             class="mb-5px mr-[45px] min-w-[70px] text-sm font-normal leading-150 text-space"
           >
             Почта:
-          </p>
-          <p class="text-sm font-medium text-space">
+          </span>
+          <span class="text-sm font-medium text-space">
             {{ candidate.email }}
-          </p>
+          </span>
         </div>
         <div class="flex">
-          <p
+          <span
             class="mb-5px mr-[45px] min-w-[70px] text-sm font-normal leading-150 text-space"
           >
             Скайп:
-          </p>
-          <p class="text-sm font-medium text-space">
+          </span>
+          <span class="text-sm font-medium text-space">
             {{ candidate.skype }}
-          </p>
+          </span>
         </div>
         <div class="flex">
-          <p
+          <span
             class="mb-5px mr-[45px] min-w-[70px] text-sm font-normal leading-150 text-space"
           >
             Telegram:
-          </p>
-          <p class="text-sm font-medium text-space">
-            {{ '@' + candidate.telegram }}
-          </p>
+          </span>
+          <span class="text-sm font-medium text-space">
+            {{ candidate.telegram ? '@' + candidate.telegram : '' }}
+          </span>
         </div>
         <div class="flex">
-          <p
+          <span
             class="mr-[45px] min-w-[70px] text-sm font-normal leading-150 text-space"
           >
             Теги:
-          </p>
+          </span>
           <div class="flex">
             <span
               v-for="(tag, index) in candidate?.tags"

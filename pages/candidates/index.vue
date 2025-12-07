@@ -2,6 +2,7 @@
   import { ref, watch, nextTick } from 'vue';
   import { useRouter } from 'vue-router';
   import { getCandidates, createCandidate } from '@/src/api/candidates';
+  import { disableBodyScroll, enableBodyScroll } from '@/utils/bodyScoll';
   import UiDotsLoader from '~/components/custom/UiDotsLoader.vue';
   import MyInput from '~/components/custom/MyInput.vue';
   import MyCheckbox from '~/components/custom/MyCheckbox.vue';
@@ -9,7 +10,8 @@
   import CardIcon from '~/components/custom/CardIcon.vue';
   import Pagination from '@/components/custom/Pagination.vue';
   import DynamicForm from '@/components/custom/DynamicForm.vue';
-  import { disableBodyScroll, enableBodyScroll } from '@/utils/bodyScoll';
+  import BtnIcon from '@/components/custom/BtnIcon.vue';
+
   import type { Candidate } from '@/types/candidates';
   import type { UserRole } from '@/types/roles';
   import type { FormConfig } from '@/types/form';
@@ -29,6 +31,12 @@
   const lastPage = ref(1);
   const loadingCandidates = ref(false);
   const isAddCandidatePopup = ref(false);
+  const actionSort = ref<'Включить сортировку' | 'Отключить сортировку'>(
+    'Включить сортировку'
+  );
+  const actionFunnel = ref<'Включить фильтрацию' | 'Отключить фильтрацию'>(
+    'Включить фильтрацию'
+  );
 
   const data = ref<Candidate[]>([]);
 
@@ -114,13 +122,31 @@
     lastPage.value = pagination.lastPage;
   };
 
-  function funnelToggleActive() {
+  const funnelToggleActive = () => {
     isActiveFunnel.value = !isActiveFunnel.value;
-  }
+    actionFunnel.value = isActiveFunnel.value
+      ? 'Отключить фильтрацию'
+      : 'Включить фильтрацию';
+  };
 
-  function sortToggleActive() {
+  const sortToggleActive = () => {
     isActiveSort.value = !isActiveSort.value;
-  }
+    actionSort.value = isActiveSort.value
+      ? 'Отключить сортировку'
+      : 'Включить сортировку';
+    // if (candidatesList.value) {
+    //   candidatesList.value = candidatesList.value.sort(
+    //     (a: Candidate, b: Candidate) => {
+    //       const candidateA = a.surname + a.firstname + a.patronymic;
+    //       const candidateB = b.surname + b.firstname + b.patronymic;
+    //       const comparison = candidateA.localeCompare(candidateB, 'ru', {
+    //         sensitivity: 'base',
+    //       });
+    //       return isActiveSort.value ? comparison : -comparison;
+    //     }
+    //   );
+    // }
+  };
 
   const toggleAll = (isChecked: boolean) => {
     data.value.forEach(item => {
@@ -142,37 +168,8 @@
     isAddCandidatePopup.value = false;
   };
 
-  watch(
-    selected,
-    newSelected => {
-      const allChecked = data.value.every(item => newSelected[item.id]);
-      const noneChecked = data.value.every(item => !newSelected[item.id]);
-
-      allSelected.value = allChecked;
-
-      if (!allChecked && !noneChecked) {
-        console.log('Частично выбрано');
-      }
-    },
-    { deep: true }
-  );
-
-  watch(
-    isAddCandidatePopup,
-    newValue => {
-      if (newValue) {
-        disableBodyScroll();
-      } else {
-        nextTick(() => {
-          enableBodyScroll();
-        });
-      }
-    },
-    { immediate: false }
-  );
-
   function goToCandidate(id: number) {
-    console.log('[goToCandidate] Переходим к кандидату:', id);
+    // console.log('[goToCandidate] Переходим к кандидату:', id);
     router.push(`/candidates/${id}`);
   }
 
@@ -234,45 +231,39 @@
 
   // Обработка отправки формы (получаем валидированные данные)
   const handleFormSubmit = async (formData: Record<string, any>) => {
-    console.log('[handleFormSubmit] Получены данные от формы:', formData);
-    console.log('[handleFormSubmit] Попап открыт:', isAddCandidatePopup.value);
+    // console.log('[handleFormSubmit] Получены данные от формы:', formData);
+    // console.log('[handleFormSubmit] Попап открыт:', isAddCandidatePopup.value);
 
     if (!isAddCandidatePopup.value) {
-      console.warn('[handleFormSubmit] Попап закрыт, прерываем обработку');
+      // console.warn('[handleFormSubmit] Попап закрыт, прерываем обработку');
       return;
     }
 
     isSubmitting.value = true;
     serverErrors.value = {}; // Очищаем предыдущие ошибки
-    console.log('[handleFormSubmit] Начинаем отправку на сервер');
+    // console.log('[handleFormSubmit] Начинаем отправку на сервер');
 
     try {
       // Подготовка данных для отправки
       const candidateData: CandidateCreateRequest = {
-        firstname: formData.firstname || '',
-        surname: formData.surname || '',
-        patronymic: '',
-        email: formData.email || '',
-        vacancy: '',
+        firstname: formData.firstname,
+        surname: formData.surname || null,
+        patronymic: formData.patronymic || null,
+        email: formData.email,
         phone:
-          formData.phone && formData.phone !== '+7'
-            ? formData.phone
-            : undefined,
-        resume: formData.resume || undefined,
+          formData.phone && formData.phone !== '+7' ? formData.phone : null,
+        resume: formData.resume || null,
       };
 
       // Отправка запроса
-      console.log(
-        '[handleFormSubmit] Отправляем данные на сервер:',
-        candidateData
-      );
+      // console.log('[handleFormSubmit] Отправляем данные на сервер:', candidateData);
       const response = await createCandidate(candidateData);
-      console.log('[handleFormSubmit] Ответ от сервера:', response);
-      console.log('[handleFormSubmit] Тип ответа:', typeof response);
+      // console.log('[handleFormSubmit] Ответ от сервера:', response);
+      // console.log('[handleFormSubmit] Тип ответа:', typeof response);
 
       // Проверяем, что ответ - это объект с данными
       if (response && typeof response === 'object' && response.data) {
-        console.log('[handleFormSubmit] Кандидат успешно создан');
+        // console.log('[handleFormSubmit] Кандидат успешно создан');
         // Обновляем список кандидатов
         await getCandidatesData();
 
@@ -314,6 +305,35 @@
   };
 
   getCandidatesData();
+
+  watch(
+    selected,
+    newSelected => {
+      const allChecked = data.value.every(item => newSelected[item.id]);
+      const noneChecked = data.value.every(item => !newSelected[item.id]);
+
+      allSelected.value = allChecked;
+
+      if (!allChecked && !noneChecked) {
+        console.log('Частично выбрано');
+      }
+    },
+    { deep: true }
+  );
+
+  watch(
+    isAddCandidatePopup,
+    newValue => {
+      if (newValue) {
+        disableBodyScroll();
+      } else {
+        nextTick(() => {
+          enableBodyScroll();
+        });
+      }
+    },
+    { immediate: false }
+  );
 </script>
 
 <template>
@@ -344,32 +364,18 @@
           :search="true"
         />
         <div class="flex gap-x-15px">
-          <button
-            class="max-h-10 rounded-ten border p-[9px] transition-colors"
-            @mouseover="isHoveredSort = true"
-            @mouseleave="isHoveredSort = false"
+          <BtnIcon
+            icon="sort-list"
+            :isActive="isActiveSort"
+            :tooltipText="actionSort"
             @click="sortToggleActive()"
-            :class="
-              isHoveredSort
-                ? 'border-zumthor bg-zumthor text-dodger'
-                : 'border-athens bg-athens-gray text-slate-custom'
-            "
-          >
-            <svg-icon name="sort-list" width="20" height="20" />
-          </button>
-          <button
-            class="max-h-10 rounded-ten border p-[9px] transition-colors"
-            @mouseover="isHoveredFunnel = true"
-            @mouseleave="isHoveredFunnel = false"
+          />
+          <BtnIcon
+            icon="funnel"
+            :isActive="isActiveFunnel"
+            :tooltipText="actionFunnel"
             @click="funnelToggleActive()"
-            :class="
-              isHoveredFunnel
-                ? 'border-zumthor bg-zumthor text-dodger'
-                : 'border-athens bg-athens-gray text-slate-custom'
-            "
-          >
-            <svg-icon name="funnel" width="20" height="20" />
-          </button>
+          />
         </div>
       </div>
     </div>

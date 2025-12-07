@@ -58,44 +58,6 @@
   // Ошибки валидации
   const formErrors = ref<Record<string, string>>({});
 
-  // Обновление формы при изменении начальных данных от родителя
-  watch(
-    () => props.modelValue,
-    newValue => {
-      if (newValue) {
-        // Обновляем форму, объединяя с дефолтными значениями
-        formData.value = { ...initializeFormData(), ...newValue };
-      } else {
-        // Если передан null/undefined - сбрасываем форму
-        formData.value = initializeFormData();
-      }
-    },
-    { immediate: false }
-  );
-
-  // Применение ошибок сервера к полям формы
-  watch(
-    () => props.serverErrors,
-    errors => {
-      if (errors) {
-        // Применяем ошибки сервера к полям (кроме _general)
-        Object.keys(errors).forEach(key => {
-          if (key !== '_general') {
-            formErrors.value[key] = errors[key];
-          }
-        });
-      } else {
-        // Если ошибок нет - очищаем серверные ошибки из полей
-        // (клиентские ошибки валидации остаются)
-        Object.keys(formErrors.value).forEach(key => {
-          // Удаляем только те ошибки, которые были от сервера
-          // Это упрощенная логика - можно улучшить, если нужно различать
-        });
-      }
-    },
-    { immediate: true }
-  );
-
   // Валидация одного поля
   function validateField(fieldName: string, value: any): boolean {
     const field = props.config.fields.find(f => f.name === fieldName);
@@ -208,7 +170,7 @@
     // После валидации применяем серверные ошибки (если они есть)
     if (props.serverErrors) {
       const serverErrorKeys = Object.keys(props.serverErrors).filter(
-        k => k !== '_general'
+        errorKey => errorKey !== '_general'
       );
       serverErrorKeys.forEach(key => {
         formErrors.value[key] = props.serverErrors![key];
@@ -302,6 +264,44 @@
       flexBasis: `calc(${fieldPercentage}% - ${gapPerField}px)`,
     };
   };
+
+  // Обновление формы при изменении начальных данных от родителя
+  watch(
+    () => props.modelValue,
+    newValue => {
+      if (newValue) {
+        // Обновляем форму, объединяя с дефолтными значениями
+        formData.value = { ...initializeFormData(), ...newValue };
+      } else {
+        // Если передан null/undefined - сбрасываем форму
+        formData.value = initializeFormData();
+      }
+    },
+    { immediate: false }
+  );
+
+  // Применение ошибок сервера к полям формы
+  watch(
+    () => props.serverErrors,
+    errors => {
+      if (errors) {
+        // Применяем ошибки сервера к полям (кроме _general)
+        Object.keys(errors).forEach(key => {
+          if (key !== '_general') {
+            formErrors.value[key] = errors[key];
+          }
+        });
+      } else {
+        // Если ошибок нет - очищаем серверные ошибки из полей
+        // (клиентские ошибки валидации остаются)
+        Object.keys(formErrors.value).forEach(key => {
+          // Удаляем только те ошибки, которые были от сервера
+          // Это упрощенная логика - можно улучшить, если нужно различать
+        });
+      }
+    },
+    { immediate: true }
+  );
 </script>
 
 <template>

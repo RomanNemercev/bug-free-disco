@@ -51,7 +51,7 @@
           class="flex pl-2.5 text-sm font-medium text-slate-custom"
           @click="
             ['dateStart', 'dateWork', 'status'].includes(header.key) &&
-              sortBy(header.key)
+              sortBy(header.key);
           "
           :class="{
             'cursor-pointer select-none': [
@@ -1139,7 +1139,7 @@
     <Pagination
       v-if="pagination.total_page > 1"
       :currentPage="pagination.current_page"
-      :lastPage="pagination.last_page"
+      :totalPages="pagination.last_page"
       @page-changed="handlePageChange"
     />
 
@@ -1240,7 +1240,7 @@
   import { reject } from '@/utils/applicationItem';
   const isCreateVacancy = ref(false);
 
-  import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/constants.ts';
+  import { API_YANDEX_KEY, API_YANDEX_SUGGEST } from '@/src/constants';
 
   import { useRouter } from 'vue-router';
 
@@ -1347,6 +1347,7 @@
   const reasonReject = ref(false);
 
   const { data: profileCustomer, error: errorProfile } = await profile();
+  console.log('profileCustomer', profileCustomer);
   if (!errorProfile) {
   }
   // Функция обновления высоты контента
@@ -1747,6 +1748,7 @@
     loadingItem.value = true;
     try {
       const fullData = await fetchApplicationDetail(vacancy.id);
+      console.log('profiler', profileCustomer);
       detailedVacancy.value = fullData.data; // save full response.data
       if (detailedVacancy.value.status.name == 'На рассмотрении') {
         if (

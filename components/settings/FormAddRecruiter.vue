@@ -78,7 +78,7 @@
                 {{ errors.response }}
         </div>
     </div>
-     <div v-if="success.status" class="text-red-500 text-xs mt-1">
+     <div v-if="success.status" class="text-green-500 text-xs mt-1">
                 {{ success.message }}
         </div>
     </form>
@@ -89,6 +89,8 @@ import MyInput from "../custom/MyInput.vue";
 import { registerClient } from "@/utils/registerUser";
 import ResponseInput from "../custom/ResponseInput.vue";
 import { getDepartments } from "@/utils/executorsList";
+
+const emit = defineEmits(['update']);
 
 const errors = ref({})
 const data = ref({})
@@ -126,6 +128,7 @@ async function createClient(event) {
     errors.value.response = false
     success.value.status = true
     success.value.message = message
+    emit('update')
   }
 }
 </script>

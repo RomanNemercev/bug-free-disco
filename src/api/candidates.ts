@@ -59,10 +59,10 @@ export async function getCandidateById(id: number): Promise<ApiResponseById> {
   const authToken = useCookie('auth_token').value;
   const authUser = useCookie('auth_user').value;
 
-  console.log('Запрашиваю кандидата с id:', id);
-  console.log('auth_token:', authToken);
-  console.log('auth_user:', authUser);
-  console.log('URL запроса:', `${config.public.apiBase}/candidates/${id}`);
+  // console.log('Запрашиваю кандидата с id:', id);
+  // console.log('auth_token:', authToken);
+  // console.log('auth_user:', authUser);
+  // console.log('URL запроса:', `${config.public.apiBase}/candidates/${id}`);
 
   try {
     const response: ApiCandidateByIdResponse =

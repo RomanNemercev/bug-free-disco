@@ -454,28 +454,28 @@ watch(() => newVacancy.employment, (newValue) => {
             <p class="text-sm font-medium text-space mb-3.5">
                   Статус
             </p>
-            <!-- <MyDropdown 
+            <MyDropdown 
                   :defaultValue="''" 
                   placeholder="Выберите статус"
                   :options="['В работе', 'Черновик', 'Архив']"
                   :model-value="newVacancy.status ? newVacancy.status : null"
                   @update:model-value="$event => newVacancy.status = $event" 
-            /> -->
+            />
           </div>
            <div class="w-full">
               <p class="text-sm font-medium text-space mb-3.5">
                   Желаемая дата закрытия
               </p>
-              <!-- <DropdownCalendarStatic 
+              <DropdownCalendarStatic 
                   @update:model-value="newVacancy.dateEnd = $event" 
                   :is-open="isOpenDateTo"
-                /> -->
+                />
            </div>
            <div class="w-full">
                 <p class="text-sm font-medium text-space leading-normal mb-15px">
                   Отдел
                 </p>
-                <!-- <ResponseInput
+                <ResponseInput
                 class="w-full"
                 :responses="departments"
                 :model-value="newVacancy.department ? newVacancy.department : ''"
@@ -483,7 +483,7 @@ watch(() => newVacancy.employment, (newValue) => {
                 notFound="Отдел не найден"
                 placeholder="Введите название отдела"
                 @update:modelValue="newVacancy.department = $event"
-              /> -->
+              />
               </div>
         </div>
         <div class="w-full">

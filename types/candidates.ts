@@ -1,18 +1,16 @@
-// import type { Resume } from './platform';
-
-export interface SkillCandidate {
+export type SkillCandidate = {
   id: number;
   name: string;
   created_at?: string;
   updated_at?: string;
-}
+};
 
-export interface TagCandidate {
+export type TagCandidate = {
   id: number;
   name: string;
-}
+};
 
-export interface CustomFieldCandidate {
+export type CustomFieldCandidate = {
   id: number;
   value: string;
   type_id: number;
@@ -21,12 +19,12 @@ export interface CustomFieldCandidate {
     value?: string;
     name?: string;
   };
-}
+};
 
-export interface AttachmentCandidate {
+export type AttachmentCandidate = {
   id: number;
   link: string;
-}
+};
 
 // Основной интерфейс кандидата (как возвращается из API)
 export interface Candidate {
@@ -53,15 +51,15 @@ export interface Candidate {
   coverPath?: string | null;
   source?: string | null;
   isReserve?: boolean | null;
-  customer: number | null;
-  vacancy: number | null;
-  stage: number | null;
+  customer?: number | null;
+  vacancy?: number | null;
+  stage?: number | null;
   attachments?: AttachmentCandidate[] | null;
   skills?: SkillCandidate[] | null;
   tags?: TagCandidate[] | null;
   customFields?: CustomFieldCandidate[] | null;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // Успешный ответ запроса списка кандидатов
@@ -125,10 +123,10 @@ export interface CandidateDeleteResponse {
 // Для создания кандидата
 export interface CandidateCreateRequest {
   firstname: string;
-  surname: string;
-  patronymic: string;
+  surname?: string;
+  patronymic?: string;
   email: string;
-  vacancy: string;
+  vacancy?: string;
   age?: number | null;
   phone?: string; // формат: +7XXXXXXXXXX
   stage_id?: number | null;
@@ -165,32 +163,6 @@ export type ApiErrorResponse = {
   message: string;
   data?: null;
 };
-
-// // Ошибка 404
-// export interface CandidateNotFoundResponse {
-//   message: string;  // "Кандидата с id = {id} не существует"
-//   data: null;
-// }
-
-// // Ошибка валидации 422
-// export interface ValidationErrorResponse {
-//   message: 'Ошибка валидации';
-// }
-
-// // Ошибка дубликата 409
-// export interface DuplicateErrorResponse {
-//   message: string;  // "Кандидат с номером телефона {phone} уже существует"
-//   // или "Кандидат с email {email} уже существует"
-// }
-
-// // Ошибка создания 500
-// export interface CreateErrorResponse {
-//   message: string;  // "Ошибка создания кандидата {surname} {firstname} {patronymic}"
-// }
-
-// Использование
-// type CandidateResponse = ApiSuccessResponse<Candidate>;
-// type CandidatesListResponse = ApiSuccessResponse<LaravelPaginatedResponse<Candidate>>;
 
 export interface ApiResponseCandidates {
   data: {
