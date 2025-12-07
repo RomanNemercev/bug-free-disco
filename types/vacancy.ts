@@ -1,58 +1,75 @@
+export type Option<T = string> = {
+  id: number;
+  name: T;
+};
+export type Phrase = string | Option[];
+
 export interface Vacancy {
-    name: string,
-    code?: number,
-    description: string,
-    industry?: string,
-    specializations?: string,
-    employment?: string,
-    schedule?: string
-    experience?: string,
-    education?: string,
-    phrases?: string,
-    conditions?: Number[], 
-    drivers?: Number[], 
-    additions?: Number[], 
-    salary_from?: Number,
-    salary_to?: Number,
-    currency?: string,
-    place?: Number,
-    location?:string,
-    customer_id?: number,
-    customer_phone?: string,
-    customer_email?: string,
+  id?: number;
+  name: string;
+  code?: number;
+  description: string;
+  dateEnd?: string;
+  specializations?: string;
+  industry?: string;
+  employment?: string;
+  schedule?: string;
+  experience?: string;
+  education?: string;
+  salary_from?: Number;
+  salary_to?: Number;
+  salary_type?: string;
+  currency?: string;
+  place?: Number;
+  location?: string;
+  customer_id?: number;
+  executor_name?: string;
+  executor_id?: number;
+  executor_email?: string;
+  executor_phone?: string;
+  status?: string;
+  show_executor?: boolean;
+  phrases?: Phrase;
+  conditions?: Option[];
+  drivers?: Option[];
+  additions?: Option[];
+  customer_phone?: string;
+  customer_email?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-type Data = {
-    id: number;
-    name: string;
-}
+// type Data = {
+//   id: number;
+//   name: string;
+// };
 
 export interface ResponseVacancy {
-    name: string,
-    code: string | null,
-    description: string,
-    industry: string,
-    specializations: string | null,
-    employment: string | null,
-    schedule: string | null,
-    experience: string | null,
-    education: string | null,
-    phrases: string | null,
-    conditions: Data[] | [], 
-    drivers: Data[] | [], 
-    additions: Data[] | [], 
-    salary_from: Number | null,
-    salary_to: Number | null,
-    currency: string | null,
-    place: Number | null,
-    location: string | null,
-    customer_id: number | null,
-    customer_phone: string |  null,
-    customer_email: string | null,
-    status: string
+  name: string;
+  code?: string;
+  description: string;
+  industry: string;
+  specializations?: string;
+  employment?: string;
+  schedule?: string;
+  experience?: string;
+  education?: string;
+  phrases?: string;
+  conditions: Option[] | [];
+  drivers: Option[] | [];
+  additions: Option[] | [];
+  salary_from?: number;
+  salary_to?: number;
+  currency?: string;
+  place?: number;
+  location?: string;
+  customer_id?: number;
+  customer_phone?: string;
+  customer_email?: string;
+  status: string;
 }
 
 export interface ApiResponseVacancy {
-    message: string;
-    data: ResponseVacancy;
+  message: string;
+  data: Vacancy;
 }

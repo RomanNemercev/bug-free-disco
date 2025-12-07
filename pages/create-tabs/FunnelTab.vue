@@ -2,7 +2,7 @@
   import { ref } from 'vue'
   import draggable from 'vuedraggable'
   import MyInput from '@/components/custom/MyInput.vue'
-  import Popup from '~/components/custom/Popup.vue'
+  import Popup from '@/components/custom/Popup.vue'
   import StatusService from '~/components/custom/ServiceStatus.vue'
   import MyDropdown from '~/components/custom/MyDropdown.vue'
   import ResponseChoose from '~/components/custom/ResponseChoose.vue'
