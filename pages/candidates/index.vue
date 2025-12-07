@@ -134,18 +134,6 @@
     actionSort.value = isActiveSort.value
       ? 'Отключить сортировку'
       : 'Включить сортировку';
-    // if (candidatesList.value) {
-    //   candidatesList.value = candidatesList.value.sort(
-    //     (a: Candidate, b: Candidate) => {
-    //       const candidateA = a.surname + a.firstname + a.patronymic;
-    //       const candidateB = b.surname + b.firstname + b.patronymic;
-    //       const comparison = candidateA.localeCompare(candidateB, 'ru', {
-    //         sensitivity: 'base',
-    //       });
-    //       return isActiveSort.value ? comparison : -comparison;
-    //     }
-    //   );
-    // }
   };
 
   const toggleAll = (isChecked: boolean) => {
@@ -231,20 +219,15 @@
 
   // Обработка отправки формы (получаем валидированные данные)
   const handleFormSubmit = async (formData: Record<string, any>) => {
-    // console.log('[handleFormSubmit] Получены данные от формы:', formData);
-    // console.log('[handleFormSubmit] Попап открыт:', isAddCandidatePopup.value);
-
     if (!isAddCandidatePopup.value) {
-      // console.warn('[handleFormSubmit] Попап закрыт, прерываем обработку');
+      console.warn('[handleFormSubmit] Попап закрыт, прерываем обработку');
       return;
     }
 
     isSubmitting.value = true;
     serverErrors.value = {}; // Очищаем предыдущие ошибки
-    // console.log('[handleFormSubmit] Начинаем отправку на сервер');
 
     try {
-      // Подготовка данных для отправки
       const candidateData: CandidateCreateRequest = {
         firstname: formData.firstname,
         surname: formData.surname || null,
@@ -255,19 +238,11 @@
         resume: formData.resume || null,
       };
 
-      // Отправка запроса
-      // console.log('[handleFormSubmit] Отправляем данные на сервер:', candidateData);
       const response = await createCandidate(candidateData);
-      // console.log('[handleFormSubmit] Ответ от сервера:', response);
-      // console.log('[handleFormSubmit] Тип ответа:', typeof response);
 
-      // Проверяем, что ответ - это объект с данными
       if (response && typeof response === 'object' && response.data) {
-        // console.log('[handleFormSubmit] Кандидат успешно создан');
-        // Обновляем список кандидатов
         await getCandidatesData();
 
-        // Очищаем форму и закрываем попап
         closeAddCandidatePopup();
       } else {
         // Если ответ не является объектом с data, это ошибка
@@ -277,7 +252,6 @@
             ? response
             : response?.message || 'Неизвестная ошибка сервера';
 
-        // Обрабатываем как ошибку
         const errors = parseServerErrors({
           message: errorMessage,
           response: {
@@ -295,7 +269,6 @@
       serverErrors.value = errors; // Передаем ошибки в форму
     } finally {
       isSubmitting.value = false;
-      console.log('[handleFormSubmit] Завершена обработка');
     }
   };
 
@@ -357,7 +330,7 @@
           Добавить кандидата
         </UiButton>
       </div>
-      <!-- <div class="absolute left-0 top-[103px] h-[1px] w-full bg-athens"></div> -->
+      <div class="absolute left-0 top-[103px] h-[1px] w-full bg-athens"></div>
       <div class="flex gap-x-15px">
         <MyInput
           placeholder="Поиск по кандидатам или ключевым фразам"
