@@ -24,7 +24,7 @@
       </div>
     </div>
     <transition name="slide-fade">
-      <div class="calendare-wrapper absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
+      <div ref="calendarWrapper" class="calendare-wrapper absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
         <CalendarBarStatic ref="calendarBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" class="calendar-wrapper" />
       </div>
     </transition>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import CalendarBarStatic from '@/components/custom/CalendarBarStatic.vue';
 import { dateStringToDots } from '../../helpers/date'
 
@@ -52,6 +52,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue', 'isOpen'])
 const calendarBar = ref(null)
+const calendarWrapper = ref(null)
 const dataPicker = ref(null)
 
 const isDropDownVisible = ref(props.isOpen);
@@ -76,19 +77,175 @@ const updateDate = (newDate) => {
 
 // Обработка клика вне компонента
 const handleClickOutside = (event) => {
-  const selectContent = document.querySelector('.calendare-wrapper');
-  console.log('click calendare', event.target);
-  if (
-    isDropDownVisible.value &&
-    // dataPicker.value &&
-    !dataPicker.value.contains(event.target) &&
-    (calendarBar.value?.$el !== undefined) &&
-    !calendarBar.value.$el.contains(event.target) &&
-    // (calendarBar.value?.$el !== undefined || !calendarBar.value.$el.contains(event.target))  &&
-    // !calendarBar.value.$el.contains(event.target) &&
-    (!event.target.contains(selectContent) || !selectContent) ||
-    (event.target.classList.contains('filters-wrapper'))
-  ) {
+  if (!isDropDownVisible.value) {
+    return;
+  }
+
+  // Получаем путь события для проверки всех элементов в цепочке
+  // Это важно, так как SelectContent использует портал (teleport) и элементы могут быть вне основного DOM
+  const path = event.composedPath ? event.composedPath() : [event.target];
+  
+  // Находим реальный элемент клика (первый элемент в path, который не является html/document/window)
+  // Это нужно, когда event.target указывает на html из-за всплытия события через портал
+  const getRealTarget = () => {
+    for (const element of path) {
+      if (element && 
+          element !== document.documentElement && 
+          element !== document && 
+          element !== window &&
+          element instanceof Node) {
+        return element;
+      }
+    }
+    return event.target; // Fallback на event.target, если ничего не найдено
+  };
+  
+  const realTarget = getRealTarget();
+
+  // Проверяем, был ли клик внутри SelectContent (выпадающие списки года/месяца) или SelectTrigger
+  // SelectContent рендерится через портал, поэтому проверяем в path
+  // Важно: если event.target - это html, проверяем все элементы в path до html
+  const isInsideSelectContent = (() => {
+    // Специальная обработка для случая, когда клик попал на html
+    if (event.target === document.documentElement || event.target === document || event.target === window) {
+      // Проверяем, есть ли в DOM открытый выпадающий список с role="presentation"
+      // Это может быть портал SelectContent от radix-vue
+      const presentationElement = document.querySelector('[role="presentation"]');
+      if (presentationElement) {
+        return true;
+      }
+      
+      // Проходим по всем элементам в path до html и ищем элементы Select
+      for (const element of path) {
+        if (!element || typeof element === 'string' || !(element instanceof Node)) {
+          continue;
+        }
+        
+        // Пропускаем html, document и window
+        if (element === document.documentElement || element === document || element === window) {
+          continue;
+        }
+        
+        // Проверяем, является ли элемент частью Select
+        // Проверяем role атрибуты
+        if (element.getAttribute && typeof element.getAttribute === 'function') {
+          const role = element.getAttribute('role');
+          if (role === 'listbox' || role === 'option' || role === 'presentation') {
+            return true;
+          }
+        }
+        
+        // Проверяем классы
+        if (element.classList && typeof element.classList.contains === 'function') {
+          if (element.classList.contains('select-month-custom')) {
+            return true;
+          }
+        }
+        
+        // Проверяем через closest (работает для всех элементов кроме html/document/window)
+        if (element.closest && typeof element.closest === 'function') {
+          if (element.closest('[role="listbox"]') ||
+              element.closest('[role="option"]') ||
+              element.closest('[role="presentation"]') ||
+              element.closest('.select-month-custom')) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
+    // Обычная проверка для всех элементов в path
+    return path.some(element => {
+      if (!element || typeof element === 'string' || !(element instanceof Node)) {
+        return false;
+      }
+     
+      // Пропускаем html, document и window элементы
+      if (element === document.documentElement || element === document || element === window) {
+        return false;
+      }
+      
+      return false;
+    });
+  })();
+
+  // Проверяем, был ли клик внутри календаря или его обертки
+  // Проверяем все элементы в пути события, включая дочерние
+  const clickedInsideCalendar = path.some(element => {
+    if (!element || typeof element === 'string' || !(element instanceof Node)) {
+      return false;
+    }
+    
+    // Пропускаем html, document и window элементы
+    if (element === document.documentElement || element === document || element === window) {
+      return false;
+    }
+    
+    // Проверяем, является ли элемент частью календаря
+    const isInsideCalendarWrapper = calendarWrapper.value && calendarWrapper.value.contains(element);
+    const isInsideCalendarBar = calendarBar.value?.$el && calendarBar.value.$el.contains(element);
+    
+    // Проверяем через closest на .calendar-wrapper
+    const isInsideCalendarWrapperByClosest = element.closest && typeof element.closest === 'function' && 
+      !!element.closest('.calendar-wrapper');
+    
+    // Проверяем через closest на CalendarHeader (header-handler или select-month-custom)
+    const isInsideCalendarHeader = element.closest && typeof element.closest === 'function' && (
+      !!element.closest('.header-handler') || 
+      !!element.closest('.select-month-custom')
+    );
+    
+    // Проверяем, является ли сам элемент SelectTrigger
+    const isSelectTrigger = element.classList && typeof element.classList.contains === 'function' && 
+      element.classList.contains('select-month-custom');
+    
+    // Если элемент внутри calendarBar или calendarWrapper, или является частью CalendarHeader/SelectTrigger
+    if (isInsideCalendarWrapper || isInsideCalendarBar || isInsideCalendarWrapperByClosest || isInsideCalendarHeader || isSelectTrigger) {
+      return true;
+    }
+    
+    return false;
+  });
+
+  // Также проверяем realTarget напрямую для более надежной проверки
+  const clickedInsideRealTarget = (() => {
+    if (realTarget && realTarget !== event.target && realTarget !== document.documentElement) {
+      // Проверяем через closest
+      if (realTarget.closest && typeof realTarget.closest === 'function') {
+        if (realTarget.closest('.calendar-wrapper') || 
+            realTarget.closest('.header-handler') || 
+            realTarget.closest('.select-month-custom') ||
+            realTarget.closest('[role="listbox"]')) {
+          return true;
+        }
+      }
+      // Проверяем через contains
+      if (calendarWrapper.value && calendarWrapper.value.contains(realTarget)) {
+        return true;
+      }
+      if (calendarBar.value?.$el && calendarBar.value.$el.contains(realTarget)) {
+        return true;
+      }
+    }
+    return false;
+  })();
+
+  // Объединяем проверки: клик внутри календаря, CalendarHeader или внутри SelectContent
+  const clickedInside = clickedInsideCalendar || clickedInsideRealTarget || isInsideSelectContent;
+
+  // Проверяем, был ли клик на кнопке выбора даты
+  const clickedOnButton = path.some(element => {
+    if (!element || typeof element === 'string' || !(element instanceof Node)) {
+      return false;
+    }
+    
+    // Проверяем, является ли элемент частью кнопки выбора даты
+    return element.classList && element.classList.contains('dropdown-selected-option');
+  });
+
+  // Закрываем календарь только если клик был вне календаря и не на кнопке
+  if (!clickedInside && !clickedOnButton) {
     isDropDownVisible.value = false;
     emit('isOpen', isDropDownVisible.value);
   }
@@ -102,12 +259,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-// watch(
-//   () => props.isOpen,
-//   (newStatus) => {
-//     isDropDownVisible.value = newStatus;
-//   },
-// );
 </script>
 
 <style scoped>

@@ -11,6 +11,7 @@ export default defineNuxtRouteMiddleware(async (to: RouteLocationNormalized, fro
     return;
   }
 
+  console.log('prerender');
   // Пропускаем middleware во время SSR build, если мы на сервере без клиента
   // Это предотвращает выполнение HTTP запросов к API во время сборки
   if (import.meta.server && import.meta.env.NODE_ENV === 'production') {
@@ -18,6 +19,7 @@ export default defineNuxtRouteMiddleware(async (to: RouteLocationNormalized, fro
   }
 
   const tokenCookie = useCookie('auth_token');
+  console.log('tokenCookie', tokenCookie.value);
 
   if (to.path === '/auth' || to.path.startsWith('/public')) {
     return;
@@ -37,6 +39,8 @@ export default defineNuxtRouteMiddleware(async (to: RouteLocationNormalized, fro
       if (status == 401) {
         await getServerToken();
         const { data: profileUser, error: profileError, status: statusUpdate } = await getProfile();
+        console.log('statusUpdate', statusUpdate);
+        console.log('profileError', profileError);
         if (statusUpdate == 401) {
           if (profileError == 'Unauthorized') {
             if (import.meta.client) {
