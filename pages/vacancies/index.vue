@@ -426,7 +426,7 @@
             @click="(event) => updateFilters(event)"
           >
             <p class="text-18px font-medium text-space leading-normal mb-35px">
-              Фильтры
+              Сортировка
             </p>
             <div class="filters grid grid-cols-4 gap-15px mb-6">
               <div>

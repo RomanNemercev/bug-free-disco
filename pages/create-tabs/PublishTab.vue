@@ -1,5 +1,137 @@
 <template>
     <div class="container pb-72 pt-48">
+        <div class="mb-9">
+                 <!-- Третий блок(магазин) -->
+            <p class="text-xl font-semibold text-space mb-5px">Размещения</p>
+            <p class="text-sm font-normal text-slate-custom mb-27px leading-normal">
+              Разместите вакансию на работном сайте
+            </p>
+            <div class="w-full gap-x-25px flex">
+              <div
+                class="grid grid-cols-[repeat(auto-fit,minmax(234px,1fr))] gap-15px mb-35px max-w-[875px] w-full"
+              >
+                <!-- Динамический рендеринг карточек -->
+                <div
+                  v-for="card in cartStore.cardsData"
+                  :key="card.id"
+                  class="p-25px bg-white rounded-fifteen flex flex-col min-w-56"
+                >
+                  <div class="flex items-center gap-2.5 mb-3.5">
+                    <CardIcon
+                      :icon="card.icon"
+                      :isPng="card.isPng"
+                      :imagePath="card.imagePath"
+                    />
+                    <p class="text-sm font-medium text-slate-custom">{{ card.name }}</p>
+                  </div>
+                  <div class="w-full h-[1px] bg-athens mb-3.5"></div>
+                  <UiButton
+                    :variant="cartStore.isInCart(card.id) ? 'success' : 'action'"
+                    size="action"
+                  >
+                    Подключить аккаунт
+                    <svg-icon
+                      v-if="cartStore.isInCart(card.id)"
+                      name="check-success"
+                      width="16"
+                      height="16"
+                    />
+                  </UiButton>
+                </div>
+              </div>
+              <div class="max-w-[275px] w-full">
+                <div
+                  v-if="Object.keys(cartStore.cartItems).length > 0"
+                  class="flex flex-col p-25px bg-white rounded-fifteen"
+                >
+                  <p class="text-xl font-semibold text-gray-900 mb-25px">
+                    Ваша корзина
+                  </p>
+                  <div class="w-full h-[1px] bg-athens"></div>
+                  <div
+                    v-for="(item, id) in cartStore.cartItems"
+                    :key="id"
+                    class="flex justify-between flex-col border-b py-25px"
+                  >
+                    <div class="flex gap-x-15px mb-25px">
+                      <CardIcon
+                        :icon="getCardProperty(id, 'icon')"
+                        :isPng="getCardProperty(id, 'isPng')"
+                        :imagePath="getCardProperty(id, 'imagePath')"
+                      />
+                      <div class="flex flex-col gap-y-5px">
+                        <p class="text-15px font-medium">{{ getCardName(id) }}</p>
+                        <p class="text-sm font-normal text-slate-custom">
+                          {{ getRateName(id, item.rateId) }}
+                        </p>
+                        <p class="text-15px font-medium">
+                          {{ getRatePrice(id, item.rateId) * item.count }} руб.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex gap-15px">
+                      <div class="flex items-center gap-x-5px w-full">
+                        <button
+                          @click="cartStore.removeItem(id)"
+                          :disabled="cartStore.isRemoveDisabled(id)"
+                          :class="{
+                            'opacity-50 cursor-not-allowed':
+                              cartStore.isRemoveDisabled(id),
+                            'hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger':
+                              !cartStore.isRemoveDisabled(id),
+                          }"
+                          class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom transition-all shrink-0"
+                        >
+                          <svg-icon name="basket-minus" width="20" height="20" />
+                        </button>
+                        <p
+                          class="text-sm font-semibold w-full h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-space"
+                        >
+                          {{ item.count }}
+                        </p>
+                        <button
+                          @click="cartStore.addItem(id, item.rateId)"
+                          class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-dodger hover:border-zumthor hover:bg-zumthor active:text-white active:bg-dodger active:border-dodger transition-all shrink-0"
+                        >
+                          <svg-icon name="basket-plus" width="20" height="20" />
+                        </button>
+                      </div>
+                      <button
+                        @click="cartStore.deleteItem(id)"
+                        class="w-10 h-10 bg-athens-gray border border-athens rounded-ten flex items-center justify-center text-slate-custom hover:text-red hover:border-cinderella hover:bg-pink active:text-white active:bg-red active:border-red transition-all ml-auto shrink-0"
+                      >
+                        <svg-icon name="basket-basket" width="20" height="20" />
+                      </button>
+                    </div>
+          </div>
+          <div class="mt-4">
+            <div class="flex justify-between">
+              <p class="text-sm font-normal text-slate-custom">Позиций</p>
+              <p class="text-15px font-semibold text-space">
+                {{ cartStore.totalItems }}
+              </p>
+            </div>
+            <div class="flex justify-between mb-35px">
+              <p class="text-sm font-normal text-slate-custom">Итого</p>
+              <p class="text-15px font-semibold text-space">
+                {{ cartStore.totalSum }} ₽
+              </p>
+            </div>
+            <UiButton variant="action" size="action" class="w-full">
+              Перейти к оформлению
+            </UiButton>
+          </div>
+        </div>
+        <div v-else class="p-25px bg-white rounded-fifteen">
+          <p class="text-xl font-medium text-space mb-15px">Ваша корзина</p>
+          <p class="text-sm font-normal text-slate-custom">
+            Пока что здесь пусто
+          </p>
+        </div>
+      </div>
+    </div>
+        </div>
+    
         <!-- Заголовок -->
         <div class="flex justify-between bg-white rounded-fifteen p-25px items-center mb-15px">
             <div>
@@ -95,8 +227,11 @@ import DotsDropdown from '~/components/custom/DotsDropdown.vue';
 import CardIcon from '~/components/custom/CardIcon.vue';
 import Popup from '~/components/custom/Popup.vue';
 import AddPublication from "~/components/platforms/AddPublication.vue";
+import MultiDropdown from "~/components/custom/MultiDropdown.vue";
 import { getPublications } from "~/utils/hhAccount";
 import { dateStringToDots } from "@/helpers/date";
+import { useCartStore } from '@/stores/cart'
+import cardsData from '~/src/data/cards-data.json'
 
 const data = ref([
     { id: 1, vacancy: "Менеджер по продажам не детских игрушек", region: "Санкт-Петербург", tariff: "Стандарт", site: "SJ", icon: "sj20", isPng: false, imagePath: "", views: 3250, responses: 492, expires: "18.12" },
@@ -119,6 +254,7 @@ const sortDirection = ref("asc");
 const isOpenPopup = ref(false);
 const publicationsHh = ref([]);
 const publications = await getPublications()
+const cartStore = useCartStore()
 publicationsHh.value = publications.roles?.items
 console.log('publicationsHh.value', publicationsHh.value)
 const sortedData = computed(() => {
@@ -130,6 +266,54 @@ const sortedData = computed(() => {
         return 0;
     });
 });
+
+//////////////////////////////////////////////
+onMounted(async () => {
+    await Promise.all([
+      cartStore.setCardsData(cardsData),
+      cartStore.setRatesData(ratesData),
+    ])
+  })
+
+  function getCardName(id) {
+    const card = this.cartStore.cardsData.find(card => card.id === id)
+    return card?.name || 'Неизвестный товар'
+  }
+
+  function getRateName(id, rateId) {
+    const card = cartStore.cardsData.find(card => card.id === id)
+    if (!card) return '' // Возвращаем пустую строку, если карточка не найдена
+
+    const rate = ratesData.find(rate => rate.id === rateId)
+    if (!rate) return '' // Возвращаем пустую строку, если тариф не найден
+
+    return rate.name || '' // Если у тарифа нет названия, возвращаем пустую строку
+  }
+
+  function getRatePrice(id, rateId) {
+    const card = cartStore.cardsData.find(card => card.id === id)
+    if (!card) return 0 // Возвращаем 0, если карточка не найдена
+
+    const rate = ratesData.find(rate => rate.id === rateId)
+    if (!rate) return 0 // Возвращаем 0, если тариф не найден
+
+    return rate.price || 0 // Если у тарифа нет цены, возвращаем 0
+  }
+
+  function handleAddToCart(cardId, selectedRate) {
+    if (!selectedRate) {
+      alert('Пожалуйста, выберите тарифный план.')
+      return
+    }
+    this.cartStore.addItem(cardId, selectedRate.id)
+  }
+
+  const getCardProperty = (id, key) => {
+    const card = cartStore.cardsData.find(card => card.id === id)
+    return card ? card[key] : null // Если карта найдена, вернуть значение ключа
+  }
+
+  ////////////////////////////////////
 
 const sortBy = (key) => {
     if (sortKey.value === key) {
@@ -161,6 +345,7 @@ const toggleAll = (isChecked) => {
         selected.value[item.id] = isChecked;
     });
 };
+
 
 // Следить за изменениями состояния частных чекбоксов
 watch(selected, (newSelected) => {

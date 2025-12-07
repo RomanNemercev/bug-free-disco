@@ -34,7 +34,6 @@
   currentResponse.value = props.modelValue
   const filteredResponses = ref(props.responses)
   const isFocused = ref(false)
-  console.log('filteredResponses', filteredResponses.value)
   const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null]})
 
   // Дебаунс-функция для фильтрации списка
@@ -57,11 +56,10 @@
   }
 
   const selectResponse = response => {
-    console.log('value executors', response)
     currentResponse.value = response.name
     filteredResponses.value = []
     isFocused.value = false
-    emit('update:modelValue', response.name, response.id)
+    emit('update:modelValue', response.name, response.id, response.email)
   }
 </script>
 

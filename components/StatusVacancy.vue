@@ -24,7 +24,7 @@
                 </div>
               </div>
             </li>
-            <li :class="{ 'active-tab': currentTab === 'search' }"
+            <!-- <li :class="{ 'active-tab': currentTab === 'search' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('search')">
               <div
                 class="cursor-pointer opacity-30 hover:opacity-100 transition-all hover:bg-athens-gray px-25px pt-10px pb-10px rounded-ten h-full"
@@ -37,7 +37,7 @@
                   <p class="text-slate-custom text-13px">в 3 строчки</p>
                 </div>
               </div>
-            </li>
+            </li> -->
             <li :class="{ 'active-tab': currentTab === 'publish' }"
               class="border-r border-athens w-full px-4.5px max-w-card-width" @click="changeTab('publish')">
               <div
