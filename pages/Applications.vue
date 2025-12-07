@@ -51,7 +51,7 @@
           class="flex pl-2.5 text-sm font-medium text-slate-custom"
           @click="
             ['dateStart', 'dateWork', 'status'].includes(header.key) &&
-              sortBy(header.key);
+              sortBy(header.key)
           "
           :class="{
             'cursor-pointer select-none': [
