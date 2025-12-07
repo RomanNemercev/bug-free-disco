@@ -30,6 +30,7 @@ const forwardedProps = useForwardProps(delegatedProps)
         props.class,
       )
     "
+    @click.stop
   >
     <span class="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectItemIndicator>

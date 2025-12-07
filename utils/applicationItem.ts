@@ -4,7 +4,7 @@ interface NotData {
     'message': string;
 }
 
-export async function fetchApplicationDetail(id: number) {
+export async function fetchApplicationDetail(id: string) {
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
@@ -24,7 +24,8 @@ export async function fetchApplicationDetail(id: number) {
         if (!response || typeof response !== 'object' || Array.isArray(response)) {
             throw new Error('Response is not a valid Application object');
         }
-        
+
+
         return response;
     } catch (error) {
         if (error.response.status === 401) {
@@ -66,7 +67,7 @@ export async function reject(id: string, descr: string) {
         }
     }
 
-    return { data: null, error: error.value};
+    return { data: null, error: error.value };
 }
 
 export async function approve(id: string) {
@@ -96,5 +97,5 @@ export async function approve(id: string) {
         }
     }
 
-    return { data: null, error: error.value};
+    return { data: null, error: error.value };
 }
