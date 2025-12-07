@@ -122,12 +122,6 @@
             </UiButton>
           </div>
         </div>
-        <div v-else class="p-25px bg-white rounded-fifteen">
-          <p class="text-xl font-medium text-space mb-15px">Ваша корзина</p>
-          <p class="text-sm font-normal text-slate-custom">
-            Пока что здесь пусто
-          </p>
-        </div>
       </div>
     </div>
         </div>
