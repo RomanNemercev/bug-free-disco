@@ -109,7 +109,7 @@ export type CandidateUpdateResponse = ApiSuccessResponse<{
   };
 }>;
 
-// Успешный ответ
+// Успешный ответ удаления кандидата
 export type CandidateDeleteResponse = ApiSuccessResponse<{
   data: null;
 }>;

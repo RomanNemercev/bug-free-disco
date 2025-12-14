@@ -9,12 +9,6 @@
   import type { ApiResponseById, Candidate } from '@/types/candidates';
   // import type { SelectedLabel } from '@/types/ui-components';
 
-  // import {
-  //   getProfile as profileHh,
-  //   getResponse,
-  //   getData,
-  // } from '@/utils/hhAccount';
-
   // get current route from candidateFull
   const route = useRoute();
   const router = useRouter();
@@ -72,8 +66,6 @@
     });
   }
 
-  // loadCandidate(parseInt(candidateId));
-
   const goToPrevious = () => {
     if (candidate.value) {
       const prevId = candidate.value?.id - 1;
@@ -86,6 +78,18 @@
       const nextId = candidate.value?.id + 1;
       if (nextId > 0) router.push(`/candidates/${nextId}`);
     }
+  };
+
+  const handleCandidateUpdated = async (updatedCandidate: Candidate) => {
+    if (updatedCandidate?.id) {
+      await loadCandidate(updatedCandidate.id);
+    } else if (candidate.value?.id) {
+      await loadCandidate(candidate.value.id);
+    }
+  };
+
+  const handleCandidateDeleted = () => {
+    router.push('/candidates');
   };
 
   onMounted(async () => {
@@ -152,7 +156,12 @@
       <UiDotsLoader />
     </div>
     <div class="w-full" v-else-if="candidate">
-      <BlockCandidateInfo :candidate="candidate" :isFunnel="false" />
+      <BlockCandidateInfo
+        :candidate="candidate"
+        :isFunnel="false"
+        @candidate-updated="handleCandidateUpdated"
+        @candidate-deleted="handleCandidateDeleted"
+      />
       <BlockCandidateTabsInfo :candidate="candidate" />
     </div>
   </div>

@@ -113,6 +113,56 @@ export async function moveCandidateToVacancy(
   });
 }
 
+/**
+ * Загружает фотографию кандидата на фронтенд-сервер (Nuxt API route)
+ * ВАЖНО: Это запрос к локальному серверному API Nuxt, а не к бэкенду!
+ *
+ * @param candidateId - ID кандидата
+ * @param file - Файл изображения
+ * @returns Путь к загруженному файлу
+ */
+export async function uploadCandidatePhoto(
+  candidateId: number,
+  file: File
+): Promise<{ imagePath: string }> {
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  // ВАЖНО: Используем $fetch БЕЗ baseURL - это запрос к серверному API route Nuxt
+  // Путь /api/candidates/... обрабатывается серверным route в server/api/
+  // Это НЕ запрос к бэкенду (который идет через config.public.apiBase)
+  try {
+    const response = await $fetch<{ success: boolean; imagePath: string }>(
+      `/api/candidates/${candidateId}/photo`,
+      {
+        method: 'POST',
+        body: formData,
+        baseURL: 'http://localhost:3000',
+        // НЕ указываем baseURL - запрос идет к локальному серверу Nuxt
+        // НЕ указываем Content-Type - браузер установит автоматически с boundary
+      }
+    );
+
+    if (!response || !response.success) {
+      throw new Error('Ошибка при загрузке фото');
+    }
+
+    return { imagePath: response.imagePath };
+  } catch (error: any) {
+    console.error('[uploadCandidatePhoto] Ошибка при загрузке фото:', error);
+
+    if (error.statusMessage) {
+      throw new Error(error.statusMessage);
+    }
+
+    if (error.response?._data?.message) {
+      throw new Error(error.response._data.message);
+    }
+
+    throw new Error(error.message || 'Ошибка при загрузке фото');
+  }
+}
+
 // export async function fetchCandidatesMin(page = 1) {
 //   const { candidates, pagination } = await fetchCandidatesFull(page);
 
