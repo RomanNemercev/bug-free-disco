@@ -1,23 +1,39 @@
-import type { ApiResponseVacancy, Vacancy } from '@/types/vacancy';
+import { apiGet } from './client';
+import type { ApiResponseVacanciesData } from '@/types/vacancy';
 
-// interface Vacancies {
-//   vacancies: Vacancy[];
-// }
+import type { Vacancy } from '@/types/vacancy';
 
 export const getVacancyName = async (id: string): Promise<string> => {
-  const config = useRuntimeConfig();
-  const authToken = useCookie('auth_token').value;
-  const authUser = useCookie('auth_user').value;
+  try {
+    const response = await apiGet<Vacancy>(`/vacancies/${id}`);
+    return response.data.name || 'Неизвестная вакансия';
+  } catch (err) {
+    console.error('Ошибка при получении названия вакансии:', err);
+    return 'Неизвестная вакансия';
+  }
+};
 
-  const response = await fetch(`${config.public.apiBase}/vacancies/${id}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${authToken}`,
-      'X-Auth-User': `${authUser}`,
-    },
-  });
+export const getVacancyById = async (id: string): Promise<Vacancy | null> => {
+  try {
+    const response = await apiGet<Vacancy>(`/vacancies/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error('Ошибка при получении вакансии:', err);
+    return null;
+  }
+};
 
-  const dataVacancy = await response.json();
-  return dataVacancy?.data?.name || 'Неизвестная вакансия';
+export const getVacancies = async (
+  queryParams?: Record<string, any>
+): Promise<Vacancy[] | null> => {
+  try {
+    const response = await apiGet<ApiResponseVacanciesData>(
+      '/vacancies',
+      queryParams
+    );
+    return response.data.data || null;
+  } catch (err) {
+    console.error('Ошибка при получении списка вакансий:', err);
+    return null;
+  }
 };

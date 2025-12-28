@@ -1,8 +1,8 @@
+import type { ApiSuccessResponse } from './clients';
+
 export type SkillCandidate = {
   id: number;
   name: string;
-  created_at?: string;
-  updated_at?: string;
 };
 
 export type TagCandidate = {
@@ -30,7 +30,7 @@ export type AttachmentCandidate = {
 export interface Candidate {
   id: number;
   firstname?: string;
-  surname: string;
+  surname?: string;
   patronymic?: string | null;
   email: string;
   age?: number | null;
@@ -52,7 +52,7 @@ export interface Candidate {
   source?: string | null;
   isReserve?: boolean | null;
   customer?: number | null;
-  vacancy?: number | null;
+  vacancy_id?: number | null;
   stage?: number | null;
   attachments?: AttachmentCandidate[] | null;
   skills?: SkillCandidate[] | null;
@@ -63,62 +63,56 @@ export interface Candidate {
 }
 
 // Успешный ответ запроса списка кандидатов
-export interface ApiCandidatesResponse {
-  message: 'Success';
-  data: {
-    data: Candidate[];
-    current_page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-    from: number | null;
-    to: number | null;
-    path: string;
-    first_page_url: string;
-    last_page_url: string;
-    prev_page_url: string | null;
-    next_page_url: string | null;
-  };
-}
+export type ApiCandidatesResponse = ApiSuccessResponse<{
+  data: Candidate[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  from: number | null;
+  to: number | null;
+  path: string;
+  first_page_url: string;
+  last_page_url: string;
+  prev_page_url: string | null;
+  next_page_url: string | null;
+}>;
 
 // Успешный ответ запроса по id кандидата
-export interface ApiCandidateByIdResponse {
-  message: string;
-  data: Candidate & {
+export type ApiCandidateByIdResponse = ApiSuccessResponse<
+  Candidate & {
     attachments?: AttachmentCandidate[];
     skills?: SkillCandidate[];
     tags?: TagCandidate[];
     customFields?: CustomFieldCandidate[];
-  };
-}
+  }
+>;
 
 // Успешный ответ создания кандидата
-export interface CandidateCreateResponse {
-  message: string;
-  data: Candidate & {
+export type CandidateCreateResponse = ApiSuccessResponse<
+  Candidate & {
     customer: number;
     skills?: SkillCandidate[];
     tags?: TagCandidate[];
     customFields?: CustomFieldCandidate[];
     attachments?: AttachmentCandidate[];
-  };
-}
+  }
+>;
 
 // Успешный ответ обновления данных кандидата
-export interface CandidateUpdateResponse {
-  message: 'Success';
-  data: Candidate & {
-    attachments: AttachmentCandidate[];
-    skills: SkillCandidate[];
-    tags: TagCandidate[];
-    customFields: CustomFieldCandidate[];
-  };
-}
+export type CandidateUpdateResponse = ApiSuccessResponse<
+  Candidate & {
+    attachments?: AttachmentCandidate[];
+    skills?: SkillCandidate[];
+    tags?: TagCandidate[];
+    customFields?: CustomFieldCandidate[];
+  }
+>;
 
-// Успешный ответ
-export interface CandidateDeleteResponse {
-  message: string;
-}
+// Успешный ответ удаления кандидата
+export type CandidateDeleteResponse = ApiSuccessResponse<{
+  data: null;
+}>;
 
 // Для создания кандидата
 export interface CandidateCreateRequest {
@@ -152,34 +146,17 @@ export interface CandidateCreateRequest {
 // Для запроса на обновление данных кандидата
 export interface CandidateUpdateRequest extends Partial<Candidate> {}
 
-// Общий тип успешного ответа
-export type ApiSuccessResponse<T> = {
-  message: string;
-  data: T;
-};
-
-// Общий тип ошибки
-export type ApiErrorResponse = {
-  message: string;
-  data?: null;
-};
-
-export interface ApiResponseCandidates {
-  data: {
-    data: Candidate[];
-    total: number;
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    firstName?: string;
-  };
-}
-
-export interface Pagination {
+export type ApiResponseCandidatesData = {
+  data: Candidate[];
   total: number;
   current_page: number;
   last_page: number;
   per_page: number;
+  firstName?: string;
+};
+
+export interface ApiResponseCandidates {
+  data: ApiResponseCandidatesData;
 }
 
 // Успешный ответ запроса по id кандидата
