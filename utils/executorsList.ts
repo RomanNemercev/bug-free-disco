@@ -178,12 +178,16 @@ export async function  employeesList() {
         return employees;
 };
 
+<<<<<<< HEAD
 export async function  teamList(id: string) {
+=======
+export async function  teamList(id = 0, role = '') {
+>>>>>>> c65abef (из оригинального репозитория)
     const config = useRuntimeConfig();
     const authToken = useCookie('auth_token').value;
     const authUser = useCookie('auth_user').value;
 
-    const response: ApiResponseTeam = await $fetch(`${config.public.apiBase}/team/${id}`, {
+    const response: ApiResponseTeam = await $fetch(`${config.public.apiBase}/team/${id}${roles}`, {
         headers: {
             Accept: 'application/json',
             Authorization: `Bearer ${authToken}`,
