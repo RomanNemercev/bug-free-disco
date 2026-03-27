@@ -1,5 +1,4 @@
 import type {
-  ApiResponseCandidates,
   ApiCandidatesResponse,
   Candidate,
   CandidateCreateRequest,
@@ -10,74 +9,48 @@ import type {
   SkillCandidate,
   TagCandidate,
   CustomFieldCandidate,
+  CandidateUpdateRequest,
+  CandidateUpdateResponse,
 } from '~/types/candidates';
+import { apiGet, apiPost, apiPut, apiDelete } from './client';
+import type { ApiEventsResponse } from '@/types/events';
 
-export async function getCandidates(page = 1) {
-  const config = useRuntimeConfig();
-  const authToken = useCookie('auth_token').value;
-  const authUser = useCookie('auth_user').value;
-
+export async function getCandidates(page = 1, filters?: Record<string, any>) {
   try {
-    const response: ApiCandidatesResponse = await $fetch<ApiCandidatesResponse>(
-      `${config.public.apiBase}/candidates`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${authToken}`,
-          'X-Auth-User': `${authUser}`,
-        },
-        query: { page },
-      }
+    const queryParams: Record<string, any> = { page };
+
+    if (filters) {
+      Object.assign(queryParams, filters);
+    }
+
+    const response = await apiGet<ApiCandidatesResponse['data']>(
+      '/candidates',
+      { ...queryParams }
     );
 
     return {
-      candidates: response?.data?.data || [],
+      candidates: response.data.data || [],
       pagination: {
         total: response.data.total,
-        currentPage: response.data.current_page,
-        lastPage: response.data.last_page,
-        perPage: response.data.per_page,
+        current_page: response.data.current_page,
+        last_page: response.data.last_page,
+        per_page: response.data.per_page,
       },
     };
-  } catch (error: any) {
-    if (error.response.status === 401) {
-      alert('Ваша сессия истекла! Пожалуйста, авторизуйтесь снова.');
-      useRouter().replace('/auth');
-    } else {
-      console.error('Ошибка при получении кандидатов:', error);
-    }
+  } catch (error) {
+    console.error('Ошибка при получении кандидатов:', error);
     return {
       candidates: [],
-      pagination: { total: 0, currentPage: 1, lastPage: 1, perPage: 15 },
+      pagination: { total: 0, current_page: 1, last_page: 1, per_page: 15 },
     };
   }
 }
 
 export async function getCandidateById(id: number): Promise<ApiResponseById> {
-  const config = useRuntimeConfig();
-  const authToken = useCookie('auth_token').value;
-  const authUser = useCookie('auth_user').value;
-
-  // console.log('Запрашиваю кандидата с id:', id);
-  // console.log('auth_token:', authToken);
-  // console.log('auth_user:', authUser);
-  // console.log('URL запроса:', `${config.public.apiBase}/candidates/${id}`);
-
   try {
-    const response: ApiCandidateByIdResponse =
-      await $fetch<ApiCandidateByIdResponse>(
-        `${config.public.apiBase}/candidates/${id}`,
-        {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-            Authorization: `Bearer ${authToken}`,
-            'X-Auth-User': `${authUser}`,
-          },
-        }
-      );
-
+    const response = await apiGet<ApiCandidateByIdResponse['data']>(
+      `/candidates/${id}`
+    );
     return {
       candidateData: response.data as Candidate,
       candidateExtra: {
@@ -87,12 +60,29 @@ export async function getCandidateById(id: number): Promise<ApiResponseById> {
         customFields: response.data?.customFields as CustomFieldCandidate[],
       },
     };
-  } catch (error) {
-    console.error('Ошибка при получении кандидата:', error);
-    console.error(`Ошибка при получении кандидата #${id}:`, error);
+  } catch (error: unknown) {
+    // Специфичная обработка для 404
+    if (error && typeof error === 'object' && 'response' in error) {
+      const fetchError = error as {
+        response?: {
+          status?: number;
+        };
+      };
+
+      if (
+        fetchError.response?.status === 404 ||
+        fetchError.response?.status === 400
+      ) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Кандидат не найден',
+        });
+      }
+    }
+
     throw createError({
-      statusCode: 404,
-      statusMessage: 'Кандидат не найден',
+      statusCode: 500,
+      statusMessage: 'Ошибка при получении кандидата',
     });
   }
 }
@@ -100,30 +90,127 @@ export async function getCandidateById(id: number): Promise<ApiResponseById> {
 export async function createCandidate(
   candidate: CandidateCreateRequest
 ): Promise<CandidateCreateResponse> {
-  const config = useRuntimeConfig();
-  const authToken = useCookie('auth_token').value;
-  const authUser = useCookie('auth_user').value;
+  // Ошибки пробрасываются автоматически для обработки в компоненте
+  return await apiPost<CandidateCreateResponse['data']>(
+    '/candidates',
+    candidate
+  );
+}
 
+export async function updateCandidate(
+  candidate: CandidateUpdateRequest
+): Promise<CandidateUpdateResponse> {
+  return await apiPut<CandidateUpdateResponse['data']>(
+    `/candidates/${candidate.id}`,
+    candidate
+  );
+}
+
+export async function deleteCandidate(id: number): Promise<void> {
+  await apiDelete(`/candidates/${id}`);
+}
+
+/**
+ * Загружает фотографию кандидата на фронтенд-сервер (Nuxt API route)
+ * ВАЖНО: Это запрос к локальному серверному API Nuxt, а не к бэкенду!
+ *
+ * @param candidateId - ID кандидата
+ * @param file - Файл изображения
+ * @returns Путь к загруженному файлу
+ */
+export async function uploadCandidatePhoto(
+  candidateId: number,
+  file: File
+): Promise<{ imagePath: string }> {
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  // ВАЖНО: Используем $fetch БЕЗ baseURL - это запрос к серверному API route Nuxt
+  // Путь /api/candidates/... обрабатывается серверным route в server/api/
+  // Это НЕ запрос к бэкенду (который идет через config.public.apiBase)
   try {
-    const response = await $fetch<CandidateCreateResponse>(
-      `${config.public.apiBase}/candidates`,
+    const response = await $fetch<{ success: boolean; imagePath: string }>(
+      `/api/candidates/${candidateId}/photo`,
       {
         method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${authToken}`,
-          'X-Auth-User': `${authUser}`,
-        },
-        body: candidate,
+        body: formData,
+        baseURL: 'http://localhost:3000',
+        // НЕ указываем baseURL - запрос идет к локальному серверу Nuxt
+        // НЕ указываем Content-Type - браузер установит автоматически с boundary
       }
     );
 
-    return response;
+    if (!response || !response.success) {
+      throw new Error('Ошибка при загрузке фото');
+    }
+
+    return { imagePath: response.imagePath };
   } catch (error: any) {
-    // Пробрасываем ошибку для обработки в компоненте
-    throw error;
+    console.error('[uploadCandidatePhoto] Ошибка при загрузке фото:', error);
+
+    if (error.statusMessage) {
+      throw new Error(error.statusMessage);
+    }
+
+    if (error.response?._data?.message) {
+      throw new Error(error.response._data.message);
+    }
+
+    throw new Error(error.message || 'Ошибка при загрузке фото');
   }
 }
+
+export async function getCandidatesByVacancy(vacancyId: number, page = 1) {
+  try {
+    const response = await apiGet<ApiCandidatesResponse['data']>(
+      '/candidates',
+      {
+        page,
+        vacancy: vacancyId, // или filters[vacancy]=vacancyId
+      }
+    );
+
+    return {
+      candidates: response.data.data || [],
+      pagination: {
+        total: response.data.total,
+        currentPage: response.data.current_page,
+        lastPage: response.data.last_page,
+        perPage: response.data.per_page,
+      },
+    };
+  } catch (error) {
+    console.error('Ошибка при получении кандидатов по вакансии:', error);
+    return {
+      candidates: [],
+      pagination: { total: 0, currentPage: 1, lastPage: 1, perPage: 15 },
+    };
+  }
+}
+
+export async function getCandidateEvents(candidateId: number, vacancyId?: number) {
+  const url = vacancyId
+    ? `/candidates/${candidateId}/vacancies/${vacancyId}/events`
+    : `/candidates/${candidateId}/events`;
+
+  return apiGet<ApiEventsResponse>(url);
+};
+
+export async function sendCandidateChat(
+  candidateId: number,
+  content: string,
+  provider: 'jobly' | 'hh' | 'avito' | 'rabota',
+  vacancyId?: number
+){
+  const url = vacancyId
+    ? `/candidates/${candidateId}/vacancies/${vacancyId}/chats`
+    : `/candidates/${candidateId}/chats`;
+
+  return apiPost<{ message: string; event_id: number; status: 'sent' | 'pending' }>(
+    url,
+    { provider, content }
+  );
+};
 
 // export async function fetchCandidatesMin(page = 1) {
 //   const { candidates, pagination } = await fetchCandidatesFull(page);

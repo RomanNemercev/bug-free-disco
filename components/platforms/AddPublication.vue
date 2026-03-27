@@ -1,55 +1,25 @@
 <template>
   <div class="container p-0">
     <div class="flex gap-x-[24px]">
-      <div class="max-w-[875px] flex-grow bg-white rounded-fifteen">
+      <div class="max-w-[100%] flex-grow bg-white rounded-fifteen">
         <p class="text-space text-xl font-semibold">Новая публикация</p>
         <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Основная информация
+        </p>
         <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Доступные источники
-            </p>
-            <DropDownList 
-            :options="platforms" 
-            v-model="data.platform"
-            :selected="data.platform"
-            @update:model-value="$event => changePlatform($event)"
-            ></DropDownList>
-          </div>
-        </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Баланс публикаций:
-            </p>
-            <DropDownTypes 
-            :options="platforms[0]?.types"
-            :selected="data.billing_types"
-            @update:model-value="$event => changeBalance($event)"
-            ></DropDownTypes>
-          </div>
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Дней всего
-            </p>
-            <MyInput
-                placeholder="Введите число дней"
-                v-model="data.days"
-                :type="'Number'"
-                :readonly="true"
-            />
-          </div>
-        </div>
-        <div class="mb-25px mt-25px border-t"></div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
+          <div id="name" class="w-full anchor">
+            <p 
+              class="text-sm font-medium mb-4 leading-normal"
+              :class="validFields.name.status === false ? 'text-red-custom' : 'text-space'"
+            >
               <span class="text-red-custom">*</span>
               Название должности
             </p>
             <MyInput
                 placeholder="Например, Менеджер по продажам"
                 v-model="data.name"
+                @update:model-value="($event) => updateValidField('name', $event.trim() !== '')"
             />
           </div>
           <div class="w-full">
@@ -59,196 +29,355 @@
             <MyInput
                 placeholder="Код вакансии"
                 v-model="data.code"
-                @update:model-value="$event => updateEvent($event, 'code')"
             />
           </div>
-        </div>
-        <div class="w-full">
-          <div class="w-full flex justify-between">
-            <p class="text-sm font-medium text-space mb-4">
-              <span class="text-red-custom">*</span>
-              Описание вакансии
-            </p>
-          </div>
-          <GenerateButton></GenerateButton>
-          <div class="mt-15px mb-25px">
-          <TiptapEditor 
-            v-model="data.description" 
-            class="mb-15px" 
-            @update:model-value="$event => updateEvent($event, 'description')"
-          />
-          <p class="text-xs text-bali font-normal">
-            Максимум 700 символов. Использовано 0 символов.
-          </p>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
+              <span class="text-red-custom">*</span>
               Отрасль компании
             </p>
             <DropDownRoles 
             :options="currectRole"
             :selected="data.industry ?? ''"
-            @update:model-value="$event => updateIndustry($event)"
             ></DropDownRoles>
           </div>
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
+          <div id="professional_roles" class="w-full anchor">
+            <p 
+              class="text-sm font-medium mb-4 leading-normal"
+              :class="validFields.professional_roles.status === false ? 'text-red-custom' : 'text-space'"
+            >
+              <span class="text-red-custom">*</span>
               Выберите специализацию
             </p>
             <DropDownRoles
-            :options="data.industry !== undefined ?? currectRole[data.industry.key]?.roles"
+            :options="professionsOptions"
             :selected="data.professional_roles[0]"
             v-model="data.professional_roles[0]"
-            @update:model-value="$event => updateRoles($event)"
+            @update:model-value="($event) => handleIdUpdate('professional_roles', $event)"
             ></DropDownRoles>
           </div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
+          <div class="w-full anchor">
+              <p 
+                class="text-sm font-medium mb-4 leading-normal"
+                :class="validFields.experience.status === false ? 'text-red-custom' : 'text-space'"
+              >
+                <span class="text-red-custom">*</span>
+                Опыт работы
+              </p>
+              <DropDownTypes 
+              :options=experienceOptions
+              :selected="findValue(experienceOptions, globCurrentVacancy?.experience)"
+              v-model="data.experience"
+              @update:model-value="($event) => handleIdUpdate('experience', $event)"
+              ></DropDownTypes>
+          </div>
+          <div class="w-full"></div>
+        </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Условия работы
+        </p>
+        <div class="w-full justify-between flex gap-25px mb-6">
+          <div id="employment_form" class="w-full anchor">
+            <p 
+              class="text-sm font-medium mb-4 leading-normal"
+              :class="validFields.employment_form.status === false ? 'text-red-custom' : 'text-space'"
+            >
+              <span class="text-red-custom">*</span>
               Тип занятости
             </p>
             <DropDownTypes 
-            :options=HH_EMPLOYMENT_TYPES
-            :selected="data.employment_form"
+            :options=employmentTypesOptions
+            :selected="findValue(employmentTypesOptions, globCurrentVacancy?.employment) || employmentTypesOptions[0]"
             v-model="data.employment_form"
+            @update:model-value="($event) => handleIdUpdate('employment_form', $event)"
             ></DropDownTypes>
           </div>
           <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              График работы
-            </p>
-            <DropDownTypes 
-            :options=HH_WORK_SCHEDULE_BY_DAYS
-            :selected="data.work_schedule_by_days"
-            v-model="data.work_schedule_by_days"
-            ></DropDownTypes>
+            <template v-if="data.employment_form?.id === 'FLY_IN_FLY_OUT'">
+              <p class="text-sm font-medium mb-4 leading-normal text-space">
+                Количество смен
+              </p>
+              <MultiSelect 
+              :options="experienceDaysOptions"
+              :withId="true"
+              v-model="data.fly_in_fly_out_duration"
+              defaultValue="Выберите количество смен"
+              ></MultiSelect>
+            </template>
           </div>
         </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Образование
-            </p>
-            <DropDownTypes 
-            :options=HH_EDUCATION_LAVEL
-            :selected="data.education_level"
-            v-model="data.education_level"
-            ></DropDownTypes>
-          </div>
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Опыт работы
-            </p>
-            <DropDownTypes 
-            :options=experience
-            :selected="data.experience"
-            v-model="data.experience"
-            ></DropDownTypes>
-          </div>
-        </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Ключевые фразы
-            </p>
-            <tag-select :options="phrases" :model-value="data.phrases ? data.phrases : []"
-            @update:model-value="$event => updateTags($event)" @delete="$event => updateTags($event)" />
-          </div>
-        </div>
-        <div class="w-fit mb-25px">
-          <MyAccordion title="дополнительные условия" class="mb-15px">
-            <div class="flex flex-col flex-wrap max-h-40 gap-x-25px gap-y-15px">
-              <CheckboxGroup  model-value='' :options="ArrayAdditional" />
-            </div>
-          </MyAccordion>
-          <MyAccordion title="водительские права" class="mb-15px">
-            <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup  
-                v-model="data.driver_license_types" 
-                :options="ArrayCarId" 
-                @update:model-value="($event, data) => updateEvent($event, 'driver_license_types', data)"
-              />
-            </div>
-          </MyAccordion>
-          <MyAccordion title="дополнительные пожелания">
-            <div class="flex flex-col flex-wrap max-h-[195px] gap-x-25px gap-y-15px">
-              <CheckboxGroup  :m-value=null :options="ArrayOptions"/>
-            </div>
-          </MyAccordion>
-        </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Заработная плата / мес
-            </p>
-            <div class="flex items-center gap-[10px]">
-              <!-- <div class="w-full">
-                <MyInput
-                placeholder="От"
-                type="Number"
-                v-model="data.salary_range?.from"
-                @update:model-value="$event => updateEvent($event, 'salary_range.from')"
-                />
-              </div> -->
-              <!-- <div class="w-full">
-                <MyInput
-                placeholder="До"
-                type="Number"
-                v-model="data.salary_range?.to"
-                /> 
-              </div>-->
-            </div>
-          </div>
-          <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Валюта
-            </p>
-            <my-dropdown :defaultValue="'Валюта'" :options="ArrayCurrency" :selected="0"
-              :initialValue="null"/>
-          </div>
-        </div>
-        <RadioGroup default-value="past-cash" class="flex gap-[18px] mb-25px" v-model="salaryType">
-                <div class="my-checkbox">
-                  <Label for="past-cash" class="cursor-pointer flex items-center">
-                    <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
-                    <p>На руки</p>
-                  </Label>
-                </div>
-                <div class="my-checkbox">
-                  <Label for="full-cash" class="cursor-pointer flex items-center">
-                    <RadioGroupItem id="full-cash" value="full-cash" class="mr-5px" />
-                    <p>До вычета налогов</p>
-                  </Label>
-                </div>
-        </RadioGroup>
         <div class="w-full justify-between flex gap-25px mb-6">
            <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Место работы
+              Формат работы
             </p>
-            <RadioGroup default-value="1" class="flex gap-x-15px w-full" >
-              <CardOption v-for="card in cards" 
-                  :key="card.id" 
-                  :id="card.id"
-                  :title="card.title"
-                  :description="card.description"  :hoveredCard="hoveredCard"
-                  :selectedCard="data.workSpace"
-                  @update:selected="handleCheck" @hover="handleHover" @leave="clearHover" 
-              />
-            </RadioGroup>
+            <MultiSelect 
+              :options="workFormatOptions"
+              v-model="data.work_format"
+              defaultValue="Выберите формат работы"
+              :withId="true"
+            />
            </div>
         </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          График и часы работы
+        </p>
+        <div class="w-full justify-between flex gap-25px mb-6">
+          <div id="work_schedule_by_days" class="w-full anchor">
+            <p 
+              class="text-sm font-medium mb-4 leading-normal"
+              :class="validFields.work_schedule_by_days.status === false ? 'text-red-custom' : 'text-space'"
+            >
+              <span class="text-red-custom">*</span>
+              График работы
+            </p>
+            <MultiSelect 
+            :options="workScheduleOptions"
+            v-model="data.work_schedule_by_days"
+            defaultValue="Выберите график работы"
+            :withId="true"
+            ></MultiSelect>
+          </div>
+          <div id="working_hours" class="w-full anchor">
+            <p 
+              class="text-sm font-medium mb-4 leading-normal"
+              :class="validFields.working_hours.status === false ? 'text-red-custom' : 'text-space'"
+            >
+              <span class="text-red-custom">*</span>
+              Рабочие часы в день
+            </p>
+            <MultiSelect 
+            :options="workingHoursOptions"
+            v-model="data.working_hours"
+            defaultValue="Выберите рабочие часы"
+            :withId="true"
+            ></MultiSelect>
+          </div>
+        </div>
+        <div class="w-full justify-between flex gap-25px mb-6">
+          <div class="w-full">
+             <MyCheckbox 
+                :id="'evening-night-shifts'" 
+                :label="'Есть вечерние или ночные смены'" 
+                v-model="data.has_evening_night_shifts" 
+             />
+          </div>
+        </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Город публикации и адрес работы
+        </p>
+        <div class="w-full justify-between flex gap-25px mb-6">
+          <div id="areas" class="w-full anchor">
+            <p class="text-sm font-medium mb-4 leading-normal" 
+                 :class="validFields.area.status === false ? 'text-red-custom' : 'text-space'">
+              <span class="text-red-custom">*</span>
+              Город публикации
+            </p>
+            <CityAutocomplete 
+              :options="citiesOptions"
+              :model-value="data.area"
+              @update:model-value="($event) => handleIdUpdate('area', $event)"
+              placeholder="Например, Санкт-Петербург"
+            />
+          </div>
+          <div id="address" class="w-full anchor">
+            <p class="text-sm font-medium mb-4 leading-normal" 
+                 :class="validFields.address.status === false ? 'text-red-custom' : 'text-space'">
+              <span class="text-red-custom">*</span>
+              Город размещения
+            </p>
+            <CityAutocomplete 
+              :options="addresses"
+              :isOpen="true"
+              :model-value="data.address"
+              @update:model-value="($event) => handleIdUpdate('address', $event)"
+              placeholder="Например, Санкт-Петербург"
+            />
+          </div>
+        </div>
+        <div class="w-full justify-between flex gap-25px mb-6">
+          <div class="w-full">
+             <MyCheckbox 
+                :id="'show_metro_only'" 
+                :label="'Показывать только станцию метро в вакансии'" 
+                v-model="data.address.show_metro_only" 
+             />
+          </div>
+        </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Оплата работы
+        </p>
         <div class="w-full justify-between flex gap-25px mb-6">
            <div class="w-full">
-            <p class="text-sm font-medium mb-4 leading-normal text-space">
-              Локация офиса
+            
+           <div class="flex items-end gap-[10px] mb-6">
+              <div class="w-full">
+                <p class="text-sm font-medium mb-4 leading-normal text-space">
+                  Заработная плата / мес
+                </p>
+                <div class="w-full flex gap-x-2.5">
+                  <MyInput
+                   placeholder="От"
+                   type="Number"
+                   v-model="data.salary_range.from"
+                   @update:model-value="($event) => handleSalaryRangeUpdate('from', $event)"
+                   />
+                   <MyInput
+                   placeholder="До"
+                   type="Number"
+                   v-model="data.salary_range.to"
+                   @update:model-value="($event) => handleSalaryRangeUpdate('to', $event)"
+                   /> 
+                </div>
+              </div>
+              <div class="w-full">
+                <p class="text-sm font-medium text-space mb-3.5">Валюта</p>
+                <MyDropdown 
+                  :options="ArrayCurrency" 
+                  :model-value="ArrayCurrency.find(c => c.id === data.salary_range.currency)?.value"
+                  @update:model-value="($event) => handleSalaryRangeUpdate('currency', ArrayCurrency.find(c => c.value === $event))"
+                />
+              </div>
+              <div class="w-full">
+                <DropDownTypes 
+                  :options=HH_SALARY_TYPE
+                  :selected="HH_SALARY_TYPE[0]"
+                  v-model="data.salary_range.mode"
+                  @update:model-value="($event) => handleSalaryRangeUpdate('mode', $event)"
+                >
+                </DropDownTypes>
+                </div>
+            </div>
+            <div class="w-full  items-end justify-between flex mb-6 gap-25px">
+              <RadioGroup 
+                default-value="full-cash" 
+                class="w-full flex gap-[18px]" 
+                :model-value="data.salary_range?.gross === true ? 'full-cash' : 'past-cash'"
+                @update:model-value="(value) => data.salary_range.gross = value === 'full-cash'"
+              >
+                      <div class="my-checkbox">
+                        <Label for="past-cash" class="cursor-pointer flex items-center">
+                          <RadioGroupItem id="past-cash" value="past-cash" class="mr-5px" />
+                          <p>На руки</p>
+                        </Label>
+                      </div>
+                      <div class="my-checkbox">
+                        <Label for="full-cash" class="cursor-pointer flex items-center">
+                          <RadioGroupItem id="full-cash" value="full-cash" class="mr-5px" />
+                          <p>До вычета налогов</p>
+                        </Label>
+                      </div>
+              </RadioGroup>
+            </div>
+            <div class="w-full  items-end justify-between flex gap-25px">
+              <div class="w-full">
+                <p class="text-sm font-medium text-space mb-3.5">
+                  Частота выплаты
+                </p>
+                <DropDownTypes 
+                  :options=HH_SALARY_FREQUENCY
+                  :selected="HH_SALARY_FREQUENCY[3]"
+                  v-model="data.salary_range.frequency"
+                  @update:model-value="($event) => handleSalaryRangeUpdate('frequency', $event)"
+                >
+                </DropDownTypes>
+              </div>
+              <div class="w-full"></div>
+            </div>
+          </div> 
+        </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Описание вакансии
+        </p>
+        <div id="description" class="w-full anchor">
+          <p 
+            class="text-sm font-medium mb-3.5"
+            :class="validFields.description.status === false ? 'text-red-custom' : 'text-space'"
+          >
+            <span class="text-red-custom">*</span>
+            Текст вакансии
+          </p>
+          <GenerateButton></GenerateButton>
+          <div class="mt-15px mb-25px">
+          <TiptapEditor 
+            v-model="data.description" 
+            class="mb-15px"
+            @update:model-value="($event) => updateDescriptionValidation($event)"
+          />
+          <p 
+            class="text-xs font-normal"
+            :class="descriptionLength < 200 ? 'text-red-custom' : 'text-bali'"
+          >
+            Минимум 200 символов. Максимум 700 символов. Использовано {{ descriptionLength }} символов.
+            <span v-if="descriptionLength < 200" class="text-red-custom font-medium">
+              (Требуется еще {{ 200 - descriptionLength }} символов)
+            </span>
+          </p>
+        </div>
+        <div class="flex gap-25px">
+          <div class="w-full">
+            <p class="text-sm font-medium text-space mb-13px">
+              Навыки
             </p>
-            <p class="leading-normal text-xs text-bali font-normal">
-              Укажите расположение офиса для нового сотрудника.
-             </p>
+            <TagSelect 
+              :options="[]" :model-value="data.key_skills ? data.key_skills : []"
+              :is-new="true"
+              :placeholder="'Например, Активный'"
+              @enter="$event => updateSkills($event)" 
+              @delete="$event => updateSkills($event)" 
+            />
           </div>
+          <div class="w-full">
+            <p class="text-sm font-medium text-space mb-13px">
+               Водительские права
+            </p>
+            <MultiSelect 
+            :options="driverLicenseOptions"
+            v-model="data.driver_license_types"
+            defaultValue="Сделайте выбор"
+             :withId="true"
+            ></MultiSelect>
+          </div>
+        </div>
+        <div class="mb-25px mt-25px border-t"></div>
+        <p class="text-space text-xl font-semibold mb-8">
+          Настройка откликов и управление вакансией
+        </p>
+        <div class="w-full mb-6">
+          <p class="text-sm font-medium mb-4 leading-normal text-space">
+            Кто и как может откликаться
+          </p>
+          <MultiSelect  
+          :options="additionalConditionsOptions"
+          defaultValue="Сделайте выбор"
+          :withId="true"
+          v-model="data.additional_conditions"
+          ></MultiSelect >
+        </div>
+        <div class="w-full flex justify-between gap-25px mb-6">
+          <div class="w-full">
+            <p class="text-sm font-medium mb-4 leading-normal text-space">
+              Нужно ли приложить к отклику сопроводительное письмо?
+            </p>
+            <DropDownRoles 
+              :options="[
+                {id: '1', name: 'Да'}, 
+                {id: '0', name: 'Нет'}
+              ]"
+              :selected="data.response_letter_required === true ? {id: '1', name: 'Да'} : data.response_letter_required === false ? {id: '0', name: 'Нет'} : null"
+              @update:model-value="($event) => data.response_letter_required = $event?.id === '1'"
+            ></DropDownRoles>
+          </div>
+          <div class="w-full"></div>
         </div>
         <div class="w-full justify-between flex gap-25px mb-25px">
           <div class="w-full">
@@ -260,6 +389,9 @@
                 type="String"
             />
           </div>
+          <div class="w-full"></div>
+        </div>
+        <div class="w-full flex justify-between gap-25px mb-10">
           <div class="w-full">
             <p class="text-sm font-medium mb-4 leading-normal text-space">
               Номер телефона
@@ -268,12 +400,15 @@
               :model-value="null"
             />
           </div>
-        </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
           <div class="w-full">
-             <MyCheckbox :id="'show-contacts'" :label="'Отображать контакты в вакансии'" />
+            <p class="text-sm font-medium text-space leading-normal mb-4">
+              Email
+            </p>
+            <email-input :model-value="data.executor_email"
+              @update:model-value="$event => console.log('update:model-value', $event)" />
           </div>
         </div>
+
         <div class="w-full justify-between flex gap-25px mb-6">
           <div class="w-full">
              <MyCheckbox 
@@ -284,19 +419,66 @@
              />
           </div>
         </div>
-        <div class="w-full justify-between flex gap-25px mb-6">
-          <div class="w-full">
+        <div class="w-full justify-start flex gap-25px mb-6">
+           <template v-if="currentPlatform === 'hh' && tariffsOptions.length > 0">
+              <DropDownTypes 
+                :options="tariffsOptions"
+                :selected="tariffsOptions[0]"
+                placeholder="Выберите тариф"
+                @update:model-value="($event) => handleTariffUpdate($event)"
+              ></DropDownTypes>
+            </template>
+            <template v-else-if="currentPlatform === 'hh'">
+              <DropDownTypes 
+                :options="HH_BILLING_TYPES"
+                :selected="data.billing_types"
+                placeholder="Выберите тариф"
+                v-model="data.billing_types"
+              ></DropDownTypes>
+            </template>
+            <!-- <template v-if="data.platform?.platform === 'hh' && tariffsOptions.length > 0">
+              <DropDownTypes 
+                :options="tariffsOptions"
+                :selected="selectedTariff"
+                @update:model-value="($event) => handleTariffUpdate($event)"
+              ></DropDownTypes>
+            </template>
+            <template v-else>
+              <DropDownTypes 
+                :options=HH_BILLING_TYPES
+                :selected="data.billing_types"
+                v-model="data.billing_types"
+              ></DropDownTypes>
+            </template> -->
             <UiButton @click="savePublication" variant="action" size="semiaction" class="font-semibold">
               Опубликовать
             </UiButton>
             <div class="status" v-if="status">
               {{ status }}
             </div>
-          </div>
-          <div class="w-full flex justify-end">
             <UiButton variant="semiaction" size="semiaction" class="text-space">
               Отмена
             </UiButton>
+        </div>
+        <div v-if="statusValidate === false" class="w-full text-red-custom mb-6">
+          <p class="text-sm font-medium mb-4 leading-normal text-space">
+            Не заполнены обязательные поля:
+          </p>
+          <div class="grid grid-cols-2 gap-5px">
+            <template v-for="(field, key) in validFields" :key="key">
+              <div v-if="field.status === false" class="flex flex-col">
+                <a 
+                  :href="`#${key}`" 
+                  @click.prevent="scrollToElement(key)"
+                  class="text-red-custom hover:text-red-custom-hover underline cursor-pointer"
+                >
+                  {{ field.name }}
+                </a>
+                <span v-if="field.error" class="text-xs text-red-custom mt-1">
+                  {{ field.error }}
+                </span>
+              </div>
+            </template>
           </div>
         </div>
       </div>   
@@ -305,43 +487,80 @@
   </div>
 </template>
 <script setup>
-import DropDownList from './DropDownList.vue';
 import DropDownTypes from './DropDownTypes.vue';
 import DropDownRoles from './DropDownRoles.vue';
 import MyDropdown from '~/components/custom/MyDropdown.vue';
 import MyInput from '~/components/custom/MyInput.vue';
 import MyCheckbox from '~/components/custom/MyCheckbox.vue';
+import EmailInput from '~/components/custom/EmailInput.vue';
 import TiptapEditor from '~/components/TiptapEditor.vue';
 import GenerateButton from '../custom/GenerateButton.vue';
-import MyAccordion from '~/components/custom/MyAccordion.vue';
-import CheckboxGroup from '~/components/custom/CheckboxGroup.vue';
 import TagSelect from '~/components/custom/TagSelect.vue'
+import MultiSelect from '~/components/custom/MultiSelect.vue'
+import CityAutocomplete from '~/components/custom/CityAutocomplete.vue'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import CardOption from '~/components/custom/CardOption.vue';
 import { getPhrases } from '@/utils/getVacancies'
 import PhoneInput from '~/components/custom/PhoneInput.vue';
-import MoreOptions from '~/src/data/more-options.json'
-import CarId from '~/src/data/car-id.json'
-import AccordionAdditional from '~/src/data/accordion-additional.json'
 import currency from '~/src/data/currency.json'
 import { 
   PLATFORM_PROPERTIES, 
   HH_EMPLOYMENT_TYPES, 
   HH_WORKING_HOURS, 
   HH_WORK_SCHEDULE_BY_DAYS,
-  HH_EDUCATION_LAVEL 
+  HH_EDUCATION_LAVEL,
+  HH_WORK_FORMAT,
+  HH_EXPERIENCE_DAYS,
+  HH_SALARY_TYPE,
+  HH_SALARY_FREQUENCY,
+  HH_DRIVER_LICENSE_TYPES,
+  HH_ADDITIONAL_CONDITIONS,
+  HH_BILLING_TYPES,
 } from '@/src/constants'
 import experience from '~/src/data/experience.json'
-import { inject } from 'vue'
+import { inject, watch, computed, defineProps } from 'vue'
+
+const props = defineProps({
+  selectedPlatform: {
+    type: String,
+    default: null
+  }
+})
 import { 
   getProfile as profileHh, 
   getAvailableTypes as typesHh, 
   addDraft as addDraftHh,
-  getRoles as getRolesHh
+  publishVacancy as publishVacancyToHh,
+  getRoles as getRolesHh,
+  getAreas as getAreasHh,
+  getAddresses as getAddressesHh,
+  getAvailablePublications as getAvailablePublicationsHh
 } from '@/utils/hhAccount'
+import { addDraft as addDraftAvito, getProfile as profileAvito } from '@/utils/avitoAccount'
+import { 
+  getProfile as profileRabota, 
+  addDraft as addDraftRabota, 
+  publishVacancy as publishVacancyToRabota,
+  getProfessions as getProfessionsRabota,
+  getRegions as getRegionsRabota,
+  getEmploymentTypes as getEmploymentTypesRabota,
+  getWorkSchedules as getWorkSchedulesRabota,
+  getExperienceLevels as getExperienceLevelsRabota,
+  getEducationLevels as getEducationLevelsRabota
+} from '@/utils/rabotaAccount'
 import { getVacancy } from '@/utils/getVacancies';
 import { useRoute } from 'vue-router'
+
+// Функция для плавного скролла к элементу
+const scrollToElement = (elementId) => {
+  const element = document.getElementById(elementId)
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    })
+  }
+}
 
 const isDraft = ref(true)
 const platforms = ref(inject('platformsGlobal'))
@@ -350,29 +569,335 @@ const vacancyData = inject('vacancyCurrect')
 const currectRole = ref(null)
 const roleData = ref(null)
 const status = ref(null)
+const statusValidate = ref(true)
 const route = useRoute();
-console.log('current vacancy - ', vacancyData);
 const phrases = ref(null)
 const data = ref({})
+const addresses = ref([])
+const tariffsHh = ref([])
 
-data.value.days = "30"
-data.value.workSpace = '1'
-data.value.areas = [{"id":"1"}]
-data.value.salary_range = {}
+// Справочники для rabota.ru
+const rabotaProfessions = ref([])
+const rabotaRegions = ref([])
+const rabotaEmploymentTypes = ref([])
+const rabotaWorkSchedules = ref([])
+const rabotaExperienceLevels = ref([])
+const rabotaEducationLevels = ref([])
+
+const validFields = ref({
+  name: {
+    status: true,
+    name: 'Название вакансии',
+  },
+  description: {
+    status: true,
+    name: 'Описание вакансии',
+    error: null,
+  },
+  professional_roles: {
+    status: true,
+    name: 'Профессиональные роли',
+  },
+  experience: {
+    status: true,
+    name: 'Опыт работы',
+  },
+  employment_form: {
+   status: true,
+   name: 'Форма найма',
+  },
+  work_schedule_by_days: {
+    status: true,
+    name: 'График работы',
+  },
+  area: {
+    status: true,
+    name: 'Город публикации',
+  },
+  address: {
+    status: true,
+    name: 'Город размещения',
+  },
+  working_hours: {
+    status: true,
+    name: 'Рабочие часы в день',
+  },
+});
+
+const mappingFieldsHH = {
+  'experience': {'field': 'experience', 'values': experience},
+  'employment_form': {'field': 'employment', 'values': HH_EMPLOYMENT_TYPES},
+  'education_level': 'education',
+  'salary_type': 'salary_type',
+  'salary_frequency': 'salary_frequency',
+  'key_skills': 'phrases',
+  'additional_conditions': 'additional_conditions',
+  'response_letter_required': 'response_letter_required',
+  'billing_types': 'billing_types',
+}
+
+const globCurrentVacancy = ref(inject('vacancyCurrect'))
+
+const findValue = (array, value) => {
+  return array.find((item) => item.name == value) || null
+}
+
+const handleIdUpdate = (property, value) => {
+  if (property === 'address' || property === 'area') {
+    if (value) {
+      data.value[property].id = value
+    } else {
+      delete data.value[property].id
+    }
+  } else {
+    data.value[property] = value ? { id: value.id } : null
+  }
+}
+
+const handleSalaryRangeUpdate = (property, value) => {
+  if (property === 'from' || property === 'to') {
+    data.value.salary_range[property] = value ? Number(value) : null
+  } else if (property === 'currency') {
+    data.value.salary_range[property] = value ? value.id : null
+  } else {
+    data.value.salary_range[property] = value ? { id: value.id } : null
+  }
+}
+
+const handleTariffUpdate = (tariff) => {
+  if (tariff) {
+    data.value.vacancy_properties = {property_type: tariff.property_type}
+  } else {
+    data.value.vacancy_properties = null
+  }
+}
+
+data.value.salary_range = {
+  from: null,
+  to: null,
+}
 data.value.professional_roles = [null]
-data.value.employment_form = null
-data.value.work_schedule_by_days = ref(null)
-data.value.education_level = ref(null)
-data.value.experience = ref(null)
-data.value.driver_license_types = ref(null)
+data.value.work_format = []
+data.value.fly_in_fly_out_duration = []
+data.value.work_schedule_by_days = []
+data.value.schedule = []
+data.value.education_level = null
+data.value.driver_license_types = []
+data.value.has_evening_night_shifts = false
+data.value.area = {}
+data.value.address = {show_metro_only: false}
+data.value.salary_range = {
+  currency: 'RUR',
+  frequency: {
+    id: HH_SALARY_FREQUENCY[3].id,
+  },
+  from: null,
+  to: null,
+  gross: true,
+  mode: {
+    id: HH_SALARY_TYPE[0].id,
+  }
+}
+data.value.salary_type = HH_SALARY_TYPE[0]
+data.value.key_skills = []
+data.value.additional_conditions = []
+data.value.response_letter_required = false
+data.value.billing_types = HH_BILLING_TYPES[0]
+data.value.contacts = null
+data.value.executor_email = null
+data.value.vacancy_properties = null
 
+
+// Список городов из API hh.ru
+const cities = ref([])
+const citiesOptions = computed(() => {
+  return cities.value.map(city => ({
+    id: city.id,
+    name: city.name,
+    value: city.id
+  }))
+})
+
+// Computed свойства для выбора справочников в зависимости от платформы
+const currentPlatform = computed(() => {
+  return data.value.platform?.platform || 'hh'
+})
+
+const professionsOptions = computed(() => {
+  if (currentPlatform.value === 'rabota' && rabotaProfessions.value.length > 0) {
+    return rabotaProfessions.value.map(prof => ({
+      id: prof.id || prof.profession_id,
+      name: prof.name || prof.title,
+      roles: prof.roles || []
+    }))
+  }
+  // Для hh.ru используем существующую логику
+  return data.value.industry?.roles || []
+})
+
+const employmentTypesOptions = computed(() => {
+  if (currentPlatform.value === 'rabota' && rabotaEmploymentTypes.value.length > 0) {
+    return rabotaEmploymentTypes.value.map(emp => ({
+      id: emp.id || emp.employment_type_id,
+      name: emp.name || emp.title
+    }))
+  }
+  return HH_EMPLOYMENT_TYPES
+})
+
+const workSchedulesOptions = computed(() => {
+  if (currentPlatform.value === 'rabota' && rabotaWorkSchedules.value.length > 0) {
+    return rabotaWorkSchedules.value.map(schedule => ({
+      id: schedule.id || schedule.work_schedule_id,
+      name: schedule.name || schedule.title
+    }))
+  }
+  return HH_WORK_SCHEDULE_BY_DAYS
+})
+
+const experienceOptions = computed(() => {
+  if (currentPlatform.value === 'rabota' && rabotaExperienceLevels.value.length > 0) {
+    return rabotaExperienceLevels.value.map(exp => ({
+      id: exp.id || exp.experience_id,
+      name: exp.name || exp.title
+    }))
+  }
+  return experience
+})
+
+const educationOptions = computed(() => {
+  if (currentPlatform.value === 'rabota' && rabotaEducationLevels.value.length > 0) {
+    return rabotaEducationLevels.value.map(edu => ({
+      id: edu.id || edu.education_id,
+      name: edu.name || edu.title
+    }))
+  }
+  return HH_EDUCATION_LAVEL
+})
+
+// Функция для загрузки справочников в зависимости от платформы
+const loadDictionaries = async (platform) => {
+  if (platform === 'rabota') {
+    // Загружаем справочники rabota.ru
+    const [professionsResult, regionsResult, employmentResult, schedulesResult, experienceResult, educationResult] = await Promise.all([
+      getProfessionsRabota(),
+      getRegionsRabota(),
+      getEmploymentTypesRabota(),
+      getWorkSchedulesRabota(),
+      getExperienceLevelsRabota(),
+      getEducationLevelsRabota()
+    ])
+    
+    if (professionsResult?.data) {
+      rabotaProfessions.value = Array.isArray(professionsResult.data) ? professionsResult.data : (professionsResult.data.items || [])
+    }
+    if (regionsResult?.data) {
+      rabotaRegions.value = Array.isArray(regionsResult.data) ? regionsResult.data : (regionsResult.data.items || [])
+      // Также обновляем cities для использования в форме
+      cities.value = rabotaRegions.value.map(region => ({
+        id: region.id || region.region_id,
+        name: region.name || region.title
+      }))
+    }
+    if (employmentResult?.data) {
+      rabotaEmploymentTypes.value = Array.isArray(employmentResult.data) ? employmentResult.data : (employmentResult.data.items || [])
+    }
+    if (schedulesResult?.data) {
+      rabotaWorkSchedules.value = Array.isArray(schedulesResult.data) ? schedulesResult.data : (schedulesResult.data.items || [])
+    }
+    if (experienceResult?.data) {
+      rabotaExperienceLevels.value = Array.isArray(experienceResult.data) ? experienceResult.data : (experienceResult.data.items || [])
+    }
+    if (educationResult?.data) {
+      rabotaEducationLevels.value = Array.isArray(educationResult.data) ? educationResult.data : (educationResult.data.items || [])
+    }
+  } else {
+    // Загружаем справочники hh.ru (по умолчанию)
+    const { roles, errorRoles } = await getRolesHh()
+    if (!errorRoles) {
+      currectRole.value = roles.categories
+    }
+    
+    // Загрузка списка городов из API hh.ru
+    const { data: areasData, error: areasError } = await getAreasHh()
+    if (!areasError && areasData) {
+      cities.value = areasData
+    }
+  }
+}
+
+// Загружаем справочники по умолчанию (hh.ru)
 const { roles, errorRoles } = await getRolesHh()
 if (!errorRoles) {
   currectRole.value = roles.categories
 }
 
+// Загрузка списка городов из API hh.ru
+const { data: areasData, error: areasError } = await getAreasHh()
+if (!areasError && areasData) {
+  cities.value = areasData
+}
+
+const { data: addressesData, error: addressesError } = await getAddressesHh()
+if (!addressesError && addressesData) {
+  addresses.value = addressesData.items
+}
+
+// Преобразование тарифов из tariffsHh в формат для DropDownTypes
+// const tariffsOptions = computed(() => {
+//   if (!tariffsHh.value || !Array.isArray(tariffsHh.value)) {
+//     return []
+//   }
+//   return tariffsHh.value.map(tariff => ({
+//     id: tariff.id || tariff.property_type || tariff.name,
+//     name: tariff.name || tariff.property_type || tariff.id,
+//     property_type: tariff.property_type || tariff.id,
+//     description: tariff.description || '',
+//     available_publications_count: tariff.available_publications_count || 0
+//   }))
+// })
+
+// console.log('tariffsOptions - ', tariffsOptions.value)
+
+// Переменная для хранения тарифов
+const tariffsOptions = ref([]);
+
+// Функция для загрузки тарифов для платформы hh
+const loadTariffsForHh = async (employerId) => {
+  try {
+    const tariffsResult = await getAvailablePublicationsHh(employerId)
+    if (tariffsResult && tariffsResult.types && Array.isArray(tariffsResult.types)) {
+      tariffsOptions.value = tariffsResult.types
+      // Устанавливаем первый тариф по умолчанию, если есть и vacancy_properties не установлен
+      if (tariffsOptions.value.length > 0 && !data.value.vacancy_properties) {
+        const firstTariff = tariffsOptions.value[0]
+        handleTariffUpdate({
+          id: firstTariff.id || firstTariff.property_type || firstTariff.name,
+          name: firstTariff.name || firstTariff.property_type || firstTariff.id,
+          property_type: firstTariff.property_type || firstTariff.id
+        })
+      }
+    } else {
+      console.warn('Не удалось загрузить тарифы или неверный формат данных:', tariffsResult);
+      tariffsOptions.value = [];
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке тарифов:', error);
+    tariffsOptions.value = [];
+  }
+}
+
+// Получение выбранного тарифа для отображения в DropDownTypes
+// const selectedTariff = computed(() => {
+//   console.log('selectedTariff - ', data.value.vacancy_properties);
+//   if (!data.value.vacancy_properties || data.value.vacancy_properties.length === 0) {
+//     return null
+//   }
+//   const propertyType = data.value.vacancy_properties.properties[0].property_type
+//   return tariffsOptions.value.find(tariff => tariff.property_type === propertyType) || null
+// })
+
 const vacancyId = route.query.id
-const globCurrentVacancy = ref(inject('vacancyCurrect'))
 if (vacancyId) {
   if (!globCurrentVacancy.value || vacancyId !== globCurrentVacancy.value.id.toString()) {
     
@@ -391,25 +916,38 @@ const getPhrasesVacancy = async function() {
 
 phrases.value = await getPhrasesVacancy()
 
+const vacancyIdFields = [
+  'experience',
+  'employment_form', 
+]
+
+vacancyIdFields.forEach((field) => {
+  if (findValue(
+    mappingFieldsHH[field].values, 
+    globCurrentVacancy.value[mappingFieldsHH[field]?.field]
+  ) == null) {
+    handleIdUpdate(field, mappingFieldsHH[field].values[0]);
+  }else {
+    handleIdUpdate(
+      field, 
+      findValue(mappingFieldsHH[field].values, globCurrentVacancy.value[mappingFieldsHH[field]?.field])
+    );
+  }
+})
+
 if (globCurrentVacancy.value) {
   for (const key in PLATFORM_PROPERTIES[data.value.platform]) {
     data.value[key] = globCurrentVacancy.value[key]
   }
 
   if (globCurrentVacancy.value['salary_from']) {
-      data.value.salary_range.from = globCurrentVacancy.value['salary_from']
+      data.value.salary_range.from = globCurrentVacancy.value.salary_from
   }
   if (globCurrentVacancy.value.salary_to) {
-      data.value.salary_range.to = globCurrentVacancy?.value?.salary_to
+      data.value.salary_range.to = globCurrentVacancy.value.salary_to
   }
-  // if (globCurrentVacancy.value.schedule) {
-  //   data.value.working_hours = HH_WORKING_HOURS.find((item) => item.name == globCurrentVacancy.value.schedule)
-  // }
   if (globCurrentVacancy.value.education) {
     data.value.education_level = HH_EDUCATION_LAVEL.find((item) => item.name == globCurrentVacancy.value.education)
-  }
-  if (globCurrentVacancy.value.education) {
-    data.value.experience = experience.find((item) => item.name == globCurrentVacancy.value.experience)
   }
   if (globCurrentVacancy.value.phrases) {
     data.value.phrases = globCurrentVacancy.value.phrases
@@ -417,11 +955,8 @@ if (globCurrentVacancy.value) {
   if (globCurrentVacancy.value.drivers) {
     data.value.driver_license_types = globCurrentVacancy.value.drivers
   }
-  data.value.salary_range.currency = 'RUR'
-  data.value.salary_range.gross = true
 }
 
-data.value.salary_range = {}
 if (vacancyData.value) {
   data.value.name = vacancyData.value.name
   data.value.code = vacancyData.value.code
@@ -441,10 +976,9 @@ if (vacancyData.value) {
     data.value.professional_roles[0] = data.value.industry.roles[0]
   }
 }
-
-data.value.employment_form = HH_EMPLOYMENT_TYPES.filter( (item, i) => {
-      return item.siteName == globCurrentVacancy.value?.employment
-})[0]
+// data.value.employment_form = HH_EMPLOYMENT_TYPES.filter( (item, i) => {
+//       return item.siteName == globCurrentVacancy.value?.employment
+// })[0] || HH_EMPLOYMENT_TYPES[0];
 
 if (!inject('isPlatforms')) {
     const { data, error } = await profileHh()
@@ -453,125 +987,342 @@ if (!inject('isPlatforms')) {
       platforms.value[0].data = {email: data.data.email }
     }
     const { types, errorTypes } = await typesHh(data.data.employer.id, data.data.manager.id)
-      if (!error && !errorTypes) {
-        platforms.value[0].types = types
-      }
+    if (!error && !errorTypes) {
+      platforms.value[0].types = types
+    }
+    // Загружаем тарифы для платформы hh
+    if (data.data?.employer?.id) {
+      await loadTariffsForHh(data.data.employer.id)
+    }
+}
+
+// Определяем платформу из props или из inject
+const getPlatformName = (platformName) => {
+  // Преобразуем формат 'hh.ru' в 'hh', 'avito.ru' в 'avito', 'rabota.ru' в 'rabota'
+  if (platformName === 'hh.ru') return 'hh'
+  if (platformName === 'avito.ru') return 'avito'
+  if (platformName === 'rabota.ru') return 'rabota'
+  return platformName
 }
 
 for (let key of platforms.value) {
     if (!isPlatforms.value) {
-        if (key.platform == 'hh') {
-          const profile = await profileHh()  
-          if (!profile.error) {
-            key.isAuthenticated = true
-            key.data = profile.data.data
-            isPlatforms.value = true
-            // data.value.billing_types = key.types ? key.types[6] : null
-            console.log('types - ', key['types'])
+        // Если передан selectedPlatform через props, используем его
+        if (props.selectedPlatform) {
+          const targetPlatform = getPlatformName(props.selectedPlatform)
+          if (key.platform === targetPlatform) {
+            if (key.platform == 'hh') {
+              const profile = await profileHh()  
+              if (!profile.error && profile.data?.data?.employer?.id) {
+                await loadTariffsForHh(profile.data.data.employer.id)
+                key.isAuthenticated = true
+                key.data = profile.data.data
+                isPlatforms.value = true
+              }
+            } else if (key.platform == 'avito') {
+              const profile = await profileAvito()  
+              if (!profile.error) {
+                key.isAuthenticated = true
+                key.data = profile.data.data
+                isPlatforms.value = true
+              }
+            } else if (key.platform == 'rabota') {
+              const profile = await profileRabota()  
+              if (!profile.error && profile.data) {
+                key.isAuthenticated = true
+                key.data = profile.data.data
+                isPlatforms.value = true
+                // Загружаем справочники rabota.ru
+                await loadDictionaries('rabota')
+              }
+            }
+            data.value.platform = key
+            break // Используем найденную платформу
+          }
+        } else {
+          // Старая логика, если платформа не передана
+          if (key.platform == 'hh') {
+            const profile = await profileHh()  
+            if (!profile.error && profile.data?.data?.employer?.id) {
+              await loadTariffsForHh(profile.data.data.employer.id)
+              key.isAuthenticated = true
+              key.data = profile.data.data
+              isPlatforms.value = true
+              // data.value.billing_types = key.types ? key.types[6] : null
+            }
+          } else if (key.platform == 'avito') {
+            const profile = await profileAvito()  
+            if (!profile.error) {
+              key.isAuthenticated = true
+              key.data = profile.data.data
+              isPlatforms.value = true
+            }
+          } else if (key.platform == 'rabota') {
+            const profile = await profileRabota()  
+            if (!profile.error && profile.data) {
+              key.isAuthenticated = true
+              key.data = profile.data.data
+              isPlatforms.value = true
+              // Загружаем справочники rabota.ru
+              await loadDictionaries('rabota')
+            }
+          }
+          data.value.platform = key
+          data.value.vacancy_properties = {
+                properties: [
+                  {
+                    property_type: tariffsOptions.value[0]
+                  }
+                ]
           }
         }
-        data.value.platform = key
     }
 }
 
-const ArrayAdditional = ref(AccordionAdditional)
-const ArrayOptions = ref(MoreOptions)
-const ArrayCarId = ref(CarId)
 const ArrayCurrency = ref(currency)
 
-const cards = [
-  {
-    id: '1',
-    title: 'Офис',
-    description: 'Сотрудники<br>работают в офисе',
-  },
-  {
-    id: '2',
-    title: 'Гибрид',
-    description: 'Сотрудники работают как офисе,<br>так и дома',
-  },
-  {
-    id: '3',
-    title: 'Удаленно',
-    description: 'Сотрудники<br>работают из дома',
-  },
-]
+// Преобразование HH_EXPERIENCE_DAYS для MultiSelect (id -> value)
+const experienceDaysOptions = HH_EXPERIENCE_DAYS.map(day => ({
+    ...day,
+    value: day.id
+}))
 
-const selectedCard = ref(null)
-const hoveredCard = ref(null)
+// Преобразование HH_WORK_FORMAT для MultiSelect (id -> value)
+const workFormatOptions = HH_WORK_FORMAT.map(format => ({
+    ...format,
+    value: format.id
+}))
 
-const workSpace = ref('1')
+// Преобразование графика работы для MultiSelect (id -> value)
+const workScheduleOptions = computed(() => {
+  const schedules = workSchedulesOptions.value
+  return schedules.map(schedule => ({
+    ...schedule,
+    value: schedule.id
+  }))
+})
 
-const handleCheck = id => {
-  selectedCard.value = id
-  workSpace.value = id
+// Преобразование HH_WORKING_HOURS для MultiSelect (id -> value)
+const workingHoursOptions = HH_WORKING_HOURS.map(hours => ({
+    ...hours,
+    value: hours.id
+}))
+
+// Преобразование HH_ADDITIONAL_CONDITIONS для MultiSelect (id -> value)
+const additionalConditionsOptions = HH_ADDITIONAL_CONDITIONS.map(condition => ({
+    ...condition,
+    value: condition.id
+}))
+
+// Преобразование HH_DRIVER_LICENSE_TYPES для MultiSelect (id -> value)
+const driverLicenseOptions = HH_DRIVER_LICENSE_TYPES.map(license => ({
+  ...license,
+  value: license.id
+}))
+
+// Функция для подсчета символов в тексте (без HTML тегов)
+const getTextLength = (htmlString) => {
+  if (!htmlString) return 0;
+  // Проверяем, что мы на клиенте
+  if (typeof document === 'undefined') return 0;
+  // Создаем временный элемент для извлечения текста
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlString;
+  const text = tempDiv.textContent || tempDiv.innerText || '';
+  return text.trim().length;
 }
 
-const handleHover = id => {
-  hoveredCard.value = id
+// Computed для подсчета длины description
+const descriptionLength = computed(() => {
+  return getTextLength(data.value.description);
+})
+
+// Функция для валидации description при изменении
+const updateDescriptionValidation = (value) => {
+  const length = getTextLength(value);
+  if (length < 200) {
+    validFields.value.description.status = false;
+    validFields.value.description.error = `Описание должно содержать минимум 200 символов. Сейчас: ${length} символов.`;
+  } else {
+    validFields.value.description.status = true;
+    validFields.value.description.error = null;
+  }
 }
 
-const clearHover = () => {
-  hoveredCard.value = null
-}
-
-const handleWorkSpaceUpdate = newValue => {
-  selectedCard.value = newValue 
-}
-
-const savePublication = async () => {
-  status.value = ''
-  if (data.value.platform.platform === 'hh') { 
-    const { draft, errorDraft} = await addDraftHh(data.value);
-    console.log('savePublication', data.value);
-    if (!errorDraft) {
-      status.value = 'Вакансия успешно опубликована'
+const validateFields = () => { 
+  let isValid = true;
+  for (const key in validFields.value) {
+    // Специальная валидация для description
+    if (key === 'description') {
+      const length = getTextLength(data.value[key]);
+      if (!data.value[key] || length < 200) {
+        isValid = false;
+        validFields.value[key].status = false;
+        validFields.value[key].error = `Описание должно содержать минимум 200 символов. Сейчас: ${length} символов.`;
+      } else {
+        validFields.value[key].status = true;
+        validFields.value[key].error = null;
+      }
+      continue;
+    }
+    
+    if (data.value[key] == null 
+         || data.value[key] == undefined 
+         || data.value[key] == '' 
+         || data.value[key] == [] 
+         || data.value[key] == {}
+        ) {
+      isValid = false
+      validFields.value[key].status = false
     } else {
-      status.value = errorDraft
+      if (key == 'address' || key == 'area') {
+        if (data.value[key].id === undefined || data.value[key].id === null) {
+          isValid = false
+          validFields.value[key].status = false
+        } else {
+          validFields.value[key].status = true
+        }
+      } else {
+        validFields.value[key].status = true
+      }
+    }
+  }
+
+  return isValid
+}
+
+const updateValidField = (field, value) => {
+  if (value && !validFields.value[field].status) {
+    if (field == 'professional_roles') {
+      if (data.value[field].id !== undefined && data.value[field].id !== null) {
+        validFields.value[field].status = true
+      }
+    } else {
+      validFields.value[field].status = true
     }
   }
 }
 
-const changeBalance = (value) => {
-  data.value.billing_types = value.vacancy_billing_type
+const savePublication = async () => {
+  if (!validateFields()) {
+    statusValidate.value = false
+    return
+  }
+  statusValidate.value = true
+  
+  // Определяем текущую платформу
+  const currentPlatform = data.value.platform?.platform || 'hh'
+  
+  // Обработка дополнительных условий (актуально для hh.ru)
+  if (data.value.additional_conditions && data.value.additional_conditions.length > 0) {
+    const boolConditions = [
+        'accept_handicapped', 
+        'accept_incomplete_resumes', 
+        'accept_temporary'
+      ];
+    data.value.additional_conditions.forEach(item => { 
+      if (boolConditions.includes(item.id)) {
+        data.value[item.id] = true
+      }
+      if (item.id == 'age_restriction_14') {
+        data.value.age_restriction = {
+          id: 'AGE_14_PLUS'
+        }
+      }
+      if (item.id == 'age_restriction_16') {
+        data.value.age_restriction = {
+          id: 'AGE_16_PLUS'
+        }
+      }
+      if (item.id == 'auto_response') {
+        data.value.auto_response = {
+          'accept_auto_response': true
+        }
+      }
+    });
+  }
+  
+  let response;
+  if (currentPlatform !== 'avito' && currentPlatform !== 'hh' && currentPlatform !== 'rabota') {
+   status.value = `Платформа ${currentPlatform} пока не поддерживается`
+   return
+  }
+  
+  // Выбираем функцию в зависимости от платформы и флага isDraft
+  if (currentPlatform === 'avito') {
+    // Для avito.ru пока только создание черновика
+    response = await addDraftAvito(data.value)
+  } 
+  if (currentPlatform === 'hh') {
+    if (isDraft.value || isDraft.value === 'true'
+    ) {
+      response = await addDraftHh(data.value)
+    } else {
+      response = await publishVacancyToHh(data.value)
+    }
+  }
+  if (currentPlatform === 'rabota') {
+    if (isDraft.value) {
+      response = await addDraftRabota(data.value)
+    } else {
+      response = await publishVacancyToRabota(data.value)
+    }
+  }
+  
+  // Обработка результата
+  if (response?.error || response?.errorDraft) {
+    status.value = response.error || response.errorDraft || 'Ошибка при сохранении вакансии'
+  } else {
+    if (isDraft.value) {
+      status.value = 'Вакансия успешно сохранена в черновике'
+    } else {
+      status.value = 'Вакансия успешно опубликована'
+    }
+  }
 }
 
-const updateIndustry = (value) => {
-  data.value.industry = value
-  roleData.value = null
-  console.log('role', roleData.value)
-  data.value.professional_roles[0] = value.roles ? value.roles[0] : null
-}
-
-const  updateRoles = (value) => {
-  // data.value.industry = value
-}
-
-const changePlatform = (value) => {
-  data.value.platform = value.platform
-}
-
-const updateEvent = (event, property, data) => {
-  console.log('event', event, property, data)
-  // data.value[property] = event
-}
-
-const updateTags = (el) => {
+const updateSkills = (el) => {
   if (el.length > 0) {
     const phrases = []
     el.forEach((item, key) => {
-      phrases.push(item.id)
+      phrases.push({name: item.name})
     })
-    data.value.phrases = phrases
+    data.value.key_skills = phrases
 
   } else {
-    if (data.value.phrases)
-        delete data.value.phrases
+    if (data.value.key_skills)
+        delete data.value.key_skills
     }
 }
 
+// Сброс experience_days при изменении типа занятости
+watch(() => data.value.employment_form, (newValue) => {
+  if (newValue?.id !== 'FLY_IN_FLY_OUT') {
+    data.value.experience_days = []
+  }
+})
+
+// Автоматическая загрузка справочников при смене платформы
+watch(() => data.value.platform?.platform, async (newPlatform) => {
+  if (newPlatform) {
+    await loadDictionaries(newPlatform)
+  }
+})
+
+// Автоматическая валидация description при изменении
+watch(() => data.value.description, (newValue) => {
+  if (newValue !== undefined && newValue !== null) {
+    updateDescriptionValidation(newValue)
+  }
+}, { immediate: true })
 
 onBeforeMount(async () => {
 })
 
 </script>
+
+<style scoped>
+  .anchor {
+    scroll-margin-top: 80px;
+  }
+</style>

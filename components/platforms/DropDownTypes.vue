@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown-wrapper cursor-pointer relative" ref="dropDown">
-        <div class="dropdown-selected-option relative border rounded-ten py-9px px-15px" :class="[
+        <div class="dropdown-selected-option relative border rounded-ten py-9px pl-15px pr-30px" :class="[
             'border-athens',
             (isSelected && selectedOption) ? 'bg-zumthor text-dodger' : 'bg-athens-gray',
         ]" @click="toggleDropDown">
@@ -89,7 +89,6 @@ const emit = defineEmits(['update:modelValue']);
 const selectedOption = ref(props.selected); // Устанавливаем начальное значение
 
 const isSelected = computed(() => props.variant === 'selected');
-console.log('types', props.options);
 // Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
     isDropDownVisible.value = !isDropDownVisible.value;
@@ -97,7 +96,6 @@ const toggleDropDown = () => {
 
 // Выбор значения
 const toggleOptionSelect = (option) => {
-    console.log(option);
     selectedOption.value = option || null;
     emit('update:modelValue', option || null);
     isDropDownVisible.value = false;

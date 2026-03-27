@@ -22,6 +22,10 @@ const props = defineProps({
             { id: 6, name: 'Маркетинг'},
             { id: 7, name: 'Менеджмент'}
         ]
+    },
+    isNew: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -54,7 +58,12 @@ const filterOptions = debounce(() => {
 // Добавление нового тега
 const addTag = () => {
     if (currentTag.value && !tags.value.includes(currentTag.value)) {
-        tags.value = [...tags.value, currentTag.value];
+        if (props.isNew) {
+            tags.value = [...tags.value, {name: currentTag.value}];
+        } else {
+            tags.value = [...tags.value, currentTag.value];
+        }
+        emit('enter', tags.value);
     }
     clearInput();
 };
@@ -72,7 +81,7 @@ const removeTag = (index) => {
     emit('delete', tags.value);
 };
 
-const emit = defineEmits(['update:modelValue', 'delete']);
+const emit = defineEmits(['update:modelValue', 'delete', 'enter']);
 
 // Очистка поля ввода
 const clearInput = () => {
