@@ -36,22 +36,35 @@ import { createDecade, createYear, toDate } from 'radix-vue/date' // импор�
 import { computed, type HTMLAttributes, type Ref } from 'vue'
 
 const props = withDefaults(
-  defineProps<CalendarRootProps & { class?: HTMLAttributes['class'] }>(),
+  defineProps<
+    CalendarRootProps & {
+      class?: HTMLAttributes['class']
+      compact?: boolean
+      /** Над панелью с очень высоким z-index (напр. PlainDateSelectDropdown) — поднимаем порталы месяца/года */
+      elevateSelectPopovers?: boolean
+    }
+  >(),
   {
     modelValue: undefined,
     placeholder() {
       return today(getLocalTimeZone())
     },
     weekdayFormat: 'short',
+    compact: false,
+    elevateSelectPopovers: false,
   }
 )
-const emits = defineEmits<CalendarRootEmits>()
+const emits = defineEmits<CalendarRootEmits & { dateClick: [date: DateValue] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, placeholder: __, ...delegated } = props
+  const { class: _, placeholder: __, compact: ___, elevateSelectPopovers: ____, ...delegated } = props
 
   return delegated
 })
+
+const selectDropdownClass = computed(() =>
+  cn('max-h-[200px]', props.elevateSelectPopovers && '!z-[10050]')
+)
 
 const placeholder = useVModel(props, 'modelValue', emits, {
   passive: true,
@@ -65,12 +78,15 @@ const formatter = useDateFormatter('ru')
 const doublClick = () => {
   (emits as any)('dblclick', placeholder.value)
 }
+
+const onDateCellClick = (date: DateValue) => {
+  emits('dateClick', date)
+}
 </script>
 
 <template>
   <CalendarRoot v-slot="{ date, grid, weekDays }" v-model:placeholder="placeholder" v-bind="forwarded"
-    :class="cn('rounded-md border p-3 bg-white shadow-shadow-droplist', props.class)" locale="ru"
-    class="calendar-wrapper">
+    :class="cn('rounded-md border bg-white shadow-shadow-droplist calendar-wrapper', props.compact ? 'calendar-wrapper--compact p-2' : 'p-3', props.class)" locale="ru">
     <CalendarHeader>
       <CalendarHeading class="flex w-full items-center justify-between gap-2">
         <Select :default-value="placeholder.month.toString()" @update:model-value="
@@ -85,7 +101,7 @@ const doublClick = () => {
           <SelectTrigger aria-label="Select month" class="w-[60%]">
             <SelectValue placeholder="Select month" />
           </SelectTrigger>
-          <SelectContent class="max-h-[200px]">
+          <SelectContent :class="selectDropdownClass">
             <SelectItem v-for="month in createYear({ dateObj: date })" :key="month.toString()"
               :value="month.month.toString()">
               {{ formatter.custom(toDate(month), { month: 'long' }) }}
@@ -105,7 +121,7 @@ const doublClick = () => {
           <SelectTrigger aria-label="Select year" class="w-[40%]">
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
-          <SelectContent class="max-h-[200px]">
+          <SelectContent :class="selectDropdownClass">
             <SelectItem v-for="yearValue in createDecade({
               dateObj: date,
               startIndex: -10,
@@ -130,7 +146,7 @@ const doublClick = () => {
         <CalendarGridBody class="grid">
           <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`weekDate-${index}`" class="mt-2 w-full">
             <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate">
-              <CalendarCellTrigger :day="weekDate" :month="month.value" @ondblclick="doublClick" />
+              <CalendarCellTrigger :day="weekDate" :month="month.value" @click="onDateCellClick(weekDate)" @ondblclick="doublClick" />
             </CalendarCell>
           </CalendarGridRow>
         </CalendarGridBody>
@@ -138,3 +154,28 @@ const doublClick = () => {
     </div>
   </CalendarRoot>
 </template>
+
+<style scoped>
+.calendar-wrapper--compact {
+  font-size: 0.8125rem;
+}
+.calendar-wrapper--compact :deep(.header-handler) {
+  gap: 0.25rem;
+}
+.calendar-wrapper--compact :deep([data-radix-select-trigger]) {
+  min-height: 28px;
+  padding: 0 0.5rem;
+  font-size: 0.8125rem;
+}
+.calendar-wrapper--compact :deep(.flex.space-y-4) {
+  padding-top: 0.5rem;
+}
+.calendar-wrapper--compact :deep([data-radix-calendar-cell-trigger]) {
+  height: 24px;
+  width: 24px;
+  font-size: 0.75rem;
+}
+.calendar-wrapper--compact :deep(th) {
+  font-size: 0.7rem;
+}
+</style>

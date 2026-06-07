@@ -1,31 +1,68 @@
 <template>
   <div class="cursor-pointer w-full relative" ref="dataPicker">
-    <div class="dropdown-selected-option relative border border-athens rounded-ten py-7px px-15px bg-athens-gray"
-      @click="toggleDropdown" @focus="isFocused = true" @blur="handleBlur" :class="[
+    <div
+      class="dropdown-selected-option relative flex min-h-10 items-center rounded-ten py-9px pl-15px pr-30px bg-athens-gray text-sm font-normal text-[#2F353D] transition-colors"
+      :class="[
         { 'bg-athens-gray': !isError },
         { 'border-red-custom': isError },
-        { focused: isFocused },
-      ]">
-      {{ currectDate }}
-      <span v-if="!currectDate" class="color-gray text-sm font-normal">
+        isDropDownVisible && !isError ? 'border border-[#5898ff]' : 'border border-athens',
+      ]"
+      @click="toggleDropdown"
+      @focus="isFocused = true"
+      @blur="handleBlur"
+    >
+      <span v-if="currectDate" class="truncate">{{ currectDate }}</span>
+      <span v-else class="color-gray text-sm font-normal">
         {{
+          props.placeholder ? props.placeholder :
           props.dateFrom ? 'Начало периода' :
             props.dateTo ? 'Конец периода' :
               'Выберите дату'
         }}
       </span>
-      <div class="absolute right-[15px] top-[11.5px]">
+      <button
+        v-show="currectDate"
+        type="button"
+        class="dropdown-cross absolute right-3.5 top-1/2 flex h-6 w-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded border-0 bg-transparent p-0 hover:bg-athens transition-colors"
+        aria-label="Очистить дату"
+        @click.stop="clearDate"
+      >
+        <svg-icon
+          name="dropdown-cross"
+          width="20"
+          height="20"
+          class="text-dodger"
+        />
+      </button>
+      <div
+        v-show="!currectDate"
+        class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
+      >
         <transition name="fade-icon" mode="out-in">
-          <span :key="props.isOpen">
-            <svg-icon :name="isDropDownVisible ? 'calendar-end' : 'calendar-start'"
-              :class="isDropDownVisible ? 'text-dodger' : 'text-bali'" width="20" height="20" />
+          <span :key="String(isDropDownVisible)">
+            <svg-icon
+              :name="isDropDownVisible ? 'calendar-end' : 'calendar-start'"
+              :class="isDropDownVisible ? 'text-dodger' : 'text-bali'"
+              width="20"
+              height="20"
+            />
           </span>
         </transition>
       </div>
     </div>
     <transition name="slide-fade">
-      <div ref="calendarWrapper" class="calendare-wrapper absolute w-max bottom-0 z-10 right-0 top-[54px]" v-if="isDropDownVisible">
-        <CalendarBarStatic ref="calendarBar" @update:placeholder="updateDate" @dblclick="isDropDownVisible = false" class="calendar-wrapper" />
+      <div
+        ref="calendarWrapper"
+        class="calendare-wrapper absolute right-0 top-[54px] bottom-0 z-[100] w-max"
+        v-if="isDropDownVisible"
+      >
+        <CalendarBarStatic
+          ref="calendarBar"
+          elevate-select-popovers
+          @date-click="updateDate"
+          @dblclick="isDropDownVisible = false"
+          class="calendar-wrapper"
+        />
       </div>
     </transition>
   </div>
@@ -52,6 +89,10 @@ const props = defineProps({
   modelValue: {
     type: String,
     default: null
+  },
+  placeholder: {
+    type: String,
+    default: ''
   }
 })
 const emit = defineEmits(['update:modelValue', 'isOpen'])
@@ -77,7 +118,16 @@ const toggleDropdown = () => {
 const updateDate = (newDate) => {
   currectDate.value = dateStringToDots(newDate.toString())
   emit('update:modelValue', currectDate.value)
+  isDropDownVisible.value = false
+  emit('isOpen', false)
 };
+
+function clearDate() {
+  currectDate.value = null
+  emit('update:modelValue', '')
+  isDropDownVisible.value = false
+  emit('isOpen', false)
+}
 
 // Обработка клика вне компонента
 const handleClickOutside = (event) => {
@@ -238,15 +288,14 @@ const handleClickOutside = (event) => {
   // Объединяем проверки: клик внутри календаря, CalendarHeader или внутри SelectContent
   const clickedInside = clickedInsideCalendar || clickedInsideRealTarget || isInsideSelectContent;
 
-  // Проверяем, был ли клик на кнопке выбора даты
-  const clickedOnButton = path.some(element => {
-    if (!element || typeof element === 'string' || !(element instanceof Node)) {
-      return false;
-    }
-    
-    // Проверяем, является ли элемент частью кнопки выбора даты
-    return element.classList && element.classList.contains('dropdown-selected-option');
-  });
+  // Проверяем, был ли клик на кнопке выбора даты ЭТОГО экземпляра
+  const clickedOnButton = dataPicker.value
+    ? path.some(element => {
+        if (!element || typeof element === 'string' || !(element instanceof Node)) return false;
+        return dataPicker.value && dataPicker.value.contains(element) &&
+          element.classList && element.classList.contains('dropdown-selected-option');
+      })
+    : false;
 
   // Закрываем календарь только если клик был вне календаря и не на кнопке
   if (!clickedInside && !clickedOnButton) {

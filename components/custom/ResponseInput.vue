@@ -1,11 +1,14 @@
 <script setup>
-  import { ref } from 'vue'
-  import debounce from 'lodash/debounce'
+  import { ref, watch } from 'vue'
 
   const props = defineProps({
     placeholder: {
       type: String,
       default: 'Введите значение',
+    },
+    showSearchIcon: {
+      type: Boolean,
+      default: true,
     },
     showRoles: {
       type: Boolean,
@@ -27,31 +30,36 @@
     notFound: {
       type: String,
       default: 'Ответственный не найден',
-    }
+    },
+    error: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const currentResponse = ref('')
   currentResponse.value = props.modelValue
   const filteredResponses = ref(props.responses)
   const isFocused = ref(false)
-  const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null]})
+  /** Список только после клика/ввода/стрелок — не при программном focus (модалки и т.п.). */
+  const showSuggestions = ref(false)
+  const emit = defineEmits({'update:modelValue': [String | null, Number | null], 'input:modelValue': [String | null], 'blur': [], 'focus': []})
 
-  // Дебаунс-функция для фильтрации списка
-  // const filterResponses = debounce(() => {
-  //   const input = currentResponse.value?.toLowerCase()
-  //   filteredResponses.value = props.responses.filter(response => {
-  //     const name = response.name.toLowerCase()
-  //     const role = response.role ? response.role.toLowerCase() : ''
-  //     return name.includes(input) || (props.showRoles && role.includes(input))
-  //   })
-  //   if (!filteredResponses.value.length) {
-  //     emit('input:modelValue', currentResponse.value, null)
-  //   } 
-  // }, 300)
+  const filterResponses = () => {
+    const input = currentResponse.value?.toLowerCase() || ''
+    filteredResponses.value = props.responses.filter(response => {
+      const name = (response.name || '').toLowerCase()
+      const role = response.role ? String(response.role).toLowerCase() : ''
+      return name.includes(input) || (props.showRoles && role.includes(input))
+    })
+    emit('update:modelValue', currentResponse.value, null)
+    emit('input:modelValue', currentResponse.value, null)
+  }
 
   const clearResponse = () => {
     currentResponse.value = ''
     filteredResponses.value = props.responses
+    showSuggestions.value = false
     emit('update:modelValue', '', null)
   }
 
@@ -59,8 +67,47 @@
     currentResponse.value = response.name
     filteredResponses.value = []
     isFocused.value = false
+    showSuggestions.value = false
     emit('update:modelValue', response.name, response.id, response.email)
   }
+
+  const openSuggestions = () => {
+    showSuggestions.value = true
+    filterResponses()
+  }
+
+  const onInputFocus = () => {
+    isFocused.value = true
+    filterResponses()
+    emit('focus')
+  }
+
+  const onInputBlur = () => {
+    isFocused.value = false
+    showSuggestions.value = false
+    emit('blur')
+  }
+
+  const onInput = () => {
+    showSuggestions.value = true
+    filterResponses()
+  }
+
+  const onInputKeydown = e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
+      if (filteredResponses.value.length) {
+        showSuggestions.value = true
+      }
+    }
+  }
+
+  watch(() => props.modelValue, (val) => {
+    currentResponse.value = val ?? ''
+  })
+
+  watch(() => props.responses, () => {
+    filterResponses()
+  }, { deep: true })
 </script>
 
 <template>
@@ -70,16 +117,18 @@
         <input
           type="text"
           v-model="currentResponse"
-          @input="filterResponses"
-          @focus="isFocused = true"
-          @blur="isFocused = false"
+          @mousedown="openSuggestions"
+          @input="onInput"
+          @focus="onInputFocus"
+          @blur="onInputBlur"
+          @keydown="onInputKeydown"
           :placeholder="isFocused ? '' : placeholder"
-          class="response-input w-full py-[9px] pl-[42px] pr-[42px] text-ellipsis border rounded-ten text-sm text-bali font-normal focus:outline-none focus:border focus:border-dodger"
-          :class="
-            minStyles
-              ? 'bg-transparent border-none'
-              : 'bg-athens-gray border-athens'
-          "
+          :class="[
+            'response-input w-full py-[9px] pr-[42px] text-ellipsis border rounded-ten text-sm font-normal text-[#2F353D] focus:outline-none focus:border focus:border-dodger',
+            showSearchIcon ? 'pl-[42px]' : 'pl-15px response-input-no-icon',
+            minStyles ? 'bg-transparent border-none' : 'bg-athens-gray border-athens',
+            error && '!border-red-500'
+          ]"
         />
         <button
           class="clear-response absolute top-2/4 right-4 text-slate-custom"
@@ -92,8 +141,8 @@
 
       <transition name="slide-fade">
         <ul
-          v-if="filteredResponses.length && isFocused"
-          class="responses-list absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10 max-h-[240px] overflow-y-auto"
+          v-if="filteredResponses.length && showSuggestions"
+          class="responses-list absolute w-full bg-white rounded-plus shadow-shadow-droplist top-12 z-10 max-h-[240px] overflow-y-auto"
         >
           <li
             v-for="(response, index) in filteredResponses"
@@ -115,8 +164,8 @@
         </ul>
 
         <div
-          v-else-if="currentResponse && isFocused"
-          class="no-reponse absolute w-full bg-white border border-athens rounded-plus shadow-shadow-droplist top-12 z-10"
+          v-else-if="currentResponse && showSuggestions && !filteredResponses.length"
+          class="no-reponse absolute w-full bg-white rounded-plus shadow-shadow-droplist top-12 z-10"
         >
           <div class="text-slate-custom text-sm font-normal py-10px px-15px">
             {{ props.notFound }}
@@ -128,7 +177,7 @@
 </template>
 
 <style scoped>
-  .response-input {
+  .response-input:not(.response-input-no-icon) {
     background-image: url('../../assets/sprite/svg/search.svg');
     background-repeat: no-repeat;
     background-position: 15px center;

@@ -1,22 +1,20 @@
 <script setup lang="ts">
-  import {
-    ref,
-    onMounted,
-    onBeforeUnmount,
-    defineProps,
-    defineEmits,
-  } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 
   const props = defineProps<{
     modelValue: string;
     options: string[];
   }>();
 
-  const emit = defineEmits(['update:modelValue']);
+  const emit = defineEmits(['update:modelValue', 'confirm-transfer']);
 
   const btnSelector = ref<HTMLElement | null>(null);
-  const selectedLabel = ref<string>('Подумать'); // начальное значение
+  const selectedLabel = ref(''); // начальное значение
   const showDropdown = ref(false);
+
+  const updateModelValue = () => {
+    selectedLabel.value = props.modelValue || '';
+  };
 
   const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
@@ -26,11 +24,11 @@
     selectedLabel.value = label;
     showDropdown.value = false;
     emit('update:modelValue', label);
+    emit('confirm-transfer', label);
   };
 
   const confirmTransfer = () => {
-    // Здесь будет логика "перенести на выбранное"
-    console.log('Переносим на:', selectedLabel.value);
+    emit('confirm-transfer', selectedLabel.value);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -42,8 +40,17 @@
     }
   };
 
+  watch(
+    () => [props.modelValue, props.options],
+    () => {
+      updateModelValue();
+    },
+    { immediate: true, deep: true }
+  );
+
   onMounted(() => {
     window.addEventListener('click', handleClickOutside);
+    updateModelValue();
   });
 
   onBeforeUnmount(() => {
@@ -52,20 +59,22 @@
 </script>
 
 <template>
-  <div class="relative flex h-fit items-center text-left" ref="btnSelector">
+  <div class="relative inline-flex h-fit items-stretch text-left" ref="btnSelector">
     <!-- Кнопка подтверждения -->
     <button
       @click="confirmTransfer"
-      class="rounded-l-ten border-r border-pattens bg-zumthor px-3.5 py-2.5 text-sm font-medium text-dodger"
+      type="button"
+      class="inline-flex items-center rounded-l-ten border-r border-pattens bg-zumthor px-3.5 py-2.5 text-sm !font-medium !leading-none text-[#589BFF]"
     >
       Перенести на “{{ selectedLabel }}”
     </button>
 
     <!-- Выпадающий список -->
-    <div class="relative inline-block">
+    <div class="relative flex shrink-0">
       <button
+        type="button"
         @click="toggleDropdown"
-        class="rounded-r-ten bg-zumthor px-9px py-2.5 text-dodger"
+        class="inline-flex h-full min-h-0 items-center justify-center rounded-r-ten bg-zumthor px-9px py-2.5 text-[#589BFF]"
       >
         <svg-icon name="ai-arrow" width="20" height="20" />
       </button>
@@ -77,7 +86,7 @@
       >
         <ul class="divide-y divide-athens rounded-plus bg-transparent">
           <li
-            v-for="(label, index) in props.options"
+            v-for="(label, index) in options"
             :key="index"
             @click="selectOption(label)"
             class="cursor-pointer bg-white px-15px py-[9.5px] text-sm font-normal leading-normal text-slate-custom first:rounded-t-plus first:py-2.5 last:rounded-b-plus hover:bg-slate-100"

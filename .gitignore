@@ -5,12 +5,11 @@
 .nitro
 .cache
 dist
-docs/
 nuxt.config.ts
 
 # Node dependencies
 node_modules
-
+.env.local
 # Logs
 logs
 *.log
@@ -29,4 +28,8 @@ temp/
 !.env.example
 
 *constants.ts
+!utils/hhVacancyPayloadConstants.ts
 public/img/
+/roadmaps
+
+/.cursor

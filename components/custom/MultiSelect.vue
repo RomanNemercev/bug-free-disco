@@ -1,12 +1,13 @@
 <template>
   <div class="dropdown-wrapper cursor-pointer relative" ref="dropDown">
-    <div class="dropdown-selected-option relative border border-athens rounded-ten py-9px px-15px bg-athens-gray"
+    <div
+      class="dropdown-selected-option relative border border-athens rounded-ten py-9px pr-30px pl-15px bg-athens-gray"
       @click="toggleDropDown">
       <div>
         <div :class="{
           'text-bali': !selectedOptions.length,
           'text-space': selectedOptions.length
-        }" class="text-sm truncate">
+        }" class="max-w-full truncate whitespace-nowrap pr-6 text-sm" :title="selectedOptions.length ? displayValue : ''">
           {{ displayValue }}
         </div>
         <!-- Стрелка -->
@@ -24,29 +25,69 @@
     </div>
     <transition name="slide-fade">
       <div
-        class="options-wrapper absolute w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-10"
+        class="options-wrapper flex max-h-[min(340px,55vh)] flex-col overflow-hidden absolute z-50 w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14"
         v-if="isDropDownVisible">
         <div
-          class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer first:rounded-t-ten last:rounded-b-ten"
-          v-for="(option, index) in props.options" :key="getOptionValue(option) || index"
-          @click.stop="toggleOptionSelect(option)">
-          <label class="flex items-center w-full cursor-pointer">
-            <!-- Скрытый чекбокс -->
-            <input type="checkbox" :checked="isSelected(option)" @change="toggleOptionSelect(option)" class="hidden" />
-            <!-- Кастомный чекбокс -->
-            <div class="w-5 h-5 flex items-center justify-center border rounded-md check-item mr-[6px]" :class="{
-              'bg-dodger border-dodger': isSelected(option),
-              'border-athens bg-athens-gray': !isSelected(option)
+          v-if="searchable"
+          class="shrink-0 border-b border-athens p-2"
+          @click.stop
+        >
+          <input
+            v-model="searchQuery"
+            type="text"
+            :placeholder="searchPlaceholder"
+            class="w-full rounded-md border border-athens bg-athens-gray py-2 pl-3 pr-3 text-sm text-space placeholder:text-slate-custom focus:border-dodger focus:outline-none"
+          />
+        </div>
+        <div
+          v-if="showSelectAll"
+          class="option shrink-0 border-b border-athens text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer"
+          @click.stop="toggleSelectAll"
+        >
+          <label class="flex items-start w-full cursor-pointer gap-[6px]">
+            <input type="checkbox" :checked="allSelected" class="hidden" @click.stop />
+            <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center border rounded-md check-item mt-0.5" :class="{
+              'bg-dodger border-dodger': allSelected,
+              'border-athens bg-athens-gray': !allSelected
             }">
-              <svg v-if="isSelected(option)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
+              <svg v-if="allSelected" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
                 viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd"
                   d="M16.704 5.293a1 1 0 00-1.408 0L7.5 12.086 4.704 9.293a1 1 0 00-1.408 1.414l3.5 3.5a1 1 0 001.408 0l8-8a1 1 0 000-1.414z"
                   clip-rule="evenodd" />
               </svg>
             </div>
-            <span>{{ getOptionLabel(option) }}</span>
+            <span class="min-w-0 flex-1">{{ selectAllLabel }}</span>
           </label>
+        </div>
+        <div
+          class="multi-select-options-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain"
+          @wheel.stop
+        >
+          <div
+            class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer first:rounded-t-ten last:rounded-b-ten"
+            v-for="(option, index) in filteredOptions" :key="getOptionValue(option) || index"
+            @click.stop="toggleOptionSelect(option)">
+            <label class="flex items-start w-full cursor-pointer gap-[6px]">
+              <!-- Скрытый чекбокс -->
+              <input type="checkbox" :checked="isSelected(option)" class="hidden" @click.stop />
+              <!-- Кастомный чекбокс — по верху, не сжимается -->
+              <div class="w-5 h-5 flex-shrink-0 flex items-center justify-center border rounded-md check-item mt-0.5" :class="{
+                'bg-dodger border-dodger': isSelected(option),
+                'border-athens bg-athens-gray': !isSelected(option)
+              }">
+                <svg v-if="isSelected(option)" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white"
+                  viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.704 5.293a1 1 0 00-1.408 0L7.5 12.086 4.704 9.293a1 1 0 00-1.408 1.414l3.5 3.5a1 1 0 001.408 0l8-8a1 1 0 000-1.414z"
+                    clip-rule="evenodd" />
+                </svg>
+              </div>
+              <span class="min-w-0 flex-1">
+                <span class="block text-space">{{ getOptionLabel(option) }}</span>
+              </span>
+            </label>
+          </div>
         </div>
       </div>
     </transition>
@@ -70,9 +111,29 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  withId: {
+    type: Boolean,
+    default: false
+  },
   defaultValue: {
     type: String,
     default: 'Выберите значения'
+  },
+  searchable: {
+    type: Boolean,
+    default: false
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Поиск...'
+  },
+  showSelectAll: {
+    type: Boolean,
+    default: false
+  },
+  selectAllLabel: {
+    type: String,
+    default: 'Выбрать все'
   }
 })
 
@@ -81,6 +142,33 @@ const emit = defineEmits(['update:modelValue'])
 const dropDown = ref(null)
 const isDropDownVisible = ref(false)
 const selectedOptions = ref([])
+const searchQuery = ref('')
+
+const filteredOptions = computed(() => {
+  if (!props.searchable || !searchQuery.value.trim()) return props.options
+  const q = searchQuery.value.toLowerCase().trim()
+  return props.options.filter(opt => {
+    const label = getOptionLabel(opt)
+    const subtitle = getOptionSubtitle(opt)
+    const haystack = `${label} ${subtitle}`.toLowerCase()
+    return haystack.includes(q)
+  })
+})
+
+const allSelected = computed(() => {
+  const opts = props.options
+  if (!opts.length) return false
+  return opts.every(opt => isSelected(opt))
+})
+
+function toggleSelectAll() {
+  if (allSelected.value) {
+    selectedOptions.value = []
+  } else {
+    selectedOptions.value = [...props.options]
+  }
+  emit('update:modelValue', getEmitValue(selectedOptions.value))
+}
 
 // Хелперы для работы с опциями (строки или объекты)
 const getOptionValue = (option) => {
@@ -91,21 +179,72 @@ const getOptionLabel = (option) => {
   return typeof option === 'object' && option !== null ? option.name : option
 }
 
+const getOptionSubtitle = (option) => {
+  if (typeof option !== 'object' || option === null) return ''
+  const sub = option.subtitle ?? option.role
+  const subtitle = sub != null ? String(sub).trim() : ''
+  if (!subtitle) return ''
+
+  const normalize = (value) =>
+    String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[.,;:!?()[\]{}"']/g, '')
+
+  const label = String(getOptionLabel(option) ?? '').trim()
+  const normalizedLabel = normalize(label)
+  const normalizedSubtitle = normalize(subtitle)
+
+  if (
+    normalizedLabel &&
+    normalizedSubtitle &&
+    (
+      normalizedLabel === normalizedSubtitle ||
+      normalizedLabel.includes(normalizedSubtitle) ||
+      normalizedSubtitle.includes(normalizedLabel)
+    )
+  ) {
+    return ''
+  }
+
+  return subtitle
+}
+
+// Преобразование selectedOptions в формат для emit
+const getEmitValue = (options) => {
+  if (props.withId) {
+    return options.map(option => {
+      const value = getOptionValue(option)
+      return { id: value }
+    })
+  }
+  return options.map(getOptionValue)
+}
+
 // Инициализация selectedOptions
 const initializeSelectedOptions = () => {
-  let initial = props.initialValue.length > 0 ? props.initialValue : props.modelValue
-  console.log('Initializing selectedOptions:', { initial, options: props.options })
+  const initialValue = Array.isArray(props.initialValue) ? props.initialValue : []
+  const modelVal = Array.isArray(props.modelValue) ? props.modelValue : []
+  const initial = initialValue.length > 0 ? initialValue : modelVal
   if (initial.length > 0) {
+    const extractValue = (item) => {
+      if (props.withId && typeof item === 'object' && item !== null && 'id' in item) {
+        return item.id
+      }
+      return getOptionValue(item)
+    }
+
     selectedOptions.value = initial
       .map(val => {
-        const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(val))
+        const valToFind = extractValue(val)
+        const option = props.options.find(opt => getOptionValue(opt) === valToFind)
         return option || null
       })
       .filter(val => val !== null)
   } else {
     selectedOptions.value = []
   }
-  console.log('Initialized selectedOptions:', selectedOptions.value)
 }
 
 // Отображаемое значение
@@ -125,6 +264,7 @@ const isSelected = (option) => {
 // Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
   isDropDownVisible.value = !isDropDownVisible.value
+  if (!isDropDownVisible.value) searchQuery.value = ''
 }
 
 // Выбор/снятие опции
@@ -136,14 +276,13 @@ const toggleOptionSelect = (option) => {
   } else {
     selectedOptions.value.splice(index, 1)
   }
-  console.log('toggleOptionSelect:', { selectedOptions: selectedOptions.value, emitted: selectedOptions.value.map(getOptionValue) })
-  emit('update:modelValue', selectedOptions.value.map(getOptionValue))
+
+  emit('update:modelValue', getEmitValue(selectedOptions.value))
 }
 
 // Сброс выбора
 const resetSelection = () => {
   selectedOptions.value = []
-  console.log('resetSelection: Cleared selectedOptions')
   emit('update:modelValue', [])
 }
 
@@ -156,49 +295,73 @@ const closeDropDown = (event) => {
 
 // Проверка валидности selectedOptions при изменении options
 watch(() => props.options, (newOptions) => {
-  console.log('watch: options changed', { oldOptions: props.options, newOptions, selectedOptions: selectedOptions.value })
   if (selectedOptions.value.length > 0) {
     const validOptions = selectedOptions.value.filter(selected => {
       const selectedValue = getOptionValue(selected)
       const isValid = newOptions.some(opt => getOptionValue(opt) === selectedValue)
-      console.log('Checking option:', { selectedValue, isValid })
       return isValid
     })
     if (validOptions.length !== selectedOptions.value.length) {
-      console.log('watch: updating selectedOptions', { validOptions })
       selectedOptions.value = validOptions
-      emit('update:modelValue', validOptions.map(getOptionValue))
+      emit('update:modelValue', getEmitValue(validOptions))
     }
   }
 }, { deep: true, immediate: true })
 
 // Синхронизация modelValue → selectedOptions
 watch(() => props.modelValue, (newValue) => {
-  console.log('watch: modelValue changed', { newValue, selectedOptions: selectedOptions.value })
-  if (JSON.stringify(newValue) !== JSON.stringify(selectedOptions.value.map(getOptionValue))) {
-    selectedOptions.value = newValue
+  if (!Array.isArray(newValue)) {
+    selectedOptions.value = []
+    return
+  }
+
+  // Извлекаем значения из modelValue (может быть массив значений или массив объектов {id: value})
+  const extractValue = (item) => {
+    if (props.withId && typeof item === 'object' && item !== null && 'id' in item) {
+      return item.id
+    }
+    return item
+  }
+
+  const newValues = newValue.map(extractValue)
+  const currentValues = selectedOptions.value.map(getOptionValue)
+
+  if (JSON.stringify(newValues) !== JSON.stringify(currentValues)) {
+    selectedOptions.value = newValues
       .map(val => {
         const option = props.options.find(opt => getOptionValue(opt) === val)
         return option || null
       })
       .filter(val => val !== null)
-    console.log('watch: updated selectedOptions', { selectedOptions: selectedOptions.value })
-    emit('update:modelValue', selectedOptions.value.map(getOptionValue))
+    const computedValues = selectedOptions.value.map(getOptionValue)
+    if (JSON.stringify(computedValues) !== JSON.stringify(newValues)) {
+      emit('update:modelValue', getEmitValue(selectedOptions.value))
+    }
   }
 }, { deep: true, immediate: true })
 
 // Обработка initialValue
 watch(() => props.initialValue, (newInitial) => {
-  console.log('watch: initialValue changed', { newInitial, selectedOptions: selectedOptions.value })
-  if (newInitial.length > 0 && JSON.stringify(newInitial) !== JSON.stringify(selectedOptions.value.map(getOptionValue))) {
-    selectedOptions.value = newInitial
+  const safeInitial = Array.isArray(newInitial) ? newInitial : []
+  const extractValue = (item) => {
+    if (props.withId && typeof item === 'object' && item !== null && 'id' in item) {
+      return item.id
+    }
+    return getOptionValue(item)
+  }
+
+  const newValues = safeInitial.map(extractValue)
+  const currentValues = selectedOptions.value.map(getOptionValue)
+
+  if (safeInitial.length > 0 && JSON.stringify(newValues) !== JSON.stringify(currentValues)) {
+    selectedOptions.value = safeInitial
       .map(val => {
-        const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(val))
+        const valToFind = extractValue(val)
+        const option = props.options.find(opt => getOptionValue(opt) === valToFind)
         return option || null
       })
       .filter(val => val !== null)
-    console.log('watch: updated selectedOptions from initialValue', { selectedOptions: selectedOptions.value })
-    emit('update:modelValue', selectedOptions.value.map(getOptionValue))
+    emit('update:modelValue', getEmitValue(selectedOptions.value))
   }
 }, { immediate: true })
 

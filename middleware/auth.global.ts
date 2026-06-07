@@ -3,91 +3,108 @@ import {
   defineNuxtRouteMiddleware,
   navigateTo,
   useCookie,
-  useRoute,
 } from '#app';
-// import type { RouteLocationNormalized } from '#app'; // Импортируем типы
-import type { RouteLocationNormalized } from 'vue-router'; // Импортируем типы
+import type { RouteLocationNormalized } from 'vue-router';
+import { clearAuthTokens } from '~/helpers/authToken';
 import { profile as getProfile } from '~/utils/loginUser';
 import { getServerToken } from '~/utils/getServerToken';
 
+const redirectToLogin = () => {
+  clearAuthTokens();
+  return navigateTo('/auth', { replace: true });
+};
+
+const isPublicAuthRoute = (path: string, metaAuth: unknown) =>
+  metaAuth === false ||
+  path === '/auth' ||
+  path.startsWith('/auth/') ||
+  path.startsWith('/public');
+
 export default defineNuxtRouteMiddleware(
-  async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
-    // Пропускаем middleware во время prerendering (статическая генерация)
+  async (to: RouteLocationNormalized) => {
     if (import.meta.prerender) {
       return;
     }
 
-    // Пропускаем middleware во время SSR build, если мы на сервере без клиента
-    // Это предотвращает выполнение HTTP запросов к API во время сборки
     if (import.meta.server && import.meta.env.NODE_ENV === 'production') {
       return;
     }
 
     const tokenCookie = useCookie('auth_token');
+    const userCookie = useCookie('auth_user');
+    const hasServerToken = Boolean(tokenCookie?.value);
+    const hasUserToken = Boolean(userCookie?.value);
+    const hasFullSession = hasServerToken && hasUserToken;
 
-    if (to.path === '/auth' || to.path.startsWith('/public')) {
+    if (isPublicAuthRoute(to.path, to.meta.auth)) {
+      if (to.path === '/auth' && import.meta.client && hasFullSession) {
+        const { status } = await getProfile();
+        if (status === 200) {
+          return navigateTo('/vacancies', { replace: true });
+        }
+        if (status === 401) {
+          clearAuthTokens();
+        }
+      }
       return;
     }
 
-    // Проверка: токен отсутствует, пустой или null
-    if (!tokenCookie?.value) {
-      // Во время SSR на сервере не делаем редирект, только на клиенте
+    if (to.path === '/' && hasFullSession) {
+      return navigateTo('/vacancies', { replace: true });
+    }
+
+    if (!hasServerToken || !hasUserToken) {
       if (import.meta.client) {
-        return navigateTo('/auth');
+        return redirectToLogin();
       }
       return;
-    } else {
-      try {
-        const {
-          data: profileUser,
-          error: profileError,
-          status,
-        } = await getProfile();
-        if (status == 401) {
-          await getServerToken();
-          const {
-            data: profileUser,
-            error: profileError,
-            status: statusUpdate,
-          } = await getProfile();
-          if (statusUpdate == 401) {
-            if (profileError == 'Unauthorized') {
-              if (import.meta.client) {
-                return navigateTo('/auth');
-              }
-              return;
-            }
-          }
-          // Избегаем бесконечного цикла - не делаем редирект на тот же путь во время SSR
-          if (import.meta.client) {
-            return navigateTo({ path: to.path });
-          }
-        } else {
+    }
+
+    try {
+      const { status } = await getProfile();
+
+      if (status === 200) {
+        return;
+      }
+
+      if (status !== 401) {
+        return;
+      }
+
+      const tokenResult = await getServerToken();
+      if (!tokenResult.token) {
+        if (import.meta.client) {
+          return redirectToLogin();
+        }
+        return;
+      }
+
+      const { status: statusAfterRefresh } = await getProfile();
+      if (statusAfterRefresh === 401) {
+        if (import.meta.client) {
+          return redirectToLogin();
+        }
+        return;
+      }
+    } catch (error: unknown) {
+      const err = error as { code?: string; name?: string; message?: string };
+      console.error('Ошибка в middleware auth:', err.message || error);
+
+      if (
+        err.code === 'ECONNREFUSED' ||
+        err.code === 'ETIMEDOUT' ||
+        err.name === 'TimeoutError'
+      ) {
+        console.warn(
+          'API недоступен или таймаут. Пропускаем проверку авторизации.'
+        );
+        if (import.meta.server) {
           return;
         }
-      } catch (error: any) {
-        // Обработка ошибок сети/таймаута
-        console.error('Ошибка в middleware auth:', error.message || error);
+      }
 
-        // Если это ошибка сети или таймаут, не делаем редирект во время SSR
-        if (
-          error.code === 'ECONNREFUSED' ||
-          error.code === 'ETIMEDOUT' ||
-          error.name === 'TimeoutError'
-        ) {
-          console.warn(
-            'API недоступен или таймаут. Пропускаем проверку авторизации.'
-          );
-          // Во время SSR просто продолжаем без проверки
-          if (import.meta.server) {
-            return;
-          }
-        }
-
-        // Для других ошибок делаем редирект только на клиенте
-        if (import.meta.client) {
-          return navigateTo('/auth');
-        }
+      if (import.meta.client) {
+        return redirectToLogin();
       }
     }
   }

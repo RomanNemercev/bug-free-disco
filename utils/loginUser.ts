@@ -1,3 +1,4 @@
+import { getFetchErrorMeta } from '@/helpers/authToken';
 import { getServerToken } from './getServerToken';
 import { useUserStore } from '@/stores/user';
 
@@ -11,10 +12,11 @@ interface LoginResponse {
 }
 
 export const loginUser = async (email: string, password: string) => {
-  const serverToken = await getServerToken();
-  if (!serverToken) {
-    return { data: null, error: 'Не удалось получить серверный токен' };
+  const result = await getServerToken();
+  if (!result.token) {
+    return { data: null, error: result.error || 'Не удалось получить серверный токен' };
   }
+  const serverToken = result.token;
 
   const config = useRuntimeConfig();
 
@@ -53,14 +55,17 @@ export const loginUser = async (email: string, password: string) => {
   } catch (err: any) {
     console.error('Ошибка при входе:', err.message || err);
     let errorMessage = 'Произошла ошибка при входе';
+    const errData = err.response?._data || err.response?.data;
     if (err.response?.status === 401) {
-      errorMessage = 'Неверный email или пароль';
+      errorMessage = errData?.message || 'Неверный email или пароль';
     } else if (err.response?.status === 404) {
-      errorMessage = 'Пользователь не найден';
-    } else if (err.response?.data?.message) {
-      errorMessage = err.response.data.message;
+      errorMessage = errData?.message || 'Пользователь не найден';
+    } else if (err.response?.status === 422) {
+      errorMessage = errData?.message || 'Ошибка валидации';
+    } else if (errData?.message) {
+      errorMessage = errData.message;
     }
-    console.error('Детали ошибки:', err.response?.data || err.response);
+    console.error('Детали ошибки:', errData || err.response);
     return { data: null, error: errorMessage };
   }
 };
@@ -87,23 +92,27 @@ export const profile = async () => {
     })
 
     return { data: response, error: null, status: 200 };
-  } catch (error: any) {
-    // Обработка различных типов ошибок
-    if (error.code === 'ETIMEDOUT' || error.name === 'TimeoutError') {
+  } catch (error: unknown) {
+    const err = error as { code?: string; name?: string };
+    if (err.code === 'ETIMEDOUT' || err.name === 'TimeoutError') {
       console.error('Таймаут при получении профиля: API не отвечает в течение 10 секунд');
       return { data: null, error: 'Таймаут запроса', status: 504 };
-    } else if (error.code === 'ECONNREFUSED') {
+    }
+    if (err.code === 'ECONNREFUSED') {
       console.error('Ошибка подключения: API недоступен');
       return { data: null, error: 'API недоступен', status: 503 };
-    } else if (error.response?.status) {
+    }
+
+    const { status, message } = getFetchErrorMeta(error);
+    if (status) {
       return {
         data: null,
-        error: error.response?._data?.message || 'Ошибка запроса',
-        status: error.response.status
+        error: message || 'Ошибка запроса',
+        status,
       };
-    } else {
-      console.error('Неизвестная ошибка при получении профиля:', error);
-      return { data: null, error: 'Ошибка запроса', status: 500 };
     }
+
+    console.error('Неизвестная ошибка при получении профиля:', error);
+    return { data: null, error: 'Ошибка запроса', status: 500 };
   }
 }

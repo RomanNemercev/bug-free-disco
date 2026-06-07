@@ -1,0 +1,243 @@
+<template>
+  <div class="w-full relative" ref="wrapperRef">
+    <div
+      class="flex items-center border rounded-ten h-10 min-h-10 bg-athens-gray overflow-hidden"
+      :class="[
+        props.error ? 'border-red-500' : 'border-athens',
+        { 'border-[#5898ff]': !props.error && (isDropdownOpen || isCatalogOpen) }
+      ]"
+    >
+      <div class="flex-1 flex items-center min-w-0 pl-15px">
+        <svg-icon name="search" width="20" height="20" class="text-bali shrink-0 mr-2" />
+        <input
+          ref="inputRef"
+          v-model="searchText"
+          type="text"
+          class="flex-1 bg-transparent text-sm text-[#2F353D] placeholder:text-bali outline-none min-w-0"
+          placeholder="Выберите из списка"
+          @focus="onFocus"
+          @blur="onBlur"
+          @input="onSearchInput"
+        />
+      </div>
+      <button
+        v-if="props.showCatalogButton"
+        type="button"
+        class="shrink-0 py-2 px-3 border-l border-athens hover:bg-athens-gray transition-colors text-bali hover:text-space flex items-center justify-center"
+        @click.stop="openCatalog"
+        aria-label="Открыть каталог специализаций"
+      >
+        <svg-icon name="drag-burger" width="20" height="20" />
+      </button>
+      <button
+        v-else
+        type="button"
+        class="shrink-0 py-2 px-3 border-l border-athens hover:bg-athens-gray transition-colors text-bali hover:text-space flex items-center justify-center"
+        @click.stop="toggleDropdown"
+        aria-label="Открыть выпадающий список"
+      >
+        <svg-icon
+          name="dropdown-arrow"
+          width="20"
+          height="20"
+          class="transition-transform duration-200"
+          :class="isDropdownOpen ? 'rotate-180 text-dodger' : 'text-bali'"
+        />
+      </button>
+    </div>
+    <transition name="slide-fade">
+      <div
+        v-if="isDropdownOpen"
+        class="absolute left-0 right-0 top-full mt-1 max-h-[22.1rem] overflow-y-auto bg-white rounded-plus shadow-shadow-droplist z-20"
+      >
+        <template v-if="filteredOptions.length > 0">
+          <div
+            v-for="option in filteredOptions"
+            :key="getOptionKey(option)"
+            class="text-slate-custom hover:text-space cursor-pointer hover:bg-gallery py-3 px-15px text-sm border-b border-athens last:border-b-0"
+            :class="{ 'bg-gallery': isSelected(option) }"
+            @mousedown.prevent="selectOption(option)"
+          >
+            {{ getOptionLabel(option) }}
+          </div>
+        </template>
+        <div v-else class="py-4 px-15px text-sm text-bali">
+          Ничего не найдено.
+        </div>
+      </div>
+    </transition>
+    <SpecializationCatalogModal
+      v-if="isCatalogOpen"
+      :open="isCatalogOpen"
+      :on-close="closeCatalog"
+      @update:open="isCatalogOpen = $event"
+      :categories="fullCatalog"
+      :selected="modelValue"
+      @select="onCatalogSelect"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import SpecializationCatalogModal from './SpecializationCatalogModal.vue'
+
+const props = defineProps({
+  options: {
+    type: Array,
+    default: () => [],
+  },
+  fullCatalog: {
+    type: Array,
+    default: () => [],
+  },
+  modelValue: {
+    type: [Object, String, null],
+    default: null,
+  },
+  placeholder: {
+    type: String,
+    default: 'Выберите из списка',
+  },
+  error: {
+    type: Boolean,
+    default: false,
+  },
+  showCatalogButton: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+const emit = defineEmits(['update:modelValue', 'update:model-value', 'focus', 'blur'])
+
+const wrapperRef = ref(null)
+const inputRef = ref(null)
+const searchText = ref('')
+const isDropdownOpen = ref(false)
+const isCatalogOpen = ref(false)
+
+const getOptionLabel = (opt) => (opt && typeof opt === 'object' ? opt.name : opt) ?? ''
+const getOptionKey = (opt) => (opt?.id ?? opt?.name ?? opt) ?? ''
+const isSelected = (opt) => {
+  const val = props.modelValue
+  if (!val) return false
+  const label = getOptionLabel(val)
+  return getOptionLabel(opt) === label || (opt?.id && val?.id && String(opt.id) === String(val.id))
+}
+
+/** Плоский список ролей из дерева категорий (полный каталог hh / SuperJob и т.д.) */
+const flattenedCatalogRoles = computed(() => {
+  const out = []
+  for (const cat of props.fullCatalog || []) {
+    const roles = cat?.roles && Array.isArray(cat.roles) ? cat.roles : []
+    out.push(...roles)
+  }
+  return out
+})
+
+/**
+ * По полю поиска должны находиться любые роли из полного каталога.
+ * Раньше при непустом `options` (например, только роли выбранной отрасли) выпадающий список
+ * обрезался и поиск не видел остальные позиции.
+ */
+const allOptions = computed(() => {
+  const flat = flattenedCatalogRoles.value
+  if (flat.length > 0) {
+    const seen = new Set()
+    const deduped = []
+    for (const r of flat) {
+      const id = r?.id != null ? String(r.id) : `name:${getOptionLabel(r)}`
+      if (seen.has(id)) continue
+      seen.add(id)
+      deduped.push(r)
+    }
+    return deduped
+  }
+  return props.options && props.options.length > 0 ? props.options : []
+})
+
+const filteredOptions = computed(() => {
+  const query = (searchText.value || '').trim().toLowerCase()
+  if (!query) return allOptions.value
+  return allOptions.value.filter((opt) => getOptionLabel(opt).toLowerCase().includes(query))
+})
+
+const openDropdown = () => {
+  isDropdownOpen.value = true
+  searchText.value = ''
+}
+
+const onFocus = () => {
+  openDropdown()
+  emit('focus')
+}
+
+const onBlur = () => {
+  emit('blur')
+}
+
+const onSearchInput = () => {
+  isDropdownOpen.value = true
+}
+
+const openCatalog = (e) => {
+  e?.preventDefault?.()
+  isCatalogOpen.value = true
+  isDropdownOpen.value = false
+}
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+const closeCatalog = () => {
+  isCatalogOpen.value = false
+}
+
+const selectOption = (option) => {
+  emit('update:modelValue', option)
+  emit('update:model-value', option)
+  searchText.value = ''
+  isDropdownOpen.value = false
+}
+
+const onCatalogSelect = (option) => {
+  emit('update:modelValue', option)
+  emit('update:model-value', option)
+  isCatalogOpen.value = false
+}
+
+const closeDropdown = (e) => {
+  if (wrapperRef.value && !wrapperRef.value.contains(e.target)) {
+    isDropdownOpen.value = false
+  }
+}
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    searchText.value = val ? getOptionLabel(val) : ''
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  document.addEventListener('click', closeDropdown)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeDropdown)
+})
+</script>
+
+<style scoped>
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>

@@ -39,11 +39,11 @@ export const addCandidateFormConfig: FormConfig = {
       name: 'email',
       label: 'Электронная почта',
       type: 'email',
-      placeholder: 'Введите email',
-      required: true,
+      placeholder: 'Введите email (необязательно)',
+      required: false,
       row: 3, // Третья строка
       validation: {
-        required: true,
+        required: false,
         pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         message: 'Введите корректный email',
       },
@@ -58,6 +58,16 @@ export const addCandidateFormConfig: FormConfig = {
       validation: {
         pattern: /^\+7\d{10}$/,
         message: 'Введите корректный номер телефона (+7XXXXXXXXXX)',
+      },
+    },
+    {
+      name: 'source',
+      label: 'Источник',
+      type: 'text',
+      placeholder: 'Например, hh.ru, Рекомендация',
+      row: 5,
+      validation: {
+        required: false,
       },
     },
   ],

@@ -22,6 +22,12 @@ export type Resume = {
 export interface PlatformHhResponse {
   data: {
     items?: any[];
+    resources?: any[];
+    meta?: {
+      page?: number;
+      per_page?: number;
+      [key: string]: any;
+    };
     [key: string]: any;
   };
 }
@@ -63,4 +69,6 @@ export interface DraftDataHh extends Record<string, FormDataValue> {
   name?: string;
   code?: string;
   description?: string;
+  /** Краткое описание для карточки вакансии rabota.ru (до 200 символов) */
+  rabota_short_description?: string;
 }

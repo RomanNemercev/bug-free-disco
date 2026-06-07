@@ -1,4 +1,5 @@
 import { useUserStore } from '@/stores/user';
+import type { HhVacancyExportMapRow } from '@/utils/buildHhOriginalDraftFromJoblyVacancy';
 
 interface VacancyResponse {
   data: {
@@ -23,7 +24,7 @@ interface UpdateVacancyData {
     currency?: string | null;
     place?: string | null;
     location?: string | null;
-    status?: 'active' | 'draft' | 'archive' | null;
+    status?: 'active' | 'draft' | 'closed' | 'archive' | null;
     executor_id?: number | null;
     executor_name?: string | null;
     executor_phone?: string | null;
@@ -83,6 +84,31 @@ export const getVacancies = async (params: any = '') => {
   }
 };
 
+/** Список уникальных городов по вакансиям аккаунта (для фильтра на странице вакансий). */
+export const getVacancyCities = async (): Promise<string[] | null> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const serverToken = serverTokenCookie.value;
+  const userTokenCookie = useCookie('auth_user');
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) return null;
+  try {
+    const response = await $fetch<{ data?: string[] }>('/vacancies/cities', {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    return Array.isArray(response?.data) ? response.data : null;
+  } catch (err: any) {
+    console.error('Ошибка при получении списка городов вакансий:', err);
+    return null;
+  }
+};
+
 export const getVacancy = async (id: String) => {
   const config = useRuntimeConfig();
 
@@ -132,8 +158,380 @@ export const getVacancy = async (id: String) => {
   }
 };
 
+export type SpecializationByHhResult = {
+  data: Record<string, unknown> | null;
+  error: string | null;
+};
+
+/**
+ * Специализация Jobly по id профессиональной роли hh.ru (GET /api/specializations_by_hh/{hhRoleId}).
+ */
+export const getSpecializationByHhRoleId = async (
+  hhRoleId: number | string,
+): Promise<SpecializationByHhResult> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+
+  if (!serverToken || !userToken) {
+    return { data: null, error: 'Токен авторизации не найден' };
+  }
+
+  const id = encodeURIComponent(String(hhRoleId).trim());
+  if (!id) {
+    return { data: null, error: 'Не указан id роли hh.ru' };
+  }
+
+  try {
+    const response = await $fetch<{ message?: string; data?: Record<string, unknown> }>(
+      `/specializations_by_hh/${id}`,
+      {
+        method: 'GET',
+        baseURL: config.public.apiBase as string,
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${serverToken}`,
+          'X-Auth-User': userToken,
+        },
+      },
+    );
+
+    const row = response?.data ?? null;
+    if (row && typeof row === 'object') {
+      return { data: row, error: null };
+    }
+    return { data: null, error: 'Специализация не найдена' };
+  } catch (err: unknown) {
+    const e = err as { response?: { status?: number; _data?: { message?: string } } };
+    if (e.response?.status === 401) {
+      const userStore = useUserStore();
+      userStore.clearUserData();
+      serverTokenCookie.value = null;
+      userTokenCookie.value = null;
+      alert('Срок сессии истек. Пожалуйста, авторизуйтесь снова.');
+      navigateTo('/auth');
+    }
+    const message =
+      e.response?._data?.message ||
+      (err instanceof Error ? err.message : 'Ошибка при получении специализации по роли hh.ru');
+    console.warn('getSpecializationByHhRoleId:', message, { hhRoleId });
+    return { data: null, error: message };
+  }
+};
+
+/**
+ * Карта полей Jobly → hh.ru и флаги «подключено» (как /admin/job-sites/vacancy-export).
+ */
+export const getHhVacancyExportMap = async (): Promise<HhVacancyExportMapRow[]> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return [];
+  }
+  try {
+    const response = await $fetch<{ message?: string; data?: HhVacancyExportMapRow[] }>(
+      `/vacancies/hh-export-map`,
+      {
+        method: 'GET',
+        baseURL: config.public.apiBase as string,
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${serverToken}`,
+          'X-Auth-User': userToken,
+        },
+      }
+    );
+    return Array.isArray(response?.data) ? response.data : [];
+  } catch (err: unknown) {
+    console.warn('getHhVacancyExportMap:', err);
+    return [];
+  }
+};
+
+/**
+ * Снимок публикации Avito из нашей БД без HTTP к api.avito.ru (`local_only=1`).
+ * Нужен для быстрого открытия модалки редактирования (иначе при зависании внешнего API лоадер не снимается).
+ */
+export async function getAvitoPublicationOriginalLocalOnly(
+  vacancyId: number,
+): Promise<{
+  data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown> };
+  error?: string;
+}> {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return { error: 'no_auth' };
+  }
+  try {
+    const response = await $fetch<{
+      message?: string;
+      data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown> };
+    }>(`/vacancies/${vacancyId}/avito-publication-original`, {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      params: { local_only: '1' },
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    return { data: response?.data };
+  } catch (err: unknown) {
+    const e = err as { data?: { message?: string }; message?: string };
+    const msg = e?.data?.message || e?.message || 'request_failed';
+    return { error: String(msg) };
+  }
+}
+
+/**
+ * Снимок Avito как в админке: `GET /vacancies/{id}/avito-publication-original` **без** `local_only` —
+ * ответ из БД или автоматическая подтяжка с Job API при пустом снимке (см. `VacancyController::avitoPublicationOriginal`).
+ * `refresh=1` — принудительно перезапросить Avito (медленнее).
+ */
+export async function getAvitoPublicationOriginalSync(
+  vacancyId: number,
+  params?: { refresh?: boolean },
+): Promise<{
+  data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown>; avito_vacancy_id?: string };
+  error?: string;
+}> {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const serverToken = serverTokenCookie.value;
+  const userTokenCookie = useCookie('auth_user');
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return { error: 'no_auth' };
+  }
+  const query: Record<string, string> = {};
+  if (params?.refresh) {
+    query.refresh = '1';
+  }
+  try {
+    const response = await $fetch<{
+      message?: string;
+      data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown>; avito_vacancy_id?: string };
+    }>(`/vacancies/${vacancyId}/avito-publication-original`, {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      params: Object.keys(query).length ? query : undefined,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    return { data: response?.data };
+  } catch (err: unknown) {
+    const e = err as { data?: { message?: string }; message?: string };
+    const msg = e?.data?.message || e?.message || 'request_failed';
+    return { error: String(msg) };
+  }
+}
+
+/**
+ * Снимок публикации rabota.ru из нашей БД без внешнего API (`local_only=1`).
+ */
+export async function getRabotaPublicationOriginalLocalOnly(
+  vacancyId: number,
+): Promise<{
+  data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown> };
+  error?: string;
+}> {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return { error: 'no_auth' };
+  }
+  try {
+    const response = await $fetch<{
+      message?: string;
+      data?: { payload_original?: Record<string, unknown> | null; original?: Record<string, unknown> };
+    }>(`/vacancies/${vacancyId}/rabota-publication-original`, {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      params: { local_only: '1' },
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    return { data: response?.data };
+  } catch (err: unknown) {
+    const e = err as { data?: { message?: string }; message?: string };
+    const msg = e?.data?.message || e?.message || 'request_failed';
+    return { error: String(msg) };
+  }
+}
+
+/**
+ * Карта полей Jobly → rabota.ru и флаги «подключено».
+ * Бэкенд: эндпоинт-«аналог hh-export-map» (по договорённости).
+ */
+export const getRabotaVacancyExportMap = async (): Promise<HhVacancyExportMapRow[]> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return [];
+  }
+  try {
+    const response = await $fetch<{ message?: string; data?: HhVacancyExportMapRow[] }>(
+      `/vacancies/rabota-export-map`,
+      {
+        method: 'GET',
+        baseURL: config.public.apiBase as string,
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${serverToken}`,
+          'X-Auth-User': userToken,
+        },
+      }
+    );
+    return Array.isArray(response?.data) ? response.data : [];
+  } catch (err: unknown) {
+    console.warn('getRabotaVacancyExportMap:', err);
+    return [];
+  }
+};
+
+export interface HhPublicationOriginalApiData {
+  hh_vacancy_id: string;
+  synced_at: string | null;
+  original: Record<string, unknown>;
+  payload_original?: Record<string, unknown> | null;
+}
+
+/**
+ * Снимок полей публикации hh.ru (hh_vacancy_originals + hh_vacancy_original_fields), ключи в `original` с суффиксом _original.
+ * @param refresh — query refresh=1, повторный запрос к api.hh.ru
+ * @param noSnapshot — query no_snapshot=1, не писать снимок в БД при обращении к hh.ru (карточка «Опубликовать»)
+ */
+export const getHhPublicationOriginal = async (
+  vacancyId: string | number,
+  refresh = false,
+  noSnapshot = false
+): Promise<{ data: HhPublicationOriginalApiData | null; error: string | null }> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return { data: null, error: 'Нет токена авторизации' };
+  }
+  const params = new URLSearchParams();
+  if (refresh) params.set('refresh', '1');
+  if (noSnapshot) params.set('no_snapshot', '1');
+  const q = params.toString() ? `?${params.toString()}` : '';
+  try {
+    const response = await $fetch<{
+      message?: string;
+      data?: HhPublicationOriginalApiData;
+    }>(`/vacancies/${vacancyId}/hh-publication-original${q}`, {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    return { data: response?.data ?? null, error: null };
+  } catch (err: unknown) {
+    const e = err as { data?: { message?: string }; response?: { status?: number; _data?: { message?: string } } };
+    const msg =
+      e?.data?.message ||
+      e?.response?._data?.message ||
+      (err instanceof Error ? err.message : 'Ошибка загрузки данных hh.ru');
+    if (e?.response?.status === 401) {
+      const userStore = useUserStore();
+      userStore.clearUserData();
+      serverTokenCookie.value = null;
+      userTokenCookie.value = null;
+      navigateTo('/auth');
+    }
+    return { data: null, error: typeof msg === 'string' ? msg : 'Ошибка загрузки данных hh.ru' };
+  }
+};
+
+/**
+ * Сохранить черновик полей вакансии на hh.ru (PUT api.hh.ru/vacancies/{id}) и обновить снимок в БД.
+ */
+export const putHhPublicationOriginal = async (
+  vacancyId: string | number,
+  payload: Record<string, unknown>
+): Promise<{
+  data: HhPublicationOriginalApiData | null;
+  error: string | null;
+  errors?: unknown;
+}> => {
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return { data: null, error: 'Нет токена авторизации' };
+  }
+  try {
+    const response = await $fetch<{
+      message?: string;
+      data?: HhPublicationOriginalApiData;
+      errors?: unknown;
+    }>(`/vacancies/${vacancyId}/hh-publication-original`, {
+      method: 'PUT',
+      baseURL: config.public.apiBase as string,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+      body: { payload },
+    });
+    return { data: response?.data ?? null, error: null };
+  } catch (err: unknown) {
+    const e = err as {
+      data?: { message?: string; errors?: unknown };
+      response?: { status?: number; _data?: { message?: string; errors?: unknown } };
+    };
+    const body = e?.data ?? e?.response?._data;
+    const msg =
+      body?.message ||
+      (err instanceof Error ? err.message : 'Ошибка сохранения на hh.ru');
+    if (e?.response?.status === 401) {
+      const userStore = useUserStore();
+      userStore.clearUserData();
+      serverTokenCookie.value = null;
+      userTokenCookie.value = null;
+      navigateTo('/auth');
+    }
+    return {
+      data: null,
+      error: typeof msg === 'string' ? msg : 'Ошибка сохранения на hh.ru',
+      errors: body?.errors,
+    };
+  }
+};
+
 export const getVacanciesNames = async () => {
-  const vacancies: any = await getVacancies();
+  const vacancies: any = await getVacancies('per_page=all');
   return (
     vacancies?.map((vacancy: string | number, key: keyof any) => {
       (vacancy as any)['name'] = (vacancy as any)['title'];
@@ -143,7 +541,7 @@ export const getVacanciesNames = async () => {
   );
 };
 
-export const updateVacancy = async (id: string | number, data: UpdateVacancyData) => {
+export const updateVacancyApi = async (id: string | number, data: UpdateVacancyData) => {
     const config = useRuntimeConfig();
 
     // Токен сервера из cookie
@@ -169,10 +567,12 @@ export const updateVacancy = async (id: string | number, data: UpdateVacancyData
             params.append(key, String(value));
         }
     });
+    // POST нужен, чтобы PHP разбирал тело запроса; Laravel воспринимает как PUT по _method
+    params.append('_method', 'PUT');
 
     try {
         const response = await $fetch(`/vacancies/${id}`, {
-            method: 'PUT',
+            method: 'POST',
             baseURL: config.public.apiBase as string,
             headers: {
                 'Accept': 'application/json',
@@ -187,7 +587,10 @@ export const updateVacancy = async (id: string | number, data: UpdateVacancyData
     } catch (err: any) {
         console.error('Ошибка при обновлении вакансии:', err);
 
-        if (err.response?.status === 401) {
+        const status = err.response?.status ?? err.statusCode ?? err.status;
+        const body = err.data ?? err.response?.data ?? err.response?._data;
+
+        if (status === 401) {
             const userStore = useUserStore();
             userStore.clearUserData();
 
@@ -198,13 +601,13 @@ export const updateVacancy = async (id: string | number, data: UpdateVacancyData
             return { data: null, error: 'Срок сессии истек. Пожалуйста, авторизуйтесь снова.' };
         }
 
-        // Обработка ошибок валидации (422)
-        if (err.response?.status === 422) {
-            const validationErrors = err.response._data?.errors || err.response._data?.message;
+        if (status === 422) {
+            const validationErrors = body?.errors || body?.message;
             return { data: null, error: validationErrors || 'Ошибка валидации данных' };
         }
 
-        return { data: null, error: err.response?._data?.message || 'Ошибка при обновлении вакансии' };
+        const msg = body?.message ?? body?.error ?? 'Ошибка при обновлении вакансии';
+        return { data: null, error: typeof msg === 'string' ? msg : JSON.stringify(msg) };
     }
 };
 
@@ -257,3 +660,225 @@ export const getPhrases = async () => {
     };
   }
 };
+
+/**
+ * Создание фразы через API (POST /api/phrases/s). Body: name (3–50 символов).
+ */
+export const createPhrase = async (name: string): Promise<{ data: { id: number; name: string } | null; error: string | null }> => {
+  const config = useRuntimeConfig();
+  const serverToken = useCookie('auth_token').value;
+  const userToken = useCookie('auth_user').value;
+  if (!serverToken || !userToken) {
+    return { data: null, error: 'Токен не найден' };
+  }
+  const trimmed = typeof name === 'string' ? name.trim() : '';
+  if (trimmed.length < 3 || trimmed.length > 50) {
+    return { data: null, error: 'Имя фразы должно быть от 3 до 50 символов' };
+  }
+  try {
+    const response = await $fetch<{ data?: { id: number; name: string }; message?: string }>('/phrases/s', {
+      method: 'POST',
+      baseURL: config.public.apiBase as string,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+      body: { name: trimmed },
+    });
+    const data = response?.data ?? (response as any)?.data;
+    return { data: data ?? null, error: null };
+  } catch (err: any) {
+    if (err?.response?.status === 401) {
+      const userStore = useUserStore();
+      userStore.clearUserData();
+      useCookie('auth_token').value = null;
+      useCookie('auth_user').value = null;
+    }
+    const msg = err?.response?.data?.message ?? err?.message ?? 'Ошибка создания фразы';
+    return { data: null, error: msg };
+  }
+};
+
+/**
+ * Преобразует строку с названиями фраз (через запятую) в массив id фраз нашей БД:
+ * GET /api/phrases — поиск по имени; при отсутствии — POST /api/phrases/s (name 3–50 символов).
+ * Используется при импорте вакансий (например с SuperJob), чтобы навыки сохранялись как сущности phrases.
+ */
+export const resolvePhraseNamesToIds = async (phraseNamesStr: string): Promise<number[]> => {
+  if (!phraseNamesStr || typeof phraseNamesStr !== 'string') return [];
+  const names = phraseNamesStr
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 3 && s.length <= 50);
+  if (names.length === 0) return [];
+
+  const phrasesRes = await getPhrases();
+  const phrasesList = (phrasesRes as any)?.data ?? null;
+  const list = Array.isArray(phrasesList)
+    ? phrasesList
+    : phrasesList && (phrasesList as any).data
+      ? (phrasesList as any).data
+      : [];
+  const byName = new Map<string, { id: number }>();
+  (list || []).forEach((p: any) => {
+    const n = (p?.name ?? p?.title ?? '').trim();
+    if (n && p?.id != null) byName.set(n.toLowerCase(), { id: Number(p.id) });
+  });
+
+  const ids: number[] = [];
+  for (const name of names) {
+    const existing = byName.get(name.toLowerCase());
+    if (existing) {
+      ids.push(existing.id);
+      continue;
+    }
+    const { data: created, error } = await createPhrase(name);
+    if (created?.id != null) {
+      ids.push(Number(created.id));
+      byName.set(name.toLowerCase(), { id: created.id });
+    }
+  }
+  return ids;
+};
+
+/**
+ * Справочники для формы вакансии (GET /api/vacancy-fields). data.drivers — id => name или массив { id, name }.
+ */
+export const getVacancyFields = async (): Promise<{ data?: { drivers?: Record<number, string> | Array<{ id: number; name?: string }> }; error?: string } | null> => {
+  const config = useRuntimeConfig();
+  const serverToken = useCookie('auth_token').value;
+  const userToken = useCookie('auth_user').value;
+  if (!serverToken || !userToken) return null;
+  try {
+    const response = await $fetch<{ data?: any }>('/vacancy-fields', {
+      method: 'GET',
+      baseURL: config.public.apiBase as string,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${serverToken}`,
+        'X-Auth-User': userToken,
+      },
+    });
+    const data = response?.data ?? response;
+    return { data: data ?? undefined };
+  } catch (err: any) {
+    if (err?.response?.status === 401) {
+      useUserStore().clearUserData();
+      useCookie('auth_token').value = null;
+      useCookie('auth_user').value = null;
+    }
+    return { data: undefined, error: err?.message ?? 'Ошибка загрузки справочников' };
+  }
+};
+
+/**
+ * Строит мапу название категории прав (A, B, C, D, E и т.д.) → id в нашей БД (число).
+ * drivers из vacancy-fields: объект { 1: "A", 2: "B" } или массив [{ id: 1, name: "A" }].
+ * Для совместимости с SuperJob (только A, B, C, D, E) добавляется маппинг по одной букве:
+ * если в справочнике name = "Категория A" или "A", то по запросу "A" будет найден id.
+ */
+export function buildDriverNameToDbIdMap(drivers: Record<number, string> | Array<{ id: number; name?: string }> | undefined): Map<string, number> {
+  const map = new Map<string, number>();
+  if (!drivers) return map;
+  const addEntry = (nameNorm: string, id: number) => {
+    if (!nameNorm || isNaN(id)) return;
+    map.set(nameNorm, id);
+    // Чтобы SuperJob-категории A, B, C, D, E всегда находились: из "Категория A" извлекаем букву A
+    const singleLetter = nameNorm.length === 1 && /^[A-E]$/.test(nameNorm)
+      ? nameNorm
+      : (nameNorm.match(/\b([A-E])\b/) ?? [null, null])[1];
+    if (singleLetter) map.set(singleLetter, id);
+  };
+  if (Array.isArray(drivers)) {
+    drivers.forEach((item) => {
+      const name = (item.name ?? String(item.id ?? '')).trim().toUpperCase();
+      if (name && item.id != null) addEntry(name, Number(item.id));
+    });
+  } else if (typeof drivers === 'object') {
+    Object.entries(drivers).forEach(([idStr, name]) => {
+      const nameNorm = String(name ?? '').trim().toUpperCase();
+      const id = Number(idStr);
+      if (nameNorm && !isNaN(id)) addEntry(nameNorm, id);
+    });
+  }
+  return map;
+}
+
+/**
+ * Строит мапу id категории прав в нашей БД (число) → название (A, B, BE…).
+ * Нужна для отправки на SuperJob (driving_licence: ['A','B']), когда в форме хранятся числовые id.
+ */
+export function buildDriverDbIdToNameMap(drivers: Record<number, string> | Array<{ id: number; name?: string }> | undefined): Map<number, string> {
+  const map = new Map<number, string>();
+  if (!drivers) return map;
+  if (Array.isArray(drivers)) {
+    drivers.forEach((item) => {
+      const name = (item.name ?? String(item.id ?? '')).trim().toUpperCase();
+      if (name && item.id != null) map.set(Number(item.id), name);
+    });
+  } else if (typeof drivers === 'object') {
+    Object.entries(drivers).forEach(([idStr, name]) => {
+      const nameNorm = String(name ?? '').trim().toUpperCase();
+      const id = Number(idStr);
+      if (nameNorm && !isNaN(id)) map.set(id, nameNorm);
+    });
+  }
+  return map;
+}
+
+/**
+ * Преобразует drivers с названиями категорий (из импорта SuperJob) в массив { id: number } для нашей БД.
+ * Если справочник не загружен или категория не найдена, элемент пропускается.
+ */
+export async function resolveDriverNamesToDbIds(
+  driversWithNames: Array<{ id: string }>
+): Promise<Array<{ id: number }>> {
+  if (!driversWithNames?.length) return [];
+  const fields = await getVacancyFields();
+  const drivers = fields?.data?.drivers;
+  const nameToId = buildDriverNameToDbIdMap(drivers);
+  const result: Array<{ id: number }> = [];
+  for (const d of driversWithNames) {
+    const name = String(d.id ?? '').trim().toUpperCase();
+    const dbId = nameToId.get(name);
+    if (dbId != null) result.push({ id: dbId });
+  }
+  return result;
+}
+
+/** Сохранить просмотры и число импортированных откликов в vacancy_platform (быстрый показ после перезагрузки). */
+export type PublicationStatsCacheItem = {
+  vacancy_id: number;
+  platform_id: number;
+  views?: number | null;
+  imported_responses?: number | null;
+};
+
+export async function postPublicationPlatformStatsCache(
+  items: PublicationStatsCacheItem[]
+): Promise<void> {
+  if (!items.length) {
+    return;
+  }
+  const config = useRuntimeConfig();
+  const serverTokenCookie = useCookie('auth_token');
+  const userTokenCookie = useCookie('auth_user');
+  const serverToken = serverTokenCookie.value;
+  const userToken = userTokenCookie.value;
+  if (!serverToken || !userToken) {
+    return;
+  }
+  await $fetch<{ message: string }>('/vacancies/publication-stats-cache', {
+    method: 'POST',
+    baseURL: config.public.apiBase as string,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${serverToken}`,
+      'X-Auth-User': userToken as string,
+    },
+    body: { items },
+  });
+}

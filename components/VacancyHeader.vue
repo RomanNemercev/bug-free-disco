@@ -1,14 +1,21 @@
 <template>
-  <div class="w-full bg-space">
+  <div
+    class="sticky top-0 z-50 w-full bg-space"
+    data-jobly-top-chrome
+  >
     <div class="max-w-2xl px-50px py-[12.8px] mx-auto flex leading-normal items-center">
-      <NuxtLink to="/vacancies">
-        <h1 class="text-white text-25px font-bold uppercase px-3 py-0.5 mr-4">
-          jobly
-        </h1>
+      <NuxtLink to="/vacancies" class="relative shrink-0 -top-0.5 px-3 py-0.5 mr-4">
+        <img
+          src="/full-blue-white.svg"
+          alt="Наймикс"
+          class="block h-7 w-auto"
+          width="724"
+          height="133"
+        >
       </NuxtLink>
       <ul class="flex gap-x-5px items-center">
         <li>
-          <NuxtLink to="/applications" exact-active-class="active-link">
+          <NuxtLink to="/applications" exact-active-class="active-link" prefetch>
             <p
               class="page-name leading-normal text-white opacity-50 px-3 py-2 hover:opacity-100 transition-all rounded-lg hover:bg-hoverbtn text-15px font-semibold">
               Заявки
@@ -123,10 +130,13 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { ref, computed } from 'vue'
+import { ref, computed, defineAsyncComponent, onMounted } from 'vue'
 import { logout } from '~/utils/logout'
+import { preloadRouteComponents } from '#app'
 
-import PopupNotification from '~/components/custom/PopupNotification.vue'
+const PopupNotification = defineAsyncComponent(
+  () => import('~/components/custom/PopupNotification.vue'),
+)
 
 const route = useRoute()
 const isVacanciesActive = computed(() => route.path.startsWith('/vacancies'))
@@ -144,6 +154,16 @@ const toggleNotification = () => {
 const handleLogout = () => {
   logout()
 }
+
+onMounted(() => {
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(() => {
+      void preloadRouteComponents('/applications')
+    })
+  } else {
+    setTimeout(() => void preloadRouteComponents('/applications'), 1500)
+  }
+})
 </script>
 
 <style lang="scss" scoped>

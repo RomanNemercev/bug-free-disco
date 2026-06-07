@@ -1,124 +1,254 @@
 import type {
-  ApiCandidatesResponse,
-  Candidate,
-  CandidateCreateRequest,
-  CandidateCreateResponse,
-  ApiCandidateByIdResponse,
-  ApiResponseById,
-  AttachmentCandidate,
-  SkillCandidate,
-  TagCandidate,
-  CustomFieldCandidate,
-  CandidateUpdateRequest,
-  CandidateUpdateResponse,
+    ApiCandidatesResponse,
+    Candidate,
+    CandidateCreateRequest,
+    CandidateCreateResponse,
+    ApiCandidateByIdResponse,
+    ApiResponseById,
+    AttachmentCandidate,
+    SkillCandidate,
+    TagCandidate,
+    CustomFieldCandidate,
+    CandidateUpdateRequest,
+    CandidateUpdateResponse,
+    CandidateConsideration,
+    CandidateEvent,
+    CandidatePlatformMessage,
+    CandidateChatPlatform,
+    ActivityFeedApiFilters,
+    ActivityFeedItem,
+    ActivityFeedMeta,
+    FunnelMetricsData,
+    FunnelMetricsBucket,
+    FunnelMetricsSort,
+    StageAverageDurationReport,
+    StageAverageDurationRow,
+    RejectionByStageData,
+    RejectionByStageReasonSegment,
+    RejectionByStageRow,
 } from '~/types/candidates';
 import { apiGet, apiPost, apiPut, apiDelete } from './client';
 
 export async function getCandidates(page = 1, filters?: Record<string, any>) {
-  try {
-    const queryParams: Record<string, any> = { page };
+    try {
+        const queryParams: Record<string, any> = { page };
 
-    if (filters) {
-      Object.assign(queryParams, filters);
+        if (filters) {
+            Object.assign(queryParams, filters);
+        }
+
+        const response = await apiGet<ApiCandidatesResponse['data']>(
+            '/candidates',
+            { ...queryParams }
+        );
+
+        return {
+            candidates: response.data.data || [],
+            pagination: {
+                total: response.data.total,
+                current_page: response.data.current_page,
+                last_page: response.data.last_page,
+                per_page: response.data.per_page,
+            },
+        };
+    } catch (error) {
+        console.error('Ошибка при получении кандидатов:', error);
+        return {
+            candidates: [],
+            pagination: { total: 0, current_page: 1, last_page: 1, per_page: 15 },
+        };
     }
-    const response = await apiGet<ApiCandidatesResponse['data']>(
-      '/candidates',
-      { queryParams }
-    );
-
-    return {
-      candidates: response.data.data || [],
-      pagination: {
-        total: response.data.total,
-        current_page: response.data.current_page,
-        last_page: response.data.last_page,
-        per_page: response.data.per_page,
-      },
-    };
-  } catch (error) {
-    console.error('Ошибка при получении кандидатов:', error);
-    return {
-      candidates: [],
-      pagination: { total: 0, current_page: 1, last_page: 1, per_page: 15 },
-    };
-  }
 }
 
-export async function getCandidateById(id: number): Promise<ApiResponseById> {
-  try {
-    const response = await apiGet<ApiCandidateByIdResponse['data']>(
-      `/candidates/${id}`
-    );
-    return {
-      candidateData: response.data as Candidate,
-      candidateExtra: {
-        attachments: response.data?.attachments as AttachmentCandidate[],
-        skills: response.data?.skills as SkillCandidate[],
-        tags: response.data?.tags as TagCandidate[],
-        customFields: response.data?.customFields as CustomFieldCandidate[],
-      },
-    };
-  } catch (error: unknown) {
-    // Специфичная обработка для 404
-    if (error && typeof error === 'object' && 'response' in error) {
-      const fetchError = error as {
-        response?: {
-          status?: number;
-        };
-      };
+const MAX_CANDIDATE_PAGES = 80;
 
-      if (
-        fetchError.response?.status === 404 ||
-        fetchError.response?.status === 400
-      ) {
-        throw createError({
-          statusCode: 404,
-          statusMessage: 'Кандидат не найден',
-        });
-      }
+/** Все страницы списка (для отчётов), пока last_page не исчерпан. */
+export async function getCandidatesAllPages(
+    filters?: Record<string, any>
+): Promise<Candidate[]> {
+    const all: Candidate[] = [];
+    let page = 1;
+    let lastPage = 1;
+    try {
+        do {
+            const res = await getCandidates(page, filters);
+            const batch = res.candidates ?? [];
+            all.push(...batch);
+            lastPage = Math.max(1, res.pagination.last_page);
+            page++;
+            if (page > MAX_CANDIDATE_PAGES) break;
+        } while (page <= lastPage);
+    } catch (e) {
+        console.error('getCandidatesAllPages:', e);
     }
+    return all;
+}
 
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Ошибка при получении кандидата',
-    });
-  }
+export async function getCandidateById(
+    id: number,
+    vacancyId?: number | string | null
+): Promise<ApiResponseById> {
+    try {
+        const query =
+            vacancyId != null && String(vacancyId) !== ''
+                ? { vacancy_id: String(vacancyId) }
+                : undefined;
+        const response = await apiGet<ApiCandidateByIdResponse['data']>(
+            `/candidates/${id}`,
+            query
+        );
+        return {
+            candidateData: response.data as Candidate,
+            candidateExtra: {
+                attachments: response.data?.attachments as AttachmentCandidate[],
+                skills: response.data?.skills as SkillCandidate[],
+                tags: response.data?.tags as TagCandidate[],
+                customFields: response.data?.customFields as CustomFieldCandidate[],
+            },
+        };
+    } catch (error: unknown) {
+        // Специфичная обработка для 404
+        if (error && typeof error === 'object' && 'response' in error) {
+            const fetchError = error as {
+                response?: {
+                    status?: number;
+                };
+            };
+
+            if (
+                fetchError.response?.status === 404 ||
+                fetchError.response?.status === 400
+            ) {
+                throw createError({
+                    statusCode: 404,
+                    statusMessage: 'Кандидат не найден',
+                });
+            }
+        }
+
+        throw createError({
+            statusCode: 500,
+            statusMessage: 'Ошибка при получении кандидата',
+        });
+    }
 }
 
 export async function createCandidate(
-  candidate: CandidateCreateRequest
+    candidate: CandidateCreateRequest
 ): Promise<CandidateCreateResponse> {
-  // Ошибки пробрасываются автоматически для обработки в компоненте
-  return await apiPost<CandidateCreateResponse['data']>(
-    '/candidates',
-    candidate
-  );
+    // Ошибки пробрасываются автоматически для обработки в компоненте
+    return await apiPost<CandidateCreateResponse['data']>(
+        '/candidates',
+        candidate
+    );
 }
 
 export async function updateCandidate(
-  candidate: CandidateUpdateRequest
+    candidate: CandidateUpdateRequest
 ): Promise<CandidateUpdateResponse> {
-  return await apiPut<CandidateUpdateResponse['data']>(
-    `/candidates/${candidate.id}`,
-    candidate
-  );
+    return await apiPut<CandidateUpdateResponse['data']>(
+        `/candidates/${candidate.id}`,
+        candidate
+    );
+}
+
+export async function detachCandidateTag(
+    candidateId: number,
+    tagId: number
+): Promise<void> {
+    await apiDelete(`/candidates/${candidateId}/tags/${tagId}`);
 }
 
 export async function deleteCandidate(id: number): Promise<void> {
-  await apiDelete(`/candidates/${id}`);
+    await apiDelete(`/candidates/${id}`);
 }
 
-export async function moveCandidateToVacancy(
-  vacancyId: number,
-  candidate: Pick<Candidate, 'id' | 'firstname' | 'email' | 'phone'>
-): Promise<CandidateUpdateResponse> {
-  const updateData: CandidateUpdateRequest = {
-    firstname: candidate.firstname,
-    email: candidate.email,
-    phone: candidate.phone,
-    vacancy_id: vacancyId,
-  };
-  return await apiPut(`/candidates/${candidate.id}`, updateData);
+/**
+ * Фото кандидата с hh.ru и др. — через бэкенд с токеном площадки.
+ */
+export async function fetchCandidateAvatarBlobUrl(
+    candidateId: number,
+    vacancyId?: number | string | null
+): Promise<string> {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+    if (!authToken || !authUser) {
+        throw new Error('Не авторизован');
+    }
+    const params = new URLSearchParams();
+    if (vacancyId != null && String(vacancyId) !== '') {
+        params.set('vacancy_id', String(vacancyId));
+    }
+    const qs = params.toString();
+    const url = `${config.public.apiBase}/candidates/${candidateId}/avatar${qs ? `?${qs}` : ''}`;
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${authToken}`,
+            'X-Auth-User': authUser,
+            Accept: 'image/*',
+        },
+    });
+    if (!res.ok) {
+        throw new Error('Не удалось загрузить фото');
+    }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
+}
+
+/**
+ * Скачать PDF резюме через бэкенд (HH с токеном сервера).
+ */
+export async function downloadCandidateResume(candidateId: number): Promise<void> {
+    const config = useRuntimeConfig();
+    const authToken = useCookie('auth_token').value;
+    const authUser = useCookie('auth_user').value;
+    if (!authToken || !authUser) {
+        throw new Error('Не авторизован');
+    }
+    const url = `${config.public.apiBase}/candidates/${candidateId}/download-resume`;
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${authToken}`,
+            'X-Auth-User': authUser,
+            Accept: 'application/pdf, application/json',
+        },
+    });
+    if (!res.ok) {
+        let msg = 'Не удалось скачать резюме';
+        try {
+            const j = (await res.json()) as { message?: string };
+            if (j?.message) msg = j.message;
+        } catch {
+            /* тело не JSON */
+        }
+        throw new Error(msg);
+    }
+    const blob = await res.blob();
+    let filename = `resume-${candidateId}.pdf`;
+    const cd = res.headers.get('Content-Disposition');
+    if (cd) {
+        const utf = /filename\*=UTF-8''([^;]+)/i.exec(cd);
+        const quoted = /filename="([^"]+)"/i.exec(cd);
+        const plain = /filename=([^;\s]+)/i.exec(cd);
+        const raw = utf?.[1] ?? quoted?.[1] ?? plain?.[1];
+        if (raw) {
+            try {
+                filename = decodeURIComponent(raw.replace(/^"|"$/g, ''));
+            } catch {
+                filename = raw.replace(/^"|"$/g, '');
+            }
+        }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
 }
 
 /**
@@ -130,73 +260,592 @@ export async function moveCandidateToVacancy(
  * @returns Путь к загруженному файлу
  */
 export async function uploadCandidatePhoto(
-  candidateId: number,
-  file: File
+    candidateId: number,
+    file: File
 ): Promise<{ imagePath: string }> {
-  const formData = new FormData();
-  formData.append('photo', file);
+    const formData = new FormData();
+    formData.append('photo', file);
 
-  // ВАЖНО: Используем $fetch БЕЗ baseURL - это запрос к серверному API route Nuxt
-  // Путь /api/candidates/... обрабатывается серверным route в server/api/
-  // Это НЕ запрос к бэкенду (который идет через config.public.apiBase)
-  try {
-    const response = await $fetch<{ success: boolean; imagePath: string }>(
-      `/api/candidates/${candidateId}/photo`,
-      {
-        method: 'POST',
-        body: formData,
-        baseURL: 'http://localhost:3000',
-        // НЕ указываем baseURL - запрос идет к локальному серверу Nuxt
-        // НЕ указываем Content-Type - браузер установит автоматически с boundary
-      }
+    // ВАЖНО: Используем $fetch БЕЗ baseURL - это запрос к серверному API route Nuxt
+    // Путь /api/candidates/... обрабатывается серверным route в server/api/
+    // Это НЕ запрос к бэкенду (который идет через config.public.apiBase)
+    try {
+        const response = await $fetch<{ success: boolean; imagePath: string }>(
+            `/api/candidates/${candidateId}/photo`,
+            {
+                method: 'POST',
+                body: formData,
+                baseURL: 'http://localhost:3000',
+                // НЕ указываем baseURL - запрос идет к локальному серверу Nuxt
+                // НЕ указываем Content-Type - браузер установит автоматически с boundary
+            }
+        );
+
+        if (!response || !response.success) {
+            throw new Error('Ошибка при загрузке фото');
+        }
+
+        return { imagePath: response.imagePath };
+    } catch (error: any) {
+        console.error('[uploadCandidatePhoto] Ошибка при загрузке фото:', error);
+
+        if (error.statusMessage) {
+            throw new Error(error.statusMessage);
+        }
+
+        if (error.response?._data?.message) {
+            throw new Error(error.response._data.message);
+        }
+
+        throw new Error(error.message || 'Ошибка при загрузке фото');
+    }
+}
+
+export async function getCandidateConsiderations(
+    candidateId: number,
+    opts?: { signal?: AbortSignal }
+): Promise<CandidateConsideration[]> {
+    const response = await apiGet<CandidateConsideration[]>(
+        `/candidates/${candidateId}/considerations`,
+        undefined,
+        { signal: opts?.signal }
     );
+    return Array.isArray(response.data) ? response.data : [];
+}
 
-    if (!response || !response.success) {
-      throw new Error('Ошибка при загрузке фото');
+/** События по кандидату (лог: создание резюме, смена этапа, изменение полей и т.д.). При указании vacancyId — события в контексте вакансии. */
+export async function getCandidateEvents(
+    candidateId: number,
+    vacancyId?: number | null,
+    opts?: { signal?: AbortSignal }
+): Promise<CandidateEvent[]> {
+    const url =
+        vacancyId != null
+            ? `/candidates/${candidateId}/vacancies/${vacancyId}/events`
+            : `/candidates/${candidateId}/events`;
+    const response = await apiGet<CandidateEvent[]>(url, undefined, {
+        signal: opts?.signal,
+    });
+    return Array.isArray(response.data) ? response.data : [];
+}
+
+function normalizePlatformMessage(raw: Record<string, unknown>): CandidatePlatformMessage {
+    const text =
+        typeof raw.body === 'string'
+            ? raw.body
+            : typeof raw.content === 'string'
+                ? raw.content
+                : typeof raw.text === 'string'
+                    ? raw.text
+                    : '';
+    const createdAt =
+        typeof raw.created_at === 'string'
+            ? raw.created_at
+            : typeof raw.createdAt === 'string'
+                ? raw.createdAt
+                : new Date().toISOString();
+    const rawId = raw.id;
+    const id =
+        typeof rawId === 'string' || typeof rawId === 'number' ? rawId : createdAt;
+    return {
+        id,
+        body: text,
+        created_at: createdAt,
+        direction: typeof raw.direction === 'string' ? raw.direction : (raw.direction as string | null) ?? null,
+        author_name:
+            typeof raw.author_name === 'string'
+                ? raw.author_name
+                : typeof raw.authorName === 'string'
+                    ? raw.authorName
+                    : null,
+        platform: typeof raw.platform === 'string' ? raw.platform : null,
+    };
+}
+
+function candidateMessagesPath(platform: CandidateChatPlatform, candidateId: number): string {
+    const prefixMap: Record<CandidateChatPlatform, string> = {
+        hh: 'hh',
+        superjob: 'superjob',
+        avito: 'avito',
+        rabota: 'rabota',
+    };
+    return `/${prefixMap[platform]}/candidates/${candidateId}/messages`;
+}
+
+/** Сообщения чата hh.ru / SuperJob: GET /{hh|superjob}/candidates/{id}/messages */
+export async function getCandidateMessages(
+    candidateId: number,
+    opts?: { signal?: AbortSignal; platform?: CandidateChatPlatform }
+): Promise<CandidatePlatformMessage[]> {
+    const platform = opts?.platform ?? 'hh';
+    const response = await apiGet<unknown | CandidatePlatformMessage[]>(
+        candidateMessagesPath(platform, candidateId),
+        undefined,
+        { signal: opts?.signal }
+    );
+    const d = response.data as unknown;
+    if (Array.isArray(d)) {
+        return d.map((item) =>
+            normalizePlatformMessage(
+                item && typeof item === 'object' ? (item as Record<string, unknown>) : {}
+            )
+        );
+    }
+    if (d && typeof d === 'object') {
+        const o = d as Record<string, unknown>;
+        const arr = o.messages ?? o.items ?? o.data;
+        if (Array.isArray(arr)) {
+            return arr.map((item) =>
+                normalizePlatformMessage(
+                    item && typeof item === 'object' ? (item as Record<string, unknown>) : {}
+                )
+            );
+        }
+    }
+    return [];
+}
+
+/**
+ * Отправить сообщение кандидату в чат (hh.ru или SuperJob).
+ * POST /{hh|superjob}/candidates/{id}/messages
+ */
+export async function sendCandidateChatMessage(
+    candidateId: number,
+    payload: {
+        content: string;
+        vacancy_id?: number | null;
+        platform?: CandidateChatPlatform;
+    }
+): Promise<void> {
+    const text = payload.content.trim();
+    if (!text) return;
+    const platform = payload.platform ?? 'hh';
+    const body: Record<string, unknown> = { content: text };
+    if (payload.vacancy_id != null) {
+        body.vacancy_id = payload.vacancy_id;
+    }
+    await apiPost<unknown>(candidateMessagesPath(platform, candidateId), body);
+}
+
+/** Общая лента событий по всем кандидатам заказчика (страница «Лента активности»). */
+export async function getActivityFeed(opts?: {
+    page?: number;
+    per_page?: number;
+    filters?: Partial<ActivityFeedApiFilters>;
+    signal?: AbortSignal;
+}): Promise<{ items: ActivityFeedItem[]; meta: ActivityFeedMeta }> {
+    const query: Record<string, string | number> = {
+        page: opts?.page ?? 1,
+        per_page: opts?.per_page ?? 100,
+    };
+    const f = opts?.filters;
+    if (f?.occurred_from) query.occurred_from = f.occurred_from;
+    if (f?.occurred_to) query.occurred_to = f.occurred_to;
+    if (f?.author) query.author = f.author;
+    if (f?.entity) query.entity = f.entity;
+    if (f?.kinds) query.kinds = f.kinds;
+    if (f?.value_before) query.value_before = f.value_before;
+    if (f?.value_after) query.value_after = f.value_after;
+    if (f?.vacancy_ids && f.vacancy_ids.length > 0) {
+        query.vacancy_ids = f.vacancy_ids;
+    } else if (f?.vacancy_id != null && f.vacancy_id > 0) {
+        query.vacancy_id = f.vacancy_id;
     }
 
-    return { imagePath: response.imagePath };
-  } catch (error: any) {
-    console.error('[uploadCandidatePhoto] Ошибка при загрузке фото:', error);
+    const response = await apiGet<{ items: ActivityFeedItem[]; meta: ActivityFeedMeta }>(
+        '/activity/events',
+        query,
+        { signal: opts?.signal }
+    );
+    const raw = response.data;
+    return {
+        items: Array.isArray(raw?.items) ? raw.items : [],
+        meta: raw?.meta ?? {
+            current_page: 1,
+            last_page: 1,
+            per_page: 100,
+            total: 0,
+        },
+    };
+}
 
-    if (error.statusMessage) {
-      throw new Error(error.statusMessage);
+/** Отправить письмо кандидату и создать событие в ленте. */
+export async function sendCandidateEmail(
+    candidateId: number,
+    payload: { subject: string; body: string; to: string; from_email?: string }
+): Promise<{ event_id: number }> {
+    const response = await apiPost<{ event_id: number }>(
+        `/candidates/${candidateId}/emails`,
+        {
+            subject: payload.subject.trim(),
+            body: payload.body,
+            to: payload.to.trim(),
+            from_email: payload.from_email || undefined,
+        }
+    );
+    const raw = response as { data?: { event_id?: number }; event_id?: number };
+    return { event_id: raw.data?.event_id ?? raw.event_id ?? 0 };
+}
+
+/** Создать комментарий (заметку) по кандидату. */
+export async function createCandidateComment(
+    candidateId: number,
+    content: string
+): Promise<{ event_id: number }> {
+    const response = await apiPost<{ message: string; event_id: number }>(
+        `/candidates/${candidateId}/comments`,
+        { content: content.trim() }
+    );
+    return { event_id: response.data?.event_id ?? 0 };
+}
+
+/** Удалить комментарий по кандидату (eventId — id события типа comment). */
+export async function deleteCandidateComment(
+    candidateId: number,
+    eventId: number
+): Promise<void> {
+    await apiDelete(`/candidates/${candidateId}/comments/${eventId}`);
+}
+
+/** Обновить текст комментария. */
+export async function updateCandidateComment(
+    candidateId: number,
+    eventId: number,
+    content: string
+): Promise<void> {
+    await apiPut<{ message: string; event_id: number }>(
+        `/candidates/${candidateId}/comments/${eventId}`,
+        { content: content.trim() }
+    );
+}
+
+/** Создать задачу по кандидату (отображается в ленте событий). */
+export async function createCandidateTask(
+    candidateId: number,
+    payload: { content: string; assignee_name?: string | null; scheduled_at?: string | null }
+): Promise<{ event_id: number }> {
+    const body: Record<string, string> = { content: payload.content.trim() };
+    if (payload.assignee_name != null && payload.assignee_name !== '') {
+        body.assignee_name = payload.assignee_name;
     }
-
-    if (error.response?._data?.message) {
-      throw new Error(error.response._data.message);
+    if (payload.scheduled_at != null && payload.scheduled_at !== '') {
+        body.scheduled_at = payload.scheduled_at;
     }
+    const response = await apiPost<{ message: string; event_id: number }>(
+        `/candidates/${candidateId}/tasks`,
+        body
+    );
+    return { event_id: response.data?.event_id ?? 0 };
+}
 
-    throw new Error(error.message || 'Ошибка при загрузке фото');
-  }
+/** Удалить задачу (событие типа task) по кандидату. */
+export async function deleteCandidateTask(
+    candidateId: number,
+    eventId: number
+): Promise<void> {
+    await apiDelete(`/candidates/${candidateId}/tasks/${eventId}`);
+}
+
+/** Обновить задачу по кандидату. */
+export async function updateCandidateTask(
+    candidateId: number,
+    eventId: number,
+    payload: { content: string; assignee_name?: string | null; scheduled_at?: string | null }
+): Promise<void> {
+    const body: Record<string, string> = { content: payload.content.trim() };
+    if (payload.assignee_name != null && payload.assignee_name !== '') {
+        body.assignee_name = payload.assignee_name;
+    }
+    if (payload.scheduled_at != null && payload.scheduled_at !== '') {
+        body.scheduled_at = payload.scheduled_at;
+    }
+    await apiPut<{ message: string; event_id: number }>(
+        `/candidates/${candidateId}/tasks/${eventId}`,
+        body
+    );
+}
+
+/** Отметить задачу как выполненную. */
+export async function completeCandidateTask(
+    candidateId: number,
+    eventId: number
+): Promise<void> {
+    await apiPost<{ message: string; event_id: number }>(
+        `/candidates/${candidateId}/tasks/${eventId}/complete`,
+        {}
+    );
+}
+
+/** Прикрепить кандидата к ещё одной вакансии (кандидат остаётся в текущей). */
+export async function attachCandidateToVacancy(
+    candidateId: number,
+    vacancyId: number
+): Promise<void> {
+    await apiPost<null>(`/candidates/${candidateId}/attach-vacancy`, {
+        vacancy_id: vacancyId,
+    });
+}
+
+/** Число кандидатов по вакансии и (опционально) внешнему id публикации на площадке */
+/** Отчёт «Поток кандидатов» по интервалам (та же авторизация, что у списка кандидатов). */
+export async function getCandidateFunnelMetrics(
+    params: {
+        vacancy_id: number;
+        date_from: string;
+        date_to: string;
+        bucket?: FunnelMetricsBucket;
+        sort?: FunnelMetricsSort;
+        asc?: 0 | 1;
+    },
+    opts?: { signal?: AbortSignal }
+): Promise<FunnelMetricsData> {
+    const query: Record<string, string | number> = {
+        vacancy_id: params.vacancy_id,
+        date_from: params.date_from,
+        date_to: params.date_to,
+    };
+    if (params.bucket) query.bucket = params.bucket;
+    if (params.sort) query.sort = params.sort;
+    if (params.asc !== undefined) query.asc = params.asc;
+
+    const response = await apiGet<FunnelMetricsData>('/candidates/funnel-metrics', query, {
+        signal: opts?.signal,
+        skipLoader: true,
+    });
+    const d = response.data;
+    return {
+        vacancy_id: d?.vacancy_id ?? params.vacancy_id,
+        bucket: (d?.bucket ?? params.bucket ?? 'week') as FunnelMetricsBucket,
+        date_from: d?.date_from ?? params.date_from,
+        date_to: d?.date_to ?? params.date_to,
+        rows: Array.isArray(d?.rows) ? d.rows : [],
+    };
+}
+
+function parseStageAverageDurationReport(
+    raw: unknown,
+    vacancyId: number,
+    dateFrom: string,
+    dateTo: string
+): StageAverageDurationReport | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const d = raw as Record<string, unknown>;
+    const stagesRaw = d.stages;
+    if (!Array.isArray(stagesRaw) || stagesRaw.length === 0) return null;
+    const stages: StageAverageDurationRow[] = [];
+    for (const item of stagesRaw) {
+        if (!item || typeof item !== 'object') continue;
+        const row = item as Record<string, unknown>;
+        const name =
+            typeof row.stage_name === 'string'
+                ? row.stage_name
+                : typeof row.name === 'string'
+                    ? row.name
+                    : '';
+        const days = Number(row.avg_days ?? row.average_days ?? row.days);
+        if (!name.trim() || !Number.isFinite(days)) continue;
+        stages.push({
+            stage_id: row.stage_id != null ? Number(row.stage_id) : undefined,
+            stage_name: name.trim(),
+            avg_days: days,
+        });
+    }
+    if (stages.length === 0) return null;
+    const hired =
+        d.hired && typeof d.hired === 'object'
+            ? (d.hired as Record<string, unknown>)
+            : null;
+    return {
+        vacancy_id: Number(d.vacancy_id) || vacancyId,
+        date_from: typeof d.date_from === 'string' ? d.date_from : dateFrom,
+        date_to: typeof d.date_to === 'string' ? d.date_to : dateTo,
+        avg_close_days: Number(d.avg_close_days ?? d.avg_closing_days) || 0,
+        avg_overdue_days: Number(d.avg_overdue_days) || 0,
+        hired_count: Number(hired?.count ?? d.hired_count) || 0,
+        hired_total: Number(hired?.total ?? d.hired_total) || 0,
+        closure_on_time_percent: Number(
+            d.closure_on_time_percent ?? d.closed_on_time_percent ?? d.on_time_percent
+        ) || 0,
+        closure_on_time: Number(d.closure_on_time ?? d.closed_on_time ?? d.on_time) || 0,
+        closure_overdue: Number(d.closure_overdue ?? d.closed_overdue ?? d.overdue) || 0,
+        stages,
+    };
+}
+
+/**
+ * Среднее время на этапе и сводка по закрытию вакансии.
+ * Эндпоинт ожидается как GET /candidates/stage-average-duration; при отсутствии или ошибке — null (UI подставит демо-данные).
+ */
+export async function getCandidateStageAverageDuration(
+    params: { vacancy_id: number; date_from: string; date_to: string },
+    opts?: { signal?: AbortSignal }
+): Promise<StageAverageDurationReport | null> {
+    try {
+        const response = await apiGet<unknown>(
+            '/candidates/stage-average-duration',
+            {
+                vacancy_id: params.vacancy_id,
+                date_from: params.date_from,
+                date_to: params.date_to,
+            },
+            { signal: opts?.signal, skipLoader: true }
+        );
+        return parseStageAverageDurationReport(
+            response.data,
+            params.vacancy_id,
+            params.date_from,
+            params.date_to
+        );
+    } catch {
+        return null;
+    }
+}
+
+function parseRejectionReasonSegment(raw: unknown): RejectionByStageReasonSegment | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const o = raw as Record<string, unknown>;
+    const label =
+        typeof o.label === 'string'
+            ? o.label
+            : typeof o.name === 'string'
+                ? o.name
+                : typeof o.reason === 'string'
+                    ? o.reason
+                    : '';
+    const count = Number(o.count ?? o.cnt ?? o.total);
+    if (!label.trim() || !Number.isFinite(count) || count < 0) return null;
+    const color = typeof o.color === 'string' ? o.color : undefined;
+    return { label: label.trim(), count, color };
+}
+
+function parseRejectionByStageReport(raw: unknown, vacancyId: number): RejectionByStageData | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const root = raw as Record<string, unknown>;
+    const nested =
+        root.data && typeof root.data === 'object' && !Array.isArray(root.data)
+            ? (root.data as Record<string, unknown>)
+            : null;
+    const rowsRaw = Array.isArray(root.rows)
+        ? root.rows
+        : nested && Array.isArray(nested.rows)
+            ? nested.rows
+            : null;
+    if (!rowsRaw) return null;
+    const meta =
+        nested && nested.rows === rowsRaw ? { ...root, ...nested } : root;
+    const rows: RejectionByStageRow[] = [];
+    for (const item of rowsRaw) {
+        if (!item || typeof item !== 'object') continue;
+        const row = item as Record<string, unknown>;
+        const stageName =
+            typeof row.stage_name === 'string'
+                ? row.stage_name
+                : typeof row.name === 'string'
+                    ? row.name
+                    : typeof row.stage === 'string'
+                        ? row.stage
+                        : '';
+        const stageId = Number(row.stage_id ?? row.stageId ?? row.id);
+        const candidatesCount = Number(
+            row.candidates_count ?? row.candidates ?? row.on_stage ?? row.total_candidates ?? row.candidates_on_stage
+        );
+        const rejectionsCount = Number(
+            row.rejections_count ?? row.rejections ?? row.refused ?? row.rejection_count
+        );
+        if (!stageName.trim()) continue;
+        if (!Number.isFinite(candidatesCount) || candidatesCount < 0) continue;
+        if (!Number.isFinite(rejectionsCount) || rejectionsCount < 0) continue;
+        const reasonsRaw = row.reasons ?? row.segments ?? row.by_reason ?? row.rejection_reasons;
+        let reasons: RejectionByStageReasonSegment[] | undefined;
+        if (Array.isArray(reasonsRaw)) {
+            const parsed = reasonsRaw.map(parseRejectionReasonSegment).filter(Boolean) as RejectionByStageReasonSegment[];
+            if (parsed.length > 0) reasons = parsed;
+        }
+        rows.push({
+            stage_id: Number.isFinite(stageId) ? stageId : 0,
+            stage_name: stageName.trim(),
+            candidates_count: candidatesCount,
+            rejections_count: rejectionsCount,
+            reasons,
+        });
+    }
+    return {
+        vacancy_id: Number(meta.vacancy_id) || vacancyId,
+        date_from: typeof meta.date_from === 'string' ? meta.date_from : undefined,
+        date_to: typeof meta.date_to === 'string' ? meta.date_to : undefined,
+        rows,
+    };
+}
+
+/**
+ * Отчёт «Отказ с этапа»: кандидаты на этапе и число отказов с этапа (доли по причинам — опционально).
+ * GET /candidates/rejection-by-stage
+ */
+export async function getCandidateRejectionByStage(
+    params: { vacancy_id: number; date_from?: string; date_to?: string },
+    opts?: { signal?: AbortSignal }
+): Promise<RejectionByStageData | null> {
+    try {
+        const query: Record<string, string | number> = { vacancy_id: params.vacancy_id };
+        if (params.date_from) query.date_from = params.date_from;
+        if (params.date_to) query.date_to = params.date_to;
+        const response = await apiGet<unknown>('/candidates/rejection-by-stage', query, {
+            signal: opts?.signal,
+            skipLoader: true,
+        });
+        return parseRejectionByStageReport(response.data, params.vacancy_id);
+    } catch {
+        return null;
+    }
+}
+
+export async function getPublicationResponsesCount(
+    vacancyId: number,
+    platformPublicationId?: string | null
+): Promise<number> {
+    try {
+        const query: Record<string, string | number> = { vacancy_id: vacancyId };
+        if (platformPublicationId != null && String(platformPublicationId).trim() !== '') {
+            query.platform_publication_id = String(platformPublicationId).trim();
+        }
+        const response = await apiGet<{ count: number }>(
+            '/candidates/publication-responses-count',
+            query,
+            { skipLoader: true }
+        );
+        return Number(response.data?.count) || 0;
+    } catch (error) {
+        console.error('Ошибка при подсчёте откликов по публикации:', error);
+        return 0;
+    }
 }
 
 export async function getCandidatesByVacancy(vacancyId: number, page = 1) {
-  try {
-    const response = await apiGet<ApiCandidatesResponse['data']>(
-      '/candidates',
-      {
-        page,
-        vacancy: vacancyId, // или filters[vacancy]=vacancyId
-      }
-    );
+    try {
+        const response = await apiGet<ApiCandidatesResponse['data']>(
+            '/candidates',
+            {
+                page,
+                vacancy: vacancyId, // или filters[vacancy]=vacancyId
+            }
+        );
 
-    return {
-      candidates: response.data.data || [],
-      pagination: {
-        total: response.data.total,
-        currentPage: response.data.current_page,
-        lastPage: response.data.last_page,
-        perPage: response.data.per_page,
-      },
-    };
-  } catch (error) {
-    console.error('Ошибка при получении кандидатов по вакансии:', error);
-    return {
-      candidates: [],
-      pagination: { total: 0, currentPage: 1, lastPage: 1, perPage: 15 },
-    };
-  }
+        return {
+            candidates: response.data.data || [],
+            pagination: {
+                total: response.data.total,
+                currentPage: response.data.current_page,
+                lastPage: response.data.last_page,
+                perPage: response.data.per_page,
+            },
+        };
+    } catch (error) {
+        console.error('Ошибка при получении кандидатов по вакансии:', error);
+        return {
+            candidates: [],
+            pagination: { total: 0, currentPage: 1, lastPage: 1, perPage: 15 },
+        };
+    }
 }
 // export async function fetchCandidatesMin(page = 1) {
 //   const { candidates, pagination } = await fetchCandidatesFull(page);

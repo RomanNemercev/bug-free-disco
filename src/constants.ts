@@ -88,7 +88,12 @@ export const HH_EMPLOYMENT_TYPES = [
   {
     id: 'FLY_IN_FLY_OUT',
     name: 'Вахта',
-    siteName: 'Стажировка',
+    siteName: 'Вахта',
+  },
+  {
+    id: 'SIDE_JOB',
+    name: 'Подработка',
+    siteName: 'Подработка',
   },
 ];
 
@@ -149,6 +154,170 @@ export const HH_WORKING_HOURS = [
     id: 'OTHER',
     name: 'Другое',
   },
+];
+
+export const HH_SALARY_TYPE = [
+    {
+        "id": "MONTH",
+        "name": "За месяц"
+    },
+    {
+        "id": "SHIFT",
+        "name": "За смену"
+    },
+    {
+        "id": "HOUR",
+        "name": "За час"
+    },
+    {
+        "id": "FLY_IN_FLY_OUT",
+        "name": "За вахту"
+    },
+    {
+        "id": "SERVICE",
+        "name": "За услугу"
+    }
+]
+
+export const HH_SALARY_FREQUENCY = [
+    {
+        "id": "DAILY",
+        "name": "Ежедневно"
+    },
+    {
+        "id": "WEEKLY",
+        "name": "Раз в неделю"
+    },
+    {
+        "id": "TWICE_PER_MONTH",
+        "name": "Два раза в месяц"
+    },
+    {
+        "id": "MONTHLY",
+        "name": "Раз в месяц"
+    },
+    {
+        "id": "PER_PROJECT",
+        "name": "За проект"
+    }
+];
+
+export const HH_DRIVER_LICENSE_TYPES = [
+        {
+            "id": "A",
+            "name": "A"
+        },
+        {
+            "id": "B",
+            "name": "B"
+        },
+        {
+            "id": "C",
+            "name": "C"
+        },
+        {
+            "id": "D",
+            "name": "D"
+        },
+        {
+            "id": "E",
+            "name": "E"
+        },
+        {
+            "id": "BE",
+            "name": "BE"
+        },
+        {
+            "id": "CE",
+            "name": "CE"
+        },
+        {
+            "id": "DE",
+            "name": "DE"
+        },
+        {
+            "id": "TM",
+            "name": "TM"
+        },
+        {
+            "id": "TB",
+            "name": "TB"
+        }
+];
+
+export const HH_ADDITIONAL_CONDITIONS = [
+  {
+    id: "accept_handicapped",
+    name: "Cоискатели с инвалидностью"
+  },
+  {
+    id: "accept_incomplete_resumes",
+    name: "С неполным резюме"
+  },
+  {
+    id: "accept_temporary",
+    name: "Соискатели с временным трудоустройством"
+  },
+  {
+    id: "age_restriction_14",
+    name: "От 14 лет"
+  },
+  {
+    id: "age_restriction_16",
+    name: "От 16 лет"
+  },
+  {
+    id: "auto_response",
+    name: "Кандидаты с автооткликами"
+  },
+];
+
+/** Чекбоксы «Готовы рассмотреть» на платформе SuperJob. Маппинг с нашего поля «Кто и как может откликаться». */
+export const SUPERJOB_READY_TO_CONSIDER = [
+  { id: 'accept_short_resume', name: 'Соискателей с короткой формой резюме', superjobKey: 'accept_short_resume' },
+  { id: 'accept_age_14', name: 'Соискателей от 14 лет', superjobKey: 'accept_age_14' },
+  { id: 'accept_pensioners', name: 'Пенсионеров', superjobKey: 'accept_pensioners' },
+  { id: 'accept_handicapped', name: 'Соискателей с ограниченными возможностями', superjobKey: 'accept_handicapped' },
+  { id: 'accept_students', name: 'Студентов', superjobKey: 'accept_students' },
+  { id: 'accept_volunteers', name: 'Волонтеров', superjobKey: 'accept_volunteers' },
+];
+
+/** Условия занятости для формы публикации SuperJob (множественный выбор, теги как на скрине). */
+export const SUPERJOB_EMPLOYMENT_CONDITIONS = [
+  { id: '6', name: 'Полная занятость' },
+  { id: '10', name: 'Частичная занятость' },
+  { id: '7', name: 'Возможно временное оформление' },
+  { id: '9', name: 'Вахта' },
+  { id: '12', name: 'Сменный график' },
+  { id: '13', name: 'Частичная занятость + Совместительство' },
+  { id: '14', name: 'Гибрид' },
+  { id: '1', name: 'В офисе/На объекте' },
+  { id: '2', name: 'Удалённая работа' },
+  { id: '3', name: 'Разъездная' },
+  { id: 'from_4h_day', name: 'Работа от 4-х часов в день' },
+  { id: 'weekends', name: 'Работа по выходным' },
+  { id: 'evening', name: 'Работа по вечерам' },
+  { id: 'one_time', name: 'Разовое задание' },
+  { id: 'side_job', name: 'Подработка' },
+];
+
+export const HH_BILLING_TYPES = [
+        {
+            "id": "free",
+            "name": "Бесплатная"
+        },
+        {
+            "id": "standard",
+            "name": "Стандарт"
+        },
+        {
+            "id": "standard_plus",
+            "name": "Стандарт 2"
+        },
+        {
+            "id": "premium",
+            "name": "Премиум"
+        }
 ];
 
 export const HH_EDUCATION_LAVEL = [
@@ -244,3 +413,70 @@ export const HH_WORK_SCHEDULE_BY_DAYS = [
     name: 'Другое',
   },
 ];
+
+export const HH_EXPERIENCE_DAYS = [
+        {
+            "id": "DAYS_15",
+            "name": "15"
+        },
+        {
+            "id": "DAYS_20",
+            "name": "20"
+        },
+        {
+            "id": "DAYS_30",
+            "name": "30"
+        },
+        {
+            "id": "DAYS_40",
+            "name": "40"
+        },
+        {
+            "id": "DAYS_45",
+            "name": "45"
+        },
+        {
+            "id": "DAYS_60",
+            "name": "60"
+        },
+        {
+            "id": "DAYS_90",
+            "name": "90"
+        },
+        {
+            "id": "DAYS_120",
+            "name": "120"
+        },
+        {
+            "id": "DAYS_180",
+            "name": "180"
+        },
+        {
+            "id": "OTHER",
+            "name": "Другое"
+        }
+];
+
+export const HH_WORK_FORMAT = [
+  {
+            "id": "ON_SITE",
+            "name": "На месте работодателя",
+            "description": 'Сотрудники работают в офисе',
+        },
+        {
+            "id": "REMOTE",
+            "name": "Удалённо",
+            "description": 'Сотрудники работают как офисе, так и дома',
+        },
+        {
+            "id": "HYBRID",
+            "name": "Гибрид",
+            "description": 'Сотрудники работают из дома',
+        },
+        {
+            "id": "FIELD_WORK",
+            "name": "Разъездной",
+            "description": 'Сотрудники часто ездят в разные места для выполнения задач',
+        }
+];
+export const BASE_FUNNEL_ID = 1;

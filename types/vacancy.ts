@@ -31,6 +31,8 @@ export interface Vacancy {
   executor_phone?: string;
   status?: string;
   show_executor?: boolean;
+  /** Запрашивать причину отказа при переводе на этап «Отказ» */
+  use_rejection_reasons?: boolean;
   phrases?: Phrase;
   conditions?: Option[];
   drivers?: Option[];
@@ -39,7 +41,17 @@ export interface Vacancy {
   customer_email?: string;
   created_at?: string;
   updated_at?: string;
+  stages?: VacancyStage[];
 }
+
+export type VacancyStage = {
+  id: number;
+  name: string;
+  position?: number;
+  fixed?: boolean;
+  max_days?: number | null;
+  count?: number;
+};
 
 export type ApiResponseVacanciesData = {
   data: Vacancy[];
@@ -83,3 +95,5 @@ export interface ApiResponseVacancy {
   message: string;
   data: Vacancy;
 }
+
+export type TransferMode = 'move' | 'copy';

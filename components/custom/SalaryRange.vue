@@ -3,31 +3,35 @@
     <!-- Поле "От" -->
     <input type="text" v-model="localFrom" @input="handleInput('from', $event.target.value)"
       @blur="handleBlurAndValidate('from')"
-      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px" placeholder="От"
+      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px text-sm font-normal text-[#2F353D]" placeholder="От"
       @focus="handleFocus('from')" :class="{ focused: isFocused.from }" />
 
     <!-- Поле "До" -->
     <input type="text" v-model="localTo" @input="handleInput('to', $event.target.value)"
       @blur="handleBlurAndValidate('to')"
-      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px" placeholder="До"
+      class="bg-athens-gray border border-athens rounded-ten min-h-10 max-w-400px w-full pl-15px text-sm font-normal text-[#2F353D]" placeholder="До"
       @focus="handleFocus('to')" :class="{ focused: isFocused.to }" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
-  from: Number,
-  to: Number,
+  from: { type: [Number, String], default: null },
+  to: { type: [Number, String], default: null },
 })
 
-// console.log('from', props.from)
+const numFrom = computed(() => (props.from !== null && props.from !== '' && !Number.isNaN(Number(props.from)) ? Number(props.from) : null))
+const numTo = computed(() => (props.to !== null && props.to !== '' && !Number.isNaN(Number(props.to)) ? Number(props.to) : null))
 
 const emit = defineEmits(['update:modelValue', 'update:from', 'update:to'])
-const localFrom = ref(props.from ? props.from.toLocaleString('ru-RU') : '')
-const localTo = ref(props.to ? props.to.toLocaleString('ru-RU') : '')
+const localFrom = ref(numFrom.value ? numFrom.value.toLocaleString('ru-RU') : '')
+const localTo = ref(numTo.value ? numTo.value.toLocaleString('ru-RU') : '')
 const isFocused = ref({ from: false, to: false })
+
+watch(numFrom, (v) => { localFrom.value = v ? v.toLocaleString('ru-RU') : '' }, { immediate: true })
+watch(numTo, (v) => { localTo.value = v ? v.toLocaleString('ru-RU') : '' }, { immediate: true })
 
 const handleInput = (field, value) => {
   const sanitizedValue = Number(value.replace(/[^\d]/g, ''))

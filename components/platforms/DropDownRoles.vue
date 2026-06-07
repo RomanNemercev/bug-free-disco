@@ -29,7 +29,7 @@
             <div
               class="options-wrapper absolute w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-10 max-h-400px overflow-y-scroll"
               v-if="isDropDownVisible">
-              <template v-for="(option) in props.options" :key="index">
+              <template v-for="(option) in (Array.isArray(props.options) ? props.options : [])" :key="option.id">
                 <div
                   class="option font-normal py-13px px-15px hover:bg-athens-gray cursor-pointer first:rounded-t-ten last:rounded-b-ten"
                    @click="toggleOptionSelect(option)">
@@ -49,12 +49,14 @@ import {
     computed,
     onMounted,
     onBeforeUnmount,
+    watch,
 } from 'vue';
 
 const props = defineProps({
     options: {
         type: Array,
-        required: true,
+        required: false,
+        default: () => [],
     },
     modelValue: {
         default: null,
@@ -101,9 +103,31 @@ const closeDropDown = (element) => {
 watch(
   () => props.selected,
   (newSelected) => {
-    selectedOption.value = newSelected || null;
+    if (!newSelected) {
+      selectedOption.value = null;
+      return;
+    }
+    
+    // Если выбранный объект есть в списке options, используем его (правильная ссылка)
+    // Это важно для правильного отображения выбранного элемента
+    if (props.options && props.options.length > 0) {
+      const foundOption = props.options.find(option => {
+        if (newSelected.id && option.id) {
+          return String(option.id) === String(newSelected.id);
+        }
+        if (newSelected.name && option.name) {
+          return option.name === newSelected.name;
+        }
+        return false;
+      });
+      
+      // Используем найденный объект из списка или переданный объект
+      selectedOption.value = foundOption || newSelected;
+    } else {
+      selectedOption.value = newSelected;
+    }
   },
-  { deep: true } // Watch for deep changes if selected is an object
+  { deep: true, immediate: true } // Watch for deep changes if selected is an object
 );
 
 onMounted(() => {

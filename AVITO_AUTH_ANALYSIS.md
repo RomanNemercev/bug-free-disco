@@ -1,0 +1,338 @@
+# Анализ проблемы авторизации Avito API
+
+## Текущий статус: ❌ Не работает
+
+**Дата последнего анализа:** 07.02.2026
+
+---
+
+## Причина использования API Avito (для заявки / описания приложения в Avito)
+
+**Краткая формулировка:**
+
+Интеграция платформы Jobly (job-ly.ru) с вертикалью «Работа» Авито: единый кабинет для работодателей — публикация вакансий на Авито, получение списка вакансий и откликов, просмотр резюме кандидатов, переписка с кандидатами в мессенджере Авито и просмотр статистики объявлений.
+
+**Развёрнутая формулировка:**
+
+Приложение Jobly — HR/рекрутинговая платформа для управления вакансиями и кандидатами. API Авито используется для интеграции с вертикалью «Работа»: работодатель подключает свой аккаунт Авито и через единый интерфейс Jobly может публиковать вакансии на Авито, получать список своих вакансий и данные по каждой из них, просматривать отклики и резюме кандидатов, вести переписку с кандидатами в мессенджере Авито и просматривать статистику по объявлениям. Цель — упростить работу с вакансиями на Авито без переключения между сервисами.
+
+---
+
+## Что нужно для рабочей ссылки авторизации (есть client_id и client_secret)
+
+Чтобы ссылка авторизации через **Authorization Code** работала, нужно следующее.
+
+### 1. В кабинете приложения Avito (developers.avito.ru)
+
+| Что проверить | Где | Важно |
+|---------------|-----|--------|
+| **Redirect URI** | Настройки приложения → Redirect URI / URL перенаправления | Должен **побуквенно** совпадать с тем, куда бэкенд принимает callback. Например: `https://ваш-домен.ru/api/code-avito` — без слэша в конце, тот же протокол и путь. |
+| **Scope (разрешения)** | Настройки приложения / тариф | Все scope из ссылки должны быть подключены к приложению. Минимум для вакансий: `items:info job:vacancy job:write user:read` и при необходимости остальные из списка ниже. |
+| **Тариф API** | Кабинет | Должен быть подключён платный тариф (Базовый / Расширенный / Максимальный). |
+| **Статус приложения** | Кабинет | Приложение должно быть в статусе «Активно», не заблокировано. |
+
+**Client secret в ссылку не подставляется** — он нужен только на бэкенде при обмене `code` на `access_token`.
+
+### 2. В ссылке на Avito (формирует бэкенд при редиректе на Avito)
+
+Обязательные параметры в URL `https://www.avito.ru/oauth?...`:
+
+| Параметр | Обязателен | Значение |
+|----------|------------|----------|
+| `response_type` | ✅ Да | Строго `code` |
+| `client_id` | ✅ Да | Ваш client_id из кабинета |
+| `redirect_uri` | ✅ Да | Тот же URL, что зарегистрирован в Avito (лучше передавать в query уже в URL-encoded виде). |
+| `scope` | ✅ Да | Разрешения через пробел, например: `items:info job:applications job:cv job:vacancy job:write messenger:read messenger:write user_balance:read user:read` |
+| `state` | Рекомендуется | Случайная строка; сохранить в сессии/кеше и проверить при возврате (защита от CSRF). |
+
+При формировании ссылки на бэкенде:
+
+- Использовать **`http_build_query()`** (PHP) или аналог, чтобы `redirect_uri` и `scope` были корректно закодированы (двоеточия в scope → `%3A`, слэши в redirect_uri → `%2F`).
+- Обязательно добавить **`response_type=code`** — без него Avito возвращает «Что-то пошло не так».
+
+### 3. После возврата пользователя с Avito (callback)
+
+Avito перенаправит на ваш `redirect_uri` с параметрами `?code=...&state=...`. На бэкенде нужно:
+
+1. Проверить `state` (если использовали).
+2. Обменять `code` на токены: **POST** на `https://api.avito.ru/token` с телом `grant_type=authorization_code&client_id=...&client_secret=...&redirect_uri=...&code=...` (здесь уже используется **client_secret**).
+3. Сохранить `access_token` и `refresh_token` и привязать к пользователю/сессии.
+4. Редирект пользователя на фронт с параметрами успеха/ошибки (например `?popup_account=true&platform=avito&message=success`).
+
+**Итого:** для рабочей **ссылки** авторизации нужны: корректный `redirect_uri` в кабинете Avito и в параметрах ссылки, обязательный `response_type=code`, правильный `scope` и кодирование параметров. Secret нужен только на этапе обмена `code` на токен на бэкенде.
+
+---
+
+## Диагностика текущей проблемы
+
+### 🔴 Частая причина ошибки «Что-то пошло не так»: неверный формат `scope`
+
+**В вашей ссылке scope передаётся с разделителем-запятой:**  
+`scope=items%3Ainfo%2Cjob%3Aapplications%2C...` → расшифровка: `items:info,job:applications,...` (**запятые `%2C`**).
+
+**Так нельзя.** По OAuth 2.0 и документации Avito разрешения в `scope` должны быть **разделены пробелами**, не запятыми.
+
+| Как сейчас (ошибка) | Как должно быть |
+|---------------------|-----------------|
+| `items:info,job:applications,job:cv,...` | `items:info job:applications job:cv ...` |
+| В URL: `%2C` между scope | В URL: `%20` (пробел) между scope |
+
+**На бэкенде (Laravel):** собирать scope одной строкой с **пробелами**:  
+`$scope = 'items:info job:applications job:cv job:vacancy job:write messenger:read messenger:write user_balance:read user:read';`  
+Не использовать `implode(',', $array)` — использовать `implode(' ', $array)` или задать строку с пробелами. После этого `http_build_query()` закодирует пробелы в `%20`, и ссылка будет валидной.
+
+---
+
+### Текущий OAuth URL (НЕ РАБОЧИЙ):
+```
+https://www.avito.ru/oauth?client_id=nuUTpqmaqHYIn2JCk1J1&redirect_uri=https://admin.job-ly.ru/api/code-avito&scope=items:info%20job:applications%20job:cv%20job:vacancy%20job:write%20messenger:read%20messenger:write%20user_balance:read%20user:read
+```
+
+**Ошибка:** Страница Avito отображает *"Что-то пошло не так. Попробуйте ещё раз или загляните позже"*
+
+### Другие возможные причины (если scope уже с пробелами):
+
+| Параметр | Текущее состояние | Требуется |
+|---|---|---|
+| `response_type` | ✅ Есть в новой ссылке | `response_type=code` |
+| `client_id` | ✅ | Актуальный из кабинета Avito |
+| `redirect_uri` | ✅ Закодирован | Совпадает с настройками приложения |
+| `scope` | ❌ **Запятые вместо пробелов** | Пробелы между scope, в URL — `%20` |
+| `state` | ✅ | Рекомендуется |
+
+### Правильный OAuth URL (scope с пробелами, в URL — %20):
+```
+https://www.avito.ru/oauth?response_type=code&client_id=nuUTpqmaqHYIn2JCk1J1&redirect_uri=https%3A%2F%2Fadmin.job-ly.ru%2Fapi%2Fcode-avito&scope=items%3Ainfo%20job%3Aapplications%20job%3Acv%20job%3Avacancy%20job%3Awrite%20messenger%3Aread%20messenger%3Awrite%20user_balance%3Aread%20user%3Aread&state=RANDOM_STATE_VALUE
+```
+
+---
+
+## Поток авторизации
+
+### Схема взаимодействия:
+```
+Фронтенд                    Бэкенд (Laravel)              Avito OAuth
+   │                              │                            │
+   │ 1. Нажатие кнопки            │                            │
+   │    "Авторизация Avito"       │                            │
+   │──────────────────────────────>│                            │
+   │  GET /code-avito?            │                            │
+   │    customerToken=xxx         │                            │
+   │                              │ 2. Формирует OAuth URL     │
+   │                              │    и делает редирект       │
+   │                              │────────────────────────────>│
+   │                              │  302 → avito.ru/oauth?     │
+   │                              │    response_type=code&     │
+   │                              │    client_id=...&          │
+   │                              │    redirect_uri=...&       │
+   │                              │    scope=...               │
+   │                              │                            │
+   │                              │ 3. Пользователь            │
+   │                              │    авторизуется            │
+   │                              │                            │
+   │                              │<────────────────────────────│
+   │                              │  GET /code-avito?code=XXX  │
+   │                              │                            │
+   │                              │ 4. Обменивает code на      │
+   │                              │    access_token            │
+   │<─────────────────────────────│                            │
+   │  302 → frontend?             │                            │
+   │    popup_account=true&       │                            │
+   │    platform=avito&           │                            │
+   │    message=success           │                            │
+   │                              │                            │
+   │ 5. Фронтенд вызывает        │                            │
+   │    authAvito() → GET         │                            │
+   │    /avito/auth               │                            │
+   │──────────────────────────────>│                            │
+```
+
+### Код фронтенда (инициация авторизации):
+
+**Файл:** `pages/create-tabs/PublishTab.vue:881-885`
+```javascript
+} else if (platformName === 'avito.ru') {
+    const config = useRuntimeConfig();
+    const tokenCookie = useCookie('auth_user');
+    setCookie('process_auth', 'true', 1);
+    window.location.href = config.public.apiBase + `/code-avito?customerToken=${tokenCookie.value}`;
+}
+```
+
+### Код фронтенда (получение результата авторизации):
+
+**Файл:** `utils/avitoAccount.ts:103-136` — функция `auth()`
+- Делает GET запрос к `/avito/auth` на бэкенде
+- Ожидает получение токенов авторизации
+
+---
+
+## Чек-лист исправлений
+
+### 🔧 На бэкенде (Laravel — `admin.job-ly.ru/api`)
+
+- [ ] **КРИТИЧНО:** Добавить `response_type=code` в OAuth URL
+- [ ] **КРИТИЧНО:** URL-encode параметр `redirect_uri` через `urlencode()` / `rawurlencode()`
+- [ ] **ВАЖНО:** URL-encode значение `scope` (двоеточия `:` → `%3A`)
+- [ ] **РЕКОМЕНДУЕТСЯ:** Добавить параметр `state` (случайная строка) для защиты от CSRF
+- [ ] Проверить, что `client_id` (`nuUTpqmaqHYIn2JCk1J1`) актуален на портале developers.avito.ru
+- [ ] Проверить, что `redirect_uri` точно совпадает с зарегистрированным в настройках приложения Avito
+- [ ] Проверить, что все scope одобрены для приложения на портале разработчика
+
+### Пример правильного формирования URL на бэкенде (Laravel):
+
+```php
+// В контроллере обработки /code-avito
+$clientId = config('services.avito.client_id'); // nuUTpqmaqHYIn2JCk1J1
+$redirectUri = config('services.avito.redirect_uri'); // https://admin.job-ly.ru/api/code-avito
+$scope = 'items:info job:applications job:cv job:vacancy job:write messenger:read messenger:write user_balance:read user:read';
+$state = Str::random(40); // Сохранить в сессии для проверки при callback
+
+// Сохраняем state в сессии/кеше для валидации
+Cache::put('avito_oauth_state_' . $customerToken, $state, 600);
+
+$authUrl = 'https://www.avito.ru/oauth?' . http_build_query([
+    'response_type' => 'code',        // ← ОБЯЗАТЕЛЬНЫЙ параметр!
+    'client_id'     => $clientId,
+    'redirect_uri'  => $redirectUri,
+    'scope'         => $scope,
+    'state'         => $state,
+]);
+
+return redirect($authUrl);
+```
+
+### 🖥️ На фронтенде (этот проект)
+
+- [ ] Добавить обработку ошибки авторизации (query параметр `error`)
+- [ ] Улучшить отображение ошибок для пользователя
+- [ ] Добавить проверку `state` параметра при возврате с Avito
+
+---
+
+## Обязательные параметры OAuth 2.0 для Avito
+
+Согласно документации Avito API (https://developers.avito.ru/api-catalog/auth/documentation):
+
+| Параметр | Обязательный | Описание |
+|---|---|---|
+| `response_type` | ✅ Да | Должен быть `code` для Authorization Code flow |
+| `client_id` | ✅ Да | Идентификатор приложения |
+| `redirect_uri` | ✅ Да | URI для редиректа (должен совпадать с зарегистрированным) |
+| `scope` | ✅ Да | Запрашиваемые разрешения (через пробел) |
+| `state` | ⚠️ Рекомендуется | Случайная строка для защиты от CSRF |
+
+### Доступные scope для работы с вакансиями:
+- `items:info` — информация об объявлениях (в т.ч. по объявлению-вакансии)
+- `job:applications` — отклики на вакансии
+- `job:cv` — резюме кандидатов
+- `job:vacancy` — чтение вакансий
+- `job:write` — создание и редактирование вакансий
+- `messenger:read` — чтение сообщений
+- `messenger:write` — отправка сообщений
+- `user_balance:read` — чтение баланса пользователя
+- `user:read` — чтение профиля пользователя
+- `stats:read` — получение статистики объявлений
+
+### Какие scope нужны под задачи (список вакансий, одна вакансия, создание, отклики, кандидаты, переписка):
+
+| Задача | Нужный scope |
+|--------|----------------|
+| Получать список вакансий | `job:vacancy` |
+| Данные по одной вакансии | `job:vacancy`, при необходимости `items:info` |
+| Создавать вакансию | `job:write` |
+| Получать отклики по вакансии | `job:applications` |
+| Данные кандидатов (резюме) | `job:cv` |
+| Переписка с кандидатом (читать и писать) | `messenger:read`, `messenger:write` |
+
+**Минимальный набор scope** для перечисленных возможностей:
+```
+items:info job:applications job:cv job:vacancy job:write messenger:read messenger:write user:read
+```
+Опционально: `user_balance:read` — баланс пользователя; `stats:read` — статистика объявлений.
+
+### Готовая строка scope (по выбранным в кабинете Avito):
+```
+items:info job:applications job:cv job:write messenger:read messenger:write user:read stats:read
+```
+
+### Пример готовой ссылки авторизации (подставьте свой `client_id` и `redirect_uri`):
+```
+https://www.avito.ru/oauth?response_type=code&client_id=ВАШ_CLIENT_ID&redirect_uri=https%3A%2F%2Fadmin.job-ly.ru%2Fapi%2Fcode-avito&scope=items%3Ainfo%20job%3Aapplications%20job%3Acv%20job%3Awrite%20messenger%3Aread%20messenger%3Awrite%20user%3Aread%20stats%3Aread&state=random_state_123
+```
+В бэкенде: замените `ВАШ_CLIENT_ID` на client_id приложения, `redirect_uri` — на ваш URL (тот же, что в настройках Avito), `state` — на случайную строку из сессии.
+
+---
+
+## Возможные причины ошибки "Что-то пошло не так"
+
+### 1. ❌ Запрос scope, которого нет в приложении (в т.ч. `job:vacancy`)
+В кабинете Avito (раздел «Доступы») в списке разрешений **нет** отдельного scope `job:vacancy`. Есть только: `job:write`, `job:applications`, `job:cv`, `items:info`, `messenger:read`, `messenger:write`, `user:read`, `user_balance:read`, `stats:read` и др. Если в ссылке авторизации указать **несуществующий или не подключённый** scope (например `job:vacancy`), Avito возвращает «Что-то пошло не так».  
+**Решение:** убрать `job:vacancy` из параметра `scope` и запрашивать только те scope, которые реально отмечены в настройках приложения. Чтение вакансий покрывается связкой `items:info` + `job:write` для вертикали «Работа».
+
+### 2. ❌ Отсутствует `response_type=code` (ПОДТВЕРЖДЕНО)
+Без этого параметра сервер Avito OAuth не понимает, какой тип авторизации запрашивается.
+
+### 3. ⚠️ Неправильный `redirect_uri`
+- URI должен **побуквенно совпадать** с зарегистрированным в настройках приложения
+- Учитываются: протокол, домен, путь, порт, trailing slash
+- Текущий: `https://admin.job-ly.ru/api/code-avito`
+
+### 4. ⚠️ Невалидный `client_id`
+- Предыдущий: `RMGPpKuMKSn9wRKkYnWD`
+- Текущий: `nuUTpqmaqHYIn2JCk1J1`
+- Убедиться, что приложение активно на портале developers.avito.ru
+
+### 5. ⚠️ Недоступные scope
+- Все запрашиваемые scope должны быть одобрены для приложения
+- Если хотя бы один scope не разрешён — авторизация может упасть
+
+### 6. ⚠️ Отсутствие платного тарифа
+- Для API Avito требуется один из тарифов: "Базовый", "Расширенный" или "Максимальный"
+
+### 7. ⚠️ Блокировка аккаунта
+- При нарушении правил Avito доступ к API блокируется
+
+---
+
+## Публикация вакансии (создание объявления)
+
+API Avito ожидает **JSON** и строгие типы полей. Ошибка вида `cannot unmarshal string into Go struct field VacancyCreate.profession of type int64` означает, что поле `profession` (и другие числовые поля) переданы строкой вместо числа.
+
+**Поля и типы:**
+- `profession` — **int64** (число), ID профессии из справочника Avito
+- `business_area` — **int64** (число), ID отрасли (если передаётся)
+- `salary_range` — **object**: вилка зарплаты (рубли в месяц). Поля: `from` (integer) — нижняя граница, `to` (integer) — верхняя граница. При одновременной передаче с `salary` имеет приоритет.
+- `payout_frequency.id` — число (если передаётся)
+
+В проекте: запросы к `/avito/drafts` и `/avito/publications` отправляются с `Content-Type: application/json` и телом в виде JSON; перед отправкой вызывается `ensureAvitoPayloadTypes()`, чтобы привести эти поля к типу number.
+
+---
+
+## Ошибка «server_error» / «error while processing request. Please, contact support»
+
+Если API Avito возвращает:
+- **message:** `"error while processing request. Please, contact support"`
+- **slug:** `"server_error"`
+
+это **внутренняя ошибка на стороне Avito**, а не ошибка валидации параметров. Исправлять запрос с нашей стороны обычно не нужно.
+
+**Что делать:**
+1. Повторить запрос через некоторое время — сбой может быть временным.
+2. Если ошибка повторяется — обратиться в поддержку Avito (см. ниже), указать: момент (создание черновика / публикация), `client_id` приложения, по возможности тело запроса (без чувствительных данных) и текст/ slug ошибки.
+
+---
+
+## Контакты поддержки Avito
+
+- **Телефон:** 8 800 600-00-01
+- **Email:** supportautoload@avito.ru
+- **Портал разработчика:** https://developers.avito.ru
+- **Документация Auth API:** https://developers.avito.ru/api-catalog/auth/documentation
+- **Условия использования API:** https://developers.avito.ru/docs/APITermsOfServiceV1.pdf
+
+**При обращении укажите:**
+- Полный URL OAuth запроса (для ошибок авторизации)
+- `client_id` приложения
+- Скриншот ошибки или текст (message, slug)
+- Описание ожидаемого поведения

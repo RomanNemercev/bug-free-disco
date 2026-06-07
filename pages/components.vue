@@ -1,0 +1,646 @@
+<script setup lang="ts">
+import MyInput from '~/components/custom/MyInput.vue'
+import SimpleInput from '~/components/custom/SimpleInput.vue'
+import PasswordInput from '~/components/custom/PasswordInput.vue'
+import PhoneInput from '~/components/custom/PhoneInput.vue'
+import EmailInput from '~/components/custom/EmailInput.vue'
+import MyTextarea from '~/components/custom/MyTextarea.vue'
+import MyCheckbox from '~/components/custom/MyCheckbox.vue'
+import MyToggleSwitch from '~/components/custom/MyToggleSwitch.vue'
+import MyDropdown from '~/components/custom/MyDropdown.vue'
+import MultiSelect from '~/components/custom/MultiSelect.vue'
+import UiDotsLoader from '~/components/custom/UiDotsLoader.vue'
+import UiCircleLoader from '~/components/custom/UiCircleLoader.vue'
+import Popup from '~/components/custom/Popup.vue'
+import DeleteConfirmPopup from '~/components/custom/DeleteConfirmPopup.vue'
+import CandidateDeletePopup from '~/components/custom/page-parts/candidate/popups/CandidateDeletePopup.vue'
+import type { Candidate } from '~/types/candidates'
+import UiDialog from '~/components/ui/dialog/Dialog.vue'
+import UiDialogTrigger from '~/components/ui/dialog/DialogTrigger.vue'
+import UiDialogContent from '~/components/ui/dialog/DialogContent.vue'
+import UiDialogHeader from '~/components/ui/dialog/DialogHeader.vue'
+import UiDialogTitle from '~/components/ui/dialog/DialogTitle.vue'
+import UiDialogDescription from '~/components/ui/dialog/DialogDescription.vue'
+import BtnIcon from '~/components/custom/BtnIcon.vue'
+import BtnIconText from '~/components/custom/BtnIconText.vue'
+import BtnTab from '~/components/custom/BtnTab.vue'
+import BtnCalendar from '~/components/custom/BtnCalendar.vue'
+import BtnEmail from '~/components/custom/BtnEmail.vue'
+import BtnStop from '~/components/custom/BtnStop.vue'
+import Pagination from '~/components/custom/Pagination.vue'
+import PlainSingleSelectDropdown from '~/components/custom/PlainSingleSelectDropdown.vue'
+import PlainMultiSelectDropdown from '~/components/custom/PlainMultiSelectDropdown.vue'
+
+definePageMeta({
+  layout: 'default',
+})
+
+useHead({ title: 'Каталог компонентов' })
+
+const inputValue = ref('')
+const textareaValue = ref('')
+const passwordValue = ref('')
+const phoneValue = ref('')
+const dropdownValue = ref<string | null>(null)
+const departmentValue = ref<string | null>(null)
+const multiSelectValue = ref<string[]>([])
+const plainMultiSelectDemo = ref<number[]>([])
+const checkbox1 = ref(false)
+const checkbox2 = ref(true)
+const toggleSwitchDemo = ref(false)
+const toggleSwitchDemoOn = ref(true)
+const popupOpen = ref(false)
+const deleteConfirmOpen = ref(false)
+const candidateDeleteOpen = ref(false)
+const demoCandidateForDelete: Candidate = {
+  id: 0,
+  email: 'demo@example.com',
+  surname: 'Иванов',
+  firstname: 'Иван',
+}
+const dialogOpen = ref(false)
+const currentPage = ref(1)
+const selectedTab = ref('tab1')
+const plainSelectDemo = ref('')
+
+const plainSelectDemoOptions = [
+  'Минимальный без авто',
+  'Оптимальный без авто',
+  'Максимальный без авто',
+]
+
+const dropdownOptions = [
+  { name: 'Вариант 1', value: 'v1' },
+  { name: 'Вариант 2', value: 'v2' },
+  { name: 'Вариант 3', value: 'v3' },
+]
+
+const plainMultiSelectDemoOptions = [
+  { id: 1, name: 'Вариант 1' },
+  { id: 2, name: 'Вариант 2' },
+  { id: 3, name: 'Вариант 3' },
+]
+
+const departmentOptions = [
+  { name: 'Отдел продаж', value: 'sales' },
+  { name: 'Отдел маркетинга', value: 'marketing' },
+  { name: 'Отдел подбора персонала', value: 'recruiting' },
+  { name: 'Отдел разработки', value: 'engineering' },
+  { name: 'Отдел клиентского сервиса', value: 'support' },
+  { name: 'Финансовый отдел', value: 'finance' },
+  { name: 'Юридический отдел', value: 'legal' },
+  { name: 'Административный отдел', value: 'administration' },
+]
+
+// Иконки из папки icons (Tilda Icons): список генерируется скриптом scripts/extract-icons.cjs
+const iconsList = ref<{ num: number; name: string }[]>([])
+onMounted(async () => {
+  try {
+    const data = await $fetch<{ num: number; name: string }[]>('/icons/list.json')
+    iconsList.value = data
+  } catch (e) {
+    console.error('Не удалось загрузить список иконок:', e)
+  }
+})
+</script>
+
+<template>
+  <div class="max-w-4xl mx-auto px-4 py-10">
+    <h1 class="text-2xl font-bold text-space mb-2">
+      Каталог компонентов
+    </h1>
+    <p class="text-slate-custom text-sm mb-10">
+      Страница для просмотра кнопок, полей ввода и других UI-компонентов проекта.
+    </p>
+
+    <!-- Кнопки -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        1. Кнопки (UI Button)
+      </h2>
+      <div class="flex flex-wrap gap-3">
+        <UiButton variant="default">
+          Default
+        </UiButton>
+        <UiButton variant="action" size="action">
+          Action
+        </UiButton>
+        <UiButton variant="semiaction" size="semiaction">
+          Semiaction
+        </UiButton>
+        <UiButton variant="outline">
+          Outline
+        </UiButton>
+        <UiButton variant="secondary">
+          Secondary
+        </UiButton>
+        <UiButton variant="destructive">
+          Destructive
+        </UiButton>
+        <UiButton variant="ghost">
+          Ghost
+        </UiButton>
+        <UiButton variant="link">
+          Link
+        </UiButton>
+        <UiButton variant="black" size="black">
+          Black
+        </UiButton>
+        <UiButton variant="success" size="success">
+          Success
+        </UiButton>
+        <UiButton variant="back" size="back">
+          Back
+        </UiButton>
+        <UiButton variant="delete" size="delete">
+          Delete
+        </UiButton>
+        <UiButton variant="gray" size="gray">
+          Gray
+        </UiButton>
+        <UiButton size="icon">
+          <span class="text-lg">⊕</span>
+        </UiButton>
+      </div>
+    </section>
+
+    <!-- Поля ввода -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        2. Поля ввода
+      </h2>
+      <div class="grid gap-6 max-w-md">
+        <div class="min-w-0 w-full">
+          <p class="text-sm text-bali mb-1">
+            MyInput
+          </p>
+          <MyInput
+            v-model="inputValue"
+            placeholder="Введите текст"
+          />
+        </div>
+        <div class="min-w-0 w-full">
+          <p class="text-sm text-bali mb-1">
+            SimpleInput
+          </p>
+          <SimpleInput
+            v-model="inputValue"
+            placeholder="Простое поле"
+          />
+        </div>
+        <div class="min-w-0 w-full">
+          <p class="text-sm text-bali mb-1">
+            PasswordInput
+          </p>
+          <PasswordInput
+            v-model="passwordValue"
+            placeholder="Введите пароль"
+          />
+        </div>
+        <div class="min-w-0 w-full">
+          <p class="text-sm text-bali mb-1">
+            PhoneInput
+          </p>
+          <PhoneInput v-model="phoneValue" />
+        </div>
+        <div class="min-w-0 w-full">
+          <p class="text-sm text-bali mb-1">
+            EmailInput
+          </p>
+          <EmailInput
+            v-model="inputValue"
+            placeholder="email@example.com"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Редактируемые поля -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        Редактируемые поля
+      </h2>
+      <p class="text-sm text-slate-custom mb-4">
+        <strong>PlainSingleSelectDropdown</strong> — выпадающий список с одним значением: без фона и обводки у триггера (как поле «Источник» на вкладке «Поля» карточки кандидата).
+      </p>
+      <div class="max-w-md rounded-fifteen border border-athens bg-white p-25px">
+        <div class="flex items-center justify-between gap-2.5">
+          <p class="min-w-[120px] shrink-0 text-sm font-normal text-space">
+            Источник
+          </p>
+          <PlainSingleSelectDropdown
+            v-model="plainSelectDemo"
+            :options="plainSelectDemoOptions"
+            placeholder="Выбрать"
+          />
+        </div>
+        <p class="mt-4 text-sm text-bali">
+          Текущее значение:
+          <span class="text-space">{{ plainSelectDemo.trim() ? plainSelectDemo : '—' }}</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Текстовое поле -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        3. Многострочное поле (MyTextarea)
+      </h2>
+      <div class="max-w-md">
+        <MyTextarea
+          v-model="textareaValue"
+          placeholder="Введите описание..."
+        />
+      </div>
+    </section>
+
+    <!-- Чекбоксы -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        4. Чекбоксы
+      </h2>
+      <div class="flex flex-wrap gap-6">
+        <MyCheckbox
+          :id="1"
+          v-model="checkbox1"
+          label="Не выбран"
+        />
+        <MyCheckbox
+          :id="2"
+          v-model="checkbox2"
+          label="Выбран"
+        />
+        <MyCheckbox
+          :id="3"
+          v-model="checkbox1"
+          label="С цветом dodger"
+          label-color="dodger"
+        />
+      </div>
+    </section>
+
+    <!-- Переключатель (toggle) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        4.1. Переключатель (MyToggleSwitch)
+      </h2>
+      <p class="text-sm text-slate-custom mb-4">
+        Вместо чекбокса для бинарных настроек (как в «Причины отказа»): трек в цветах проекта — <span class="text-dodger">dodger</span> при включении, <span class="text-bali">athens / серый</span> при выключении.
+      </p>
+      <div class="flex flex-col gap-4 max-w-md">
+        <MyToggleSwitch
+          id="demo-toggle-1"
+          v-model="toggleSwitchDemo"
+          label="Выключить / включить"
+        />
+        <MyToggleSwitch
+          id="demo-toggle-2"
+          v-model="toggleSwitchDemoOn"
+          label="Включено по умолчанию"
+        />
+        <MyToggleSwitch
+          id="demo-toggle-3"
+          :model-value="true"
+          label="Только просмотр (disabled)"
+          disabled
+        />
+      </div>
+    </section>
+
+    <!-- Выпадающий список -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        5. Выпадающий список (MyDropdown)
+      </h2>
+      <div class="max-w-xs mb-4">
+        <MyDropdown
+          v-model="dropdownValue"
+          :options="dropdownOptions"
+          placeholder="Выберите вариант"
+        />
+      </div>
+      <div class="max-w-xs">
+        <p class="text-sm text-bali mb-1">
+          Поле "Отдел" (поиск по списку)
+        </p>
+        <MyDropdown
+          v-model="departmentValue"
+          :options="departmentOptions"
+          placeholder="Выберите отдел"
+          :searchable="true"
+          search-placeholder="Начните вводить название отдела"
+        />
+      </div>
+    </section>
+
+    <!-- Множественный выбор -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        6. Множественный выбор (MultiSelect)
+      </h2>
+      <div class="max-w-xs">
+        <MultiSelect
+          v-model="multiSelectValue"
+          :options="dropdownOptions"
+          default-value="Выберите значения"
+        />
+      </div>
+      <p v-if="multiSelectValue.length" class="text-sm text-bali mt-2">
+        Выбрано: {{ multiSelectValue.join(', ') }}
+      </p>
+      <p class="text-sm text-bali mb-1 mt-6">
+        <strong>PlainMultiSelectDropdown</strong> — то же по смыслу, что MultiSelect, но стиль триггера и панели как у <strong>PlainSingleSelectDropdown</strong> (вкладка «Поля»).
+      </p>
+      <div class="max-w-xs">
+        <PlainMultiSelectDropdown
+          v-model="plainMultiSelectDemo"
+          :options="plainMultiSelectDemoOptions"
+          placeholder="Выбрать"
+        />
+      </div>
+      <p v-if="plainMultiSelectDemo.length" class="text-sm text-bali mt-2">
+        Выбраны id: {{ plainMultiSelectDemo.join(', ') }}
+      </p>
+    </section>
+
+    <!-- Лейблы -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        7. Лейбл (UI Label)
+      </h2>
+      <div class="max-w-md flex flex-col gap-2">
+        <UiLabel>Подпись к полю</UiLabel>
+        <UiLabel class="text-dodger">Лейбл синего цвета</UiLabel>
+      </div>
+    </section>
+
+    <!-- Загрузчики -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        8. Индикаторы загрузки
+      </h2>
+      <div class="flex flex-wrap items-end gap-10">
+        <div>
+          <p class="text-sm text-bali mb-2">
+            UiDotsLoader
+          </p>
+          <UiDotsLoader />
+        </div>
+        <div>
+          <p class="text-sm text-bali mb-2">
+            UiCircleLoader
+          </p>
+          <div class="scale-50 origin-left">
+            <UiCircleLoader />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Попап (кастомный) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        9. Модальное окно (Popup)
+      </h2>
+      <UiButton variant="action" size="action" @click="popupOpen = true">
+        Открыть попап
+      </UiButton>
+      <Popup
+        :is-open="popupOpen"
+        width="400px"
+        :show-close-button="true"
+        @close="popupOpen = false"
+      >
+        <div class="p-4">
+          <h3 class="text-lg font-semibold text-space mb-2">
+            Пример попапа
+          </h3>
+          <p class="text-sm text-slate-custom mb-4">
+            Это кастомный компонент Popup. Закройте кнопкой или по клику вне окна.
+          </p>
+          <UiButton variant="outline" @click="popupOpen = false">
+            Закрыть
+          </UiButton>
+        </div>
+      </Popup>
+    </section>
+
+    <!-- Подтверждение удаления (DeleteConfirmPopup) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        9.1. Подтверждение удаления (DeleteConfirmPopup)
+      </h2>
+      <p class="text-sm text-slate-custom mb-3">
+        Окно подтверждения в едином стиле: те же отступы, что на страницах <strong>Настройки → Сотрудники</strong> и <strong>Настройки → Интеграции → Почта</strong> при удалении.
+      </p>
+      <p class="text-sm text-bali mb-4">
+        <NuxtLink to="/components" class="text-dodger hover:underline">Каталог компонентов</NuxtLink> — эта страница.
+      </p>
+      <UiButton variant="outline" @click="deleteConfirmOpen = true">
+        Открыть подтверждение удаления
+      </UiButton>
+      <DeleteConfirmPopup
+        :isOpen="deleteConfirmOpen"
+        @close="deleteConfirmOpen = false"
+        @confirm="deleteConfirmOpen = false"
+      >
+        Вы уверены, что хотите удалить <strong>элемент</strong>? Это действие нельзя отменить.
+      </DeleteConfirmPopup>
+    </section>
+
+    <!-- Dialog (Radix/shadcn) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        10. Диалог (UI Dialog)
+      </h2>
+      <UiDialog v-model:open="dialogOpen">
+        <UiDialogTrigger as-child>
+          <UiButton variant="outline">
+            Открыть диалог
+          </UiButton>
+        </UiDialogTrigger>
+        <UiDialogContent class="sm:max-w-md">
+          <UiDialogHeader>
+            <UiDialogTitle>Заголовок диалога</UiDialogTitle>
+            <UiDialogDescription>
+              Диалог на базе Radix Vue (shadcn-nuxt). Используется для подтверждений и форм.
+            </UiDialogDescription>
+          </UiDialogHeader>
+          <div class="py-4">
+            <UiButton variant="action" size="action" @click="dialogOpen = false">
+              Понятно
+            </UiButton>
+          </div>
+        </UiDialogContent>
+      </UiDialog>
+    </section>
+
+    <!-- Кнопки кастомные -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        11. Кастомные кнопки (BtnIcon, BtnTab и др.)
+      </h2>
+      <div class="flex flex-wrap items-center gap-4">
+        <BtnIcon
+          icon="clip20"
+          tooltip-text="Поиск"
+        />
+        <BtnIconText
+          icon="plus-blue20"
+          text="Добавить"
+        />
+        <BtnTab
+          v-model="selectedTab"
+          :tabs="[
+            { label: 'Вкладка 1', value: 'tab1' },
+            { label: 'Вкладка 2', value: 'tab2' },
+          ]"
+        />
+        <BtnCalendar />
+        <BtnEmail />
+        <BtnStop />
+      </div>
+    </section>
+
+    <!-- Пагинация -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        12. Пагинация
+      </h2>
+      <Pagination
+        :current-page="currentPage"
+        :last-page="10"
+        @page-changed="(page: number) => (currentPage = page)"
+      />
+    </section>
+
+    <!-- Tooltip -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        13. Подсказка (Tooltip)
+      </h2>
+      <UiTooltipProvider>
+        <UiTooltip>
+          <UiTooltipTrigger as-child>
+            <UiButton variant="outline">
+              Наведите на меня
+            </UiButton>
+          </UiTooltipTrigger>
+          <UiTooltipContent>
+            Текст подсказки
+          </UiTooltipContent>
+        </UiTooltip>
+      </UiTooltipProvider>
+    </section>
+
+    <!-- Avatar -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        14. Аватар
+      </h2>
+      <div class="flex items-center gap-4">
+        <UiAvatar>
+          <UiAvatarImage src="https://github.com/shadcn.png" alt="Avatar" />
+          <UiAvatarFallback>JD</UiAvatarFallback>
+        </UiAvatar>
+        <UiAvatar>
+          <UiAvatarFallback>AB</UiAvatarFallback>
+        </UiAvatar>
+      </div>
+    </section>
+
+    <!-- Select (UI) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        15. Выбор (UI Select)
+      </h2>
+      <div class="max-w-xs">
+        <UiSelect>
+          <UiSelectTrigger class="w-full">
+            <UiSelectValue placeholder="Выберите опцию" />
+          </UiSelectTrigger>
+          <UiSelectContent>
+            <UiSelectItem value="a">
+              Опция A
+            </UiSelectItem>
+            <UiSelectItem value="b">
+              Опция B
+            </UiSelectItem>
+            <UiSelectItem value="c">
+              Опция C
+            </UiSelectItem>
+          </UiSelectContent>
+        </UiSelect>
+      </div>
+    </section>
+
+    <!-- Radio Group -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        16. Радио-кнопки
+      </h2>
+      <UiRadioGroup default-value="one" class="flex gap-4">
+        <div class="flex items-center gap-2">
+          <UiRadioGroupItem id="r1" value="one" />
+          <UiLabel for="r1">Первый</UiLabel>
+        </div>
+        <div class="flex items-center gap-2">
+          <UiRadioGroupItem id="r2" value="two" />
+          <UiLabel for="r2">Второй</UiLabel>
+        </div>
+        <div class="flex items-center gap-2">
+          <UiRadioGroupItem id="r3" value="three" />
+          <UiLabel for="r3">Третий</UiLabel>
+        </div>
+      </UiRadioGroup>
+    </section>
+
+    <!-- Иконки (Tilda Icons из папки icons) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        17. Иконки (Tilda Icons)
+      </h2>
+      <p class="text-slate-custom text-sm mb-4">
+        Иконки из архивов в папке <code class="rounded bg-athens px-1">icons/</code>, без дубликатов. Всего: {{ iconsList.length }}
+      </p>
+      <div v-if="iconsList.length" class="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-3">
+        <div
+          v-for="item in iconsList"
+          :key="item.num"
+          class="flex flex-col items-center justify-center rounded-lg border border-athens bg-[#FBFCFD] p-3 text-center"
+        >
+          <img
+            :src="`/icons/${item.num}.svg`"
+            :alt="item.name"
+            class="h-10 w-10 shrink-0 object-contain"
+            loading="lazy"
+          >
+          <span class="mt-2 text-xs font-medium text-space">{{ item.num }}</span>
+          <span class="mt-0.5 max-w-full truncate text-[10px] text-slate-custom" :title="item.name">{{ item.name }}</span>
+        </div>
+      </div>
+      <p v-else class="text-sm text-slate-custom">
+        Загрузка списка иконок… Запустите <code class="rounded bg-athens px-1">node scripts/extract-icons.cjs</code> из корня проекта, чтобы сгенерировать иконки и список.
+      </p>
+    </section>
+
+    <!-- Удаление кандидата (карточка кандидата) -->
+    <section class="mb-12">
+      <h2 class="text-lg font-semibold text-space mb-4 pb-2 border-b border-athens">
+        18. Удалить кандидата (CandidateDeletePopup)
+      </h2>
+      <p class="text-sm text-slate-custom mb-4">
+        Окно подтверждения удаления из карточки кандидата: те же отступы (<code class="rounded bg-athens px-1">p-25px</code> снаружи, без двойного padding), что и у модалок настроек причин отказа.
+      </p>
+      <UiButton variant="outline" @click="candidateDeleteOpen = true">
+        Открыть «Удалить кандидата»
+      </UiButton>
+      <CandidateDeletePopup
+        :is-open="candidateDeleteOpen"
+        :candidate="demoCandidateForDelete"
+        @close="candidateDeleteOpen = false"
+        @confirm="candidateDeleteOpen = false"
+      />
+    </section>
+  </div>
+</template>

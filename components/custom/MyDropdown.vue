@@ -1,52 +1,135 @@
 <template>
-  <div class="dropdown-wrapper cursor-pointer relative" ref="dropDown">
-    <div class="dropdown-selected-option relative border border-athens rounded-ten py-9px px-15px bg-athens-gray"
-      @click="toggleDropDown">
-      <div>
-        <div :class="{
-          'text-bali': !selectedOption,
-          'text-space': selectedOption,
-        }" class="text-sm">
-          {{ mappedSelectedOption }}
-        </div>
-        <div v-show="!selectedOption"
-          class="right-3.5 top-2 transition-transform duration-300 text-bali text-sm">
-          {{ props.placeholder }}
-        </div>
-        <!-- Стрелка -->
-        <div v-show="!selectedOption"
-          class="dropdown-arrow absolute right-3.5 top-[calc(50%-10px)] transition-transform duration-300 text-bali"
-          :class="{ 'rotate-180 text-dodger': isDropDownVisible }">
-          <svg-icon name="dropdown-arrow" width="20" height="20" />
-        </div>
-        <!-- Крестик -->
-        <div v-show="selectedOption" class="dropdown-cross absolute right-3.5 top-2" @click.stop="resetSelection">
-          <svg-icon name="dropdown-cross" width="20" height="20" />
-        </div>
+  <div
+    class="dropdown-wrapper relative cursor-pointer"
+    :class="fitContent ? 'w-fit max-w-full' : 'w-full'"
+    ref="dropDown"
+  >
+    <div
+      class="dropdown-selected-option relative flex min-w-0 items-center gap-2 rounded-ten py-9px pl-3.5 pr-3.5 text-sm font-normal transition-colors"
+      :class="[triggerVariantClasses, fitContent ? 'w-fit' : 'w-full']"
+      @click="toggleDropDown"
+    >
+      <span
+        :class="[
+          fitContent ? 'whitespace-nowrap text-sm' : 'min-w-0 flex-1 truncate text-sm',
+          {
+            'text-bali': !selectedOption && triggerVariant !== 'semiaction',
+            'text-space': selectedOption && triggerVariant !== 'semiaction',
+            'text-dodger': triggerVariant === 'semiaction',
+          },
+        ]"
+      >
+        {{ displayText }}
+      </span>
+      <div
+        v-if="clearable && selectedOption"
+        class="ml-auto shrink-0 text-dodger hover:opacity-80"
+        @click.stop="resetSelection"
+        aria-label="Очистить"
+      >
+        <svg-icon name="dropdown-cross" width="20" height="20" />
+      </div>
+      <div
+        v-show="!clearable || !selectedOption"
+        class="dropdown-arrow ml-auto shrink-0 transition-transform duration-300"
+        :class="[
+          triggerVariant === 'semiaction' ? 'text-dodger' : (isDropDownVisible ? 'text-dodger' : 'text-bali'),
+          { 'rotate-180': isDropDownVisible },
+        ]"
+      >
+        <svg-icon name="dropdown-arrow" width="20" height="20" />
       </div>
     </div>
-    <transition name="slide-fade">
+    <template v-if="teleportToBody">
+      <Teleport to="body">
+        <transition name="slide-fade">
+          <div
+            v-if="isDropDownVisible"
+            ref="optionsRef"
+            class="options-wrapper my-dropdown-list bg-white border border-athens rounded-ten shadow-shadow-droplist"
+            :style="teleportStyle"
+          >
+            <div
+              v-if="searchable"
+              class="border-b border-athens p-2"
+              @click.stop
+            >
+              <input
+                ref="searchInputRef"
+                v-model="searchQuery"
+                type="text"
+                :placeholder="searchPlaceholder"
+                class="w-full rounded-md border border-athens bg-athens-gray py-2 pl-3 pr-3 text-sm text-space placeholder:text-slate-custom focus:border-dodger focus:outline-none"
+                @click.stop
+              />
+            </div>
+            <template v-for="(option, idx) in filteredOptions" :key="option?.type === 'header' ? 'header-' + option.name + idx : getOptionKey(option)">
+              <div
+                v-if="option?.type === 'header'"
+                class="option text-xs font-medium text-slate-custom py-8px px-15px bg-athens-gray cursor-default"
+              >
+                {{ option.name }}
+              </div>
+              <div
+                v-else
+                class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer whitespace-nowrap"
+                @click="toggleOptionSelect(option)"
+              >
+                {{ getOptionLabel(option) }}
+              </div>
+            </template>
+          </div>
+        </transition>
+      </Teleport>
+    </template>
+    <transition v-else name="slide-fade">
       <div
-        class="options-wrapper absolute w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-10"
-        v-if="isDropDownVisible">
+        v-if="isDropDownVisible"
+        ref="optionsRef"
+        class="options-wrapper my-dropdown-list absolute w-max min-w-full bg-white border border-athens rounded-ten shadow-shadow-droplist top-14 z-50"
+      >
         <div
-          class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer first:rounded-t-ten last:rounded-b-ten"
-          v-for="option in props.options" :key="getOptionKey(option)" @click="toggleOptionSelect(option)">
-          {{ getOptionLabel(option) }}
+          v-if="searchable"
+          class="border-b border-athens p-2"
+          @click.stop
+        >
+          <input
+            ref="searchInputRef"
+            v-model="searchQuery"
+            type="text"
+            :placeholder="searchPlaceholder"
+            class="w-full rounded-md border border-athens bg-athens-gray py-2 pl-3 pr-3 text-sm text-space placeholder:text-slate-custom focus:border-dodger focus:outline-none"
+            @click.stop
+          />
         </div>
+        <template v-for="(option, idx) in filteredOptions" :key="option?.type === 'header' ? 'header-' + option.name + idx : getOptionKey(option)">
+          <div
+            v-if="option?.type === 'header'"
+            class="option text-xs font-medium text-slate-custom py-8px px-15px bg-athens-gray cursor-default"
+          >
+            {{ option.name }}
+          </div>
+          <div
+            v-else
+            class="option text-slate-custom text-sm font-normal py-10px px-15px hover:text-space hover:bg-zumthor cursor-pointer whitespace-nowrap"
+            @click="toggleOptionSelect(option)"
+          >
+            {{ getOptionLabel(option) }}
+          </div>
+        </template>
       </div>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
 const props = defineProps({
   options: {
     type: Array,
     required: true,
-    validator: (options) => options.every(opt => typeof opt === 'string' || ('name' in opt && 'value' in opt))
+    validator: (options) => options.every(opt => typeof opt === 'string' || opt?.type === 'header' || ('name' in opt && ('value' in opt || 'id' in opt)))
   },
   modelValue: {
     type: [String, Number, Object, null],
@@ -68,13 +151,73 @@ const props = defineProps({
     type: String,
     default: 'Выберите значение',
   },
+  triggerVariant: {
+    type: String,
+    default: 'default', // 'default' | 'semiaction' — стиль как у кнопки «В черновик»
+  },
+  error: {
+    type: Boolean,
+    default: false,
+  },
+  clearable: {
+    type: Boolean,
+    default: false,
+  },
+  searchable: {
+    type: Boolean,
+    default: false,
+  },
+  searchPlaceholder: {
+    type: String,
+    default: 'Поиск…',
+  },
+  teleportToBody: {
+    type: Boolean,
+    default: false,
+  },
+  /** Ширина триггера по содержимому (без растягивания на 100%) */
+  fitContent: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits(['update:modelValue', 'select'])
+const emit = defineEmits(['update:modelValue', 'select', 'open'])
 
 const dropDown = ref(null)
+const optionsRef = ref(null)
+const teleportStyle = ref({})
+
+const triggerVariantClasses = computed(() => {
+  const base = 'leading-normal'
+  if (props.triggerVariant === 'semiaction') {
+    return [
+      'bg-zumthor text-dodger border',
+      props.error ? 'border-red-500' : (isDropDownVisible.value ? 'border-dodger' : 'border-transparent'),
+      base,
+    ].filter(Boolean).join(' ')
+  }
+  return [
+    'border bg-athens-gray',
+    props.error ? 'border-red-500' : (isDropDownVisible.value ? 'border-[#5898ff]' : 'border-athens'),
+    base,
+  ].join(' ')
+})
 const isDropDownVisible = ref(false)
+const openDelayTimer = ref(null)
 const selectedOption = ref(props.defaultValue ? props.defaultValue : null)
+const searchQuery = ref('')
+const searchInputRef = ref(null)
+
+const filteredOptions = computed(() => {
+  if (!props.searchable || !searchQuery.value.trim()) return props.options
+  const q = searchQuery.value.trim().toLowerCase()
+  return props.options.filter((opt) => {
+    if (opt?.type === 'header') return true
+    const label = getOptionLabel(opt)
+    return typeof label === 'string' && label.toLowerCase().includes(q)
+  })
+})
 
 // Утилиты для обработки options
 const getOptionValue = (option) => option?.value ?? option
@@ -82,21 +225,40 @@ const getOptionLabel = (option) => option?.name ?? option
 const getOptionKey = (option) => getOptionValue(option)
 const valueData = ref(props.defaultValue)
 
-// Вычисляемое свойство для отображаемого значения
-const mappedSelectedOption = computed(() => {
-  if (selectedOption.value === null || selectedOption.value === undefined) {
-    return props.defaultValue
+// Отображаемый текст: при выборе — значение, иначе — только placeholder
+const displayText = computed(() => {
+  const val = selectedOption.value
+  if (val === null || val === undefined || val === '') {
+    return props.placeholder
   }
-  // Если selectedOption не в options, показываем его как есть (для данных с сервера)
-  return getOptionLabel(selectedOption.value)
+  return getOptionLabel(val)
 })
+
+// Поиск опции по значению, названию, id или по объекту опции (id/value/name)
+const findOption = (value) => {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const id = value?.id ?? value?.value
+    const name = value?.name
+    const found = props.options.find(opt =>
+      (id !== undefined && (opt?.id === id || opt?.value === id)) ||
+      (name != null && getOptionLabel(opt) === name)
+    )
+    return found ?? null
+  }
+  return props.options.find(opt =>
+    getOptionValue(opt) === value ||
+    getOptionLabel(opt) === value ||
+    (opt?.id !== undefined && opt.id === value)
+  ) ?? null
+}
 
 // Инициализация selectedOption
 const initializeSelectedOption = () => {
   let initial = props.initialValue ?? props.modelValue ?? props.selected
-  if (initial !== null && initial !== undefined) {
-    const option = props.options.find(opt => getOptionValue(opt) === getOptionValue(initial))
-    selectedOption.value = option ?? initial // Сохраняем initial, даже если его нет в options
+  if (initial !== null && initial !== undefined && initial !== '') {
+    const option = findOption(initial)
+    selectedOption.value = option ?? initial
   } else {
     selectedOption.value = null
   }
@@ -104,11 +266,32 @@ const initializeSelectedOption = () => {
 
 // Открытие/закрытие выпадающего списка
 const toggleDropDown = () => {
-  isDropDownVisible.value = !isDropDownVisible.value
+  if (isDropDownVisible.value) {
+    isDropDownVisible.value = false
+    searchQuery.value = ''
+    if (openDelayTimer.value) {
+      clearTimeout(openDelayTimer.value)
+      openDelayTimer.value = null
+    }
+  } else {
+    if (openDelayTimer.value) return
+    openDelayTimer.value = setTimeout(() => {
+      isDropDownVisible.value = true
+      openDelayTimer.value = null
+      if (props.teleportToBody) {
+        nextTick(() => updateTeleportPosition())
+      }
+      emit('open')
+      if (props.searchable && searchInputRef.value) {
+        setTimeout(() => searchInputRef.value?.focus(), 50)
+      }
+    }, 120)
+  }
 }
 
-// Выбор значения
+// Выбор значения (заголовки не выбираются)
 const toggleOptionSelect = (option) => {
+  if (option?.type === 'header') return
   selectedOption.value = option
   emit('update:modelValue', getOptionValue(option))
   emit('select', option)
@@ -124,18 +307,46 @@ const resetSelection = () => {
 
 // Закрытие выпадающего списка при клике вне
 const closeDropDown = (event) => {
+  if (dropDown.value?.contains(event.target) || optionsRef.value?.contains(event.target)) {
+    return
+  }
   if (!dropDown.value?.contains(event.target)) {
+    if (openDelayTimer.value) {
+      clearTimeout(openDelayTimer.value)
+      openDelayTimer.value = null
+    }
     isDropDownVisible.value = false
+    searchQuery.value = ''
   }
 }
 
-// Проверка валидности selectedOption при изменении options
+const updateTeleportPosition = () => {
+  if (!props.teleportToBody || !dropDown.value) return
+  const rect = dropDown.value.getBoundingClientRect()
+  teleportStyle.value = {
+    position: 'fixed',
+    top: `${Math.round(rect.bottom + 6)}px`,
+    left: `${Math.round(rect.left)}px`,
+    width: `${Math.round(rect.width)}px`,
+    zIndex: 9999,
+  }
+}
+
+const onViewportChange = () => {
+  if (isDropDownVisible.value) {
+    updateTeleportPosition()
+  }
+}
+
+// Проверка валидности selectedOption при изменении options + обновление на полный объект опции
 watch(() => props.options, (newOptions) => {
-  if (selectedOption.value !== null) {
-    const currentValue = getOptionValue(selectedOption.value)
-    const isValid = newOptions.some(opt => getOptionValue(opt) === currentValue)
-    // Сбрасываем только если компонент используется в контексте динамических опций (например, SettingsForms)
-    // Для данных с сервера (InfoTab) сохраняем значение
+  if (selectedOption.value === null && !props.modelValue) return
+  const currentValue = props.modelValue ?? getOptionValue(selectedOption.value)
+  const foundOption = findOption(currentValue)
+  if (foundOption) {
+    selectedOption.value = foundOption
+  } else if (currentValue !== null && currentValue !== undefined && currentValue !== '') {
+    const isValid = newOptions.some(opt => getOptionValue(opt) === currentValue || getOptionLabel(opt) === currentValue)
     if (!isValid && !props.initialValue) {
       selectedOption.value = null
       emit('update:modelValue', null)
@@ -145,12 +356,10 @@ watch(() => props.options, (newOptions) => {
 
 // Синхронизация modelValue → selectedOption
 watch(() => props.modelValue, (newValue) => {
-  if (newValue !== getOptionValue(selectedOption.value)) {
-    const option = props.options.find(opt => getOptionValue(opt) === newValue)
-    selectedOption.value = option ?? newValue // Сохраняем newValue, если оно с сервера
-    if (!option && newValue !== null && !props.initialValue) {
-      emit('update:modelValue', null) // Сбрасываем, если значение невалидно и не с сервера
-    }
+  const option = findOption(newValue)
+  selectedOption.value = option ?? (newValue && newValue !== '' ? newValue : null)
+  if (!option && newValue !== null && newValue !== '' && !props.initialValue) {
+    emit('update:modelValue', null)
   }
 }, { immediate: true })
 
@@ -165,13 +374,28 @@ watch(() => props.selected, (newSelected) => {
 
 onMounted(() => {
   window.addEventListener('click', closeDropDown)
+  window.addEventListener('resize', onViewportChange)
+  window.addEventListener('scroll', onViewportChange, true)
   initializeSelectedOption()
 })
 
 onBeforeUnmount(() => {
+  if (openDelayTimer.value) {
+    clearTimeout(openDelayTimer.value)
+  }
   window.removeEventListener('click', closeDropDown)
+  window.removeEventListener('resize', onViewportChange)
+  window.removeEventListener('scroll', onViewportChange, true)
 })
 </script>
+
+<style>
+/* Выпадающий список: ограничение высоты и прокрутка (без scoped — элемент внутри transition) */
+.my-dropdown-list {
+  max-height: 15rem;
+  overflow-y: auto;
+}
+</style>
 
 <style scoped>
 .option:not(:last-child) {
